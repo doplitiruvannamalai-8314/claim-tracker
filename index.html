@@ -142,21 +142,22 @@
         <div id="trackResult" class="hidden border p-4 rounded-lg bg-slate-50 space-y-2 text-sm"></div>
 
         <h4 class="font-bold text-md mt-6 text-slate-700">Submitted Claims Overview</h4>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr class="bg-slate-100 border-b text-slate-700">
-                <th class="p-3">Ref No (Txn ID)</th>
-                <th class="p-3">Office Name</th>
-                <th class="p-3">Txn Date</th>
-                <th class="p-3">Amount</th>
-                <th class="p-3">Status</th>
-                <th class="p-3">Action / File</th>
-              </tr>
-            </thead>
-            <tbody id="claimsTableBody" class="divide-y"></tbody>
-          </table>
-        </div>
+<div class="overflow-x-auto">
+  <table class="w-full text-left text-sm border-collapse">
+    <thead>
+      <tr class="bg-slate-100 border-b text-slate-700">
+        <th class="p-3">Ref No (Txn ID)</th>
+        <th class="p-3">Office Name</th>
+        <th class="p-3">Txn Date</th>
+        <th class="p-3">Amount</th>
+        <th class="p-3">Status</th>
+        <th class="p-3">Admin Reply / Remarks</th> 
+        <th class="p-3">Action / File</th>
+      </tr>
+    </thead>
+    <tbody id="claimsTableBody" class="divide-y"></tbody>
+  </table>
+</div>     
       </div>
 
       <!-- TAB 2: CLAIM REGISTRATION FORM -->
@@ -604,53 +605,62 @@
 
    // Global variable to store current claims for modal lookup
     let currentClaimsList = [];
+    
+    // LOAD CLAIMS SUMMARY TABLE WITH ADMIN REPLY COLUMN
+async function loadClaimsSummary() {
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
-    // LOAD CLAIMS SUMMARY TABLE WITH CLICKABLE REF NO
-    async function loadClaimsSummary() {
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+  let query = supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
 
-      let query = supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+  if (!isAdmin) {
+    query = query.eq('created_by', currentUser.id);
+  }
 
-      if (!isAdmin) {
-        query = query.eq('created_by', currentUser.id);
-      }
+  const { data: claims, error } = await query;
+  currentClaimsList = claims || []; // Cache claims list for details modal
 
-      const { data: claims, error } = await query;
-      currentClaimsList = claims || []; // Cache claims list
+  const tbody = document.getElementById('claimsTableBody');
+  tbody.innerHTML = '';
 
-      const tbody = document.getElementById('claimsTableBody');
-      tbody.innerHTML = '';
+  if (error) {
+    console.error("Error fetching claims:", error);
+    return;
+  }
 
-      if (error) {
-        console.error("Error fetching claims:", error);
-        return;
-      }
+  if (!claims || claims.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No requests found.</td></tr>`;
+    return;
+  }
 
-      if (!claims || claims.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No requests found.</td></tr>`;
-        return;
-      }
+  claims.forEach(c => {
+    // Format Admin Remarks badge
+    const adminReplyHtml = c.reply_remarks_admin 
+      ? `<div class="bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded text-xs max-w-xs font-medium" title="${c.reply_remarks_admin}">${c.reply_remarks_admin}</div>`
+      : `<span class="text-slate-400 italic text-xs">Pending Response</span>`;
 
-      claims.forEach(c => {
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-3 font-bold">
-              <button type="button" onclick="openDetailsModal('${c.id}')" class="text-blue-600 hover:underline font-bold cursor-pointer">
-                ${c.txn_id_ref}
-              </button>
-            </td>
-            <td class="p-3">${c.raised_for_office}</td>
-            <td class="p-3">${c.txn_date}</td>
-            <td class="p-3">₹${c.txn_amount}</td>
-            <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
-            <td class="p-3">
-              ${isAdmin ? `<button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`)" class="text-blue-600 font-bold underline cursor-pointer">Reply/Edit</button>` : `<a href="${c.file_url}" target="_blank" class="text-slate-600 underline">View File</a>`}
-            </td>
-          </tr>
-        `;
-      });
-    }
-
+    tbody.innerHTML += `
+      <tr>
+        <td class="p-3 font-bold">
+          <button type="button" onclick="openDetailsModal('${c.id}')" class="text-blue-600 hover:underline font-bold cursor-pointer">
+            ${c.txn_id_ref}
+          </button>
+        </td>
+        <td class="p-3">${c.raised_for_office}</td>
+        <td class="p-3">${c.txn_date}</td>
+        <td class="p-3">₹${c.txn_amount}</td>
+        <td class="p-3">
+          <span class="px-2 py-1 rounded text-xs font-bold ${getStatusColor(c.claim_status)}">
+            ${c.claim_status}
+          </span>
+        </td>
+        <td class="p-3">${adminReplyHtml}</td>
+        <td class="p-3">
+          ${isAdmin ? `<button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`)" class="text-blue-600 font-bold underline cursor-pointer">Reply/Edit</button>` : `<a href="${c.file_url}" target="_blank" class="text-slate-600 underline">View File</a>`}
+        </td>
+      </tr>
+    `;
+  });
+}
     // OPEN FULL DETAILS MODAL
     function openDetailsModal(claimId) {
       const claim = currentClaimsList.find(c => c.id === claimId);
