@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claim Portal - Employee ID Login</title>
+  <title>Claim Management & Tracking Portal</title>
+  <!-- Supabase JS v2 & Tailwind CSS via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -11,48 +12,62 @@
 
   <!-- NAVBAR -->
   <nav id="navbar" class="hidden bg-slate-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
-    <div class="font-bold text-lg tracking-wide">Claims Portal</div>
+    <div class="font-bold text-lg tracking-wide">Claims Management Portal</div>
     <div class="flex items-center gap-4 text-sm">
-      <span id="userInfo" class="bg-slate-800 px-3 py-1 rounded text-slate-300"></span>
-      <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded font-semibold transition">Logout</button>
+      <span id="userInfo" class="bg-slate-800 px-3 py-1 rounded text-slate-300 font-medium"></span>
+      <button type="button" onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded font-semibold transition cursor-pointer">Logout</button>
     </div>
   </nav>
 
   <div class="max-w-6xl mx-auto p-4 md:p-6">
 
-    <!-- LOGIN / REGISTER CONTAINER -->
+    <!-- AUTHENTICATION CONTAINER (LOGIN / REGISTER) -->
     <div id="authSection" class="max-w-md mx-auto mt-12 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+      
+      <!-- TAB SWITCHER -->
       <div class="flex justify-around mb-6 border-b pb-2">
-        <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="font-bold text-blue-600 border-b-2 border-blue-600 pb-2">Emp ID Login</button>
-        <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="font-bold text-slate-400 pb-2">Register User</button>
+        <button 
+          type="button" 
+          id="tabLoginBtn" 
+          onclick="switchAuthTab('login')" 
+          class="font-bold text-blue-600 border-b-2 border-blue-600 pb-2 cursor-pointer focus:outline-none">
+          Emp ID Login
+        </button>
+        <button 
+          type="button" 
+          id="tabRegisterBtn" 
+          onclick="switchAuthTab('register')" 
+          class="font-bold text-slate-400 hover:text-slate-600 pb-2 cursor-pointer focus:outline-none">
+          Register User
+        </button>
       </div>
 
-      <!-- LOGIN FORM USING EMPLOYEE ID -->
+      <!-- 1. LOGIN FORM USING EMPLOYEE ID -->
       <form id="loginForm" onsubmit="handleEmpIdLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Employee ID</label>
-          <input type="text" id="loginEmpId" placeholder="e.g. 12345678" required class="w-full border p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase">
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Employee ID *</label>
+          <input type="text" id="loginEmpId" placeholder="e.g. EMP1001" required class="w-full border p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password *</label>
           <input type="password" id="loginPassword" required class="w-full border p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded transition">Log In</button>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded transition cursor-pointer">Log In</button>
       </form>
 
-      <!-- REGISTRATION FORM USING EMPLOYEE ID -->
+      <!-- 2. REGISTRATION FORM USING EMPLOYEE ID -->
       <form id="registerForm" onsubmit="handleEmpIdRegister(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID *</label>
-          <input type="text" id="regEmpId" placeholder="e.g. EMP1001" required class="w-full border p-2 rounded text-sm uppercase">
+          <input type="text" id="regEmpId" placeholder="e.g. EMP1001" required class="w-full border p-2 rounded text-sm uppercase focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Employee Name *</label>
-          <input type="text" id="regEmpName" placeholder="Full Name" required class="w-full border p-2 rounded text-sm">
+          <input type="text" id="regEmpName" placeholder="Full Name" required class="w-full border p-2 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Office Name *</label>
-          <select id="regOfficeName" required class="w-full border p-2 rounded text-sm bg-white">
+          <select id="regOfficeName" required class="w-full border p-2 rounded text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
             <option value="">-- Select Office Name --</option>
             <option value="Head Office - Zone 1">Head Office - Zone 1</option>
             <option value="Regional Office - East">Regional Office - East</option>
@@ -62,44 +77,44 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Password *</label>
-          <input type="password" id="regPassword" placeholder="Minimum 6 characters" minlength="6" required class="w-full border p-2 rounded text-sm">
+          <input type="password" id="regPassword" placeholder="Minimum 6 characters" minlength="6" required class="w-full border p-2 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
-        <p class="text-xs text-slate-500">Note: Default role is <strong>User</strong>. Admins can update roles later.</p>
-        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition">Create Account</button>
+        <p class="text-xs text-slate-500">Note: Default role assigned is <strong>User</strong>. Admins can update roles later.</p>
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition cursor-pointer">Create Account</button>
       </form>
     </div>
 
-    <!-- MAIN DASHBOARD -->
+    <!-- MAIN APPLICATION DASHBOARD (HIDDEN UNTIL AUTHENTICATED) -->
     <div id="mainDashboard" class="hidden space-y-6">
 
-      <!-- NAVIGATION TABS -->
+      <!-- DASHBOARD NAVIGATION TABS -->
       <div class="flex flex-wrap gap-2 border-b border-slate-300 pb-2">
-        <button onclick="showTab('track')" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm">Track Claim</button>
-        <button onclick="showTab('registerClaim')" class="tab-btn bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm">Claim Registration</button>
-        <button id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm">User Role Management</button>
-        <button onclick="showTab('reports')" class="tab-btn bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm">MIS & Pendency Reports</button>
+        <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm cursor-pointer">Track Claim</button>
+        <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm cursor-pointer">Claim Registration</button>
+        <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm cursor-pointer">User Role Management</button>
+        <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm cursor-pointer">MIS & Pendency Reports</button>
       </div>
 
       <!-- TAB 1: TRACK CLAIM -->
       <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
         <h3 class="text-lg font-bold text-slate-800">Track Claim Status</h3>
         <div class="flex gap-2 max-w-md">
-          <input type="text" id="searchRefNo" placeholder="Enter 12-Digit Reference No (Txn ID)" class="border p-2 rounded w-full text-sm">
-          <button onclick="trackClaim()" class="bg-blue-600 text-white px-4 py-2 rounded font-bold text-sm">Search</button>
+          <input type="text" id="searchRefNo" placeholder="Enter 12-Digit Reference No (Txn ID)" class="border p-2 rounded w-full text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          <button type="button" onclick="trackClaim()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold text-sm cursor-pointer">Search</button>
         </div>
-        <div id="trackResult" class="hidden border p-4 rounded-lg bg-slate-50 space-y-2"></div>
+        <div id="trackResult" class="hidden border p-4 rounded-lg bg-slate-50 space-y-2 text-sm"></div>
 
-        <h4 class="font-bold text-md mt-6 text-slate-700">All Submitted Claims Summary</h4>
+        <h4 class="font-bold text-md mt-6 text-slate-700">Submitted Claims Overview</h4>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm border-collapse">
             <thead>
-              <tr class="bg-slate-100 border-b">
+              <tr class="bg-slate-100 border-b text-slate-700">
                 <th class="p-3">Ref No (Txn ID)</th>
                 <th class="p-3">Office Name</th>
                 <th class="p-3">Txn Date</th>
                 <th class="p-3">Amount</th>
                 <th class="p-3">Status</th>
-                <th class="p-3">Action</th>
+                <th class="p-3">Action / File</th>
               </tr>
             </thead>
             <tbody id="claimsTableBody" class="divide-y"></tbody>
@@ -107,9 +122,9 @@
         </div>
       </div>
 
-      <!-- TAB 2: CLAIM REGISTRATION -->
+      <!-- TAB 2: CLAIM REGISTRATION FORM -->
       <div id="registerClaimView" class="tab-content hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="text-lg font-bold mb-4 text-slate-800">Claim Registration Form</h3>
+        <h3 class="text-lg font-bold mb-4 text-slate-800">New Claim Registration Form</h3>
         <form onsubmit="submitClaim(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold mb-1">Raised for Office Name *</label>
@@ -169,7 +184,7 @@
             <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" required class="w-full border p-2 rounded text-sm">
           </div>
           <div class="md:col-span-2">
-            <button type="submit" class="bg-green-600 text-white font-bold px-6 py-2 rounded text-sm">Submit Claim</button>
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded text-sm cursor-pointer transition">Submit Claim</button>
           </div>
         </form>
       </div>
@@ -180,7 +195,7 @@
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm border-collapse">
             <thead>
-              <tr class="bg-slate-100 border-b">
+              <tr class="bg-slate-100 border-b text-slate-700">
                 <th class="p-3">Emp ID</th>
                 <th class="p-3">Emp Name</th>
                 <th class="p-3">Office Name</th>
@@ -195,7 +210,7 @@
 
       <!-- TAB 4: MIS & PENDENCY REPORTS -->
       <div id="reportsView" class="tab-content hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
-        <h3 class="text-lg font-bold text-slate-800">MIS & Pendency Reports</h3>
+        <h3 class="text-lg font-bold text-slate-800">MIS & Pendency Monitoring Reports</h3>
         
         <div class="flex flex-wrap gap-4 items-end bg-slate-50 p-4 rounded-lg border">
           <div>
@@ -206,7 +221,7 @@
             <label class="block text-xs font-bold mb-1">To Date</label>
             <input type="date" id="filterToDate" class="border p-2 rounded text-sm">
           </div>
-          <button onclick="generateMISReport()" class="bg-blue-600 text-white px-4 py-2 rounded font-bold text-sm">Filter Report</button>
+          <button type="button" onclick="generateMISReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold text-sm cursor-pointer">Filter Report</button>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -232,13 +247,13 @@
     </div>
   </div>
 
-  <!-- ADMIN REPLY MODAL -->
-  <div id="replyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl p-6 max-w-lg w-full space-y-4">
-      <h3 class="font-bold text-lg text-slate-800">Admin Action & Reply</h3>
+  <!-- ADMIN REPLY & ACTION MODAL -->
+  <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-lg w-full space-y-4 shadow-xl">
+      <h3 class="font-bold text-lg text-slate-800">Admin Action & Reply Remarks</h3>
       <input type="hidden" id="modalClaimId">
       <div>
-        <label class="block text-xs font-bold mb-1">Update Status</label>
+        <label class="block text-xs font-bold mb-1">Update Claim Status</label>
         <select id="modalStatus" class="w-full border p-2 rounded text-sm bg-white">
           <option value="Pending">Pending</option>
           <option value="In Progress">In Progress</option>
@@ -251,44 +266,54 @@
         <textarea id="modalAdminRemarks" class="w-full border p-2 rounded text-sm h-24" required></textarea>
       </div>
       <div class="flex justify-end gap-2">
-        <button onclick="closeModal()" class="bg-slate-300 px-4 py-2 rounded text-sm font-bold">Cancel</button>
-        <button onclick="submitAdminReply()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold">Save Changes</button>
+        <button type="button" onclick="closeModal()" class="bg-slate-300 hover:bg-slate-400 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
+        <button type="button" onclick="submitAdminReply()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer">Save Changes</button>
       </div>
     </div>
   </div>
 
+  <!-- APPLICATION LOGIC -->
   <script>
-    const SUPABASE_URL = "YOUR_SUPABASE_URL";
-    const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
+    // REPLACE WITH YOUR ACTUAL SUPABASE CREDENTIALS
+     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
+
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null;
     let userProfile = null;
 
-    // HELPER: Convert Emp ID to Internal Auth Email
+    // HELPER: Map Employee ID to internal auth email
     function empIdToEmail(empId) {
       return `${empId.trim().toLowerCase()}@internal.app`;
     }
 
-    // AUTH TAB SWITCHING
+    // AUTH TAB SWITCHER FUNCTION
     function switchAuthTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const tabLoginBtn = document.getElementById('tabLoginBtn');
+      const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+
+      if (!loginForm || !registerForm) return;
+
       if (tab === 'login') {
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('registerForm').classList.add('hidden');
-        document.getElementById('tabLoginBtn').className = "font-bold text-blue-600 border-b-2 border-blue-600 pb-2";
-        document.getElementById('tabRegisterBtn').className = "font-bold text-slate-400 pb-2";
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        tabLoginBtn.className = "font-bold text-blue-600 border-b-2 border-blue-600 pb-2 cursor-pointer focus:outline-none";
+        tabRegisterBtn.className = "font-bold text-slate-400 hover:text-slate-600 pb-2 cursor-pointer focus:outline-none";
       } else {
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('registerForm').classList.remove('hidden');
-        document.getElementById('tabRegisterBtn').className = "font-bold text-blue-600 border-b-2 border-blue-600 pb-2";
-        document.getElementById('tabLoginBtn').className = "font-bold text-slate-400 pb-2";
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        tabRegisterBtn.className = "font-bold text-blue-600 border-b-2 border-blue-600 pb-2 cursor-pointer focus:outline-none";
+        tabLoginBtn.className = "font-bold text-slate-400 hover:text-slate-600 pb-2 cursor-pointer focus:outline-none";
       }
     }
 
-    // LOGIN USING EMPLOYEE ID
+    // LOGIN VIA EMPLOYEE ID & PASSWORD
     async function handleEmpIdLogin(e) {
       e.preventDefault();
-      const empId = document.getElementById('loginEmpId').value;
+      const empId = document.getElementById('loginEmpId').value.trim().toUpperCase();
       const password = document.getElementById('loginPassword').value;
       const shadowEmail = empIdToEmail(empId);
 
@@ -297,46 +322,57 @@
         password 
       });
 
-      if (error) return alert("Login failed: Invalid Employee ID or Password");
+      if (error) {
+        return alert("Login failed: Invalid Employee ID or Password");
+      }
       initApp();
     }
 
-    // REGISTER USING EMPLOYEE ID
+    // REGISTER USER VIA EMPLOYEE ID
     async function handleEmpIdRegister(e) {
       e.preventDefault();
+      
       const emp_id = document.getElementById('regEmpId').value.trim().toUpperCase();
-      const emp_name = document.getElementById('regEmpName').value;
+      const emp_name = document.getElementById('regEmpName').value.trim();
       const office_name = document.getElementById('regOfficeName').value;
       const password = document.getElementById('regPassword').value;
+
+      if (!emp_id || !emp_name || !office_name || !password) {
+        return alert("Please fill in all required fields!");
+      }
+
       const shadowEmail = empIdToEmail(emp_id);
 
-      // Check if Employee ID already exists in profiles
-      const { data: existing } = await supabase.from('profiles').select('emp_id').eq('emp_id', emp_id).maybeSingle();
-      if (existing) return alert("Employee ID already registered! Please log in.");
+      // Check if Employee ID already exists
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('emp_id')
+        .eq('emp_id', emp_id)
+        .maybeSingle();
 
+      if (existing) {
+        return alert(`Employee ID '${emp_id}' is already registered! Please log in.`);
+      }
+
+      // Register in Auth & pass details for DB trigger
       const { data, error } = await supabase.auth.signUp({ 
         email: shadowEmail, 
-        password 
+        password: password,
+        options: {
+          data: {
+            emp_id: emp_id,
+            emp_name: emp_name,
+            office_name: office_name
+          }
+        }
       });
 
-      if (error) return alert("Registration failed: " + error.message);
-
-      if (data.user) {
-        const { error: profileError } = await supabase.from('profiles').insert([{
-          id: data.user.id,
-          emp_id,
-          emp_name,
-          office_name,
-          role: 'user'
-        }]);
-
-        if (profileError) {
-          alert("Error creating profile: " + profileError.message);
-        } else {
-          alert(`Registration successful for Employee ID: ${emp_id}! You can now log in.`);
-          switchAuthTab('login');
-          document.getElementById('loginEmpId').value = emp_id;
-        }
+      if (error) {
+        alert("Registration failed: " + error.message);
+      } else {
+        alert(`Account created successfully for Employee ID '${emp_id}'! You can now log in.`);
+        switchAuthTab('login');
+        document.getElementById('loginEmpId').value = emp_id;
       }
     }
 
@@ -346,13 +382,15 @@
       window.location.reload();
     }
 
-    // INITIALIZE APPLICATION
+    // INITIALIZE APP AFTER AUTHENTICATION
     async function initApp() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       currentUser = user;
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      
+      if (!profile) return;
       userProfile = profile;
 
       document.getElementById('authSection').classList.add('hidden');
@@ -367,26 +405,47 @@
 
       loadClaimsSummary();
       generateMISReport();
+      subscribeRealtimeClaims();
     }
 
-    // TAB MANAGEMENT
+    // DASHBOARD TAB NAVIGATION
     function showTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      if (tabId === 'track') document.getElementById('trackView').classList.remove('hidden');
-      if (tabId === 'registerClaim') document.getElementById('registerClaimView').classList.remove('hidden');
-      if (tabId === 'adminRoleMgmt') document.getElementById('adminRoleMgmtView').classList.remove('hidden');
-      if (tabId === 'reports') document.getElementById('reportsView').classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-blue-600', 'text-white');
+        el.classList.add('bg-slate-200', 'text-slate-700');
+      });
+
+      if (tabId === 'track') {
+        document.getElementById('trackView').classList.remove('hidden');
+        document.getElementById('tabBtnTrack').className = "tab-btn bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm cursor-pointer";
+      }
+      if (tabId === 'registerClaim') {
+        document.getElementById('registerClaimView').classList.remove('hidden');
+        document.getElementById('tabBtnRegister').className = "tab-btn bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm cursor-pointer";
+      }
+      if (tabId === 'adminRoleMgmt') {
+        document.getElementById('adminRoleMgmtView').classList.remove('hidden');
+        document.getElementById('adminTabBtn').className = "tab-btn bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm cursor-pointer";
+      }
+      if (tabId === 'reports') {
+        document.getElementById('reportsView').classList.remove('hidden');
+        document.getElementById('tabBtnReports').className = "tab-btn bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm cursor-pointer";
+      }
     }
 
     // SUBMIT CLAIM WITH ATTACHMENT
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = document.getElementById('claimFile').files[0];
-      const txn_id_ref = document.getElementById('claimTxnId').value;
+      const txn_id_ref = document.getElementById('claimTxnId').value.trim();
+
+      if (!fileInput) return alert("Please attach a document!");
 
       const fileExt = fileInput.name.split('.').pop();
       const filePath = `claims/${txn_id_ref}-${Date.now()}.${fileExt}`;
-      const { uploadData, error: uploadError } = await supabase.storage.from('claim-attachments').upload(filePath, fileInput);
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage.from('claim-attachments').upload(filePath, fileInput);
 
       if (uploadError) return alert("File upload failed: " + uploadError.message);
 
@@ -406,8 +465,9 @@
         created_by: currentUser.id
       }]);
 
-      if (error) alert("Error submitting claim: " + error.message);
-      else {
+      if (error) {
+        alert("Error submitting claim: " + error.message);
+      } else {
         alert("Claim registered successfully!");
         e.target.reset();
         showTab('track');
@@ -415,16 +475,19 @@
       }
     }
 
-    // LOAD CLAIMS SUMMARY
+    // LOAD CLAIMS SUMMARY TABLE
     async function loadClaimsSummary() {
       const { data: claims } = await supabase.from('claims').select('*').order('created_at', { ascending: false });
       const tbody = document.getElementById('claimsTableBody');
       tbody.innerHTML = '';
 
-      if (!claims) return;
+      if (!claims || claims.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No claims submitted yet.</td></tr>`;
+        return;
+      }
 
       claims.forEach(c => {
-        const isAdmin = userProfile.role === 'admin' || userProfile.role === 'superadmin';
+        const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
         tbody.innerHTML += `
           <tr>
             <td class="p-3 font-bold">${c.txn_id_ref}</td>
@@ -433,14 +496,14 @@
             <td class="p-3">₹${c.txn_amount}</td>
             <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
             <td class="p-3">
-              ${isAdmin ? `<button onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin}\`)" class="text-blue-600 font-bold underline">Reply/Edit</button>` : `<a href="${c.file_url}" target="_blank" class="text-slate-600 underline">View File</a>`}
+              ${isAdmin ? `<button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`)" class="text-blue-600 font-bold underline cursor-pointer">Reply/Edit</button>` : `<a href="${c.file_url}" target="_blank" class="text-slate-600 underline">View File</a>`}
             </td>
           </tr>
         `;
       });
     }
 
-    // TRACK SINGLE CLAIM
+    // SEARCH & TRACK SINGLE CLAIM
     async function trackClaim() {
       const refNo = document.getElementById('searchRefNo').value.trim();
       if (!refNo) return alert("Please enter a reference number");
@@ -451,10 +514,10 @@
 
       if (data) {
         resCard.innerHTML = `
-          <p><strong>Ref ID:</strong> ${data.txn_id_ref}</p>
-          <p><strong>Office:</strong> ${data.raised_for_office}</p>
+          <p><strong>Ref ID (Txn ID):</strong> ${data.txn_id_ref}</p>
+          <p><strong>Raised For Office:</strong> ${data.raised_for_office}</p>
           <p><strong>Status:</strong> <span class="font-bold ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
-          <p><strong>User Remarks:</strong> ${data.remarks_by_user}</p>
+          <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
           <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
           <p><a href="${data.file_url}" target="_blank" class="text-blue-600 underline font-semibold">Download Submitted Attachment</a></p>
         `;
@@ -484,14 +547,14 @@
 
       if (error) alert("Failed to update: " + error.message);
       else {
-        alert("Claim updated successfully!");
+        alert("Claim status updated successfully!");
         closeModal();
         loadClaimsSummary();
         generateMISReport();
       }
     }
 
-    // USER ROLE MANAGEMENT
+    // LOAD USERS FOR ROLE MANAGEMENT
     async function loadAllUsers() {
       const { data: users } = await supabase.from('profiles').select('*');
       const tbody = document.getElementById('usersTableBody');
@@ -507,7 +570,7 @@
             <td class="p-3">${u.office_name}</td>
             <td class="p-3 font-bold">${u.role.toUpperCase()}</td>
             <td class="p-3">
-              <select onchange="updateUserRole('${u.id}', this.value)" class="border p-1 rounded text-xs">
+              <select onchange="updateUserRole('${u.id}', this.value)" class="border p-1 rounded text-xs bg-white">
                 <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
                 <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
                 <option value="superadmin" ${u.role === 'superadmin' ? 'selected' : ''}>Superadmin</option>
@@ -524,7 +587,7 @@
       else alert("User role updated successfully!");
     }
 
-    // MIS REPORTS
+    // GENERATE MIS REPORTS
     async function generateMISReport() {
       let query = supabase.from('claims').select('*');
       const from = document.getElementById('filterFromDate').value;
@@ -542,7 +605,17 @@
       document.getElementById('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
     }
 
-    // STATUS STYLING
+    // REALTIME UPDATES LISTENER
+    function subscribeRealtimeClaims() {
+      supabase.channel('public:claims')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => {
+          loadClaimsSummary();
+          generateMISReport();
+        })
+        .subscribe();
+    }
+
+    // STATUS BADGE COLOR HELPER
     function getStatusColor(status) {
       if (status === 'Pending') return 'bg-yellow-100 text-yellow-800';
       if (status === 'In Progress') return 'bg-blue-100 text-blue-800';
@@ -551,7 +624,7 @@
       return 'bg-slate-100 text-slate-800';
     }
 
-    // CHECK AUTH STATE
+    // AUTO-CHECK AUTHENTICATION SESSION ON PAGE LOAD
     supabase.auth.onAuthStateChange((event, session) => {
       if (session) initApp();
     });
