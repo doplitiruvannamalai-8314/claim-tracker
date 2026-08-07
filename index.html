@@ -349,7 +349,24 @@
       </div>
     </div>
   </div>
+<!-- CLAIM DETAILS FULL VIEW MODAL -->
+  <div id="detailsModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-2xl w-full space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-lg text-slate-800">Complete Claim Registration Details</h3>
+        <button type="button" onclick="closeDetailsModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+      </div>
+      
+      <!-- DYNAMIC DETAILS GRID -->
+      <div id="detailsModalContent" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <!-- Populated via JavaScript -->
+      </div>
 
+      <div class="flex justify-end gap-2 border-t pt-3">
+        <button type="button" onclick="closeDetailsModal()" class="bg-slate-300 hover:bg-slate-400 px-4 py-2 rounded text-sm font-bold cursor-pointer transition">Close</button>
+      </div>
+    </div>
+  </div>
   <!-- APPLICATION LOGIC -->
   <script>
   
@@ -585,18 +602,22 @@
       }
     }
 
-   // LOAD CLAIMS SUMMARY (RESTRICTED BY USER ROLE)
+   // Global variable to store current claims for modal lookup
+    let currentClaimsList = [];
+
+    // LOAD CLAIMS SUMMARY TABLE WITH CLICKABLE REF NO
     async function loadClaimsSummary() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
       let query = supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
 
-      // If regular user, filter query specifically for their own claims
       if (!isAdmin) {
         query = query.eq('created_by', currentUser.id);
       }
 
       const { data: claims, error } = await query;
+      currentClaimsList = claims || []; // Cache claims list
+
       const tbody = document.getElementById('claimsTableBody');
       tbody.innerHTML = '';
 
@@ -613,7 +634,11 @@
       claims.forEach(c => {
         tbody.innerHTML += `
           <tr>
-            <td class="p-3 font-bold">${c.txn_id_ref}</td>
+            <td class="p-3 font-bold">
+              <button type="button" onclick="openDetailsModal('${c.id}')" class="text-blue-600 hover:underline font-bold cursor-pointer">
+                ${c.txn_id_ref}
+              </button>
+            </td>
             <td class="p-3">${c.raised_for_office}</td>
             <td class="p-3">${c.txn_date}</td>
             <td class="p-3">₹${c.txn_amount}</td>
@@ -626,6 +651,52 @@
       });
     }
 
+    // OPEN FULL DETAILS MODAL
+    function openDetailsModal(claimId) {
+      const claim = currentClaimsList.find(c => c.id === claimId);
+      if (!claim) return alert("Claim details not found!");
+
+      const container = document.getElementById('detailsModalContent');
+      container.innerHTML = `
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-blue-600">${claim.txn_id_ref}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium">${claim.module}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Article Number:</strong> <span class="font-medium">${claim.article_number}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">RRN Number:</strong> <span class="font-medium">${claim.rrn_number}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Txn Date:</strong> <span class="font-medium">${claim.txn_date}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Txn Amount:</strong> <span class="font-bold text-emerald-700">₹${claim.txn_amount}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Payment Channel:</strong> <span class="font-medium">${claim.payment_channel}</span></div>
+        
+        <div class="col-span-1 md:col-span-2">
+          <strong class="text-slate-500 text-xs block mb-1">Claim Status:</strong> 
+          <span class="px-2.5 py-1 rounded text-xs font-bold inline-block ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span>
+        </div>
+        
+        <div class="col-span-1 md:col-span-2 bg-slate-100 p-3 rounded border border-slate-200">
+          <strong class="text-slate-600 text-xs block mb-1">Remarks by User:</strong> 
+          <p class="text-slate-800">${claim.remarks_by_user}</p>
+        </div>
+        
+        <div class="col-span-1 md:col-span-2 bg-blue-50 p-3 rounded border border-blue-200">
+          <strong class="text-blue-700 text-xs block mb-1">Reply Remarks by Admin:</strong> 
+          <p class="text-slate-800">${claim.reply_remarks_admin || 'Pending Response'}</p>
+        </div>
+        
+        <div class="col-span-1 md:col-span-2">
+          <strong class="text-slate-500 text-xs block mb-1">Uploaded Document Attachment:</strong> 
+          <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
+            📄 View / Download File
+          </a>
+        </div>
+      `;
+
+      document.getElementById('detailsModal').classList.remove('hidden');
+    }
+
+    // CLOSE DETAILS MODAL
+    function closeDetailsModal() {
+      document.getElementById('detailsModal').classList.add('hidden');
+    }
     // SEARCH & TRACK SINGLE CLAIM (ROLE-RESTRICTED)
     async function trackClaim() {
       const refNo = document.getElementById('searchRefNo').value.trim();
