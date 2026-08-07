@@ -412,17 +412,50 @@
       window.location.reload();
     }
 
-    // INITIALIZE APP AFTER AUTHENTICATION
+   // INITIALIZE APP AFTER AUTHENTICATION (FIXED 406 & 422 ERRORS)
     async function initApp() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) return;
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+      if (authError || !user) return;
 
       currentUser = user;
-      const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-      
-      if (!profile) return;
+
+      // Use .maybeSingle() instead of .single() to avoid 406 error
+      let { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      // FALLBACK: If user exists in Auth but profile row is missing, auto-create it now
+      if (!profile) {
+        console.warn("Profile missing for user. Creating fallback profile...");
+        const fallbackEmpId = user.user_metadata?.emp_id || `EMP-${user.id.substring(0, 5)}`.toUpperCase();
+        const fallbackName = user.user_metadata?.emp_name || "Employee";
+        const fallbackOffice = user.user_metadata?.office_name || "Head Office - Zone 1";
+
+        const { data: newProfile, error: insertError } = await supabaseClient
+          .from('profiles')
+          .insert([{
+            id: user.id,
+            emp_id: fallbackEmpId,
+            emp_name: fallbackName,
+            office_name: fallbackOffice,
+            role: 'user'
+          }])
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error("Profile creation error:", insertError);
+          alert("Could not load user profile. Please try logging in again.");
+          return;
+        }
+        profile = newProfile;
+      }
+
       userProfile = profile;
 
+      // Update UI
       document.getElementById('authSection').classList.add('hidden');
       document.getElementById('navbar').classList.remove('hidden');
       document.getElementById('mainDashboard').classList.remove('hidden');
