@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -30,6 +29,14 @@
     <!-- AUTHENTICATION CONTAINER (LOGIN / REGISTER) -->
     <div id="authSection" class="max-w-md mx-auto mt-12 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
       
+      <!-- PORTAL TITLE ON LOGIN SCREEN -->
+      <div class="text-center mb-6">
+        <h1 class="text-xl font-extrabold text-slate-900 uppercase tracking-tight">
+          Refund Claims Management Portal
+        </h1>
+        <div class="h-1 w-16 bg-blue-600 mx-auto mt-2 rounded"></div>
+      </div>
+
       <!-- TAB SWITCHER -->
       <div class="flex justify-around mb-6 border-b pb-2">
         <button 
@@ -246,7 +253,7 @@
           <button type="button" onclick="generateMISReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold text-sm cursor-pointer">Filter Report</button>
         </div>
 
-        <!-- METRIC CARDS (UPDATED WITH IN PROGRESS) -->
+        <!-- METRIC CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
           <div onclick="generateMISReport('All')" class="bg-blue-50 border border-blue-200 p-4 rounded-lg text-center cursor-pointer hover:bg-blue-100 transition shadow-sm">
             <p class="text-xs text-blue-600 font-bold uppercase">Total Claims</p>
@@ -860,7 +867,6 @@
       else alert("User role updated successfully!");
     }
 
-    // GENERATE MIS REPORT (UPDATED WITH IN PROGRESS COUNT LOGIC)
     async function generateMISReport(filterStatus = 'All') {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
@@ -879,7 +885,6 @@
       const { data: claims } = await query;
       if (!claims) return;
 
-      // Update Counts
       document.getElementById('misTotal').innerText = claims.length;
       document.getElementById('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
       document.getElementById('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
