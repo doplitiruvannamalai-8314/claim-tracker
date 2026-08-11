@@ -760,7 +760,7 @@
       }
 
       claims.forEach(c => {
-        const creatorEmpId = c.profiles?.emp_id || 'N/A';
+        const creatorEmpId = c.profiles?.emp_name || 'N/A';
         const entryDateTime = formatDateTime(c.created_at);
 
         let adminReplyHtml = c.reply_remarks_admin 
