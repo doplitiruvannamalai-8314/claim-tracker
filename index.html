@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -17,7 +18,7 @@
 
   <!-- NAVBAR -->
   <nav id="navbar" class="hidden bg-slate-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
-    <div class="font-bold text-lg tracking-wide">Refund Claims Management Portal - Chennai City Central Division</div>
+    <div class="font-bold text-lg tracking-wide">Refund Claims Management Portal</div>
     <div class="flex items-center gap-4 text-sm">
       <span id="userInfo" class="bg-slate-800 px-3 py-1 rounded text-slate-300 font-medium"></span>
       <button type="button" onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded font-semibold transition cursor-pointer">Logout</button>
@@ -32,7 +33,7 @@
       <!-- PORTAL TITLE ON LOGIN SCREEN -->
       <div class="text-center mb-6">
         <h1 class="text-xl font-extrabold text-slate-900 uppercase tracking-tight">
-          Refund Claims Management Portal- Chennai City Central Division
+          Refund Claims Management Portal
         </h1>
         <div class="h-1 w-16 bg-blue-600 mx-auto mt-2 rounded"></div>
       </div>
@@ -44,14 +45,14 @@
           id="tabLoginBtn" 
           onclick="switchAuthTab('login')" 
           class="font-bold text-blue-600 border-b-2 border-blue-600 pb-2 cursor-pointer focus:outline-none">
-          Employee Login
+          Emp ID Login
         </button>
         <button 
           type="button" 
           id="tabRegisterBtn" 
           onclick="switchAuthTab('register')" 
           class="font-bold text-slate-400 hover:text-slate-600 pb-2 cursor-pointer focus:outline-none">
-          Register as User
+          Register User
         </button>
       </div>
 
@@ -84,7 +85,6 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Office Name *</label>
-          <!-- DYNAMICALLY POPULATED FROM DATABASE -->
           <select id="regOfficeName" required class="w-full border p-2 rounded text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
             <option value="">-- Loading Offices... --</option>
           </select>
@@ -106,7 +106,7 @@
         <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm cursor-pointer">Track Claim</button>
         <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm cursor-pointer">Claim Registration</button>
         <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm cursor-pointer">User Role Management</button>
-        <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm cursor-pointer">MIS and Pendency Reports</button>
+        <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-slate-200 text-slate-700 px-4 py-2 rounded font-semibold text-sm cursor-pointer">MIS & Pendency Reports</button>
       </div>
 
       <!-- TAB 1: TRACK CLAIM -->
@@ -124,7 +124,9 @@
             <thead>
               <tr class="bg-slate-100 border-b text-slate-700">
                 <th class="p-3">Ref No (Txn ID)</th>
+                <th class="p-3">Emp ID</th>
                 <th class="p-3">Office Name</th>
+                <th class="p-3">Entry Date/Time</th>
                 <th class="p-3">Txn Date</th>
                 <th class="p-3">Amount</th>
                 <th class="p-3">Status</th>
@@ -140,14 +142,13 @@
       <!-- TAB 2: CLAIM REGISTRATION FORM -->
       <div id="registerClaimView" class="tab-content hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h3 class="text-lg font-bold mb-4 text-slate-800">New Claim Registration Form</h3>
-        <form onsubmit="submitClaim(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold mb-1">User Mobile Number *</label>
             <input type="tel" id="claimUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border p-2 rounded text-sm bg-slate-50">
           </div>
           <div>
             <label class="block text-xs font-bold mb-1">Raised for Office Name *</label>
-            <!-- DYNAMICALLY POPULATED FROM DATABASE -->
             <select id="claimOffice" required class="w-full border p-2 rounded text-sm bg-white">
               <option value="">-- Loading Offices... --</option>
             </select>
@@ -171,7 +172,7 @@
             <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border p-2 rounded text-sm">
           </div>
           <div>
-            <label class="block text-xs font-bold mb-1">RRN Number *</label>
+            <label class="block text-xs font-bold mb-1">RRN Number * <span class="text-slate-400 font-normal">(Auto-filled from Txn ID)</span></label>
             <input type="text" id="claimRrn" required class="w-full border p-2 rounded text-sm">
           </div>
           <div>
@@ -284,7 +285,9 @@
             <thead>
               <tr class="bg-slate-50 border-b text-slate-700">
                 <th class="p-3">Ref No</th>
+                <th class="p-3">Emp ID</th>
                 <th class="p-3">Office</th>
+                <th class="p-3">Entry Date/Time</th>
                 <th class="p-3">Txn Date</th>
                 <th class="p-3">Amount</th>
                 <th class="p-3">Status</th>
@@ -292,7 +295,7 @@
               </tr>
             </thead>
             <tbody id="misReportTableBody" class="divide-y">
-              <tr><td colspan="6" class="p-4 text-center text-slate-400">Loading Report...</td></tr>
+              <tr><td colspan="8" class="p-4 text-center text-slate-400">Loading Report...</td></tr>
             </tbody>
           </table>
         </div>
@@ -318,7 +321,7 @@
       </div>
     </div>
 
-    <!-- ADMIN REPLY & ACTION MODAL -->
+    <!-- ADMIN REPLY & ACTION MODAL WITH FILE ATTACHMENT -->
     <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl p-6 max-w-lg w-full space-y-4 shadow-xl">
         <h3 class="font-bold text-lg text-slate-800">Admin Action & Reply Remarks</h3>
@@ -334,7 +337,11 @@
         </div>
         <div>
           <label class="block text-xs font-bold mb-1">Reply Remarks by Admin</label>
-          <textarea id="modalAdminRemarks" class="w-full border p-2 rounded text-sm h-24" required></textarea>
+          <textarea id="modalAdminRemarks" class="w-full border p-2 rounded text-sm h-20" required></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Attach Admin File / Document (Optional)</label>
+          <input type="file" id="modalAdminFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border p-2 rounded text-sm bg-white">
         </div>
         <div class="flex justify-end gap-2">
           <button type="button" onclick="closeModal()" class="bg-slate-300 hover:bg-slate-400 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
@@ -372,6 +379,42 @@
     let currentUser = null;
     let userProfile = null;
     let currentClaimsList = [];
+    let isRrnManuallyEdited = false;
+
+    // AUTO-FILL RRN FROM TXN ID
+    const txnInput = document.getElementById('claimTxnId');
+    const rrnInput = document.getElementById('claimRrn');
+    if (txnInput && rrnInput) {
+      txnInput.addEventListener('input', (e) => {
+        if (!isRrnManuallyEdited) {
+          rrnInput.value = e.target.value;
+        }
+      });
+      rrnInput.addEventListener('input', (e) => {
+        if (rrnInput.value !== txnInput.value) {
+          isRrnManuallyEdited = true;
+        } else {
+          isRrnManuallyEdited = false;
+        }
+      });
+    }
+
+    // HELPER: FORMAT DATETIME STRING
+    function formatDateTime(isoStr) {
+      if (!isoStr) return 'N/A';
+      const d = new Date(isoStr);
+      return d.toLocaleString('en-IN', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    }
+
+    // HELPER: TIMESTAMP FOR EXPORT FILENAMES
+    function getFormattedTimestamp() {
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+    }
 
     // FETCH OFFICES FROM DATABASE & POPULATE SELECT DROPDOWNS
     async function loadOfficeOptions() {
@@ -508,7 +551,7 @@
       if (!profile) {
         const fallbackEmpId = user.user_metadata?.emp_id || `EMP-${user.id.substring(0, 5)}`.toUpperCase();
         const fallbackName = user.user_metadata?.emp_name || "Employee";
-        const fallbackMobile = user.user_metadata?.mobile_number || "";
+        const fallbackMobile = user.user_metadata?.mobile_number || user.user_metadata?.mobile_no || "";
         const fallbackOffice = user.user_metadata?.office_name || "Head Office";
 
         const { data: newProfile, error: insertError } = await supabaseClient
@@ -529,6 +572,18 @@
           return;
         }
         profile = newProfile;
+      }
+
+      // SYNC REGISTRATION MOBILE NUMBER IF MISSING IN PROFILE
+      const metaMobile = user.user_metadata?.mobile_number || user.user_metadata?.mobile_no;
+      if (metaMobile && (!profile.mobile_number || profile.mobile_number.trim() === '')) {
+        const { data: updatedProfile } = await supabaseClient
+          .from('profiles')
+          .update({ mobile_number: metaMobile })
+          .eq('id', user.id)
+          .select()
+          .single();
+        if (updatedProfile) profile = updatedProfile;
       }
 
       userProfile = profile;
@@ -660,6 +715,7 @@
       } else {
         alert("Claim registered successfully!");
         e.target.reset();
+        isRrnManuallyEdited = false;
         document.getElementById('claimUserMobile').value = userProfile.mobile_number || user_mobile;
         showTab('track');
         loadClaimsSummary();
@@ -679,10 +735,14 @@
       }
     }
 
+    // LOAD SUMMARY WITH EMP ID & ENTRY DATE/TIME
     async function loadClaimsSummary() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
-      let query = supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+      let query = supabaseClient
+        .from('claims')
+        .select('*, profiles:created_by(emp_id, emp_name)')
+        .order('created_at', { ascending: false });
 
       if (!isAdmin) {
         query = query.eq('created_by', currentUser.id);
@@ -695,14 +755,21 @@
       tbody.innerHTML = '';
 
       if (error || !claims || claims.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No requests found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">No requests found.</td></tr>`;
         return;
       }
 
       claims.forEach(c => {
-        const adminReplyHtml = c.reply_remarks_admin 
+        const creatorEmpId = c.profiles?.emp_id || 'N/A';
+        const entryDateTime = formatDateTime(c.created_at);
+
+        let adminReplyHtml = c.reply_remarks_admin 
           ? `<div class="bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded text-xs max-w-xs font-medium" title="${c.reply_remarks_admin}">${c.reply_remarks_admin}</div>`
           : `<span class="text-slate-400 italic text-xs">Pending Response</span>`;
+
+        if (c.admin_file_url) {
+          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="text-xs text-blue-600 underline font-semibold block mt-1">📎 View Admin Attachment</a>`;
+        }
 
         tbody.innerHTML += `
           <tr>
@@ -711,7 +778,9 @@
                 ${c.txn_id_ref}
               </button>
             </td>
+            <td class="p-3 font-semibold text-slate-700">${creatorEmpId}</td>
             <td class="p-3">${c.raised_for_office}</td>
+            <td class="p-3 text-xs text-slate-600">${entryDateTime}</td>
             <td class="p-3">${c.txn_date}</td>
             <td class="p-3">₹${c.txn_amount}</td>
             <td class="p-3">
@@ -735,9 +804,14 @@
       const claim = currentClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found!");
 
+      const creatorEmpId = claim.profiles?.emp_id || 'N/A';
+      const entryDateTime = formatDateTime(claim.created_at);
+
       const container = document.getElementById('detailsModalContent');
       container.innerHTML = `
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-blue-600">${claim.txn_id_ref}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Created By Emp ID:</strong> <span class="font-bold text-slate-700">${creatorEmpId}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Date & Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium">${claim.user_mobile || 'N/A'}</span></div>
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium">${claim.module}</span></div>
@@ -757,13 +831,14 @@
           <p class="text-slate-800">${claim.remarks_by_user}</p>
         </div>
         
-        <div class="col-span-1 md:col-span-2 bg-blue-50 p-3 rounded border border-blue-200">
-          <strong class="text-blue-700 text-xs block mb-1">Reply Remarks by Admin:</strong> 
+        <div class="col-span-1 md:col-span-2 bg-blue-50 p-3 rounded border border-blue-200 space-y-2">
+          <strong class="text-blue-700 text-xs block">Reply Remarks by Admin:</strong> 
           <p class="text-slate-800">${claim.reply_remarks_admin || 'Pending Response'}</p>
+          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-semibold hover:bg-blue-700 transition">📎 View Admin Attached File</a>` : ''}
         </div>
         
         <div class="col-span-1 md:col-span-2">
-          <strong class="text-slate-500 text-xs block mb-1">Uploaded Document Attachment:</strong> 
+          <strong class="text-slate-500 text-xs block mb-1">Uploaded User Document:</strong> 
           <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
             📄 View / Download File
           </a>
@@ -783,7 +858,7 @@
 
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
-      let query = supabaseClient.from('claims').select('*').eq('txn_id_ref', refNo);
+      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)').eq('txn_id_ref', refNo);
 
       if (!isAdmin) {
         query = query.eq('created_by', currentUser.id);
@@ -796,10 +871,13 @@
       if (data) {
         resCard.innerHTML = `
           <p><strong>Ref ID (Txn ID):</strong> ${data.txn_id_ref}</p>
+          <p><strong>Created By Emp ID:</strong> ${data.profiles?.emp_id || 'N/A'}</p>
+          <p><strong>Entry Date/Time:</strong> ${formatDateTime(data.created_at)}</p>
           <p><strong>Raised For Office:</strong> ${data.raised_for_office}</p>
           <p><strong>Status:</strong> <span class="font-bold ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
           <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
           <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
+          ${data.admin_file_url ? `<p><a href="${data.admin_file_url}" target="_blank" class="text-blue-600 underline font-semibold">Download Admin Attachment</a></p>` : ''}
           <p><a href="${data.file_url}" target="_blank" class="text-blue-600 underline font-semibold">Download Submitted Attachment</a></p>
         `;
       } else {
@@ -811,6 +889,7 @@
       document.getElementById('modalClaimId').value = id;
       document.getElementById('modalStatus').value = status;
       document.getElementById('modalAdminRemarks').value = remarks || '';
+      document.getElementById('modalAdminFile').value = '';
       document.getElementById('replyModal').classList.remove('hidden');
     }
 
@@ -818,12 +897,29 @@
       document.getElementById('replyModal').classList.add('hidden');
     }
 
+    // SUBMIT ADMIN REPLY WITH FILE ATTACHMENT
     async function submitAdminReply() {
       const id = document.getElementById('modalClaimId').value;
       const status = document.getElementById('modalStatus').value;
       const reply_remarks_admin = document.getElementById('modalAdminRemarks').value;
+      const adminFileInput = document.getElementById('modalAdminFile').files[0];
 
-      const { error } = await supabaseClient.from('claims').update({ claim_status: status, reply_remarks_admin }).eq('id', id);
+      let admin_file_url = null;
+
+      if (adminFileInput) {
+        const fileExt = adminFileInput.name.split('.').pop();
+        const filePath = `admin-replies/${id}-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, adminFileInput);
+        if (uploadErr) return alert("Admin file upload failed: " + uploadErr.message);
+
+        admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+      }
+
+      const updateData = { claim_status: status, reply_remarks_admin };
+      if (admin_file_url) updateData.admin_file_url = admin_file_url;
+
+      const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
 
       if (error) alert("Failed to update: " + error.message);
       else {
@@ -870,7 +966,7 @@
     async function generateMISReport(filterStatus = 'All') {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
-      let query = supabaseClient.from('claims').select('*');
+      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
 
       if (!isAdmin) {
         query = query.eq('created_by', currentUser.id);
@@ -901,7 +997,7 @@
       tbody.innerHTML = '';
 
       if (filteredClaims.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No matching claims found for this status.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No matching claims found for this status.</td></tr>`;
         return;
       }
 
@@ -909,7 +1005,9 @@
         tbody.innerHTML += `
           <tr>
             <td class="p-3 font-bold">${c.txn_id_ref}</td>
+            <td class="p-3 font-semibold text-slate-700">${c.profiles?.emp_id || 'N/A'}</td>
             <td class="p-3">${c.raised_for_office}</td>
+            <td class="p-3 text-xs text-slate-600">${formatDateTime(c.created_at)}</td>
             <td class="p-3">${c.txn_date}</td>
             <td class="p-3">₹${c.txn_amount}</td>
             <td class="p-3">
@@ -949,7 +1047,7 @@
 
     async function getFilteredMISData() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-      let query = supabaseClient.from('claims').select('*');
+      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
 
       if (!isAdmin) {
         query = query.eq('created_by', currentUser.id);
@@ -965,12 +1063,15 @@
       return claims || [];
     }
 
+    // EXPORT TO EXCEL WITH TIMESTAMP IN FILENAME
     async function exportMISExcel() {
       const claims = await getFilteredMISData();
       if (claims.length === 0) return alert("No claim data available to export!");
 
       const formattedData = claims.map(c => ({
         "Ref No (Txn ID)": c.txn_id_ref,
+        "Emp ID": c.profiles?.emp_id || "N/A",
+        "Entry Date/Time": formatDateTime(c.created_at),
         "Office Name": c.raised_for_office,
         "Module": c.module,
         "Article No": c.article_number,
@@ -980,17 +1081,19 @@
         "Payment Channel": c.payment_channel,
         "Status": c.claim_status,
         "User Remarks": c.remarks_by_user,
-        "Admin Remarks": c.reply_remarks_admin || "N/A"
+        "Admin Remarks": c.reply_remarks_admin || "N/A",
+        "Admin File URL": c.admin_file_url || "N/A"
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "MIS Report");
 
-      const fileName = `MIS_Report_${new now().toISOString().slice(0, 10)}.xlsx`;
+      const fileName = `MIS_Report_${getFormattedTimestamp()}.xlsx`;
       XLSX.writeFile(workbook, fileName);
     }
 
+    // EXPORT TO PDF WITH TIMESTAMP IN FILENAME
     async function exportMISPDF() {
       const claims = await getFilteredMISData();
       if (claims.length === 0) return alert("No claim data available to export!");
@@ -999,18 +1102,18 @@
       const doc = new jsPDF({ orientation: "landscape" });
 
       doc.setFontSize(16);
-      doc.text("MIS and Pendency Report", 14, 15);
+      doc.text("MIS & Pendency Report", 14, 15);
       doc.setFontSize(10);
       doc.text(`Generated on: ${new Date().toLocaleString()} | Total Records: ${claims.length}`, 14, 22);
 
-      const headers = [["Ref No", "Office", "Module", "Txn Date", "Amount (Rs)", "Channel", "Status", "Admin Remarks"]];
+      const headers = [["Ref No", "Emp ID", "Entry Date/Time", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = claims.map(c => [
         c.txn_id_ref,
+        c.profiles?.emp_id || "N/A",
+        formatDateTime(c.created_at),
         c.raised_for_office,
-        c.module,
         c.txn_date,
         `Rs. ${c.txn_amount}`,
-        c.payment_channel,
         c.claim_status,
         c.reply_remarks_admin || "-"
       ]);
@@ -1024,7 +1127,7 @@
         styles: { fontSize: 8, cellPadding: 2 }
       });
 
-      const fileName = `MIS_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+      const fileName = `MIS_Report_${getFormattedTimestamp()}.pdf`;
       doc.save(fileName);
     }
   </script>
