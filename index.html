@@ -33,8 +33,9 @@
       <!-- PORTAL TITLE ON LOGIN SCREEN -->
       <div class="text-center mb-6">
         <h1 class="text-xl font-extrabold text-slate-900 uppercase tracking-tight">
-          Refund Claims Management Portal - Chennai City Central Division
+          Refund Claims Management Portal
         </h1>
+        <p class="text-xs font-semibold text-blue-700 mt-1 uppercase">Chennai City Central Division</p>
         <div class="h-1 w-16 bg-blue-600 mx-auto mt-2 rounded"></div>
       </div>
 
@@ -118,20 +119,20 @@
         </div>
         <div id="trackResult" class="hidden border p-4 rounded-lg bg-slate-50 space-y-2 text-sm"></div>
 
-        <h4 class="font-bold text-md mt-6 text-slate-700">Submitted Claims Overview</h4>
+        <h4 class="font-bold text-md mt-6 text-slate-700">Submitted Claims Overview <span class="text-xs text-slate-400 font-normal">(Click headers to sort)</span></h4>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm border-collapse">
             <thead>
-              <tr class="bg-slate-100 border-b text-slate-700">
-                <th class="p-3">Ref No (Txn ID)</th>
-                <th class="p-3">Emp Name</th>
-                <th class="p-3">Office Name</th>
-                <th class="p-3">Entry Date/Time</th>
-                <th class="p-3">Txn Date</th>
-                <th class="p-3">Amount</th>
-                <th class="p-3">Status</th>
-                <th class="p-3">Admin Reply / Remarks</th> 
-                <th class="p-3">Action / File</th>
+              <tr class="bg-slate-100 border-b text-slate-700 cursor-pointer select-none">
+                <th class="p-3 hover:bg-slate-200 transition" onclick="sortTable('txn_id_ref')">Ref No (Txn ID) <span id="sort_txn_id_ref">⇅</span></th>
+                <th class="p-3 hover:bg-slate-200 transition" onclick="sortTable('emp_name')">Emp Name <span id="sort_emp_name">⇅</span></th>
+                <th class="p-3 hover:bg-slate-200 transition" onclick="sortTable('raised_for_office')">Office Name <span id="sort_raised_for_office">⇅</span></th>
+                <th class="p-3 hover:bg-slate-200 transition" onclick="sortTable('created_at')">Entry Date/Time <span id="sort_created_at">⇅</span></th>
+                <th class="p-3 hover:bg-slate-200 transition" onclick="sortTable('txn_date')">Txn Date <span id="sort_txn_date">⇅</span></th>
+                <th class="p-3 hover:bg-slate-200 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
+                <th class="p-3 hover:bg-slate-200 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
+                <th class="p-3 cursor-default">Admin Reply / Remarks</th> 
+                <th class="p-3 cursor-default">Action / File</th>
               </tr>
             </thead>
             <tbody id="claimsTableBody" class="divide-y"></tbody>
@@ -241,17 +242,32 @@
           </div>
         </div>
         
-        <!-- DATE RANGE FILTER -->
-        <div class="flex flex-wrap gap-4 items-end bg-slate-50 p-4 rounded-lg border">
+        <!-- COMPREHENSIVE FILTER SECTION -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end bg-slate-50 p-4 rounded-lg border">
           <div>
             <label class="block text-xs font-bold mb-1">From Date</label>
-            <input type="date" id="filterFromDate" class="border p-2 rounded text-sm">
+            <input type="date" id="filterFromDate" class="w-full border p-2 rounded text-sm bg-white">
           </div>
           <div>
             <label class="block text-xs font-bold mb-1">To Date</label>
-            <input type="date" id="filterToDate" class="border p-2 rounded text-sm">
+            <input type="date" id="filterToDate" class="w-full border p-2 rounded text-sm bg-white">
           </div>
-          <button type="button" onclick="generateMISReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold text-sm cursor-pointer">Filter Report</button>
+          <div>
+            <label class="block text-xs font-bold mb-1">Office Name</label>
+            <select id="filterOfficeName" class="w-full border p-2 rounded text-sm bg-white">
+              <option value="">-- All Offices --</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Entry By User</label>
+            <select id="filterEmpUser" class="w-full border p-2 rounded text-sm bg-white">
+              <option value="">-- All Users --</option>
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="generateMISReport()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded font-bold text-sm cursor-pointer transition">Filter Report</button>
+            <button type="button" onclick="resetMISFilters()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-3 py-2 rounded font-bold text-sm cursor-pointer transition">Reset</button>
+          </div>
         </div>
 
         <!-- METRIC CARDS -->
@@ -285,7 +301,7 @@
             <thead>
               <tr class="bg-slate-50 border-b text-slate-700">
                 <th class="p-3">Ref No</th>
-                <th class="p-3">Emp ID</th>
+                <th class="p-3">Emp Name</th>
                 <th class="p-3">Office</th>
                 <th class="p-3">Entry Date/Time</th>
                 <th class="p-3">Txn Date</th>
@@ -381,6 +397,10 @@
     let currentClaimsList = [];
     let isRrnManuallyEdited = false;
 
+    // SORTING STATE FOR SUMMARY TABLE
+    let currentSortCol = 'created_at';
+    let currentSortDir = 'desc';
+
     // AUTO-FILL RRN FROM TXN ID
     const txnInput = document.getElementById('claimTxnId');
     const rrnInput = document.getElementById('claimRrn');
@@ -416,30 +436,45 @@
       return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
     }
 
-    // FETCH OFFICES FROM DATABASE & POPULATE SELECT DROPDOWNS
-    async function loadOfficeOptions() {
-      const { data: offices, error } = await supabaseClient
+    // LOAD DROPDOWNS: OFFICES & USERS
+    async function loadFilterDropdowns() {
+      // Load Offices
+      const { data: offices } = await supabaseClient
         .from('offices')
         .select('office_name')
         .order('office_name', { ascending: true });
 
       const regSelect = document.getElementById('regOfficeName');
       const claimSelect = document.getElementById('claimOffice');
+      const filterOfficeSelect = document.getElementById('filterOfficeName');
 
-      if (error || !offices) {
-        console.error("Error loading offices:", error);
-        if (regSelect) regSelect.innerHTML = '<option value="">-- Error loading offices --</option>';
-        if (claimSelect) claimSelect.innerHTML = '<option value="">-- Error loading offices --</option>';
-        return;
+      if (offices) {
+        let optionsHtml = '<option value="">-- Select Office Name --</option>';
+        let filterOptionsHtml = '<option value="">-- All Offices --</option>';
+        offices.forEach(o => {
+          optionsHtml += `<option value="${o.office_name}">${o.office_name}</option>`;
+          filterOptionsHtml += `<option value="${o.office_name}">${o.office_name}</option>`;
+        });
+
+        if (regSelect) regSelect.innerHTML = optionsHtml;
+        if (claimSelect) claimSelect.innerHTML = optionsHtml;
+        if (filterOfficeSelect) filterOfficeSelect.innerHTML = filterOptionsHtml;
       }
 
-      let optionsHtml = '<option value="">-- Select Office Name --</option>';
-      offices.forEach(o => {
-        optionsHtml += `<option value="${o.office_name}">${o.office_name}</option>`;
-      });
+      // Load Entry By User Dropdown for Filters
+      const { data: users } = await supabaseClient
+        .from('profiles')
+        .select('id, emp_id, emp_name')
+        .order('emp_name', { ascending: true });
 
-      if (regSelect) regSelect.innerHTML = optionsHtml;
-      if (claimSelect) claimSelect.innerHTML = optionsHtml;
+      const filterUserSelect = document.getElementById('filterEmpUser');
+      if (users && filterUserSelect) {
+        let userOptsHtml = '<option value="">-- All Users --</option>';
+        users.forEach(u => {
+          userOptsHtml += `<option value="${u.id}">${u.emp_name} (${u.emp_id})</option>`;
+        });
+        filterUserSelect.innerHTML = userOptsHtml;
+      }
     }
 
     function empIdToEmail(empId) {
@@ -735,32 +770,58 @@
       }
     }
 
-    // LOAD SUMMARY WITH EMP ID & ENTRY DATE/TIME
-    async function loadClaimsSummary() {
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-
-      let query = supabaseClient
-        .from('claims')
-        .select('*, profiles:created_by(emp_id, emp_name)')
-        .order('created_at', { ascending: false });
-
-      if (!isAdmin) {
-        query = query.eq('created_by', currentUser.id);
+    // SORT CLAIMS TABLE FUNCTION
+    function sortTable(col) {
+      if (currentSortCol === col) {
+        currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSortCol = col;
+        currentSortDir = 'asc';
       }
+      renderClaimsSummaryTable();
+    }
 
-      const { data: claims, error } = await query;
-      currentClaimsList = claims || [];
-
+    // RENDER CLAIMS SUMMARY TABLE WITH SORTING
+    function renderClaimsSummaryTable() {
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
       tbody.innerHTML = '';
 
-      if (error || !claims || claims.length === 0) {
+      // Update Header Sort Icons
+      ['txn_id_ref', 'emp_name', 'raised_for_office', 'created_at', 'txn_date', 'txn_amount', 'claim_status'].forEach(c => {
+        const iconEl = document.getElementById('sort_' + c);
+        if (iconEl) iconEl.innerText = '⇅';
+      });
+      const activeIcon = document.getElementById('sort_' + currentSortCol);
+      if (activeIcon) activeIcon.innerText = currentSortDir === 'asc' ? '▲' : '▼';
+
+      if (!currentClaimsList || currentClaimsList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">No requests found.</td></tr>`;
         return;
       }
 
-      claims.forEach(c => {
-        const creatorEmpId = c.profiles?.emp_name || 'N/A';
+      // Sort In-Memory List
+      currentClaimsList.sort((a, b) => {
+        let valA, valB;
+
+        if (currentSortCol === 'emp_name') {
+          valA = (a.profiles?.emp_name || '').toLowerCase();
+          valB = (b.profiles?.emp_name || '').toLowerCase();
+        } else if (currentSortCol === 'txn_amount') {
+          valA = parseFloat(a.txn_amount) || 0;
+          valB = parseFloat(b.txn_amount) || 0;
+        } else {
+          valA = (a[currentSortCol] || '').toString().toLowerCase();
+          valB = (b[currentSortCol] || '').toString().toLowerCase();
+        }
+
+        if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      currentClaimsList.forEach(c => {
+        const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
         const entryDateTime = formatDateTime(c.created_at);
 
         let adminReplyHtml = c.reply_remarks_admin 
@@ -778,7 +839,7 @@
                 ${c.txn_id_ref}
               </button>
             </td>
-            <td class="p-3 font-semibold text-slate-700">${creatorEmpId}</td>
+            <td class="p-3 font-semibold text-slate-700">${creatorName}</td>
             <td class="p-3">${c.raised_for_office}</td>
             <td class="p-3 text-xs text-slate-600">${entryDateTime}</td>
             <td class="p-3">${c.txn_date}</td>
@@ -800,17 +861,36 @@
       });
     }
 
+    // FETCH SUMMARY DATA
+    async function loadClaimsSummary() {
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+
+      let query = supabaseClient
+        .from('claims')
+        .select('*, profiles:created_by(emp_id, emp_name)')
+        .order('created_at', { ascending: false });
+
+      if (!isAdmin) {
+        query = query.eq('created_by', currentUser.id);
+      }
+
+      const { data: claims, error } = await query;
+      currentClaimsList = claims || [];
+      renderClaimsSummaryTable();
+    }
+
     function openDetailsModal(claimId) {
       const claim = currentClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found!");
 
       const creatorEmpId = claim.profiles?.emp_id || 'N/A';
+      const creatorEmpName = claim.profiles?.emp_name || 'N/A';
       const entryDateTime = formatDateTime(claim.created_at);
 
       const container = document.getElementById('detailsModalContent');
       container.innerHTML = `
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-blue-600">${claim.txn_id_ref}</span></div>
-        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Created By Emp ID:</strong> <span class="font-bold text-slate-700">${creatorEmpId}</span></div>
+        <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Created By Employee:</strong> <span class="font-bold text-slate-700">${creatorEmpName} (${creatorEmpId})</span></div>
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Date & Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
         <div class="bg-slate-50 p-2 rounded"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium">${claim.user_mobile || 'N/A'}</span></div>
@@ -871,7 +951,7 @@
       if (data) {
         resCard.innerHTML = `
           <p><strong>Ref ID (Txn ID):</strong> ${data.txn_id_ref}</p>
-          <p><strong>Created By Emp ID:</strong> ${data.profiles?.emp_id || 'N/A'}</p>
+          <p><strong>Created By Employee:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
           <p><strong>Entry Date/Time:</strong> ${formatDateTime(data.created_at)}</p>
           <p><strong>Raised For Office:</strong> ${data.raised_for_office}</p>
           <p><strong>Status:</strong> <span class="font-bold ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
@@ -897,7 +977,6 @@
       document.getElementById('replyModal').classList.add('hidden');
     }
 
-    // SUBMIT ADMIN REPLY WITH FILE ATTACHMENT
     async function submitAdminReply() {
       const id = document.getElementById('modalClaimId').value;
       const status = document.getElementById('modalStatus').value;
@@ -963,6 +1042,16 @@
       else alert("User role updated successfully!");
     }
 
+    // RESET ALL MIS REPORT FILTERS
+    function resetMISFilters() {
+      document.getElementById('filterFromDate').value = '';
+      document.getElementById('filterToDate').value = '';
+      document.getElementById('filterOfficeName').value = '';
+      document.getElementById('filterEmpUser').value = '';
+      generateMISReport('All');
+    }
+
+    // GENERATE MIS REPORT WITH DATE, OFFICE, & USER FILTERS
     async function generateMISReport(filterStatus = 'All') {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
@@ -974,9 +1063,13 @@
 
       const from = document.getElementById('filterFromDate').value;
       const to = document.getElementById('filterToDate').value;
+      const selectedOffice = document.getElementById('filterOfficeName').value;
+      const selectedUser = document.getElementById('filterEmpUser').value;
 
       if (from) query = query.gte('txn_date', from);
       if (to) query = query.lte('txn_date', to);
+      if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
+      if (selectedUser) query = query.eq('created_by', selectedUser);
 
       const { data: claims } = await query;
       if (!claims) return;
@@ -997,15 +1090,17 @@
       tbody.innerHTML = '';
 
       if (filteredClaims.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No matching claims found for this status.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No matching claims found for the selected filters.</td></tr>`;
         return;
       }
 
       filteredClaims.forEach(c => {
+        const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
+
         tbody.innerHTML += `
           <tr>
             <td class="p-3 font-bold">${c.txn_id_ref}</td>
-            <td class="p-3 font-semibold text-slate-700">${c.profiles?.emp_id || 'N/A'}</td>
+            <td class="p-3 font-semibold text-slate-700">${creatorName}</td>
             <td class="p-3">${c.raised_for_office}</td>
             <td class="p-3 text-xs text-slate-600">${formatDateTime(c.created_at)}</td>
             <td class="p-3">${c.txn_date}</td>
@@ -1038,8 +1133,8 @@
       return 'bg-slate-100 text-slate-800';
     }
 
-    // INITIALIZE OFFICE DROPDOWNS ON LOAD
-    loadOfficeOptions();
+    // INITIALIZE DROPDOWNS ON LOAD
+    loadFilterDropdowns();
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
       if (session) initApp();
@@ -1055,21 +1150,26 @@
 
       const from = document.getElementById('filterFromDate').value;
       const to = document.getElementById('filterToDate').value;
+      const selectedOffice = document.getElementById('filterOfficeName').value;
+      const selectedUser = document.getElementById('filterEmpUser').value;
 
       if (from) query = query.gte('txn_date', from);
       if (to) query = query.lte('txn_date', to);
+      if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
+      if (selectedUser) query = query.eq('created_by', selectedUser);
 
       const { data: claims } = await query;
       return claims || [];
     }
 
-    // EXPORT TO EXCEL WITH TIMESTAMP IN FILENAME
+    // EXPORT TO EXCEL WITH TIMESTAMP
     async function exportMISExcel() {
       const claims = await getFilteredMISData();
       if (claims.length === 0) return alert("No claim data available to export!");
 
       const formattedData = claims.map(c => ({
         "Ref No (Txn ID)": c.txn_id_ref,
+        "Emp Name": c.profiles?.emp_name || "N/A",
         "Emp ID": c.profiles?.emp_id || "N/A",
         "Entry Date/Time": formatDateTime(c.created_at),
         "Office Name": c.raised_for_office,
@@ -1093,7 +1193,7 @@
       XLSX.writeFile(workbook, fileName);
     }
 
-    // EXPORT TO PDF WITH TIMESTAMP IN FILENAME
+    // EXPORT TO PDF WITH TIMESTAMP
     async function exportMISPDF() {
       const claims = await getFilteredMISData();
       if (claims.length === 0) return alert("No claim data available to export!");
@@ -1102,14 +1202,14 @@
       const doc = new jsPDF({ orientation: "landscape" });
 
       doc.setFontSize(16);
-      doc.text("MIS & Pendency Report", 14, 15);
+      doc.text("MIS & Pendency Report - Chennai City Central Division", 14, 15);
       doc.setFontSize(10);
       doc.text(`Generated on: ${new Date().toLocaleString()} | Total Records: ${claims.length}`, 14, 22);
 
-      const headers = [["Ref No", "Emp ID", "Entry Date/Time", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
+      const headers = [["Ref No", "Emp Name", "Entry Date/Time", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = claims.map(c => [
         c.txn_id_ref,
-        c.profiles?.emp_id || "N/A",
+        c.profiles?.emp_name || "N/A",
         formatDateTime(c.created_at),
         c.raised_for_office,
         c.txn_date,
