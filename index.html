@@ -119,7 +119,42 @@
         </div>
         <div id="trackResult" class="hidden border p-4 rounded-lg bg-slate-50 space-y-2 text-sm"></div>
 
-        <h4 class="font-bold text-md mt-6 text-slate-700">Submitted Claims Overview <span class="text-xs text-slate-400 font-normal">(Click headers to sort)</span></h4>
+        <div class="flex justify-between items-center flex-wrap gap-2 pt-4">
+          <h4 class="font-bold text-md text-slate-700">Submitted Claims Overview <span class="text-xs text-slate-400 font-normal">(Click headers to sort)</span></h4>
+        </div>
+
+        <!-- OVERVIEW TABLE FILTER PANEL -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end bg-slate-50 p-4 rounded-lg border">
+          <div>
+            <label class="block text-xs font-bold mb-1">From Date</label>
+            <input type="date" id="overviewFilterFromDate" class="w-full border p-2 rounded text-sm bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">To Date</label>
+            <input type="date" id="overviewFilterToDate" class="w-full border p-2 rounded text-sm bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Office Name</label>
+            <select id="overviewFilterOffice" class="w-full border p-2 rounded text-sm bg-white">
+              <option value="">-- All Offices --</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Status</label>
+            <select id="overviewFilterStatus" class="w-full border p-2 rounded text-sm bg-white">
+              <option value="">-- All Statuses --</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Settled">Settled</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="applyOverviewFilters()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded font-bold text-sm cursor-pointer transition">Filter</button>
+            <button type="button" onclick="resetOverviewFilters()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-3 py-2 rounded font-bold text-sm cursor-pointer transition">Reset</button>
+          </div>
+        </div>
+
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm border-collapse">
             <thead>
@@ -140,14 +175,10 @@
         </div>     
       </div>
 
-      <!-- TAB 2: CLAIM REGISTRATION FORM -->
+      <!-- TAB 2: CLAIM REGISTRATION FORM (MOBILE NUMBER MOVED TO LAST) -->
       <div id="registerClaimView" class="tab-content hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h3 class="text-lg font-bold mb-4 text-slate-800">New Claim Registration Form</h3>
         <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold mb-1">User Mobile Number *</label>
-            <input type="tel" id="claimUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border p-2 rounded text-sm bg-slate-50">
-          </div>
           <div>
             <label class="block text-xs font-bold mb-1">Raised for Office Name *</label>
             <select id="claimOffice" required class="w-full border p-2 rounded text-sm bg-white">
@@ -200,6 +231,11 @@
           <div class="md:col-span-2">
             <label class="block text-xs font-bold mb-1">File Attachment (JPG, PNG, PDF) *</label>
             <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" required class="w-full border p-2 rounded text-sm">
+          </div>
+          <!-- MOBILE NUMBER PLACED AS LAST INPUT BEFORE SUBMIT -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold mb-1">User Mobile Number *</label>
+            <input type="tel" id="claimUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border p-2 rounded text-sm bg-slate-50">
           </div>
           <div class="md:col-span-2">
             <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded text-sm cursor-pointer transition">Submit Claim</button>
@@ -319,7 +355,7 @@
 
     </div>
 
-    <!-- MANDATORY MOBILE NUMBER POPUP MODAL (FOR USERS MISSING MOBILE NO) -->
+    <!-- MANDATORY MOBILE NUMBER POPUP MODAL -->
     <div id="mobilePromptModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl p-6 max-w-md w-full space-y-4 shadow-2xl border border-blue-200">
         <div class="text-center">
@@ -337,7 +373,73 @@
       </div>
     </div>
 
-    <!-- ADMIN REPLY & ACTION MODAL WITH FILE ATTACHMENT -->
+    <!-- USER CLAIM EDIT MODAL -->
+    <div id="userEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-xl p-6 max-w-2xl w-full space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b pb-3">
+          <h3 class="font-bold text-lg text-slate-800">Edit Claim Request</h3>
+          <button type="button" onclick="closeUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+        </div>
+        <form onsubmit="submitUserClaimEdit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="hidden" id="editClaimId">
+          <div>
+            <label class="block text-xs font-bold mb-1">Raised for Office Name *</label>
+            <select id="editClaimOffice" required class="w-full border p-2 rounded text-sm bg-white"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Module *</label>
+            <select id="editClaimModule" required class="w-full border p-2 rounded text-sm bg-white">
+              <option value="Booking">Booking</option>
+              <option value="Delivery">Delivery</option>
+              <option value="DSS">DSS</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Article Number *</label>
+            <input type="text" id="editClaimArticleNo" required class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">RRN Number *</label>
+            <input type="text" id="editClaimRrn" required class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Txn Date *</label>
+            <input type="date" id="editClaimTxnDate" required class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Txn Amount (₹) *</label>
+            <input type="number" step="0.01" id="editClaimAmount" required class="w-full border p-2 rounded text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Payment Channel *</label>
+            <select id="editClaimChannel" required class="w-full border p-2 rounded text-sm bg-white">
+              <option value="DQR">DQR</option>
+              <option value="SBI POS">SBI POS</option>
+              <option value="SBI ePay">SBI ePay</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">User Mobile *</label>
+            <input type="tel" id="editClaimMobile" pattern="[0-9]{10}" required class="w-full border p-2 rounded text-sm">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold mb-1">Remarks by User *</label>
+            <textarea id="editClaimRemarks" required class="w-full border p-2 rounded text-sm h-20"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold mb-1">Replace Document Attachment (Optional)</label>
+            <input type="file" id="editClaimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border p-2 rounded text-sm">
+          </div>
+          <div class="md:col-span-2 flex justify-end gap-2 pt-2 border-t">
+            <button type="button" onclick="closeUserEditModal()" class="bg-slate-300 hover:bg-slate-400 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ADMIN REPLY MODAL -->
     <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl p-6 max-w-lg w-full space-y-4 shadow-xl">
         <h3 class="font-bold text-lg text-slate-800">Admin Action & Reply Remarks</h3>
@@ -374,9 +476,7 @@
           <button type="button" onclick="closeDetailsModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
         </div>
         
-        <div id="detailsModalContent" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <!-- Populated via JS -->
-        </div>
+        <div id="detailsModalContent" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"></div>
 
         <div class="flex justify-end gap-2 border-t pt-3">
           <button type="button" onclick="closeDetailsModal()" class="bg-slate-300 hover:bg-slate-400 px-4 py-2 rounded text-sm font-bold cursor-pointer transition">Close</button>
@@ -394,10 +494,13 @@
 
     let currentUser = null;
     let userProfile = null;
+    let rawClaimsList = [];
     let currentClaimsList = [];
+    let currentMISClaimsList = [];
+    let currentMISReportStatus = 'All';
     let isRrnManuallyEdited = false;
 
-    // SORTING STATE FOR SUMMARY TABLE
+    // SORTING STATE
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
 
@@ -419,7 +522,6 @@
       });
     }
 
-    // HELPER: FORMAT DATETIME STRING
     function formatDateTime(isoStr) {
       if (!isoStr) return 'N/A';
       const d = new Date(isoStr);
@@ -429,16 +531,13 @@
       });
     }
 
-    // HELPER: TIMESTAMP FOR EXPORT FILENAMES
     function getFormattedTimestamp() {
       const now = new Date();
       const pad = n => String(n).padStart(2, '0');
       return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
     }
 
-    // LOAD DROPDOWNS: OFFICES & USERS
     async function loadFilterDropdowns() {
-      // Load Offices
       const { data: offices } = await supabaseClient
         .from('offices')
         .select('office_name')
@@ -446,7 +545,9 @@
 
       const regSelect = document.getElementById('regOfficeName');
       const claimSelect = document.getElementById('claimOffice');
+      const editClaimSelect = document.getElementById('editClaimOffice');
       const filterOfficeSelect = document.getElementById('filterOfficeName');
+      const overviewFilterOfficeSelect = document.getElementById('overviewFilterOffice');
 
       if (offices) {
         let optionsHtml = '<option value="">-- Select Office Name --</option>';
@@ -458,10 +559,11 @@
 
         if (regSelect) regSelect.innerHTML = optionsHtml;
         if (claimSelect) claimSelect.innerHTML = optionsHtml;
+        if (editClaimSelect) editClaimSelect.innerHTML = optionsHtml;
         if (filterOfficeSelect) filterOfficeSelect.innerHTML = filterOptionsHtml;
+        if (overviewFilterOfficeSelect) overviewFilterOfficeSelect.innerHTML = filterOptionsHtml;
       }
 
-      // Load Entry By User Dropdown for Filters
       const { data: users } = await supabaseClient
         .from('profiles')
         .select('id, emp_id, emp_name')
@@ -609,7 +711,6 @@
         profile = newProfile;
       }
 
-      // SYNC REGISTRATION MOBILE NUMBER IF MISSING IN PROFILE
       const metaMobile = user.user_metadata?.mobile_number || user.user_metadata?.mobile_no;
       if (metaMobile && (!profile.mobile_number || profile.mobile_number.trim() === '')) {
         const { data: updatedProfile } = await supabaseClient
@@ -770,7 +871,100 @@
       }
     }
 
-    // SORT CLAIMS TABLE FUNCTION
+    // OPEN USER EDIT CLAIM MODAL
+    function openUserEditModal(claimId) {
+      const claim = rawClaimsList.find(c => c.id === claimId);
+      if (!claim) return alert("Claim details not found!");
+
+      document.getElementById('editClaimId').value = claim.id;
+      document.getElementById('editClaimOffice').value = claim.raised_for_office;
+      document.getElementById('editClaimModule').value = claim.module;
+      document.getElementById('editClaimArticleNo').value = claim.article_number;
+      document.getElementById('editClaimRrn').value = claim.rrn_number;
+      document.getElementById('editClaimTxnDate').value = claim.txn_date;
+      document.getElementById('editClaimAmount').value = claim.txn_amount;
+      document.getElementById('editClaimChannel').value = claim.payment_channel;
+      document.getElementById('editClaimMobile').value = claim.user_mobile || '';
+      document.getElementById('editClaimRemarks').value = claim.remarks_by_user;
+      document.getElementById('editClaimFile').value = '';
+
+      document.getElementById('userEditModal').classList.remove('hidden');
+    }
+
+    function closeUserEditModal() {
+      document.getElementById('userEditModal').classList.add('hidden');
+    }
+
+    // SUBMIT USER CLAIM EDIT
+    async function submitUserClaimEdit(e) {
+      e.preventDefault();
+      const claimId = document.getElementById('editClaimId').value;
+      const fileInput = document.getElementById('editClaimFile').files[0];
+
+      let publicUrl = null;
+
+      if (fileInput) {
+        const fileExt = fileInput.name.split('.').pop();
+        const filePath = `claims/edited-${claimId}-${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, fileInput);
+
+        if (uploadError) return alert("File upload failed: " + uploadError.message);
+        publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+      }
+
+      const updateData = {
+        raised_for_office: document.getElementById('editClaimOffice').value,
+        module: document.getElementById('editClaimModule').value,
+        article_number: document.getElementById('editClaimArticleNo').value,
+        rrn_number: document.getElementById('editClaimRrn').value,
+        txn_date: document.getElementById('editClaimTxnDate').value,
+        txn_amount: document.getElementById('editClaimAmount').value,
+        payment_channel: document.getElementById('editClaimChannel').value,
+        user_mobile: document.getElementById('editClaimMobile').value.trim(),
+        remarks_by_user: document.getElementById('editClaimRemarks').value
+      };
+
+      if (publicUrl) updateData.file_url = publicUrl;
+
+      const { error } = await supabaseClient.from('claims').update(updateData).eq('id', claimId);
+
+      if (error) {
+        alert("Failed to update claim: " + error.message);
+      } else {
+        alert("Claim request updated successfully!");
+        closeUserEditModal();
+        loadClaimsSummary();
+        generateMISReport();
+      }
+    }
+
+    // APPLY FILTERS TO OVERVIEW TABLE
+    function applyOverviewFilters() {
+      const from = document.getElementById('overviewFilterFromDate').value;
+      const to = document.getElementById('overviewFilterToDate').value;
+      const office = document.getElementById('overviewFilterOffice').value;
+      const status = document.getElementById('overviewFilterStatus').value;
+
+      currentClaimsList = rawClaimsList.filter(c => {
+        if (from && c.txn_date < from) return false;
+        if (to && c.txn_date > to) return false;
+        if (office && c.raised_for_office !== office) return false;
+        if (status && c.claim_status !== status) return false;
+        return true;
+      });
+
+      renderClaimsSummaryTable();
+    }
+
+    function resetOverviewFilters() {
+      document.getElementById('overviewFilterFromDate').value = '';
+      document.getElementById('overviewFilterToDate').value = '';
+      document.getElementById('overviewFilterOffice').value = '';
+      document.getElementById('overviewFilterStatus').value = '';
+      currentClaimsList = [...rawClaimsList];
+      renderClaimsSummaryTable();
+    }
+
     function sortTable(col) {
       if (currentSortCol === col) {
         currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
@@ -781,13 +975,11 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER CLAIMS SUMMARY TABLE WITH SORTING
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
       tbody.innerHTML = '';
 
-      // Update Header Sort Icons
       ['txn_id_ref', 'emp_name', 'raised_for_office', 'created_at', 'txn_date', 'txn_amount', 'claim_status'].forEach(c => {
         const iconEl = document.getElementById('sort_' + c);
         if (iconEl) iconEl.innerText = '⇅';
@@ -796,11 +988,10 @@
       if (activeIcon) activeIcon.innerText = currentSortDir === 'asc' ? '▲' : '▼';
 
       if (!currentClaimsList || currentClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">No requests found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">No requests found matching current filters.</td></tr>`;
         return;
       }
 
-      // Sort In-Memory List
       currentClaimsList.sort((a, b) => {
         let valA, valB;
 
@@ -823,6 +1014,7 @@
       currentClaimsList.forEach(c => {
         const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
         const entryDateTime = formatDateTime(c.created_at);
+        const isOwner = c.created_by === currentUser?.id;
 
         let adminReplyHtml = c.reply_remarks_admin 
           ? `<div class="bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded text-xs max-w-xs font-medium" title="${c.reply_remarks_admin}">${c.reply_remarks_admin}</div>`
@@ -850,18 +1042,20 @@
               </span>
             </td>
             <td class="p-3">${adminReplyHtml}</td>
-            <td class="p-3 flex items-center gap-3">
+            <td class="p-3 flex items-center gap-2">
               ${isAdmin ? `
                 <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`)" class="text-blue-600 font-bold underline cursor-pointer">Reply/Edit</button>
                 <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="text-red-600 font-bold underline cursor-pointer">Delete</button>
-              ` : `<a href="${c.file_url}" target="_blank" class="text-slate-600 underline">View File</a>`}
+              ` : `
+                ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="text-blue-600 font-bold underline cursor-pointer">Edit</button>` : ''}
+                <a href="${c.file_url}" target="_blank" class="text-slate-600 underline text-xs">View File</a>
+              `}
             </td>
           </tr>
         `;
       });
     }
 
-    // FETCH SUMMARY DATA
     async function loadClaimsSummary() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
@@ -875,12 +1069,13 @@
       }
 
       const { data: claims, error } = await query;
-      currentClaimsList = claims || [];
-      renderClaimsSummaryTable();
+      rawClaimsList = claims || [];
+      currentClaimsList = [...rawClaimsList];
+      applyOverviewFilters();
     }
 
     function openDetailsModal(claimId) {
-      const claim = currentClaimsList.find(c => c.id === claimId);
+      const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found!");
 
       const creatorEmpId = claim.profiles?.emp_id || 'N/A';
@@ -1042,7 +1237,6 @@
       else alert("User role updated successfully!");
     }
 
-    // RESET ALL MIS REPORT FILTERS
     function resetMISFilters() {
       document.getElementById('filterFromDate').value = '';
       document.getElementById('filterToDate').value = '';
@@ -1051,8 +1245,8 @@
       generateMISReport('All');
     }
 
-    // GENERATE MIS REPORT WITH DATE, OFFICE, & USER FILTERS
     async function generateMISReport(filterStatus = 'All') {
+      currentMISReportStatus = filterStatus;
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
       let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
@@ -1080,21 +1274,21 @@
       document.getElementById('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
       document.getElementById('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
 
-      let filteredClaims = claims;
+      currentMISClaimsList = claims;
       if (filterStatus !== 'All') {
-        filteredClaims = claims.filter(c => c.claim_status === filterStatus);
+        currentMISClaimsList = claims.filter(c => c.claim_status === filterStatus);
       }
 
       document.getElementById('misReportTableTitle').innerText = `Report Summary View (${filterStatus})`;
       const tbody = document.getElementById('misReportTableBody');
       tbody.innerHTML = '';
 
-      if (filteredClaims.length === 0) {
+      if (currentMISClaimsList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No matching claims found for the selected filters.</td></tr>`;
         return;
       }
 
-      filteredClaims.forEach(c => {
+      currentMISClaimsList.forEach(c => {
         const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
 
         tbody.innerHTML += `
@@ -1120,7 +1314,7 @@
       supabaseClient.channel('public:claims')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => {
           loadClaimsSummary();
-          generateMISReport();
+          generateMISReport(currentMISReportStatus);
         })
         .subscribe();
     }
@@ -1140,34 +1334,22 @@
       if (session) initApp();
     });
 
-    async function getFilteredMISData() {
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
-
-      if (!isAdmin) {
-        query = query.eq('created_by', currentUser.id);
-      }
-
-      const from = document.getElementById('filterFromDate').value;
-      const to = document.getElementById('filterToDate').value;
-      const selectedOffice = document.getElementById('filterOfficeName').value;
-      const selectedUser = document.getElementById('filterEmpUser').value;
-
-      if (from) query = query.gte('txn_date', from);
-      if (to) query = query.lte('txn_date', to);
-      if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
-      if (selectedUser) query = query.eq('created_by', selectedUser);
-
-      const { data: claims } = await query;
-      return claims || [];
+    // GENERATE DYNAMIC FILENAME FOR MIS EXPORTS AS REQUESTED
+    function buildExportFileName(ext) {
+      const from = document.getElementById('filterFromDate').value || 'ALL';
+      const to = document.getElementById('filterToDate').value || 'ALL';
+      const status = currentMISReportStatus || 'All';
+      const timestamp = getFormattedTimestamp();
+      return `Report Summary View (${status})_${from}_to_${to}_${timestamp}.${ext}`;
     }
 
-    // EXPORT TO EXCEL WITH TIMESTAMP
+    // EXPORT VISIBLE REPORT SUMMARY TO EXCEL
     async function exportMISExcel() {
-      const claims = await getFilteredMISData();
-      if (claims.length === 0) return alert("No claim data available to export!");
+      if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
+        return alert("No claim data currently visible to export!");
+      }
 
-      const formattedData = claims.map(c => ({
+      const formattedData = currentMISClaimsList.map(c => ({
         "Ref No (Txn ID)": c.txn_id_ref,
         "Emp Name": c.profiles?.emp_name || "N/A",
         "Emp ID": c.profiles?.emp_id || "N/A",
@@ -1187,27 +1369,28 @@
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "MIS Report");
+      XLSX.utils.book_append_sheet(workbook, worksheet, `Report_${currentMISReportStatus}`);
 
-      const fileName = `MIS_Report_${getFormattedTimestamp()}.xlsx`;
+      const fileName = buildExportFileName('xlsx');
       XLSX.writeFile(workbook, fileName);
     }
 
-    // EXPORT TO PDF WITH TIMESTAMP
+    // EXPORT VISIBLE REPORT SUMMARY TO PDF
     async function exportMISPDF() {
-      const claims = await getFilteredMISData();
-      if (claims.length === 0) return alert("No claim data available to export!");
+      if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
+        return alert("No claim data currently visible to export!");
+      }
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
 
-      doc.setFontSize(16);
-      doc.text("MIS & Pendency Report - Chennai City Central Division", 14, 15);
-      doc.setFontSize(10);
-      doc.text(`Generated on: ${new Date().toLocaleString()} | Total Records: ${claims.length}`, 14, 22);
+      doc.setFontSize(14);
+      doc.text(`Report Summary View (${currentMISReportStatus}) - Chennai City Central Division`, 14, 15);
+      doc.setFontSize(9);
+      doc.text(`Generated on: ${new Date().toLocaleString()} | Visible Records: ${currentMISClaimsList.length}`, 14, 22);
 
       const headers = [["Ref No", "Emp Name", "Entry Date/Time", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
-      const rows = claims.map(c => [
+      const rows = currentMISClaimsList.map(c => [
         c.txn_id_ref,
         c.profiles?.emp_name || "N/A",
         formatDateTime(c.created_at),
@@ -1227,7 +1410,7 @@
         styles: { fontSize: 8, cellPadding: 2 }
       });
 
-      const fileName = `MIS_Report_${getFormattedTimestamp()}.pdf`;
+      const fileName = buildExportFileName('pdf');
       doc.save(fileName);
     }
   </script>
