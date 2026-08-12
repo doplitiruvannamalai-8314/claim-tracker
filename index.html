@@ -1056,24 +1056,28 @@
       });
     }
 
-    async function loadClaimsSummary() {
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+// LOAD CLAIMS SUMMARY (USER-WISE + OFFICE-WISE VISIBILITY)
+async function loadClaimsSummary() {
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
-      let query = supabaseClient
-        .from('claims')
-        .select('*, profiles:created_by(emp_id, emp_name)')
-        .order('created_at', { ascending: false });
+  let query = supabaseClient
+    .from('claims')
+    .select('*, profiles:created_by(emp_id, emp_name)')
+    .order('created_at', { ascending: false });
 
-      if (!isAdmin) {
-        query = query.eq('created_by', currentUser.id);
-      }
+  // NON-ADMIN VISIBILITY: Created by user OR Raised for user's assigned office
+  if (!isAdmin) {
+    const userOffice = userProfile.office_name;
+    query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userOffice}"`);
+  }
 
-      const { data: claims, error } = await query;
-      rawClaimsList = claims || [];
-      currentClaimsList = [...rawClaimsList];
-      applyOverviewFilters();
-    }
+  const { data: claims, error } = await query;
+  if (error) console.error("Error fetching claims summary:", error);
 
+  rawClaimsList = claims || [];
+  currentClaimsList = [...rawClaimsList];
+  applyOverviewFilters();
+}
     function openDetailsModal(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found!");
@@ -1245,71 +1249,73 @@
       generateMISReport('All');
     }
 
-    async function generateMISReport(filterStatus = 'All') {
-      currentMISReportStatus = filterStatus;
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+   // GENERATE MIS REPORT (USER-WISE + OFFICE-WISE VISIBILITY)
+async function generateMISReport(filterStatus = 'All') {
+  currentMISReportStatus = filterStatus;
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
-      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
+  let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
 
-      if (!isAdmin) {
-        query = query.eq('created_by', currentUser.id);
-      }
+  // NON-ADMIN VISIBILITY: Created by user OR Raised for user's assigned office
+  if (!isAdmin) {
+    const userOffice = userProfile.office_name;
+    query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userOffice}"`);
+  }
 
-      const from = document.getElementById('filterFromDate').value;
-      const to = document.getElementById('filterToDate').value;
-      const selectedOffice = document.getElementById('filterOfficeName').value;
-      const selectedUser = document.getElementById('filterEmpUser').value;
+  const from = document.getElementById('filterFromDate').value;
+  const to = document.getElementById('filterToDate').value;
+  const selectedOffice = document.getElementById('filterOfficeName').value;
+  const selectedUser = document.getElementById('filterEmpUser').value;
 
-      if (from) query = query.gte('txn_date', from);
-      if (to) query = query.lte('txn_date', to);
-      if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
-      if (selectedUser) query = query.eq('created_by', selectedUser);
+  if (from) query = query.gte('txn_date', from);
+  if (to) query = query.lte('txn_date', to);
+  if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
+  if (selectedUser) query = query.eq('created_by', selectedUser);
 
-      const { data: claims } = await query;
-      if (!claims) return;
+  const { data: claims } = await query;
+  if (!claims) return;
 
-      document.getElementById('misTotal').innerText = claims.length;
-      document.getElementById('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
-      document.getElementById('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
-      document.getElementById('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
-      document.getElementById('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
+  document.getElementById('misTotal').innerText = claims.length;
+  document.getElementById('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
+  document.getElementById('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
+  document.getElementById('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
+  document.getElementById('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
 
-      currentMISClaimsList = claims;
-      if (filterStatus !== 'All') {
-        currentMISClaimsList = claims.filter(c => c.claim_status === filterStatus);
-      }
+  currentMISClaimsList = claims;
+  if (filterStatus !== 'All') {
+    currentMISClaimsList = claims.filter(c => c.claim_status === filterStatus);
+  }
 
-      document.getElementById('misReportTableTitle').innerText = `Report Summary View (${filterStatus})`;
-      const tbody = document.getElementById('misReportTableBody');
-      tbody.innerHTML = '';
+  document.getElementById('misReportTableTitle').innerText = `Report Summary View (${filterStatus})`;
+  const tbody = document.getElementById('misReportTableBody');
+  tbody.innerHTML = '';
 
-      if (currentMISClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No matching claims found for the selected filters.</td></tr>`;
-        return;
-      }
+  if (currentMISClaimsList.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No matching claims found for the selected filters.</td></tr>`;
+    return;
+  }
 
-      currentMISClaimsList.forEach(c => {
-        const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
+  currentMISClaimsList.forEach(c => {
+    const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
 
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-3 font-bold">${c.txn_id_ref}</td>
-            <td class="p-3 font-semibold text-slate-700">${creatorName}</td>
-            <td class="p-3">${c.raised_for_office}</td>
-            <td class="p-3 text-xs text-slate-600">${formatDateTime(c.created_at)}</td>
-            <td class="p-3">${c.txn_date}</td>
-            <td class="p-3">₹${c.txn_amount}</td>
-            <td class="p-3">
-              <span class="px-2 py-1 rounded text-xs font-bold ${getStatusColor(c.claim_status)}">
-                ${c.claim_status}
-              </span>
-            </td>
-            <td class="p-3 text-xs text-slate-600">${c.reply_remarks_admin || '-'}</td>
-          </tr>
-        `;
-      });
-    }
-
+    tbody.innerHTML += `
+      <tr>
+        <td class="p-3 font-bold">${c.txn_id_ref}</td>
+        <td class="p-3 font-semibold text-slate-700">${creatorName}</td>
+        <td class="p-3">${c.raised_for_office}</td>
+        <td class="p-3 text-xs text-slate-600">${formatDateTime(c.created_at)}</td>
+        <td class="p-3">${c.txn_date}</td>
+        <td class="p-3">₹${c.txn_amount}</td>
+        <td class="p-3">
+          <span class="px-2 py-1 rounded text-xs font-bold ${getStatusColor(c.claim_status)}">
+            ${c.claim_status}
+          </span>
+        </td>
+        <td class="p-3 text-xs text-slate-600">${c.reply_remarks_admin || '-'}</td>
+      </tr>
+    `;
+  });
+}
     function subscribeRealtimeClaims() {
       supabaseClient.channel('public:claims')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => {
