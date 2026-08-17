@@ -1716,83 +1716,90 @@
     }
 
     // SAVE ADMIN REPLY WITH VALIDATION AND ROW CHECK
-    async function submitAdminReply() {
-      const id = document.getElementById('modalClaimId').value;
-      const status = document.getElementById('modalStatus').value;
-      const moduleEl = document.getElementById('modalModule');
-      const moduleVal = moduleEl ? moduleEl.value : null;
-      const reply_remarks_admin = (document.getElementById('modalAdminRemarks').value || '').trim();
-      const adminFileInput = document.getElementById('modalAdminFile')?.files[0];
+ async function submitAdminReply() {
+  const id = document.getElementById('modalClaimId').value;
+  const status = document.getElementById('modalStatus').value;
+  const moduleEl = document.getElementById('modalModule');
+  const moduleVal = moduleEl ? moduleEl.value : null;
+  const reply_remarks_admin = (document.getElementById('modalAdminRemarks').value || '').trim();
+  const adminFileInput = document.getElementById('modalAdminFile')?.files[0];
 
-      if (!id) {
-        return alert("Error: Claim ID is missing. Please close and re-open the modal.");
+  if (!id) {
+    return alert("Error: Claim ID is missing. Please close and re-open the Reply modal.");
+  }
+
+  let admin_file_url = null;
+
+  try {
+    // 1. Upload Clipboard Snipped Image (if any)
+    if (adminPastedImageBlob) {
+      const filePath = `admin-replies/snip-${id}-${Date.now()}.png`;
+      const { error: uploadErr } = await supabaseClient.storage
+        .from('claim-attachments')
+        .upload(filePath, adminPastedImageBlob, { contentType: 'image/png' });
+
+      if (uploadErr) {
+        return alert("Failed to upload screenshot: " + uploadErr.message);
       }
+      admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    } 
+    // 2. Upload Document File (if any)
+    else if (adminFileInput) {
+      const fileExt = adminFileInput.name.split('.').pop();
+      const filePath = `admin-replies/${id}-${Date.now()}.${fileExt}`;
+      const { error: uploadErr } = await supabaseClient.storage
+        .from('claim-attachments')
+        .upload(filePath, adminFileInput);
 
-      let admin_file_url = null;
-
-      try {
-        if (adminPastedImageBlob) {
-          const filePath = `admin-replies/snip-${id}-${Date.now()}.png`;
-          const { error: uploadErr } = await supabaseClient.storage
-            .from('claim-attachments')
-            .upload(filePath, adminPastedImageBlob, { contentType: 'image/png' });
-
-          if (uploadErr) {
-            return alert("Failed to upload screenshot: " + uploadErr.message);
-          }
-          admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-        } else if (adminFileInput) {
-          const fileExt = adminFileInput.name.split('.').pop();
-          const filePath = `admin-replies/${id}-${Date.now()}.${fileExt}`;
-          const { error: uploadErr } = await supabaseClient.storage
-            .from('claim-attachments')
-            .upload(filePath, adminFileInput);
-
-          if (uploadErr) {
-            return alert("Failed to upload document: " + uploadErr.message);
-          }
-          admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-        }
-
-        const updateData = {
-          claim_status: status,
-          reply_remarks_admin: reply_remarks_admin
-        };
-
-        if (moduleVal) {
-          updateData.module = moduleVal;
-        }
-
-        if (admin_file_url) {
-          updateData.admin_file_url = admin_file_url;
-        }
-
-        const { data, error } = await supabaseClient
-          .from('claims')
-          .update(updateData)
-          .eq('id', id)
-          .select();
-
-        if (error) {
-          console.error("Database Update Error:", error);
-          return alert("Failed to save changes: " + error.message);
-        }
-
-        if (!data || data.length === 0) {
-          return alert("Notice: Update could not be applied. Please check that your user account has Admin role permissions in the system.");
-        }
-
-        alert("Claim updated successfully!");
-        closeModal();
-        await loadClaimsSummary();
-        await generateMISReport(currentMISReportStatus);
-
-      } catch (err) {
-        console.error("Unexpected Error:", err);
-        alert("An unexpected error occurred: " + err.message);
+      if (uploadErr) {
+        return alert("Failed to upload document: " + uploadErr.message);
       }
+      admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
     }
 
+    // 3. Construct update payload
+    const updateData = {
+      claim_status: status,
+      reply_remarks_admin: reply_remarks_admin
+    };
+
+    if (moduleVal) {
+      updateData.module = moduleVal;
+    }
+
+    if (admin_file_url) {
+      updateData.admin_file_url = admin_file_url;
+    }
+
+    // 4. Send UPDATE request to Supabase
+    const { data, error } = await supabaseClient
+      .from('claims')
+      .update(updateData)
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error("Database Update Error:", error);
+      return alert("Database Error: " + error.message);
+    }
+
+    // Check if RLS blocked the write (returns 0 rows updated)
+    if (!data || data.length === 0) {
+      return alert("Permission Denied: Your profile role is not recognized as 'admin' or 'superadmin' in the database. Run the SQL policy update in Supabase.");
+    }
+
+    alert("Claim updated successfully!");
+    closeModal();
+    
+    // Refresh views
+    await loadClaimsSummary();
+    await generateMISReport(currentMISReportStatus);
+
+  } catch (err) {
+    console.error("Unexpected Script Error:", err);
+    alert("An unexpected error occurred: " + err.message);
+  }
+}
     async function loadAllUsers() {
       const { data: users, error } = await supabaseClient
         .from('profiles')
