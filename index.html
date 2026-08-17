@@ -107,7 +107,7 @@
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password *</label>
-            <input type="password" id="loginPassword" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 outline-none bg-amber-50/20">
+            <input type="password" id="loginPassword" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 focus:border-postRed-600 outline-none bg-amber-50/20">
           </div>
           <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg transition shadow-md cursor-pointer">Log In</button>
         </form>
@@ -220,18 +220,18 @@
               </div>
             </div>
 
-            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR & STACKED CELLS -->
+            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR -->
             <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="sticky top-0 z-10 shadow-xs">
                   <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold whitespace-nowrap">
-                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No / Module <span id="sort_txn_id_ref">⇅</span></th>
-                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Raised By / Office <span id="sort_emp_name">⇅</span></th>
-                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn / Entry Date <span id="sort_txn_date">⇅</span></th>
-                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
-                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
-                    <th class="p-3 bg-postRed-50 cursor-default min-w-[240px]">Admin Reply / Remarks</th> 
-                    <th class="p-3 bg-postRed-50 cursor-default text-center min-w-[240px]">Action / Attachments</th>
+                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No / Module <span id="sort_txn_id_ref">⇅</span></th>
+                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Raised By / Office <span id="sort_emp_name">⇅</span></th>
+                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn / Entry Date <span id="sort_txn_date">⇅</span></th>
+                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
+                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
+                    <th class="p-3.5 bg-postRed-50 cursor-default min-w-[240px]">Admin Reply / Remarks</th> 
+                    <th class="p-3.5 bg-postRed-50 cursor-default text-center min-w-[280px]">Action &amp; Tools</th>
                   </tr>
                 </thead>
                 <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -292,7 +292,7 @@
             </div>
             <div class="md:col-span-2">
               <label class="block text-xs font-bold text-slate-700 mb-1">Remarks by User *</label>
-              <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks/reason for claim..."></textarea>
+              <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks for claim..."></textarea>
             </div>
 
             <!-- FILE ATTACHMENT & CLIPBOARD PASTE -->
@@ -1268,7 +1268,7 @@
       }
     }
 
-    // INSTANT SEARCH & FILTER COMBINED (WITH MODULE, EMP & OFFICE FILTERS)
+    // INSTANT SEARCH & FILTER COMBINED
     function applyOverviewFilters() {
       const query = (document.getElementById('overviewInstantSearch')?.value || '').trim().toLowerCase();
       const selectedModule = document.getElementById('overviewFilterModule')?.value;
@@ -1315,7 +1315,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER SUMMARY TABLE (PREVIOUS CLEAN LAYOUT WITH 2-LINE STACKING & PRINT BUTTON)
+    // RENDER SUMMARY TABLE (WITH UNIFORM ACTION BUTTONS & INCREASED PADDING)
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
@@ -1371,45 +1371,53 @@
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-top">
             <!-- 1. REF NO & MODULE STACKED -->
-            <td class="p-3 whitespace-nowrap">
+            <td class="p-3.5 whitespace-nowrap">
               <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-sm block">
                 ${c.txn_id_ref}
               </button>
               <span class="inline-block bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-xs mt-1 border border-slate-200">${c.module}</span>
             </td>
             <!-- 2. EMP NAME/ID & OFFICE STACKED -->
-            <td class="p-3 whitespace-nowrap">
+            <td class="p-3.5 whitespace-nowrap">
               <div class="font-bold text-slate-800">${empNameOnly} <span class="text-xs text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
               <div class="text-xs text-slate-600 font-medium mt-0.5">${c.raised_for_office}</div>
             </td>
             <!-- 3. TXN DATE & ENTRY TIME STACKED -->
-            <td class="p-3 whitespace-nowrap text-xs">
+            <td class="p-3.5 whitespace-nowrap text-xs">
               <div class="font-bold text-slate-800">${c.txn_date}</div>
               <div class="text-slate-500 text-[11px] mt-0.5">${entryDateTime}</div>
             </td>
             <!-- 4. AMOUNT -->
-            <td class="p-3 font-bold text-slate-900 whitespace-nowrap text-sm">₹${c.txn_amount}</td>
+            <td class="p-3.5 font-bold text-slate-900 whitespace-nowrap text-sm">₹${c.txn_amount}</td>
             <!-- 5. STATUS -->
-            <td class="p-3 whitespace-nowrap">
+            <td class="p-3.5 whitespace-nowrap">
               <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
               </span>
             </td>
             <!-- 6. FULL ADMIN REPLY -->
-            <td class="p-3 min-w-[240px]">${adminReplyHtml}</td>
-            <!-- 7. ACTIONS (WITH PRINT) -->
-            <td class="p-3 text-center whitespace-nowrap min-w-[240px]">
+            <td class="p-3.5 min-w-[240px]">${adminReplyHtml}</td>
+            <!-- 7. ACTIONS (EVENLY DISTRIBUTED RECTANGLES WITH ICONS) -->
+            <td class="p-3.5 text-center whitespace-nowrap min-w-[280px]">
               <div class="flex items-center justify-center gap-1.5 flex-wrap">
                 ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
-                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Delete</button>
+                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="inline-flex items-center justify-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+                    ✏️ Reply
+                  </button>
+                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="inline-flex items-center justify-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+                    🗑️ Delete
+                  </button>
                 ` : `
-                  ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">Edit</button>` : ''}
+                  ${isOwner ? `
+                    <button type="button" onclick="openUserEditModal('${c.id}')" class="inline-flex items-center justify-center gap-1 bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+                      ✏️ Edit
+                    </button>
+                  ` : ''}
                 `}
-                <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">
-                  📄 View Doc
+                <a href="${c.file_url}" target="_blank" class="inline-flex items-center justify-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+                  📄 Doc
                 </a>
-                <button type="button" onclick="printClaimDetails('${c.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition cursor-pointer">
+                <button type="button" onclick="printClaimDetails('${c.id}')" class="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition cursor-pointer w-[72px]">
                   🖨️ Print
                 </button>
               </div>
@@ -1448,29 +1456,29 @@
 
       const container = document.getElementById('detailsModalContent');
       container.innerHTML = `
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Created By Employee:</strong> <span class="font-bold text-slate-800">${creatorEmpName} (${creatorEmpId})</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Date & Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium">${claim.user_mobile || 'N/A'}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium text-postRed-700 font-bold">${claim.module}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Article Number:</strong> <span class="font-medium">${claim.article_number}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">RRN Number:</strong> <span class="font-medium">${claim.rrn_number}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Date:</strong> <span class="font-medium">${claim.txn_date}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Amount:</strong> <span class="font-bold text-emerald-800">₹${claim.txn_amount}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Payment Channel:</strong> <span class="font-medium">${claim.payment_channel}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Created By Employee:</strong> <span class="font-bold text-slate-800">${creatorEmpName} (${creatorEmpId})</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Date & Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium">${claim.user_mobile || 'N/A'}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium text-postRed-700 font-bold">${claim.module}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Article Number:</strong> <span class="font-medium">${claim.article_number}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">RRN Number:</strong> <span class="font-medium">${claim.rrn_number}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Date:</strong> <span class="font-medium">${claim.txn_date}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Amount:</strong> <span class="font-bold text-emerald-800">₹${claim.txn_amount}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Payment Channel:</strong> <span class="font-medium">${claim.payment_channel}</span></div>
         
         <div class="col-span-1 md:col-span-2">
           <strong class="text-slate-500 text-xs block mb-1">Claim Status:</strong> 
           <span class="px-3 py-1 rounded-full text-xs font-bold inline-block ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span>
         </div>
         
-        <div class="col-span-1 md:col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-200">
+        <div class="col-span-1 md:col-span-2 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
           <strong class="text-slate-600 text-xs block mb-1">Remarks by User:</strong> 
           <p class="text-slate-800">${claim.remarks_by_user}</p>
         </div>
         
-        <div class="col-span-1 md:col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-300 space-y-2">
+        <div class="col-span-1 md:col-span-2 bg-amber-50 p-3.5 rounded-lg border border-amber-300 space-y-2">
           <strong class="text-postRed-800 text-xs block">Reply Remarks by Admin:</strong> 
           <p class="text-slate-800 whitespace-pre-wrap">${claim.reply_remarks_admin || 'Pending Response'}</p>
           ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-postRed-600 text-white px-2.5 py-1 rounded text-xs font-bold hover:bg-postRed-700 transition shadow-xs">📎 Admin Attached File</a>` : ''}
@@ -1496,7 +1504,7 @@
       document.getElementById('detailsModal').classList.add('hidden');
     }
 
-    // PRINT COMPLETE CLAIM DOCKET (NO SIGNATURES & DOUBLED IMAGE PREVIEW HEIGHT)
+    // PRINT COMPLETE CLAIM DOCKET (ASYMMETRIC GRID WITH 25% REDUCED LEFT & EXPANDED RIGHT PANEL)
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -1519,30 +1527,34 @@
         <head>
           <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
           <style>
-            @page { size: A4 portrait; margin: 8mm 10mm; }
+            @page { size: A4 portrait; margin: 10mm 12mm; }
             * { box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 12px; font-size: 11px; line-height: 1.25; background: #fff; }
-            .header-banner { border-bottom: 2px solid #C4122F; padding-bottom: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
-            .title-area h1 { margin: 0; color: #A80F28; font-size: 14px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
-            .title-area h2 { margin: 1px 0 0 0; color: #D97706; font-size: 10px; font-weight: bold; }
-            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 12px; font-weight: bold; text-align: right; }
-            .section-title { background: #FEF9C3; color: #8A0C21; padding: 2px 6px; font-weight: bold; font-size: 10px; margin: 6px 0 4px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
-            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
-            table.details-grid td { padding: 3px 6px; border: 1px solid #cbd5e1; font-size: 10.5px; vertical-align: top; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 14px; font-size: 11px; line-height: 1.3; background: #fff; }
+            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 10.5px; font-weight: bold; }
+            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 12.5px; font-weight: bold; text-align: right; }
+            .section-title { background: #FEF9C3; color: #8A0C21; padding: 3px 8px; font-weight: bold; font-size: 10.5px; margin: 8px 0 5px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
+            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            table.details-grid td { padding: 4px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: top; }
             table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
             table.details-grid td.value { width: 28%; color: #0f172a; }
-            .status-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
+            .status-pill { display: inline-block; padding: 1.5px 8px; border-radius: 9999px; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
             .status-Pending { background: #FEF9C3; color: #B45309; border: 1px solid #FACC15; }
             .status-InProgress { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
             .status-Settled { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
             .status-Rejected { background: #FFE4E6; color: #BE123C; border: 1px solid #FDA4AF; }
-            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; background: #fafaf9; margin-bottom: 5px; font-size: 10.5px; min-height: 24px; white-space: pre-wrap; word-break: break-word; }
+            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; background: #fafaf9; margin-bottom: 6px; font-size: 11px; min-height: 26px; white-space: pre-wrap; word-break: break-word; }
             .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
-            .attachments-grid { display: flex; gap: 8px; margin-top: 4px; justify-content: space-between; }
-            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; background: #fafaf9; text-align: center; }
-            .attachment-col strong { font-size: 10px; display: block; margin-bottom: 3px; text-align: left; }
+            
+            /* ASYMMETRIC GRID: Left reduced by 25% (37%), Right expanded (61%) */
+            .attachments-grid { display: flex; gap: 10px; margin-top: 6px; justify-content: space-between; align-items: flex-start; }
+            .attachment-col-left { flex: 0 0 37%; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
+            .attachment-col-right { flex: 0 0 61%; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
+            .attachment-col-left strong, .attachment-col-right strong { font-size: 10.5px; display: block; margin-bottom: 4px; text-align: left; }
+            
             .attachment-preview { max-width: 100%; max-height: 320px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
-            .attachment-link { font-size: 10px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
+            .attachment-link { font-size: 10.5px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
             @media print {
               body { padding: 0; }
               .no-print { display: none; }
@@ -1551,9 +1563,9 @@
           </style>
         </head>
         <body>
-          <div class="no-print" style="background:#f1f5f9; padding:6px 12px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:8px;">
-            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🖨️ Print Now</button>
-            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:12px;">Close</button>
+          <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
+            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:7px 16px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🖨️ Print Now</button>
+            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:12px;">Close</button>
           </div>
 
           <div class="header-banner">
@@ -1610,7 +1622,7 @@
               <td class="label">Transaction Date:</td>
               <td class="value">${claim.txn_date}</td>
               <td class="label">Transaction Amount:</td>
-              <td class="value" style="font-size: 11px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
+              <td class="value" style="font-size: 11.5px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
             </tr>
             <tr>
               <td class="label">Payment Channel:</td>
@@ -1621,26 +1633,26 @@
           </table>
 
           <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
-          <div style="font-weight:bold; font-size:9.5px; margin-bottom:2px; color:#475569;">Remarks / Justification by User:</div>
+          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#475569;">Remarks by User:</div>
           <div class="remarks-box">${claim.remarks_by_user || 'No remarks entered.'}</div>
 
-          <div style="font-weight:bold; font-size:9.5px; margin-bottom:2px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
+          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
           <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Response from Admin.'}</div>
 
           <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
           <div class="attachments-grid">
-            <!-- User Attachment Column -->
-            <div class="attachment-col">
+            <!-- Left Side: User Attachment Column (Reduced by 25%) -->
+            <div class="attachment-col-left">
               <strong>Applicant Submitted Document:</strong>
               ${isUserImage 
                 ? `<img src="${claim.file_url}" class="attachment-preview" alt="Applicant Attachment">`
-                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View / Download Attached Document File</a>` : '<em>No applicant file attached.</em>')
+                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View Attached File</a>` : '<em>No applicant file attached.</em>')
               }
             </div>
 
-            <!-- Admin Attachment Column -->
-            <div class="attachment-col" style="${!claim.admin_file_url ? 'background:#f8fafc; color:#94a3b8;' : ''}">
-              <strong style="color: #991b1b;">Admin Attached Resolution / Screenshot:</strong>
+            <!-- Right Side: Admin Attachment Column (Expanded for Landscape) -->
+            <div class="attachment-col-right" style="${!claim.admin_file_url ? 'background:#f8fafc; color:#94a3b8;' : ''}">
+              <strong style="color: #991b1b;">Admin Attached Resolution / Landscape Document:</strong>
               ${claim.admin_file_url 
                 ? (isAdminImage 
                     ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
