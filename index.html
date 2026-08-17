@@ -61,7 +61,8 @@
       </div>
     </nav>
 
-    <div class="max-w-6xl mx-auto p-4 md:p-6">
+    <!-- EXPANDED CONTAINER WIDTH (max-w-7xl) -->
+    <div class="max-w-7xl mx-auto p-4 md:p-6 w-full">
 
       <!-- AUTHENTICATION CONTAINER (LOGIN / REGISTER) -->
       <div id="authSection" class="max-w-md mx-auto mt-10 bg-white p-8 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
@@ -155,7 +156,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS & Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW (CONTAINS SUBMITTED CLAIMS OVERVIEW WITH SEARCH & MODULE FILTER) -->
+        <!-- TAB 1: TRACK CLAIM VIEW -->
         <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div>
             <div class="border-b pb-3 border-amber-200">
@@ -169,7 +170,7 @@
             <div id="trackResult" class="hidden border border-postGold-400 p-4 rounded-lg bg-amber-50/40 mt-3 space-y-2 text-sm"></div>
           </div>
 
-          <!-- SUBMITTED CLAIMS OVERVIEW -->
+          <!-- SUBMITTED CLAIMS OVERVIEW (EMP NAME REMOVED FOR CLEAN FULL ACTION VISIBILITY) -->
           <div class="border-t pt-6 border-amber-200">
             <div class="flex justify-between items-center flex-wrap gap-2 mb-3">
               <h4 class="font-bold text-md text-slate-800">Submitted Claims Overview <span class="text-xs text-slate-400 font-normal">(Click headers to sort)</span></h4>
@@ -213,12 +214,12 @@
               </div>
             </div>
 
-            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+            <!-- TABLE WITH EXPANDED ACTION COLUMN -->
+            <div class="overflow-x-auto border border-slate-200 rounded-lg shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold">
+                  <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold whitespace-nowrap">
                     <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No (Txn ID) <span id="sort_txn_id_ref">⇅</span></th>
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Emp Name <span id="sort_emp_name">⇅</span></th>
                     <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('module')">Module <span id="sort_module">⇅</span></th>
                     <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('raised_for_office')">Office Name <span id="sort_raised_for_office">⇅</span></th>
                     <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('created_at')">Entry Date/Time <span id="sort_created_at">⇅</span></th>
@@ -226,7 +227,7 @@
                     <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
                     <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
                     <th class="p-3 cursor-default">Admin Reply</th> 
-                    <th class="p-3 cursor-default">Action / Attachments</th>
+                    <th class="p-3 cursor-default text-center min-w-[200px]">Action / Attachments</th>
                   </tr>
                 </thead>
                 <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -344,7 +345,7 @@
           <div class="overflow-x-auto border border-slate-200 rounded-lg">
             <table class="w-full text-left text-sm border-collapse">
               <thead>
-                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold">
+                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
                   <th class="p-3">Emp ID</th>
                   <th class="p-3">Emp Name</th>
                   <th class="p-3">Mobile No</th>
@@ -443,7 +444,7 @@
             <h4 id="misReportTableTitle" class="font-bold text-sm p-3 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
             <table class="w-full text-left text-sm border-collapse">
               <thead>
-                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold">
+                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
                   <th class="p-3">Ref No</th>
                   <th class="p-3">Emp Name</th>
                   <th class="p-3">Module</th>
@@ -677,12 +678,12 @@
 
   <!-- FOOTER PANEL -->
   <footer class="w-full bg-white border-t border-amber-300 py-4 mt-12 text-center text-xs text-slate-600 shadow-inner">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
       <div class="font-bold text-postRed-700">
         Refund Claims Management Portal &bull; Chennai City Central Division
       </div>
       <div class="text-slate-500 font-medium">
-        Designed and Developed : <span class="font-semibold text-slate-700">Krishnan K </span><!-- FOOTER PANEL Chennai City Central Division</span> by -->
+        Designed and Developed for <span class="font-semibold text-slate-700">Chennai City Central Division</span>
       </div>
     </div>
   </footer>
@@ -701,6 +702,10 @@
     let currentMISReportStatus = 'All';
     let allLoadedUsers = [];
     let isRrnManuallyEdited = false;
+    let isAppInitialized = false;
+
+    // ACTIVE TAB STATE PERSISTENCE
+    let currentActiveTab = sessionStorage.getItem('activePortalTab') || 'track';
 
     // Clipboard Blobs
     let adminPastedImageBlob = null;
@@ -751,7 +756,6 @@
       }
     });
 
-    // Admin Image Paste Handlers
     function handleAdminPastedImage(blob) {
       adminPastedImageBlob = blob;
       const previewImg = document.getElementById('adminPastedImagePreview');
@@ -770,7 +774,6 @@
       document.getElementById('adminPastedImagePreview').src = '';
     }
 
-    // User Registration Image Paste Handlers
     function handleUserPastedImage(blob) {
       userPastedImageBlob = blob;
       const previewImg = document.getElementById('userPastedImagePreview');
@@ -955,6 +958,7 @@
     }
 
     async function handleLogout() {
+      sessionStorage.removeItem('activePortalTab');
       await supabaseClient.auth.signOut();
       window.location.reload();
     }
@@ -1037,10 +1041,15 @@
         loadAllUsers();
       }
 
-      showTab('track');
-      loadClaimsSummary();
-      generateMISReport();
-      subscribeRealtimeClaims();
+      // PRESERVE ACTIVE TAB ON FOCUS REFRESH
+      showTab(currentActiveTab);
+
+      if (!isAppInitialized) {
+        loadClaimsSummary();
+        generateMISReport();
+        subscribeRealtimeClaims();
+        isAppInitialized = true;
+      }
     }
 
     async function submitMandatoryMobile() {
@@ -1066,7 +1075,11 @@
       }
     }
 
+    // TAB NAVIGATION WITH SESSION PERSISTENCE
     function showTab(tabId) {
+      currentActiveTab = tabId;
+      sessionStorage.setItem('activePortalTab', tabId);
+
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(el => {
         el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer";
@@ -1090,7 +1103,6 @@
       }
     }
 
-    // SUBMIT CLAIM WITH FILE OR CLIPBOARD IMAGE
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = document.getElementById('claimFile').files[0];
@@ -1278,12 +1290,13 @@
       renderClaimsSummaryTable();
     }
 
+    // RENDER SUMMARY TABLE (EMP NAME COLUMN REMOVED TO EXPAND ACTION BUTTONS SPACE)
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
       tbody.innerHTML = '';
 
-      ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'created_at', 'txn_date', 'txn_amount', 'claim_status'].forEach(c => {
+      ['txn_id_ref', 'module', 'raised_for_office', 'created_at', 'txn_date', 'txn_amount', 'claim_status'].forEach(c => {
         const iconEl = document.getElementById('sort_' + c);
         if (iconEl) iconEl.innerText = '⇅';
       });
@@ -1291,17 +1304,14 @@
       if (activeIcon) activeIcon.innerText = currentSortDir === 'asc' ? '▲' : '▼';
 
       if (!currentClaimsList || currentClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
         return;
       }
 
       currentClaimsList.sort((a, b) => {
         let valA, valB;
 
-        if (currentSortCol === 'emp_name') {
-          valA = (a.profiles?.emp_name || '').toLowerCase();
-          valB = (b.profiles?.emp_name || '').toLowerCase();
-        } else if (currentSortCol === 'txn_amount') {
+        if (currentSortCol === 'txn_amount') {
           valA = parseFloat(a.txn_amount) || 0;
           valB = parseFloat(b.txn_amount) || 0;
         } else {
@@ -1315,49 +1325,47 @@
       });
 
       currentClaimsList.forEach(c => {
-        const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
         const entryDateTime = formatDateTime(c.created_at);
         const isOwner = c.created_by === currentUser?.id;
 
         let adminReplyHtml = c.reply_remarks_admin 
-          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 px-2.5 py-1 rounded text-xs max-w-xs font-medium" title="${c.reply_remarks_admin}">${c.reply_remarks_admin}</div>`
-          : `<span class="text-slate-400 italic text-xs">Pending Response</span>`;
+          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 px-2 py-1 rounded text-xs font-medium max-w-[160px] truncate" title="${c.reply_remarks_admin}">${c.reply_remarks_admin}</div>`
+          : `<span class="text-slate-400 italic text-xs">Pending</span>`;
 
-        // ADMIN ATTACHMENT IN RED BUTTON
         if (c.admin_file_url) {
-          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs mt-1 transition">📎 Admin File </a>`;
+          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs mt-1 transition whitespace-nowrap">📎 Admin File</a>`;
         }
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-3 font-bold">
-              <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer">
+            <td class="p-3 font-bold whitespace-nowrap">
+              <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono">
                 ${c.txn_id_ref}
               </button>
             </td>
-            <td class="p-3 font-semibold text-slate-700">${creatorName}</td>
-            <td class="p-3 font-medium text-slate-700">${c.module}</td>
-            <td class="p-3">${c.raised_for_office}</td>
-            <td class="p-3 text-xs text-slate-600">${entryDateTime}</td>
-            <td class="p-3">${c.txn_date}</td>
-            <td class="p-3 font-semibold">₹${c.txn_amount}</td>
-            <td class="p-3">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
+            <td class="p-3 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
+            <td class="p-3 whitespace-nowrap">${c.raised_for_office}</td>
+            <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${entryDateTime}</td>
+            <td class="p-3 whitespace-nowrap">${c.txn_date}</td>
+            <td class="p-3 font-semibold whitespace-nowrap">₹${c.txn_amount}</td>
+            <td class="p-3 whitespace-nowrap">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
               </span>
             </td>
             <td class="p-3">${adminReplyHtml}</td>
-            <td class="p-3 flex items-center gap-2 flex-wrap">
-              ${isAdmin ? `
-                <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`)" class="text-postRed-700 hover:text-postRed-900 font-bold underline cursor-pointer text-xs">Reply/Edit</button>
-                <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer text-xs">Delete</button>
-              ` : `
-                ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="text-postGold-700 hover:text-postGold-800 font-bold underline cursor-pointer text-xs">Edit</button>` : ''}
-              `}
-              <!-- USER SUBMITTED ATTACHMENT IN GREEN BUTTON -->
-              <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs transition">
-                📄 User Doc 
-              </a>
+            <td class="p-3 text-center whitespace-nowrap min-w-[200px]">
+              <div class="flex items-center justify-center gap-2">
+                ${isAdmin ? `
+                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`)" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
+                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Delete</button>
+                ` : `
+                  ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Edit</button>` : ''}
+                `}
+                <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">
+                  📄 View Doc
+                </a>
+              </div>
             </td>
           </tr>
         `;
@@ -1393,7 +1401,7 @@
 
       const container = document.getElementById('detailsModalContent');
       container.innerHTML = `
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-postRed-700">${claim.txn_id_ref}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Created By Employee:</strong> <span class="font-bold text-slate-800">${creatorEmpName} (${creatorEmpId})</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Date & Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
@@ -1418,7 +1426,7 @@
         <div class="col-span-1 md:col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-300 space-y-2">
           <strong class="text-postRed-800 text-xs block">Reply Remarks by Admin:</strong> 
           <p class="text-slate-800">${claim.reply_remarks_admin || 'Pending Response'}</p>
-          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-postRed-600 text-white px-2.5 py-1 rounded text-xs font-bold hover:bg-postRed-700 transition shadow-xs">📎 Admin Attached File </a>` : ''}
+          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-postRed-600 text-white px-2.5 py-1 rounded text-xs font-bold hover:bg-postRed-700 transition shadow-xs">📎 Admin Attached File</a>` : ''}
         </div>
         
         <div class="col-span-1 md:col-span-2">
@@ -1455,7 +1463,7 @@
 
       if (data) {
         resCard.innerHTML = `
-          <p><strong>Ref ID (Txn ID):</strong> <span class="text-postRed-700 font-bold">${data.txn_id_ref}</span></p>
+          <p><strong>Ref ID (Txn ID):</strong> <span class="text-postRed-700 font-bold font-mono">${data.txn_id_ref}</span></p>
           <p><strong>Created By Employee:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
           <p><strong>Entry Date/Time:</strong> ${formatDateTime(data.created_at)}</p>
           <p><strong>Raised For Office:</strong> ${data.raised_for_office}</p>
@@ -1463,8 +1471,8 @@
           <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
           <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
           <div class="flex gap-2 pt-2">
-            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc </a>
-            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File </a>` : ''}
+            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc</a>
+            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File</a>` : ''}
           </div>
         `;
       } else {
@@ -1521,7 +1529,6 @@
       }
     }
 
-    // LOAD USERS AND RENDER TABLE
     async function loadAllUsers() {
       const { data: users, error } = await supabaseClient
         .from('profiles')
@@ -1537,7 +1544,6 @@
       renderUserAccounts(users);
     }
 
-    // INSTANT FILTER FOR USER ACCOUNTS
     function filterUserAccounts() {
       const query = (document.getElementById('userInstantSearch')?.value || '').trim().toLowerCase();
       if (!query) {
@@ -1568,7 +1574,7 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-3 font-bold">${u.emp_id}</td>
+            <td class="p-3 font-bold font-mono">${u.emp_id}</td>
             <td class="p-3 font-medium">${u.emp_name}</td>
             <td class="p-3">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
             <td class="p-3">${u.office_name}</td>
@@ -1760,14 +1766,14 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-3 font-bold text-postRed-700">${c.txn_id_ref}</td>
-            <td class="p-3 font-semibold text-slate-700">${creatorName}</td>
-            <td class="p-3 font-medium text-slate-700">${c.module}</td>
-            <td class="p-3">${c.raised_for_office}</td>
-            <td class="p-3 text-xs text-slate-600">${formatDateTime(c.created_at)}</td>
-            <td class="p-3">${c.txn_date}</td>
-            <td class="p-3 font-semibold">₹${c.txn_amount}</td>
-            <td class="p-3">
+            <td class="p-3 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
+            <td class="p-3 font-semibold text-slate-700 whitespace-nowrap">${creatorName}</td>
+            <td class="p-3 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
+            <td class="p-3 whitespace-nowrap">${c.raised_for_office}</td>
+            <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${formatDateTime(c.created_at)}</td>
+            <td class="p-3 whitespace-nowrap">${c.txn_date}</td>
+            <td class="p-3 font-semibold whitespace-nowrap">₹${c.txn_amount}</td>
+            <td class="p-3 whitespace-nowrap">
               <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
               </span>
@@ -1797,8 +1803,11 @@
 
     loadFilterDropdowns();
 
+    // SAFE AUTH STATE LISTENER (PREVENTS RESETTING ACTIVE TABS)
     supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (session) initApp();
+      if (session && !currentUser) {
+        initApp();
+      }
     });
 
     function buildExportFileName(ext) {
@@ -1852,7 +1861,6 @@
       doc.text(`Report Summary View (${currentMISReportStatus}) - Chennai City Central Division`, 14, 15);
       doc.setFontSize(9);
       doc.setTextColor(51, 51, 51);
-      /* Official header comment: Department of Posts */
       doc.text(`Generated on: ${new Date().toLocaleString()} | Visible Records: ${currentMISClaimsList.length}`, 14, 22);
 
       const headers = [["Ref No", "Emp Name", "Module", "Entry Date/Time", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
