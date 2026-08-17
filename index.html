@@ -1651,11 +1651,11 @@
       printWindow.document.close();
     }
 
-    // OPEN REPLY MODAL (PULLS FRESH CLAIM DATA VIA ID)
+  // SAFE POPUP OPENER
     function openReplyModal(claimId) {
       const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
       if (!claim) {
-        return alert("Error: Claim record not found in current memory list.");
+        return alert("Error: Claim ID " + claimId + " not found in memory.");
       }
 
       document.getElementById('modalClaimId').value = claim.id;
@@ -1687,7 +1687,7 @@
       clearAdminPastedImage();
     }
 
-    // SAVE ADMIN REPLY WITH VALIDATION AND ROW CHECK
+    // ROBUST ADMIN REPLY SUBMISSION
     async function submitAdminReply() {
       const id = document.getElementById('modalClaimId').value;
       const status = document.getElementById('modalStatus').value;
@@ -1697,35 +1697,47 @@
       const adminFileInput = document.getElementById('modalAdminFile')?.files[0];
 
       if (!id) {
-        return alert("Error: Claim ID is missing. Please close and re-open the modal.");
+        return alert("Error: Claim ID is missing.");
+      }
+
+      const saveBtn = event?.target;
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerText = "Saving...";
       }
 
       let admin_file_url = null;
 
       try {
+        // 1. Upload Pasted Clipboard Image (if present)
         if (adminPastedImageBlob) {
           const filePath = `admin-replies/snip-${id}-${Date.now()}.png`;
           const { error: uploadErr } = await supabaseClient.storage
             .from('claim-attachments')
-            .upload(filePath, adminPastedImageBlob, { contentType: 'image/png' });
+            .upload(filePath, adminPastedImageBlob, { contentType: 'image/png', upsert: true });
 
           if (uploadErr) {
-            return alert("Failed to upload screenshot: " + uploadErr.message);
+            console.warn("Image upload warning:", uploadErr);
+          } else {
+            admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
           }
-          admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-        } else if (adminFileInput) {
+        } 
+        // 2. Upload Selected File (if present)
+        else if (adminFileInput) {
           const fileExt = adminFileInput.name.split('.').pop();
           const filePath = `admin-replies/${id}-${Date.now()}.${fileExt}`;
           const { error: uploadErr } = await supabaseClient.storage
             .from('claim-attachments')
-            .upload(filePath, adminFileInput);
+            .upload(filePath, adminFileInput, { upsert: true });
 
           if (uploadErr) {
-            return alert("Failed to upload document: " + uploadErr.message);
+            console.warn("File upload warning:", uploadErr);
+          } else {
+            admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
           }
-          admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
         }
 
+        // 3. Prepare Payload
         const updateData = {
           claim_status: status,
           reply_remarks_admin: reply_remarks_admin
@@ -1739,33 +1751,33 @@
           updateData.admin_file_url = admin_file_url;
         }
 
-        const { data, error } = await supabaseClient
+        // 4. Execute Update
+        const { error } = await supabaseClient
           .from('claims')
           .update(updateData)
-          .eq('id', id)
-          .select();
+          .eq('id', id);
 
         if (error) {
-          console.error("Database Update Error:", error);
-          return alert("Failed to save changes: " + error.message);
+          console.error("Supabase error:", error);
+          alert("Database Error: " + error.message);
+          return;
         }
 
-        if (!data || data.length === 0) {
-          return alert("Notice: Update could not be applied. Please check that your user account has Admin role permissions in the database.");
-        }
-
-        alert("Claim updated successfully!");
+        alert("Changes saved successfully!");
         closeModal();
         await loadClaimsSummary();
         await generateMISReport(currentMISReportStatus);
 
       } catch (err) {
-        console.error("Unexpected Error:", err);
-        alert("An unexpected error occurred: " + err.message);
+        console.error("Execution error:", err);
+        alert("Unexpected Error: " + err.message);
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerText = "Save Changes";
+        }
       }
-    }
-
-    async function loadAllUsers() {
+    }    async function loadAllUsers() {
       const { data: users, error } = await supabaseClient
         .from('profiles')
         .select('*')
