@@ -1325,7 +1325,7 @@
 
         // ADMIN ATTACHMENT IN RED BUTTON
         if (c.admin_file_url) {
-          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs mt-1 transition">📎 Admin File (Red)</a>`;
+          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs mt-1 transition">📎 Admin File </a>`;
         }
 
         tbody.innerHTML += `
@@ -1356,7 +1356,7 @@
               `}
               <!-- USER SUBMITTED ATTACHMENT IN GREEN BUTTON -->
               <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs transition">
-                📄 User Doc (Green)
+                📄 User Doc 
               </a>
             </td>
           </tr>
@@ -1418,13 +1418,13 @@
         <div class="col-span-1 md:col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-300 space-y-2">
           <strong class="text-postRed-800 text-xs block">Reply Remarks by Admin:</strong> 
           <p class="text-slate-800">${claim.reply_remarks_admin || 'Pending Response'}</p>
-          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-postRed-600 text-white px-2.5 py-1 rounded text-xs font-bold hover:bg-postRed-700 transition shadow-xs">📎 Admin Attached File (Red)</a>` : ''}
+          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-postRed-600 text-white px-2.5 py-1 rounded text-xs font-bold hover:bg-postRed-700 transition shadow-xs">📎 Admin Attached File </a>` : ''}
         </div>
         
         <div class="col-span-1 md:col-span-2">
           <strong class="text-slate-500 text-xs block mb-1">Uploaded User Document:</strong> 
           <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-xs">
-            📄 User Submitted Document (Green)
+            📄 User Submitted Document
           </a>
         </div>
       `;
@@ -1463,8 +1463,8 @@
           <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
           <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
           <div class="flex gap-2 pt-2">
-            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc (Green)</a>
-            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File (Red)</a>` : ''}
+            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc </a>
+            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File </a>` : ''}
           </div>
         `;
       } else {
