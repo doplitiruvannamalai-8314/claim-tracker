@@ -220,7 +220,7 @@
               </div>
             </div>
 
-            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR & 2*2 ACTION SQUARE -->
+            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR -->
             <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="sticky top-0 z-10 shadow-xs">
@@ -1315,7 +1315,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER SUMMARY TABLE (WITH 2*2 SQUARE ACTION BUTTONS)
+    // RENDER SUMMARY TABLE (WITH ROBUST ID-ONLY POPUP HANDLERS)
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
@@ -1357,8 +1357,6 @@
         const empIdOnly = c.profiles?.emp_id ? `[${c.profiles.emp_id}]` : '';
         const entryDateTime = formatDateTime(c.created_at);
         const isOwner = c.created_by === currentUser?.id;
-        const cleanRemarks = (c.reply_remarks_admin || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        const cleanModule = (c.module || 'Booking');
 
         let adminReplyHtml = c.reply_remarks_admin 
           ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-2.5 rounded text-xs font-medium whitespace-normal break-words leading-relaxed">${c.reply_remarks_admin}</div>`
@@ -1398,12 +1396,12 @@
             <!-- 6. FULL ADMIN REPLY -->
             <td class="p-3.5 min-w-[240px]">${adminReplyHtml}</td>
             
-            <!-- 7. ACTIONS (PERFECT 2x2 SQUARE GRID) -->
+            <!-- 7. ACTIONS (2x2 SQUARE GRID) -->
             <td class="p-3.5 text-center whitespace-nowrap min-w-[170px]">
               <div class="grid grid-cols-2 gap-1.5 w-[160px] mx-auto">
                 <!-- Row 1: Reply / Edit & Delete -->
                 ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="flex items-center justify-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
+                  <button type="button" onclick="openReplyModal('${c.id}')" class="flex items-center justify-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
                     ✏️ Reply
                   </button>
                   <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="flex items-center justify-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
@@ -1683,17 +1681,20 @@
       printWindow.document.close();
     }
 
-    function openReplyModal(id, status, remarks, moduleVal) {
-      document.getElementById('modalClaimId').value = id || '';
-      document.getElementById('modalStatus').value = status || 'Pending';
+    // SAFE POPUP OPENER (PREVENTS SPECIAL CHARACTER SYNTAX ERRORS)
+    function openReplyModal(claimId) {
+      const claim = rawClaimsList.find(c => c.id === claimId);
+      if (!claim) return alert("Claim record not found!");
+
+      document.getElementById('modalClaimId').value = claim.id;
+      document.getElementById('modalStatus').value = claim.claim_status || 'Pending';
       
       const moduleSelect = document.getElementById('modalModule');
       if (moduleSelect) {
-        moduleSelect.value = moduleVal || 'Booking';
+        moduleSelect.value = claim.module || 'Booking';
       }
 
-      const remarksText = (remarks && remarks !== 'undefined' && remarks !== 'null') ? remarks : '';
-      document.getElementById('modalAdminRemarks').value = remarksText;
+      document.getElementById('modalAdminRemarks').value = claim.reply_remarks_admin || '';
       
       const fileInput = document.getElementById('modalAdminFile');
       if (fileInput) fileInput.value = '';
@@ -1714,6 +1715,7 @@
       clearAdminPastedImage();
     }
 
+    // SAVE ADMIN REPLY WITH VALIDATION AND ROW CHECK
     async function submitAdminReply() {
       const id = document.getElementById('modalClaimId').value;
       const status = document.getElementById('modalStatus').value;
@@ -1765,14 +1767,19 @@
           updateData.admin_file_url = admin_file_url;
         }
 
-        const { error } = await supabaseClient
+        const { data, error } = await supabaseClient
           .from('claims')
           .update(updateData)
-          .eq('id', id);
+          .eq('id', id)
+          .select();
 
         if (error) {
           console.error("Database Update Error:", error);
           return alert("Failed to save changes: " + error.message);
+        }
+
+        if (!data || data.length === 0) {
+          return alert("Notice: Update could not be applied. Please check that your user account has Admin role permissions in the system.");
         }
 
         alert("Claim updated successfully!");
