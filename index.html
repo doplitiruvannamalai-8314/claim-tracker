@@ -156,7 +156,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS & Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW (WITH CLEAN 2-LINE STACKED COLUMNS) -->
+        <!-- TAB 1: TRACK CLAIM VIEW (WITH CLEAN 2-LINE STACKED COLUMNS & PRINT OPTION) -->
         <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div>
             <div class="border-b pb-3 border-amber-200">
@@ -231,7 +231,7 @@
                     <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
                     <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
                     <th class="p-3 bg-postRed-50 cursor-default min-w-[240px]">Admin Reply / Remarks</th> 
-                    <th class="p-3 bg-postRed-50 cursor-default text-center min-w-[190px]">Action / Attachments</th>
+                    <th class="p-3 bg-postRed-50 cursor-default text-center min-w-[240px]">Action / Attachments</th>
                   </tr>
                 </thead>
                 <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -679,7 +679,7 @@
         </div>
       </div>
 
-      <!-- CLAIM DETAILS FULL VIEW MODAL -->
+      <!-- CLAIM DETAILS FULL VIEW MODAL (WITH DIRECT PRINT BUTTON) -->
       <div id="detailsModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-3 border-amber-200">
@@ -688,6 +688,7 @@
           </div>
           <div id="detailsModalContent" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"></div>
           <div class="flex justify-end gap-2 border-t pt-3 border-amber-200">
+            <button type="button" id="modalPrintBtn" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer transition">🖨️ Print Docket</button>
             <button type="button" onclick="closeDetailsModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer transition">Close</button>
           </div>
         </div>
@@ -1314,7 +1315,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER SUMMARY TABLE (PREVIOUS CLEAN LAYOUT WITH 2-LINE STACKING)
+    // RENDER SUMMARY TABLE (PREVIOUS CLEAN LAYOUT WITH 2-LINE STACKING & PRINT BUTTON)
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
@@ -1396,18 +1397,21 @@
             </td>
             <!-- 6. FULL ADMIN REPLY -->
             <td class="p-3 min-w-[240px]">${adminReplyHtml}</td>
-            <!-- 7. ACTIONS -->
-            <td class="p-3 text-center whitespace-nowrap min-w-[190px]">
-              <div class="flex items-center justify-center gap-2 flex-wrap">
+            <!-- 7. ACTIONS (WITH PRINT) -->
+            <td class="p-3 text-center whitespace-nowrap min-w-[240px]">
+              <div class="flex items-center justify-center gap-1.5 flex-wrap">
                 ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
+                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
                   <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Delete</button>
                 ` : `
-                  ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">Edit</button>` : ''}
+                  ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Edit</button>` : ''}
                 `}
-                <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">
+                <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">
                   📄 View Doc
                 </a>
+                <button type="button" onclick="printClaimDetails('${c.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition cursor-pointer">
+                  🖨️ Print
+                </button>
               </div>
             </td>
           </tr>
@@ -1480,11 +1484,197 @@
         </div>
       `;
 
+      // Wire Print Button inside Details Modal
+      const printBtn = document.getElementById('modalPrintBtn');
+      if (printBtn) {
+        printBtn.onclick = () => printClaimDetails(claim.id);
+      }
+
       document.getElementById('detailsModal').classList.remove('hidden');
     }
 
     function closeDetailsModal() {
       document.getElementById('detailsModal').classList.add('hidden');
+    }
+
+    // PRINT COMPLETE CLAIM REGISTRATION DETAILS WITH EMBEDDED ATTACHMENTS
+    function printClaimDetails(claimId) {
+      const claim = rawClaimsList.find(c => c.id === claimId);
+      if (!claim) return alert("Claim details not found for printing!");
+
+      const creatorEmpId = claim.profiles?.emp_id || 'N/A';
+      const creatorEmpName = claim.profiles?.emp_name || 'N/A';
+      const entryDateTime = formatDateTime(claim.created_at);
+
+      // Check file types for embedding
+      const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/snip-'));
+      const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('admin-replies/snip-'));
+
+      const printWindow = window.open('', '_blank', 'width=950,height=850');
+      if (!printWindow) {
+        return alert("Popup blocked! Please allow popups for this site to print.");
+      }
+
+      const printHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
+          <style>
+            @page { size: A4; margin: 15mm; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 20px; font-size: 13px; line-height: 1.4; }
+            .header-banner { border-bottom: 3px solid #C4122F; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title-area h1 { margin: 0; color: #A80F28; font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px; }
+            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 13px; font-weight: bold; }
+            .ref-badge { background: #FDF2F4; border: 2px solid #C4122F; color: #8A0C21; padding: 6px 12px; border-radius: 6px; font-family: monospace; font-size: 14px; font-weight: bold; text-align: right; }
+            .section-title { background: #FEF9C3; color: #8A0C21; padding: 4px 8px; font-weight: bold; font-size: 12px; margin: 15px 0 8px 0; border-left: 4px solid #C4122F; }
+            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+            table.details-grid td { padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 12px; vertical-align: top; }
+            table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
+            table.details-grid td.value { width: 28%; color: #0f172a; }
+            .status-pill { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+            .status-Pending { background: #FEF9C3; color: #B45309; border: 1px solid #FACC15; }
+            .status-InProgress { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
+            .status-Settled { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+            .status-Rejected { background: #FFE4E6; color: #BE123C; border: 1px solid #FDA4AF; }
+            .remarks-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; background: #fafaf9; margin-bottom: 10px; font-size: 12px; min-height: 35px; white-space: pre-wrap; }
+            .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
+            .attachment-container { margin-top: 15px; page-break-inside: avoid; }
+            .attachment-preview { max-width: 100%; max-height: 400px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 6px; margin-top: 6px; display: block; }
+            .attachment-link { font-size: 12px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
+            .signatures { margin-top: 35px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+            .sig-block { width: 40%; text-align: center; border-top: 1px dashed #64748b; padding-top: 6px; font-size: 12px; font-weight: bold; color: #334155; }
+            @media print {
+              body { padding: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="background:#f1f5f9; padding:10px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:15px;">
+            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:8px 18px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:13px;">🖨️ Print Now</button>
+            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:8px 14px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:6px; font-size:13px;">Close</button>
+          </div>
+
+          <div class="header-banner">
+            <div class="title-area">
+              <h1>Refund Claims Management Portal</h1>
+              <h2>Chennai City Central Division &bull; Complete Claim Registration Docket</h2>
+            </div>
+            <div class="ref-badge">
+              REF NO: ${claim.txn_id_ref}
+            </div>
+          </div>
+
+          <div class="section-title">1. REGISTRATION &amp; APPLICANT DETAILS</div>
+          <table class="details-grid">
+            <tr>
+              <td class="label">Created By Employee:</td>
+              <td class="value"><strong>${creatorEmpName}</strong></td>
+              <td class="label">Employee ID:</td>
+              <td class="value"><strong>${creatorEmpId}</strong></td>
+            </tr>
+            <tr>
+              <td class="label">Raised For Office:</td>
+              <td class="value">${claim.raised_for_office}</td>
+              <td class="label">User Contact Mobile:</td>
+              <td class="value">${claim.user_mobile || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td class="label">Date &amp; Time of Entry:</td>
+              <td class="value">${entryDateTime}</td>
+              <td class="label">Current Status:</td>
+              <td class="value">
+                <span class="status-pill status-${(claim.claim_status || 'Pending').replace(/\s+/g, '')}">
+                  ${claim.claim_status}
+                </span>
+              </td>
+            </tr>
+          </table>
+
+          <div class="section-title">2. TRANSACTION &amp; POSTAL CLAIM DATA</div>
+          <table class="details-grid">
+            <tr>
+              <td class="label">Module:</td>
+              <td class="value"><strong>${claim.module}</strong></td>
+              <td class="label">Article Number:</td>
+              <td class="value"><strong>${claim.article_number}</strong></td>
+            </tr>
+            <tr>
+              <td class="label">Reference / Txn ID:</td>
+              <td class="value" style="font-family: monospace; font-weight:bold;">${claim.txn_id_ref}</td>
+              <td class="label">RRN Number:</td>
+              <td class="value" style="font-family: monospace;">${claim.rrn_number}</td>
+            </tr>
+            <tr>
+              <td class="label">Transaction Date:</td>
+              <td class="value">${claim.txn_date}</td>
+              <td class="label">Transaction Amount:</td>
+              <td class="value" style="font-size: 13px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
+            </tr>
+            <tr>
+              <td class="label">Payment Channel:</td>
+              <td class="value">${claim.payment_channel}</td>
+              <td class="label">Docket Print Date:</td>
+              <td class="value">${new Date().toLocaleString()}</td>
+            </tr>
+          </table>
+
+          <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
+          <div style="font-weight:bold; font-size:11px; margin-bottom:3px; color:#475569;">Remarks / Justification by User:</div>
+          <div class="remarks-box">${claim.remarks_by_user || 'No remarks entered.'}</div>
+
+          <div style="font-weight:bold; font-size:11px; margin-bottom:3px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
+          <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Response from Admin.'}</div>
+
+          <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
+          
+          <!-- User Document Section -->
+          <div class="attachment-container">
+            <strong>Applicant Submitted Document:</strong><br>
+            ${isUserImage 
+              ? `<img src="${claim.file_url}" class="attachment-preview" alt="Applicant Attachment" onload="window.__userImgLoaded = true;">`
+              : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View / Download Attached Document File (${claim.file_url})</a>` : '<em>No applicant file attached.</em>')
+            }
+          </div>
+
+          <!-- Admin Document Section -->
+          ${claim.admin_file_url ? `
+            <div class="attachment-container">
+              <strong style="color: #991b1b;">Admin Attached Resolution / Screenshot:</strong><br>
+              ${isAdminImage 
+                ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment" onload="window.__adminImgLoaded = true;">`
+                : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File (${claim.admin_file_url})</a>`
+              }
+            </div>
+          ` : ''}
+
+          <div class="signatures">
+            <div class="sig-block">
+              Signature of Applicant / Submitting Official<br>
+              (${creatorEmpName})
+            </div>
+            <div class="sig-block">
+              Signature &amp; Seal of Approving / Admin Authority<br>
+              (Chennai City Central Division)
+            </div>
+          </div>
+
+          <script>
+            // Automatically print after assets load
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 600);
+            };
+          <\/script>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.open();
+      printWindow.document.write(printHtml);
+      printWindow.document.close();
     }
 
     async function trackClaim() {
@@ -1514,9 +1704,10 @@
           <p><strong>Status:</strong> <span class="font-bold px-2 py-0.5 rounded ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
           <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
           <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
-          <div class="flex gap-2 pt-2">
+          <div class="flex gap-2 pt-2 flex-wrap">
             <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc</a>
             ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File</a>` : ''}
+            <button type="button" onclick="printClaimDetails('${data.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">🖨️ Print Docket</button>
           </div>
         `;
       } else {
