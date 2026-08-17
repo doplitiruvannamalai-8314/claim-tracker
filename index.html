@@ -220,7 +220,7 @@
               </div>
             </div>
 
-            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR -->
+            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR & 2*2 ACTION SQUARE -->
             <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="sticky top-0 z-10 shadow-xs">
@@ -231,7 +231,7 @@
                     <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
                     <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
                     <th class="p-3.5 bg-postRed-50 cursor-default min-w-[240px]">Admin Reply / Remarks</th> 
-                    <th class="p-3.5 bg-postRed-50 cursor-default text-center min-w-[280px]">Action &amp; Tools</th>
+                    <th class="p-3.5 bg-postRed-50 cursor-default text-center min-w-[170px]">Action &amp; Tools</th>
                   </tr>
                 </thead>
                 <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -1315,7 +1315,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER SUMMARY TABLE (WITH UNIFORM ACTION BUTTONS & INCREASED PADDING)
+    // RENDER SUMMARY TABLE (WITH 2*2 SQUARE ACTION BUTTONS)
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
@@ -1397,27 +1397,32 @@
             </td>
             <!-- 6. FULL ADMIN REPLY -->
             <td class="p-3.5 min-w-[240px]">${adminReplyHtml}</td>
-            <!-- 7. ACTIONS (EVENLY DISTRIBUTED RECTANGLES WITH ICONS) -->
-            <td class="p-3.5 text-center whitespace-nowrap min-w-[280px]">
-              <div class="flex items-center justify-center gap-1.5 flex-wrap">
+            
+            <!-- 7. ACTIONS (PERFECT 2x2 SQUARE GRID) -->
+            <td class="p-3.5 text-center whitespace-nowrap min-w-[170px]">
+              <div class="grid grid-cols-2 gap-1.5 w-[160px] mx-auto">
+                <!-- Row 1: Reply / Edit & Delete -->
                 ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="inline-flex items-center justify-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="flex items-center justify-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
                     ✏️ Reply
                   </button>
-                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="inline-flex items-center justify-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="flex items-center justify-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
                     🗑️ Delete
                   </button>
                 ` : `
                   ${isOwner ? `
-                    <button type="button" onclick="openUserEditModal('${c.id}')" class="inline-flex items-center justify-center gap-1 bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+                    <button type="button" onclick="openUserEditModal('${c.id}')" class="flex items-center justify-center gap-1 bg-postGold-500 hover:bg-postGold-600 text-postRed-900 py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
                       ✏️ Edit
                     </button>
-                  ` : ''}
+                  ` : `<div class="py-1.5"></div>`}
+                  <div class="py-1.5"></div>
                 `}
-                <a href="${c.file_url}" target="_blank" class="inline-flex items-center justify-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition w-[72px]">
+
+                <!-- Row 2: View Doc & Print -->
+                <a href="${c.file_url}" target="_blank" class="flex items-center justify-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white py-1.5 rounded text-xs font-bold shadow-xs transition">
                   📄 Doc
                 </a>
-                <button type="button" onclick="printClaimDetails('${c.id}')" class="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition cursor-pointer w-[72px]">
+                <button type="button" onclick="printClaimDetails('${c.id}')" class="flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
                   🖨️ Print
                 </button>
               </div>
