@@ -107,7 +107,7 @@
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password *</label>
-            <input type="password" id="loginPassword" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 focus:border-postRed-600 outline-none bg-amber-50/20">
+            <input type="password" id="loginPassword" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 outline-none bg-amber-50/20">
           </div>
           <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg transition shadow-md cursor-pointer">Log In</button>
         </form>
@@ -679,7 +679,7 @@
         </div>
       </div>
 
-      <!-- CLAIM DETAILS FULL VIEW MODAL (WITH DIRECT PRINT BUTTON) -->
+      <!-- CLAIM DETAILS FULL VIEW MODAL -->
       <div id="detailsModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-3 border-amber-200">
@@ -1496,7 +1496,7 @@
       document.getElementById('detailsModal').classList.add('hidden');
     }
 
-    // PRINT COMPLETE CLAIM DOCKET (FITS PRECISELY IN A SINGLE A4 PAGE)
+    // PRINT COMPLETE CLAIM DOCKET (NO SIGNATURES & DOUBLED IMAGE PREVIEW HEIGHT)
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -1539,16 +1539,14 @@
             .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; background: #fafaf9; margin-bottom: 5px; font-size: 10.5px; min-height: 24px; white-space: pre-wrap; word-break: break-word; }
             .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
             .attachments-grid { display: flex; gap: 8px; margin-top: 4px; justify-content: space-between; }
-            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px; background: #fafaf9; text-align: center; }
-            .attachment-col strong { font-size: 10px; display: block; margin-bottom: 2px; text-align: left; }
-            .attachment-preview { max-width: 100%; max-height: 160px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 3px; margin: 0 auto; display: block; }
-            .attachment-link { font-size: 10px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 2px; display: inline-block; }
-            .signatures { margin-top: 14px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-            .sig-block { width: 42%; text-align: center; border-top: 1px dashed #64748b; padding-top: 4px; font-size: 10px; font-weight: bold; color: #334155; }
+            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; background: #fafaf9; text-align: center; }
+            .attachment-col strong { font-size: 10px; display: block; margin-bottom: 3px; text-align: left; }
+            .attachment-preview { max-width: 100%; max-height: 320px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
+            .attachment-link { font-size: 10px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
             @media print {
               body { padding: 0; }
               .no-print { display: none; }
-              .attachment-preview { max-height: 140px; }
+              .attachment-preview { max-height: 320px; }
             }
           </style>
         </head>
@@ -1649,17 +1647,6 @@
                     : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`)
                 : '<em>No admin attachment uploaded.</em>'
               }
-            </div>
-          </div>
-
-          <div class="signatures">
-            <div class="sig-block">
-              Signature of Applicant / Submitting Official<br>
-              (${creatorEmpName})
-            </div>
-            <div class="sig-block">
-              Signature &amp; Seal of Approving / Admin Authority<br>
-              (Chennai City Central Division)
             </div>
           </div>
 
