@@ -156,7 +156,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS & Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW (WITH CLEAN 2-LINE STACKED COLUMNS & PRINT OPTION) -->
+        <!-- TAB 1: TRACK CLAIM VIEW -->
         <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div>
             <div class="border-b pb-3 border-amber-200">
@@ -1401,15 +1401,15 @@
             <td class="p-3 text-center whitespace-nowrap min-w-[240px]">
               <div class="flex items-center justify-center gap-1.5 flex-wrap">
                 ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
+                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', '${cleanRemarks}', '${cleanModule}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
                   <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Delete</button>
                 ` : `
-                  ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Edit</button>` : ''}
+                  ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">Edit</button>` : ''}
                 `}
-                <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">
+                <a href="${c.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition">
                   📄 View Doc
                 </a>
-                <button type="button" onclick="printClaimDetails('${c.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition cursor-pointer">
+                <button type="button" onclick="printClaimDetails('${c.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs transition cursor-pointer">
                   🖨️ Print
                 </button>
               </div>
@@ -1484,7 +1484,6 @@
         </div>
       `;
 
-      // Wire Print Button inside Details Modal
       const printBtn = document.getElementById('modalPrintBtn');
       if (printBtn) {
         printBtn.onclick = () => printClaimDetails(claim.id);
@@ -1497,7 +1496,7 @@
       document.getElementById('detailsModal').classList.add('hidden');
     }
 
-    // PRINT COMPLETE CLAIM REGISTRATION DETAILS WITH EMBEDDED ATTACHMENTS
+    // PRINT COMPLETE CLAIM DOCKET (FITS PRECISELY IN A SINGLE A4 PAGE)
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -1506,7 +1505,6 @@
       const creatorEmpName = claim.profiles?.emp_name || 'N/A';
       const entryDateTime = formatDateTime(claim.created_at);
 
-      // Check file types for embedding
       const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/snip-'));
       const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('admin-replies/snip-'));
 
@@ -1521,39 +1519,43 @@
         <head>
           <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
           <style>
-            @page { size: A4; margin: 15mm; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 20px; font-size: 13px; line-height: 1.4; }
-            .header-banner { border-bottom: 3px solid #C4122F; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
-            .title-area h1 { margin: 0; color: #A80F28; font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px; }
-            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 13px; font-weight: bold; }
-            .ref-badge { background: #FDF2F4; border: 2px solid #C4122F; color: #8A0C21; padding: 6px 12px; border-radius: 6px; font-family: monospace; font-size: 14px; font-weight: bold; text-align: right; }
-            .section-title { background: #FEF9C3; color: #8A0C21; padding: 4px 8px; font-weight: bold; font-size: 12px; margin: 15px 0 8px 0; border-left: 4px solid #C4122F; }
-            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-            table.details-grid td { padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 12px; vertical-align: top; }
+            @page { size: A4 portrait; margin: 8mm 10mm; }
+            * { box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 12px; font-size: 11px; line-height: 1.25; background: #fff; }
+            .header-banner { border-bottom: 2px solid #C4122F; padding-bottom: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title-area h1 { margin: 0; color: #A80F28; font-size: 14px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+            .title-area h2 { margin: 1px 0 0 0; color: #D97706; font-size: 10px; font-weight: bold; }
+            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 12px; font-weight: bold; text-align: right; }
+            .section-title { background: #FEF9C3; color: #8A0C21; padding: 2px 6px; font-weight: bold; font-size: 10px; margin: 6px 0 4px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
+            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+            table.details-grid td { padding: 3px 6px; border: 1px solid #cbd5e1; font-size: 10.5px; vertical-align: top; }
             table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
             table.details-grid td.value { width: 28%; color: #0f172a; }
-            .status-pill { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+            .status-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
             .status-Pending { background: #FEF9C3; color: #B45309; border: 1px solid #FACC15; }
             .status-InProgress { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
             .status-Settled { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
             .status-Rejected { background: #FFE4E6; color: #BE123C; border: 1px solid #FDA4AF; }
-            .remarks-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; background: #fafaf9; margin-bottom: 10px; font-size: 12px; min-height: 35px; white-space: pre-wrap; }
+            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; background: #fafaf9; margin-bottom: 5px; font-size: 10.5px; min-height: 24px; white-space: pre-wrap; word-break: break-word; }
             .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
-            .attachment-container { margin-top: 15px; page-break-inside: avoid; }
-            .attachment-preview { max-width: 100%; max-height: 400px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 6px; margin-top: 6px; display: block; }
-            .attachment-link { font-size: 12px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
-            .signatures { margin-top: 35px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-            .sig-block { width: 40%; text-align: center; border-top: 1px dashed #64748b; padding-top: 6px; font-size: 12px; font-weight: bold; color: #334155; }
+            .attachments-grid { display: flex; gap: 8px; margin-top: 4px; justify-content: space-between; }
+            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px; background: #fafaf9; text-align: center; }
+            .attachment-col strong { font-size: 10px; display: block; margin-bottom: 2px; text-align: left; }
+            .attachment-preview { max-width: 100%; max-height: 160px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 3px; margin: 0 auto; display: block; }
+            .attachment-link { font-size: 10px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 2px; display: inline-block; }
+            .signatures { margin-top: 14px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+            .sig-block { width: 42%; text-align: center; border-top: 1px dashed #64748b; padding-top: 4px; font-size: 10px; font-weight: bold; color: #334155; }
             @media print {
               body { padding: 0; }
               .no-print { display: none; }
+              .attachment-preview { max-height: 140px; }
             }
           </style>
         </head>
         <body>
-          <div class="no-print" style="background:#f1f5f9; padding:10px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:15px;">
-            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:8px 18px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:13px;">🖨️ Print Now</button>
-            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:8px 14px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:6px; font-size:13px;">Close</button>
+          <div class="no-print" style="background:#f1f5f9; padding:6px 12px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:8px;">
+            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🖨️ Print Now</button>
+            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:12px;">Close</button>
           </div>
 
           <div class="header-banner">
@@ -1610,7 +1612,7 @@
               <td class="label">Transaction Date:</td>
               <td class="value">${claim.txn_date}</td>
               <td class="label">Transaction Amount:</td>
-              <td class="value" style="font-size: 13px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
+              <td class="value" style="font-size: 11px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
             </tr>
             <tr>
               <td class="label">Payment Channel:</td>
@@ -1621,33 +1623,34 @@
           </table>
 
           <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
-          <div style="font-weight:bold; font-size:11px; margin-bottom:3px; color:#475569;">Remarks / Justification by User:</div>
+          <div style="font-weight:bold; font-size:9.5px; margin-bottom:2px; color:#475569;">Remarks / Justification by User:</div>
           <div class="remarks-box">${claim.remarks_by_user || 'No remarks entered.'}</div>
 
-          <div style="font-weight:bold; font-size:11px; margin-bottom:3px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
+          <div style="font-weight:bold; font-size:9.5px; margin-bottom:2px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
           <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Response from Admin.'}</div>
 
           <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
-          
-          <!-- User Document Section -->
-          <div class="attachment-container">
-            <strong>Applicant Submitted Document:</strong><br>
-            ${isUserImage 
-              ? `<img src="${claim.file_url}" class="attachment-preview" alt="Applicant Attachment" onload="window.__userImgLoaded = true;">`
-              : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View / Download Attached Document File (${claim.file_url})</a>` : '<em>No applicant file attached.</em>')
-            }
-          </div>
-
-          <!-- Admin Document Section -->
-          ${claim.admin_file_url ? `
-            <div class="attachment-container">
-              <strong style="color: #991b1b;">Admin Attached Resolution / Screenshot:</strong><br>
-              ${isAdminImage 
-                ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment" onload="window.__adminImgLoaded = true;">`
-                : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File (${claim.admin_file_url})</a>`
+          <div class="attachments-grid">
+            <!-- User Attachment Column -->
+            <div class="attachment-col">
+              <strong>Applicant Submitted Document:</strong>
+              ${isUserImage 
+                ? `<img src="${claim.file_url}" class="attachment-preview" alt="Applicant Attachment">`
+                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View / Download Attached Document File</a>` : '<em>No applicant file attached.</em>')
               }
             </div>
-          ` : ''}
+
+            <!-- Admin Attachment Column -->
+            <div class="attachment-col" style="${!claim.admin_file_url ? 'background:#f8fafc; color:#94a3b8;' : ''}">
+              <strong style="color: #991b1b;">Admin Attached Resolution / Screenshot:</strong>
+              ${claim.admin_file_url 
+                ? (isAdminImage 
+                    ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
+                    : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`)
+                : '<em>No admin attachment uploaded.</em>'
+              }
+            </div>
+          </div>
 
           <div class="signatures">
             <div class="sig-block">
@@ -1661,11 +1664,10 @@
           </div>
 
           <script>
-            // Automatically print after assets load
             window.onload = function() {
               setTimeout(function() {
                 window.print();
-              }, 600);
+              }, 500);
             };
           <\/script>
         </body>
@@ -1675,44 +1677,6 @@
       printWindow.document.open();
       printWindow.document.write(printHtml);
       printWindow.document.close();
-    }
-
-    async function trackClaim() {
-      const refNo = document.getElementById('searchRefNo').value.trim();
-      if (!refNo) return alert("Please enter a reference number");
-
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-
-      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)').eq('txn_id_ref', refNo);
-
-      if (!isAdmin) {
-        const userOffice = userProfile.office_name;
-        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userOffice}"`);
-      }
-
-      const { data } = await query.maybeSingle();
-      const resCard = document.getElementById('trackResult');
-      resCard.classList.remove('hidden');
-
-      if (data) {
-        resCard.innerHTML = `
-          <p><strong>Ref ID (Txn ID):</strong> <span class="text-postRed-700 font-bold font-mono">${data.txn_id_ref}</span></p>
-          <p><strong>Created By Employee:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
-          <p><strong>Entry Date/Time:</strong> ${formatDateTime(data.created_at)}</p>
-          <p><strong>Module:</strong> <span class="font-bold text-postRed-700">${data.module}</span></p>
-          <p><strong>Raised For Office:</strong> ${data.raised_for_office}</p>
-          <p><strong>Status:</strong> <span class="font-bold px-2 py-0.5 rounded ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
-          <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
-          <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
-          <div class="flex gap-2 pt-2 flex-wrap">
-            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc</a>
-            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File</a>` : ''}
-            <button type="button" onclick="printClaimDetails('${data.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">🖨️ Print Docket</button>
-          </div>
-        `;
-      } else {
-        resCard.innerHTML = `<p class="text-postRed-700 font-bold">No record found with Reference ID: ${refNo} under your access.</p>`;
-      }
     }
 
     function openReplyModal(id, status, remarks, moduleVal) {
