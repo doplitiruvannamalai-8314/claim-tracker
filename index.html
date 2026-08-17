@@ -1516,62 +1516,103 @@
       }
     }
 
-    // OPEN REPLY MODAL (PRELOADS CURRENT MODULE)
-    function openReplyModal(id, status, remarks, moduleVal) {
-      document.getElementById('modalClaimId').value = id;
-      document.getElementById('modalStatus').value = status;
-      document.getElementById('modalModule').value = moduleVal || 'Booking';
-      document.getElementById('modalAdminRemarks').value = remarks || '';
-      document.getElementById('modalAdminFile').value = '';
-      clearAdminPastedImage();
-      document.getElementById('replyModal').classList.remove('hidden');
-    }
+  // OPEN REPLY MODAL (SAFE PRE-FILL)
+function openReplyModal(id, status, remarks, moduleVal) {
+  document.getElementById('modalClaimId').value = id || '';
+  document.getElementById('modalStatus').value = status || 'Pending';
+  
+  const moduleSelect = document.getElementById('modalModule');
+  if (moduleSelect) {
+    moduleSelect.value = moduleVal || 'Booking';
+  }
 
-    function closeModal() {
-      document.getElementById('replyModal').classList.add('hidden');
-      clearAdminPastedImage();
-    }
+  document.getElementById('modalAdminRemarks').value = (remarks && remarks !== 'undefined' && remarks !== 'null') ? remarks : '';
+  
+  const fileInput = document.getElementById('modalAdminFile');
+  if (fileInput) fileInput.value = '';
+  
+  clearAdminPastedImage();
+  document.getElementById('replyModal').classList.remove('hidden');
+}
 
-    // SUBMIT ADMIN REPLY WITH STATUS & MODULE UPDATE
-    async function submitAdminReply() {
-      const id = document.getElementById('modalClaimId').value;
-      const status = document.getElementById('modalStatus').value;
-      const moduleVal = document.getElementById('modalModule').value;
-      const reply_remarks_admin = document.getElementById('modalAdminRemarks').value;
-      const adminFileInput = document.getElementById('modalAdminFile').files[0];
+// SUBMIT ADMIN REPLY WITH MODULE UPDATE
+async function submitAdminReply() {
+  const id = document.getElementById('modalClaimId').value;
+  const status = document.getElementById('modalStatus').value;
+  const moduleEl = document.getElementById('modalModule');
+  const moduleVal = moduleEl ? moduleEl.value : null;
+  const reply_remarks_admin = (document.getElementById('modalAdminRemarks').value || '').trim();
+  const adminFileInput = document.getElementById('modalAdminFile')?.files[0];
 
-      let admin_file_url = null;
+  if (!id) {
+    return alert("Error: Claim ID is missing. Please close and re-open the modal.");
+  }
 
-      if (adminPastedImageBlob) {
-        const filePath = `admin-replies/snip-${id}-${Date.now()}.png`;
-        const { error: uploadErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, adminPastedImageBlob, { contentType: 'image/png' });
-        if (uploadErr) return alert("Clipboard image upload failed: " + uploadErr.message);
-        admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-      } else if (adminFileInput) {
-        const fileExt = adminFileInput.name.split('.').pop();
-        const filePath = `admin-replies/${id}-${Date.now()}.${fileExt}`;
-        const { error: uploadErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, adminFileInput);
-        if (uploadErr) return alert("Admin file upload failed: " + uploadErr.message);
-        admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+  let admin_file_url = null;
+
+  try {
+    // 1. Upload Clipboard Snipping Tool Image if attached
+    if (adminPastedImageBlob) {
+      const filePath = `admin-replies/snip-${id}-${Date.now()}.png`;
+      const { error: uploadErr } = await supabaseClient.storage
+        .from('claim-attachments')
+        .upload(filePath, adminPastedImageBlob, { contentType: 'image/png' });
+
+      if (uploadErr) {
+        return alert("Failed to upload screenshot: " + uploadErr.message);
       }
+      admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    } 
+    // 2. Upload Selected File if attached
+    else if (adminFileInput) {
+      const fileExt = adminFileInput.name.split('.').pop();
+      const filePath = `admin-replies/${id}-${Date.now()}.${fileExt}`;
+      const { error: uploadErr } = await supabaseClient.storage
+        .from('claim-attachments')
+        .upload(filePath, adminFileInput);
 
-      const updateData = { 
-        claim_status: status, 
-        module: moduleVal, 
-        reply_remarks_admin 
-      };
-      if (admin_file_url) updateData.admin_file_url = admin_file_url;
-
-      const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
-
-      if (error) alert("Failed to update: " + error.message);
-      else {
-        alert("Claim status and module updated successfully!");
-        closeModal();
-        loadClaimsSummary();
-        generateMISReport();
+      if (uploadErr) {
+        return alert("Failed to upload document: " + uploadErr.message);
       }
+      admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
     }
+
+    // 3. Build Update Object
+    const updateData = {
+      claim_status: status,
+      reply_remarks_admin: reply_remarks_admin
+    };
+
+    if (moduleVal) {
+      updateData.module = moduleVal;
+    }
+
+    if (admin_file_url) {
+      updateData.admin_file_url = admin_file_url;
+    }
+
+    // 4. Update row in Supabase
+    const { data, error } = await supabaseClient
+      .from('claims')
+      .update(updateData)
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error("Database Update Error:", error);
+      return alert("Failed to save changes: " + error.message);
+    }
+
+    alert("Claim updated successfully!");
+    closeModal();
+    await loadClaimsSummary();
+    await generateMISReport(currentMISReportStatus);
+
+  } catch (err) {
+    console.error("Unexpected Error:", err);
+    alert("An unexpected error occurred: " + err.message);
+  }
+}
 
     async function loadAllUsers() {
       const { data: users, error } = await supabaseClient
