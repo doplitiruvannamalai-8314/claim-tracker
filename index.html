@@ -156,7 +156,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS & Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW -->
+        <!-- TAB 1: TRACK CLAIM VIEW (CONTAINS SUBMITTED CLAIMS OVERVIEW WITH SEARCH & MODULE/EMP FILTER) -->
         <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div>
             <div class="border-b pb-3 border-amber-200">
@@ -170,18 +170,18 @@
             <div id="trackResult" class="hidden border border-postGold-400 p-4 rounded-lg bg-amber-50/40 mt-3 space-y-2 text-sm"></div>
           </div>
 
-          <!-- SUBMITTED CLAIMS OVERVIEW (EMP NAME REMOVED FOR CLEAN FULL ACTION VISIBILITY) -->
+          <!-- SUBMITTED CLAIMS OVERVIEW -->
           <div class="border-t pt-6 border-amber-200">
             <div class="flex justify-between items-center flex-wrap gap-2 mb-3">
               <h4 class="font-bold text-md text-slate-800">Submitted Claims Overview <span class="text-xs text-slate-400 font-normal">(Click headers to sort)</span></h4>
               <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live Instant Filter Active</span>
             </div>
 
-            <!-- OVERVIEW FILTER PANEL INCLUDING MODULE FILTER -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200 mb-4">
+            <!-- OVERVIEW FILTER PANEL INCLUDING MODULE & USER/EMP FILTERS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200 mb-4">
               <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-postRed-800 mb-1">⚡ Instant Search (Ref No / Article No)</label>
-                <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type Ref No or Article..." class="w-full border-2 border-postGold-400 p-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none shadow-xs font-mono">
+                <label class="block text-xs font-bold text-postRed-800 mb-1">⚡ Instant Search (Ref / Article / Name)</label>
+                <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type Ref No, Article or Name..." class="w-full border-2 border-postGold-400 p-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none shadow-xs font-mono">
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Module</label>
@@ -200,6 +200,12 @@
                 </select>
               </div>
               <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Entry By User</label>
+                <select id="overviewFilterEmpUser" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+                  <option value="">-- All Users --</option>
+                </select>
+              </div>
+              <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
                 <select id="overviewFilterStatus" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
                   <option value="">-- All Statuses --</option>
@@ -210,24 +216,25 @@
                 </select>
               </div>
               <div>
-                <button type="button" onclick="resetOverviewFilters()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold text-sm cursor-pointer transition">Reset Filters</button>
+                <button type="button" onclick="resetOverviewFilters()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold text-sm cursor-pointer transition">Reset</button>
               </div>
             </div>
 
-            <!-- TABLE WITH EXPANDED ACTION COLUMN -->
-            <div class="overflow-x-auto border border-slate-200 rounded-lg shadow-xs">
+            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR & STICKY HEADERS -->
+            <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
-                <thead>
+                <thead class="sticky top-0 z-10 shadow-xs">
                   <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold whitespace-nowrap">
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No (Txn ID) <span id="sort_txn_id_ref">⇅</span></th>
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('module')">Module <span id="sort_module">⇅</span></th>
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('raised_for_office')">Office Name <span id="sort_raised_for_office">⇅</span></th>
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('created_at')">Entry Date/Time <span id="sort_created_at">⇅</span></th>
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn Date <span id="sort_txn_date">⇅</span></th>
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
-                    <th class="p-3 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
-                    <th class="p-3 cursor-default">Admin Reply</th> 
-                    <th class="p-3 cursor-default text-center min-w-[200px]">Action / Attachments</th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No (Txn ID) <span id="sort_txn_id_ref">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Emp Name <span id="sort_emp_name">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('module')">Module <span id="sort_module">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('raised_for_office')">Office Name <span id="sort_raised_for_office">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('created_at')">Entry Date/Time <span id="sort_created_at">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn Date <span id="sort_txn_date">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
+                    <th class="p-3 bg-postRed-50 cursor-default">Admin Reply</th> 
+                    <th class="p-3 bg-postRed-50 cursor-default text-center min-w-[200px]">Action / Attachments</th>
                   </tr>
                 </thead>
                 <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -360,7 +367,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: MIS & PENDENCY REPORTS (WITH MODULE FILTER) -->
+        <!-- TAB 4: MIS & PENDENCY REPORTS -->
         <div id="reportsView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
             <div>
@@ -377,7 +384,7 @@
             </div>
           </div>
           
-          <!-- COMPREHENSIVE FILTER SECTION (INCLUDING MODULE FILTER) -->
+          <!-- COMPREHENSIVE FILTER SECTION -->
           <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">From Date</label>
@@ -440,20 +447,20 @@
           </div>
 
           <!-- MIS FILTERED DETAILS TABLE -->
-          <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-xs">
-            <h4 id="misReportTableTitle" class="font-bold text-sm p-3 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
+          <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
+            <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-sm p-3 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
             <table class="w-full text-left text-sm border-collapse">
-              <thead>
+              <thead class="sticky top-[45px] z-10 shadow-xs">
                 <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
-                  <th class="p-3">Ref No</th>
-                  <th class="p-3">Emp Name</th>
-                  <th class="p-3">Module</th>
-                  <th class="p-3">Office</th>
-                  <th class="p-3">Entry Date/Time</th>
-                  <th class="p-3">Txn Date</th>
-                  <th class="p-3">Amount</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3">Admin Remarks</th>
+                  <th class="p-3 bg-postRed-50">Ref No</th>
+                  <th class="p-3 bg-postRed-50">Emp Name</th>
+                  <th class="p-3 bg-postRed-50">Module</th>
+                  <th class="p-3 bg-postRed-50">Office</th>
+                  <th class="p-3 bg-postRed-50">Entry Date/Time</th>
+                  <th class="p-3 bg-postRed-50">Txn Date</th>
+                  <th class="p-3 bg-postRed-50">Amount</th>
+                  <th class="p-3 bg-postRed-50">Status</th>
+                  <th class="p-3 bg-postRed-50">Admin Remarks</th>
                 </tr>
               </thead>
               <tbody id="misReportTableBody" class="divide-y divide-slate-200">
@@ -610,20 +617,37 @@
         </div>
       </div>
 
-      <!-- ADMIN REPLY MODAL WITH FILE ATTACHMENT & CLIPBOARD PASTE -->
+      <!-- ADMIN REPLY MODAL (WITH PROVISION TO CHANGE MODULE) -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
-          <h3 class="font-bold text-lg text-postRed-700">Admin Action & Reply Remarks</h3>
-          <input type="hidden" id="modalClaimId">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Update Claim Status</label>
-            <select id="modalStatus" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Settled">Settled</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+          <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
+            <h3 class="font-bold text-lg text-postRed-700">Admin Action & Reply Remarks</h3>
+            <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
           </div>
+          <input type="hidden" id="modalClaimId">
+
+          <!-- ADMIN PROVISION TO UPDATE STATUS & MODULE -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Update Claim Status</label>
+              <select id="modalStatus" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Settled">Settled</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Change Module (Admin)</label>
+              <select id="modalModule" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-semibold text-postRed-700">
+                <option value="Booking">Booking</option>
+                <option value="Delivery">Delivery</option>
+                <option value="DSS">DSS</option>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+          </div>
+
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Reply Remarks by Admin</label>
             <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" required placeholder="Type reply remarks or instructions..."></textarea>
@@ -842,12 +866,15 @@
         .order('emp_name', { ascending: true });
 
       const filterUserSelect = document.getElementById('filterEmpUser');
-      if (users && filterUserSelect) {
+      const overviewFilterEmpUser = document.getElementById('overviewFilterEmpUser');
+
+      if (users) {
         let userOptsHtml = '<option value="">-- All Users --</option>';
         users.forEach(u => {
           userOptsHtml += `<option value="${u.id}">${u.emp_name} (${u.emp_id})</option>`;
         });
-        filterUserSelect.innerHTML = userOptsHtml;
+        if (filterUserSelect) filterUserSelect.innerHTML = userOptsHtml;
+        if (overviewFilterEmpUser) overviewFilterEmpUser.innerHTML = userOptsHtml;
       }
     }
 
@@ -1041,7 +1068,6 @@
         loadAllUsers();
       }
 
-      // PRESERVE ACTIVE TAB ON FOCUS REFRESH
       showTab(currentActiveTab);
 
       if (!isAppInitialized) {
@@ -1075,7 +1101,6 @@
       }
     }
 
-    // TAB NAVIGATION WITH SESSION PERSISTENCE
     function showTab(tabId) {
       currentActiveTab = tabId;
       sessionStorage.setItem('activePortalTab', tabId);
@@ -1248,11 +1273,12 @@
       }
     }
 
-    // INSTANT SEARCH & FILTER COMBINED (WITH MODULE FILTER)
+    // INSTANT SEARCH & FILTER COMBINED (WITH MODULE, EMP & OFFICE FILTERS)
     function applyOverviewFilters() {
       const query = (document.getElementById('overviewInstantSearch')?.value || '').trim().toLowerCase();
       const selectedModule = document.getElementById('overviewFilterModule')?.value;
       const office = document.getElementById('overviewFilterOffice')?.value;
+      const selectedUser = document.getElementById('overviewFilterEmpUser')?.value;
       const status = document.getElementById('overviewFilterStatus')?.value;
 
       currentClaimsList = rawClaimsList.filter(c => {
@@ -1260,10 +1286,13 @@
           const matchTxn = (c.txn_id_ref || '').toLowerCase().includes(query);
           const matchArticle = (c.article_number || '').toLowerCase().includes(query);
           const matchRrn = (c.rrn_number || '').toLowerCase().includes(query);
-          if (!matchTxn && !matchArticle && !matchRrn) return false;
+          const matchEmpName = (c.profiles?.emp_name || '').toLowerCase().includes(query);
+          const matchEmpId = (c.profiles?.emp_id || '').toLowerCase().includes(query);
+          if (!matchTxn && !matchArticle && !matchRrn && !matchEmpName && !matchEmpId) return false;
         }
         if (selectedModule && c.module !== selectedModule) return false;
         if (office && c.raised_for_office !== office) return false;
+        if (selectedUser && c.created_by !== selectedUser) return false;
         if (status && c.claim_status !== status) return false;
         return true;
       });
@@ -1275,6 +1304,7 @@
       if (document.getElementById('overviewInstantSearch')) document.getElementById('overviewInstantSearch').value = '';
       if (document.getElementById('overviewFilterModule')) document.getElementById('overviewFilterModule').value = '';
       if (document.getElementById('overviewFilterOffice')) document.getElementById('overviewFilterOffice').value = '';
+      if (document.getElementById('overviewFilterEmpUser')) document.getElementById('overviewFilterEmpUser').value = '';
       if (document.getElementById('overviewFilterStatus')) document.getElementById('overviewFilterStatus').value = '';
       currentClaimsList = [...rawClaimsList];
       renderClaimsSummaryTable();
@@ -1290,13 +1320,13 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER SUMMARY TABLE (EMP NAME COLUMN REMOVED TO EXPAND ACTION BUTTONS SPACE)
+    // RENDER SUMMARY TABLE (WITH RESTORED EMP NAME COLUMN)
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = document.getElementById('claimsTableBody');
       tbody.innerHTML = '';
 
-      ['txn_id_ref', 'module', 'raised_for_office', 'created_at', 'txn_date', 'txn_amount', 'claim_status'].forEach(c => {
+      ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'created_at', 'txn_date', 'txn_amount', 'claim_status'].forEach(c => {
         const iconEl = document.getElementById('sort_' + c);
         if (iconEl) iconEl.innerText = '⇅';
       });
@@ -1304,14 +1334,17 @@
       if (activeIcon) activeIcon.innerText = currentSortDir === 'asc' ? '▲' : '▼';
 
       if (!currentClaimsList || currentClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
         return;
       }
 
       currentClaimsList.sort((a, b) => {
         let valA, valB;
 
-        if (currentSortCol === 'txn_amount') {
+        if (currentSortCol === 'emp_name') {
+          valA = (a.profiles?.emp_name || '').toLowerCase();
+          valB = (b.profiles?.emp_name || '').toLowerCase();
+        } else if (currentSortCol === 'txn_amount') {
           valA = parseFloat(a.txn_amount) || 0;
           valB = parseFloat(b.txn_amount) || 0;
         } else {
@@ -1325,6 +1358,7 @@
       });
 
       currentClaimsList.forEach(c => {
+        const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
         const entryDateTime = formatDateTime(c.created_at);
         const isOwner = c.created_by === currentUser?.id;
 
@@ -1343,6 +1377,7 @@
                 ${c.txn_id_ref}
               </button>
             </td>
+            <td class="p-3 font-semibold text-slate-700 whitespace-nowrap">${creatorName}</td>
             <td class="p-3 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
             <td class="p-3 whitespace-nowrap">${c.raised_for_office}</td>
             <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${entryDateTime}</td>
@@ -1357,7 +1392,7 @@
             <td class="p-3 text-center whitespace-nowrap min-w-[200px]">
               <div class="flex items-center justify-center gap-2">
                 ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`)" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
+                  <button type="button" onclick="openReplyModal('${c.id}', '${c.claim_status}', \`${c.reply_remarks_admin || ''}\`, '${c.module}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Reply/Edit</button>
                   <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Delete</button>
                 ` : `
                   ${isOwner ? `<button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2 py-1 rounded text-xs font-bold shadow-2xs transition">Edit</button>` : ''}
@@ -1406,7 +1441,7 @@
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Date & Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium">${claim.user_mobile || 'N/A'}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium">${claim.module}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium text-postRed-700 font-bold">${claim.module}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Article Number:</strong> <span class="font-medium">${claim.article_number}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">RRN Number:</strong> <span class="font-medium">${claim.rrn_number}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Date:</strong> <span class="font-medium">${claim.txn_date}</span></div>
@@ -1466,6 +1501,7 @@
           <p><strong>Ref ID (Txn ID):</strong> <span class="text-postRed-700 font-bold font-mono">${data.txn_id_ref}</span></p>
           <p><strong>Created By Employee:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
           <p><strong>Entry Date/Time:</strong> ${formatDateTime(data.created_at)}</p>
+          <p><strong>Module:</strong> <span class="font-bold text-postRed-700">${data.module}</span></p>
           <p><strong>Raised For Office:</strong> ${data.raised_for_office}</p>
           <p><strong>Status:</strong> <span class="font-bold px-2 py-0.5 rounded ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
           <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
@@ -1480,9 +1516,11 @@
       }
     }
 
-    function openReplyModal(id, status, remarks) {
+    // OPEN REPLY MODAL (PRELOADS CURRENT MODULE)
+    function openReplyModal(id, status, remarks, moduleVal) {
       document.getElementById('modalClaimId').value = id;
       document.getElementById('modalStatus').value = status;
+      document.getElementById('modalModule').value = moduleVal || 'Booking';
       document.getElementById('modalAdminRemarks').value = remarks || '';
       document.getElementById('modalAdminFile').value = '';
       clearAdminPastedImage();
@@ -1494,9 +1532,11 @@
       clearAdminPastedImage();
     }
 
+    // SUBMIT ADMIN REPLY WITH STATUS & MODULE UPDATE
     async function submitAdminReply() {
       const id = document.getElementById('modalClaimId').value;
       const status = document.getElementById('modalStatus').value;
+      const moduleVal = document.getElementById('modalModule').value;
       const reply_remarks_admin = document.getElementById('modalAdminRemarks').value;
       const adminFileInput = document.getElementById('modalAdminFile').files[0];
 
@@ -1515,14 +1555,18 @@
         admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
       }
 
-      const updateData = { claim_status: status, reply_remarks_admin };
+      const updateData = { 
+        claim_status: status, 
+        module: moduleVal, 
+        reply_remarks_admin 
+      };
       if (admin_file_url) updateData.admin_file_url = admin_file_url;
 
       const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
 
       if (error) alert("Failed to update: " + error.message);
       else {
-        alert("Claim status updated successfully!");
+        alert("Claim status and module updated successfully!");
         closeModal();
         loadClaimsSummary();
         generateMISReport();
@@ -1803,7 +1847,6 @@
 
     loadFilterDropdowns();
 
-    // SAFE AUTH STATE LISTENER (PREVENTS RESETTING ACTIVE TABS)
     supabaseClient.auth.onAuthStateChange((event, session) => {
       if (session && !currentUser) {
         initApp();
@@ -1861,6 +1904,7 @@
       doc.text(`Report Summary View (${currentMISReportStatus}) - Chennai City Central Division`, 14, 15);
       doc.setFontSize(9);
       doc.setTextColor(51, 51, 51);
+      /* Official header comment: Department of Posts */
       doc.text(`Generated on: ${new Date().toLocaleString()} | Visible Records: ${currentMISClaimsList.length}`, 14, 22);
 
       const headers = [["Ref No", "Emp Name", "Module", "Entry Date/Time", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
