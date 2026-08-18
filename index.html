@@ -63,8 +63,6 @@
 
       <!-- AUTHENTICATION CONTAINER -->
       <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 md:p-8 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
-        
-        <!-- HEADER WITH INDIA POST EMBLEM -->
         <div class="text-center mb-5">
           <div class="flex justify-center mb-2">
             <img id="loginLogoImg" src="" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded-full border-2 border-postGold-500 shadow-sm">
@@ -74,7 +72,6 @@
           <div class="h-1 w-20 bg-postGold-500 mx-auto mt-2 rounded"></div>
         </div>
 
-        <!-- 1. LOGIN FORM -->
         <div id="loginFormContainer">
           <form id="loginForm" onsubmit="handleEmpIdLogin(event)" class="space-y-4">
             <div>
@@ -98,7 +95,6 @@
           </div>
         </div>
 
-        <!-- 2. REGISTER FORM -->
         <div id="registerFormContainer" class="hidden">
           <div class="mb-3 pb-2 border-b border-amber-200 flex justify-between items-center">
             <h2 class="text-sm font-bold text-postRed-700 uppercase">New Staff Registration</h2>
@@ -138,13 +134,12 @@
             </div>
           </form>
         </div>
-
       </div>
 
       <!-- MAIN APPLICATION DASHBOARD -->
       <div id="mainDashboard" class="hidden space-y-6">
 
-        <!-- DASHBOARD NAVIGATION TABS -->
+        <!-- TABS -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
           <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer">Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
@@ -167,14 +162,13 @@
             <div id="trackResult" class="hidden border border-postGold-400 p-4 rounded-lg bg-amber-50/40 mt-3 space-y-2 text-sm"></div>
           </div>
 
-          <!-- SUBMITTED CLAIMS OVERVIEW -->
+          <!-- OVERVIEW TABLE -->
           <div class="border-t pt-6 border-amber-200">
             <div class="flex justify-between items-center flex-wrap gap-2 mb-3">
               <h4 class="font-bold text-md text-slate-800">Submitted Claims Overview <span class="text-xs text-slate-400 font-normal">(Click headers to sort)</span></h4>
               <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live Instant Filter Active</span>
             </div>
 
-            <!-- OVERVIEW FILTER PANEL -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200 mb-4">
               <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-postRed-800 mb-1">⚡ Instant Search (Ref / Article / Name)</label>
@@ -217,7 +211,6 @@
               </div>
             </div>
 
-            <!-- TABLE -->
             <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="sticky top-0 z-10 shadow-xs">
@@ -293,13 +286,12 @@
               <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks for claim..."></textarea>
             </div>
 
-            <!-- ROW: LEFT = USER MOBILE NUMBER, RIGHT = DOCUMENT ATTACHMENT -->
+            <!-- ROW: LEFT = MOBILE, RIGHT = DOCUMENT ATTACHMENT -->
             <div class="flex flex-col justify-start">
               <label class="block text-xs font-bold text-slate-700 mb-1">User Mobile Number *</label>
               <input type="tel" id="claimUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border border-slate-300 p-2.5 rounded text-sm bg-amber-50/30 focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
 
-            <!-- RIGHT COLUMN: DOCUMENT ATTACHMENT -->
             <div class="space-y-2">
               <div class="flex items-center justify-between flex-wrap gap-1">
                 <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
@@ -334,7 +326,7 @@
           </form>
         </div>
 
-        <!-- TAB 3: STANDALONE THEME CONVERTER TOOL TAB -->
+        <!-- TAB 3: THEME CONVERTER TOOL TAB -->
         <div id="converterTabView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="border-b pb-3 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -384,7 +376,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: ADMIN USER MANAGEMENT (WITH LOGO MANAGER FOR SUPERADMIN) -->
+        <!-- TAB 4: ADMIN USER MANAGEMENT -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
             <div>
@@ -398,7 +390,6 @@
             </div>
           </div>
 
-          <!-- SUPERADMIN LOGO MANAGEMENT PANEL -->
           <div id="superadminLogoPanel" class="hidden bg-amber-50/70 border border-amber-300 rounded-xl p-3.5 flex items-center justify-between flex-wrap gap-3">
             <div class="flex items-center gap-3">
               <img id="adminLogoPreview" src="" alt="Division Logo" class="h-11 w-11 object-contain bg-white p-1 rounded-full border border-postGold-500 shadow-xs">
@@ -436,12 +427,12 @@
           </div>
         </div>
 
-        <!-- TAB 5: MIS & PENDENCY REPORTS -->
+        <!-- TAB 5: MIS & PENDENCY REPORTS WITH TAT / AGING ANALYTICS -->
         <div id="reportsView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
             <div>
-              <h3 class="text-lg font-bold text-postRed-700">MIS &amp; Pendency Monitoring Reports</h3>
-              <p class="text-xs text-slate-500">Division-wide performance analytics and exports</p>
+              <h3 class="text-lg font-bold text-postRed-700">MIS &amp; Settlement Turnaround Time (TAT) Reports</h3>
+              <p class="text-xs text-slate-500">Aging analytics, SLA monitoring, and claim resolution metrics</p>
             </div>
             <div class="flex gap-2">
               <button type="button" onclick="exportMISExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer transition">
@@ -453,6 +444,7 @@
             </div>
           </div>
           
+          <!-- FILTERS -->
           <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">From Date</label>
@@ -490,29 +482,84 @@
             </div>
           </div>
 
+          <!-- PRIMARY STATUS CARDS -->
           <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <div onclick="generateMISReport('All')" class="bg-white border-2 border-postRed-600 p-4 rounded-xl text-center cursor-pointer hover:bg-postRed-50/50 transition shadow-xs">
-              <p class="text-xs text-postRed-700 font-bold uppercase tracking-wider">Total Claims</p>
-              <p id="misTotal" class="text-2xl font-extrabold text-slate-900 mt-1">0</p>
+            <div onclick="generateMISReport('All')" class="bg-white border-2 border-postRed-600 p-3 rounded-xl text-center cursor-pointer hover:bg-postRed-50/50 transition shadow-xs">
+              <p class="text-[11px] text-postRed-700 font-bold uppercase tracking-wider">Total Claims</p>
+              <p id="misTotal" class="text-xl font-extrabold text-slate-900 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('Pending')" class="bg-white border-2 border-postGold-500 p-4 rounded-xl text-center cursor-pointer hover:bg-amber-50/60 transition shadow-xs">
-              <p class="text-xs text-postGold-700 font-bold uppercase tracking-wider">Pending</p>
-              <p id="misPending" class="text-2xl font-extrabold text-postGold-700 mt-1">0</p>
+            <div onclick="generateMISReport('Pending')" class="bg-white border-2 border-postGold-500 p-3 rounded-xl text-center cursor-pointer hover:bg-amber-50/60 transition shadow-xs">
+              <p class="text-[11px] text-postGold-700 font-bold uppercase tracking-wider">Pending</p>
+              <p id="misPending" class="text-xl font-extrabold text-postGold-700 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('In Progress')" class="bg-white border-2 border-blue-500 p-4 rounded-xl text-center cursor-pointer hover:bg-blue-50/50 transition shadow-xs">
-              <p class="text-xs text-blue-700 font-bold uppercase tracking-wider">In Progress</p>
-              <p id="misInProgress" class="text-2xl font-extrabold text-blue-900 mt-1">0</p>
+            <div onclick="generateMISReport('In Progress')" class="bg-white border-2 border-blue-500 p-3 rounded-xl text-center cursor-pointer hover:bg-blue-50/50 transition shadow-xs">
+              <p class="text-[11px] text-blue-700 font-bold uppercase tracking-wider">In Progress</p>
+              <p id="misInProgress" class="text-xl font-extrabold text-blue-900 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('Settled')" class="bg-white border-2 border-emerald-600 p-4 rounded-xl text-center cursor-pointer hover:bg-emerald-50/50 transition shadow-xs">
-              <p class="text-xs text-emerald-700 font-bold uppercase tracking-wider">Settled</p>
-              <p id="misSettled" class="text-2xl font-extrabold text-emerald-900 mt-1">0</p>
+            <div onclick="generateMISReport('Settled')" class="bg-white border-2 border-emerald-600 p-3 rounded-xl text-center cursor-pointer hover:bg-emerald-50/50 transition shadow-xs">
+              <p class="text-[11px] text-emerald-700 font-bold uppercase tracking-wider">Settled</p>
+              <p id="misSettled" class="text-xl font-extrabold text-emerald-900 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('Rejected')" class="bg-white border-2 border-rose-600 p-4 rounded-xl text-center cursor-pointer hover:bg-rose-50/50 transition shadow-xs">
-              <p class="text-xs text-rose-700 font-bold uppercase tracking-wider">Rejected</p>
-              <p id="misRejected" class="text-2xl font-extrabold text-rose-900 mt-1">0</p>
+            <div onclick="generateMISReport('Rejected')" class="bg-white border-2 border-rose-600 p-3 rounded-xl text-center cursor-pointer hover:bg-rose-50/50 transition shadow-xs">
+              <p class="text-[11px] text-rose-700 font-bold uppercase tracking-wider">Rejected</p>
+              <p id="misRejected" class="text-xl font-extrabold text-rose-900 mt-0.5">0</p>
             </div>
           </div>
 
+          <!-- TIME TAKEN TO SETTLE (TAT) & PENDING AGING REPORT RIBBONS -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            
+            <!-- 1. SETTLED CLAIMS TAT BREAKDOWN (Txn Date to Settlement Date) -->
+            <div class="bg-emerald-50/60 border border-emerald-300 rounded-xl p-3.5 space-y-2.5">
+              <div class="flex justify-between items-center border-b border-emerald-200 pb-1.5">
+                <span class="font-bold text-xs text-emerald-900 uppercase">⏱️ Settled Claims TAT Breakdown</span>
+                <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Avg: <strong id="misAvgTat">0 Days</strong></span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div onclick="generateMISReport('Settled_le3')" class="bg-white border border-emerald-300 p-2 rounded-lg cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">Settled &le; 3 Days</span>
+                  <span id="misSettledLe3" class="text-base font-extrabold text-emerald-800">0</span>
+                </div>
+                <div onclick="generateMISReport('Settled_4to10')" class="bg-white border border-emerald-300 p-2 rounded-lg cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">Settled 4 - 10 Days</span>
+                  <span id="misSettled4to10" class="text-base font-extrabold text-amber-700">0</span>
+                </div>
+                <div onclick="generateMISReport('Settled_gt10')" class="bg-white border border-emerald-300 p-2 rounded-lg cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">Settled &gt; 10 Days</span>
+                  <span id="misSettledGt10" class="text-base font-extrabold text-rose-700">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. PENDING CLAIMS AGING BREAKDOWN -->
+            <div class="bg-amber-50/60 border border-amber-300 rounded-xl p-3.5 space-y-2.5">
+              <div class="flex justify-between items-center border-b border-amber-200 pb-1.5">
+                <span class="font-bold text-xs text-postGold-900 uppercase">⏳ Pending Claims Aging Buckets</span>
+                <span class="text-[11px] text-slate-500">Aging calculated from Txn Date</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 text-center text-xs">
+                <div onclick="generateMISReport('Pending_le10')" class="bg-white border border-amber-300 p-2 rounded-lg cursor-pointer hover:bg-amber-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&le; 10 Days</span>
+                  <span id="misPendingLe10" class="text-base font-extrabold text-slate-800">0</span>
+                </div>
+                <div onclick="generateMISReport('Pending_11to20')" class="bg-white border border-amber-300 p-2 rounded-lg cursor-pointer hover:bg-amber-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">11 - 20 Days</span>
+                  <span id="misPending11to20" class="text-base font-extrabold text-amber-700">0</span>
+                </div>
+                <div onclick="generateMISReport('Pending_21to30')" class="bg-white border border-amber-300 p-2 rounded-lg cursor-pointer hover:bg-amber-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">21 - 30 Days</span>
+                  <span id="misPending21to30" class="text-base font-extrabold text-orange-700">0</span>
+                </div>
+                <div onclick="generateMISReport('Pending_gt30')" class="bg-white border border-amber-300 p-2 rounded-lg cursor-pointer hover:bg-amber-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&gt; 30 Days</span>
+                  <span id="misPendingGt30" class="text-base font-extrabold text-rose-700">0</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- MIS TABLE -->
           <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-sm p-3 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
             <table class="w-full text-left text-sm border-collapse">
@@ -523,14 +570,15 @@
                   <th class="p-3 bg-postRed-50">Module</th>
                   <th class="p-3 bg-postRed-50">Office</th>
                   <th class="p-3 bg-postRed-50">Txn Date</th>
-                  <th class="p-3 bg-postRed-50">Entry Date/Time</th>
+                  <th class="p-3 bg-postRed-50">Settlement Date</th>
+                  <th class="p-3 bg-postRed-50">TAT / Aging</th>
                   <th class="p-3 bg-postRed-50">Amount</th>
                   <th class="p-3 bg-postRed-50">Status</th>
                   <th class="p-3 bg-postRed-50">Admin Remarks</th>
                 </tr>
               </thead>
               <tbody id="misReportTableBody" class="divide-y divide-slate-200">
-                <tr><td colspan="9" class="p-4 text-center text-slate-400">Loading Report...</td></tr>
+                <tr><td colspan="10" class="p-4 text-center text-slate-400">Loading Report...</td></tr>
               </tbody>
             </table>
           </div>
@@ -692,7 +740,7 @@
         </div>
       </div>
 
-      <!-- ADMIN REPLY MODAL -->
+      <!-- ADMIN REPLY MODAL (WITH DYNAMIC SETTLEMENT DATE PICKER) -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
@@ -705,7 +753,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Update Claim Status</label>
-              <select id="modalStatus" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <select id="modalStatus" onchange="toggleSettlementDateField()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-bold">
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Settled">Settled</option>
@@ -721,6 +769,13 @@
                 <option value="Others">Others</option>
               </select>
             </div>
+          </div>
+
+          <!-- ACTUAL DATE OF SETTLEMENT INPUT (CAPTURES ACTUAL REFUND DATE) -->
+          <div id="modalSettlementDateContainer" class="hidden bg-emerald-50/70 p-3 rounded-lg border border-emerald-300">
+            <label class="block text-xs font-bold text-emerald-900 mb-1">📅 Date of Settlement (Actual Refund Date) *</label>
+            <input type="date" id="modalSettlementDate" class="w-full border border-emerald-400 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-emerald-600 outline-none font-bold text-emerald-900">
+            <p class="text-[11px] text-emerald-700 mt-1">Enter the actual date refund credited to account to compute true Turnaround Time (TAT).</p>
           </div>
 
           <div>
@@ -783,7 +838,7 @@
     </div>
   </footer>
 
-  <!-- APPLICATION SCRIPT -->
+  <!-- APPLICATION LOGIC SCRIPT -->
   <script>
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
@@ -791,7 +846,7 @@
 
     const $ = id => document.getElementById(id);
 
-    // OFFICIAL INDIA POST DAK SEWA JAN SEWA LOGO URL
+    // OFFICIAL INDIA POST LOGO URL
     const DEFAULT_INDIA_POST_LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
 
     let currentAppLogo = localStorage.getItem('app_custom_logo') || DEFAULT_INDIA_POST_LOGO;
@@ -801,7 +856,7 @@
     let rawClaimsList = [];
     let currentClaimsList = [];
     let currentMISClaimsList = [];
-    let currentMISReportStatus = 'All';
+    let currentMISReportFilter = 'All';
     let allLoadedUsers = [];
     let isRrnManuallyEdited = false;
     let isAppInitialized = false;
@@ -835,7 +890,6 @@
     }
     initLogos();
 
-    // SUPERADMIN LOGO MANAGEMENT
     function handleLogoUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -844,7 +898,7 @@
         currentAppLogo = ev.target.result;
         localStorage.setItem('app_custom_logo', currentAppLogo);
         initLogos();
-        alert("Division logo updated successfully! This will now render on the portal and in all exported PDF dockets.");
+        alert("Logo updated! It will render on the portal and in all exported PDF dockets.");
       };
       r.readAsDataURL(file);
     }
@@ -857,7 +911,6 @@
       alert("Logo reset to default India Post emblem.");
     }
 
-    // AUTH VIEW SWITCHER
     function showAuthView(view) {
       if (view === 'register') {
         $('loginFormContainer').classList.add('hidden');
@@ -868,11 +921,8 @@
       }
     }
 
-    function switchAuthTab(view) {
-      showAuthView(view);
-    }
+    function switchAuthTab(view) { showAuthView(view); }
 
-    // COPY REFERENCE NUMBER TO CLIPBOARD
     async function copyToClipboard(text, btnElement) {
       try {
         await navigator.clipboard.writeText(text);
@@ -884,24 +934,40 @@
           btnElement.classList.remove("bg-emerald-100", "text-emerald-800", "border-emerald-300");
         }, 1500);
       } catch (err) {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert(`Copied Ref No: ${text}`);
+        prompt("Copy Reference ID:", text);
       }
     }
 
-    // THEME DETECTOR & CONVERTER
+    // DAY DIFFERENCE HELPER (True integer day delta)
+    function calculateDaysDifference(startDateStr, endDateStr) {
+      if (!startDateStr || !endDateStr) return null;
+      const start = new Date(startDateStr);
+      const end = new Date(endDateStr);
+      const diffTime = end.getTime() - start.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+      return diffDays >= 0 ? diffDays : 0;
+    }
+
+    function toggleSettlementDateField() {
+      const status = $('modalStatus').value;
+      const container = $('modalSettlementDateContainer');
+      if (status === 'Settled') {
+        container.classList.remove('hidden');
+        if (!$('modalSettlementDate').value) {
+          $('modalSettlementDate').value = new Date().toISOString().split('T')[0];
+        }
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    // THEME CONVERTER ENGINE
     function rgbToHsl(r, g, b) {
       r /= 255; g /= 255; b /= 255;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
       let h, s, l = (max + min) / 2;
-      if (max === min) {
-        h = s = 0;
-      } else {
+      if (max === min) { h = s = 0; }
+      else {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         switch (max) {
@@ -916,9 +982,8 @@
 
     function hslToRgb(h, s, l) {
       let r, g, b;
-      if (s === 0) {
-        r = g = b = l;
-      } else {
+      if (s === 0) { r = g = b = l; }
+      else {
         const hue2rgb = (p, q, t) => {
           if (t < 0) t += 1;
           if (t > 1) t -= 1;
@@ -961,9 +1026,7 @@
       const data = imgData.data;
 
       const isDark = checkIsDarkTheme(data);
-      if (!isDark) {
-        return { canvas: c, isDarkTheme: false };
-      }
+      if (!isDark) return { canvas: c, isDarkTheme: false };
 
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
@@ -975,16 +1038,12 @@
         if (preserveColor && isColored) {
           const newL = l < 0.5 ? 0.35 + l * 0.4 : l;
           const [nr, ng, nb] = hslToRgb(h, Math.min(1, s * 1.15), newL);
-          data[i] = nr;
-          data[i + 1] = ng;
-          data[i + 2] = nb;
+          data[i] = nr; data[i + 1] = ng; data[i + 2] = nb;
         } else {
           let newL = 1 - l;
           newL = minTextDarkness + newL * (maxBgLightness - minTextDarkness);
           const [nr, ng, nb] = hslToRgb(h, s * 0.08, newL);
-          data[i] = nr;
-          data[i + 1] = ng;
-          data[i + 2] = nb;
+          data[i] = nr; data[i + 1] = ng; data[i + 2] = nb;
         }
       }
 
@@ -1007,7 +1066,6 @@
       });
     }
 
-    // THEME CONVERTER TAB HANDLERS
     function handleConverterFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1069,7 +1127,7 @@
       a.click();
     }
 
-    // PASTE HANDLER
+    // CLIPBOARD PASTE
     window.addEventListener('paste', async (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       let blob = null;
@@ -1331,7 +1389,6 @@
       const isSuperadmin = role === 'superadmin';
       const isViewer = role === 'viewer';
 
-      // ROLE BASED TAB RESTRICTIONS
       if (isAdmin) {
         $('adminTabBtn').classList.remove('hidden');
         $('tabBtnTrack').classList.remove('hidden');
@@ -1403,7 +1460,6 @@
       }
     }
 
-    // CLAIM SUBMISSION WITH SMART AUTO-CONVERT
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = $('claimFile').files[0];
@@ -1524,7 +1580,6 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER TABLE WITH COPY BUTTON & 4-ICON ROW
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1575,7 +1630,6 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
-            <!-- 1. REF NO & MODULE + COPY BUTTON -->
             <td class="p-3 whitespace-nowrap">
               <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-sm block">
                 ${c.txn_id_ref}
@@ -1587,27 +1641,20 @@
                 </button>
               </div>
             </td>
-            <!-- 2. EMP NAME/ID & OFFICE -->
             <td class="p-3 whitespace-nowrap">
               <div class="font-bold text-slate-800">${empNameOnly} <span class="text-xs text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
               <div class="text-xs text-slate-600 font-medium">${c.raised_for_office}</div>
             </td>
-            <!-- 3. TXN DATE -->
             <td class="p-3 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
-            <!-- 4. ENTRY DATE/TIME -->
             <td class="p-3 whitespace-nowrap text-xs text-slate-600 font-medium">${entryDateTime}</td>
-            <!-- 5. AMOUNT -->
             <td class="p-3 font-bold text-slate-900 whitespace-nowrap text-sm">₹${c.txn_amount}</td>
-            <!-- 6. STATUS -->
             <td class="p-3 whitespace-nowrap">
               <span class="px-2.5 py-1 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
               </span>
             </td>
-            <!-- 7. ADMIN REMARKS -->
             <td class="p-3 min-w-[220px]">${adminReplyHtml}</td>
             
-            <!-- 8. 4-ICON HORIZONTAL ROW -->
             <td class="p-3 text-center whitespace-nowrap min-w-[150px]">
               <div class="inline-flex items-center justify-center gap-1.5">
                 ${isAdmin ? `
@@ -1658,6 +1705,8 @@
       const creatorEmpId = claim.profiles?.emp_id || 'N/A';
       const creatorEmpName = claim.profiles?.emp_name || 'N/A';
       const entryDateTime = formatDateTime(claim.created_at);
+      const isSettled = claim.claim_status === 'Settled';
+      const tatDays = isSettled && claim.settlement_date ? calculateDaysDifference(claim.txn_date, claim.settlement_date) : null;
 
       $('detailsModalContent').innerHTML = `
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
@@ -1672,6 +1721,11 @@
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Amount:</strong> <span class="font-bold text-emerald-800">₹${claim.txn_amount}</span></div>
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Payment Channel:</strong> <span class="font-medium">${claim.payment_channel}</span></div>
         
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200">
+          <strong class="text-slate-500 text-xs block">Settlement Info:</strong> 
+          <span class="font-bold text-slate-800">${claim.settlement_date ? `${claim.settlement_date} (${tatDays !== null ? tatDays + ' Days TAT' : ''})` : 'Pending Settlement'}</span>
+        </div>
+
         <div class="col-span-1 md:col-span-2">
           <strong class="text-slate-500 text-xs block mb-1">Claim Status:</strong> 
           <span class="px-3 py-1 rounded-full text-xs font-bold inline-block ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span>
@@ -1836,8 +1890,8 @@
             <tr>
               <td class="label">Payment Channel:</td>
               <td class="value">${claim.payment_channel}</td>
-              <td class="label">Docket Print Date:</td>
-              <td class="value">${new Date().toLocaleString()}</td>
+              <td class="label">Settlement Date:</td>
+              <td class="value"><strong>${claim.settlement_date || 'Pending'}</strong></td>
             </tr>
           </table>
 
@@ -1900,8 +1954,10 @@
       $('modalStatus').value = claim.claim_status || 'Pending';
       $('modalModule').value = claim.module || 'Booking';
       $('modalAdminRemarks').value = claim.reply_remarks_admin || '';
+      $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
       $('modalAdminFile').value = '';
       
+      toggleSettlementDateField();
       clearAdminPastedImage();
       $('replyModal').classList.remove('hidden');
     }
@@ -1919,6 +1975,7 @@
       const status = $('modalStatus').value;
       const moduleVal = $('modalModule').value;
       const reply_remarks_admin = ($('modalAdminRemarks').value || '').trim();
+      const settlement_date = (status === 'Settled') ? ($('modalSettlementDate').value || new Date().toISOString().split('T')[0]) : null;
       const adminFileInput = $('modalAdminFile')?.files[0];
 
       if (!id) return alert("Error: Claim ID is missing.");
@@ -1956,7 +2013,8 @@
         const updateData = {
           claim_status: status,
           module: moduleVal,
-          reply_remarks_admin: reply_remarks_admin
+          reply_remarks_admin: reply_remarks_admin,
+          settlement_date: settlement_date
         };
 
         if (admin_file_url) updateData.admin_file_url = admin_file_url;
@@ -1974,7 +2032,7 @@
         alert("Claim updated successfully!");
         closeModal();
         await loadClaimsSummary();
-        await generateMISReport(currentMISReportStatus);
+        await generateMISReport(currentMISReportFilter);
 
       } catch (err) {
         alert("Unexpected Error: " + err.message);
@@ -2002,10 +2060,14 @@
       resCard.classList.remove('hidden');
 
       if (data) {
+        const tat = (data.claim_status === 'Settled' && data.settlement_date) 
+          ? calculateDaysDifference(data.txn_date, data.settlement_date) 
+          : calculateDaysDifference(data.txn_date, new Date().toISOString().split('T')[0]);
+
         resCard.innerHTML = `
           <p><strong>Ref ID (Txn ID):</strong> <span class="text-postRed-700 font-bold font-mono">${data.txn_id_ref}</span></p>
-          <p><strong>Created By Employee:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
-          <p><strong>Txn Date:</strong> ${data.txn_date} | <strong>Entry Date:</strong> ${formatDateTime(data.created_at)}</p>
+          <p><strong>Created By:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
+          <p><strong>Txn Date:</strong> ${data.txn_date} | <strong>${data.claim_status === 'Settled' ? 'Settled Date' : 'Aging'}:</strong> ${data.settlement_date || (tat + ' Days Pending')}</p>
           <p><strong>Module:</strong> <span class="font-bold text-postRed-700">${data.module}</span> | <strong>Office:</strong> ${data.raised_for_office}</p>
           <p><strong>Status:</strong> <span class="font-bold px-2 py-0.5 rounded ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
           <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
@@ -2021,7 +2083,7 @@
       }
     }
 
-    // USER MANAGEMENT & SECURITY SAFEGUARDS
+    // USER MANAGEMENT
     async function loadAllUsers() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       if (!isAdmin) {
@@ -2103,26 +2165,19 @@
         .eq('id', userId)
         .single();
 
-      if (error || !user) {
-        return alert("Error loading user profile: " + (error?.message || "User not found"));
-      }
+      if (error || !user) return alert("Error loading user: " + (error?.message || "Not found"));
 
       $('editUserId').value = user.id;
       $('editUserEmpId').value = user.emp_id || '';
       $('editUserEmpName').value = user.emp_name || '';
-      
-      const existingMobile = user.mobile_number || user.mobile_no || user.phone || '';
-      $('editUserMobile').value = existingMobile;
-      
+      $('editUserMobile').value = user.mobile_number || user.mobile_no || user.phone || '';
       $('editUserOffice').value = user.office_name || '';
       $('editUserRole').value = user.role || 'user';
 
       $('adminUserEditModal').classList.remove('hidden');
     }
 
-    function closeAdminUserEditModal() {
-      $('adminUserEditModal').classList.add('hidden');
-    }
+    function closeAdminUserEditModal() { $('adminUserEditModal').classList.add('hidden'); }
 
     async function submitAdminUserEdit(e) {
       e.preventDefault();
@@ -2135,18 +2190,15 @@
       const office_name = $('editUserOffice').value;
       const role = $('editUserRole').value;
 
-      if (!mobile_number || mobile_number.length !== 10) {
-        return alert("Please enter a valid 10-digit mobile number!");
-      }
+      if (!mobile_number || mobile_number.length !== 10) return alert("Please enter a valid 10-digit mobile number!");
 
       const { error } = await supabaseClient
         .from('profiles')
         .update({ emp_name, mobile_number, office_name, role })
         .eq('id', userId);
 
-      if (error) {
-        alert("Failed to update user: " + error.message);
-      } else {
+      if (error) alert("Failed to update user: " + error.message);
+      else {
         alert("User details & role updated successfully!");
         closeAdminUserEditModal();
         await loadAllUsers();
@@ -2168,9 +2220,7 @@
       $('adminResetPwdModal').classList.remove('hidden');
     }
 
-    function closeAdminResetPwdModal() {
-      $('adminResetPwdModal').classList.add('hidden');
-    }
+    function closeAdminResetPwdModal() { $('adminResetPwdModal').classList.add('hidden'); }
 
     function generateRandomPassword() {
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
@@ -2187,18 +2237,15 @@
       const userId = $('resetPwdUserId').value;
       const newPassword = $('resetPwdInput').value.trim();
 
-      if (!newPassword || newPassword.length < 6) {
-        return alert("Password must be at least 6 characters!");
-      }
+      if (!newPassword || newPassword.length < 6) return alert("Password must be at least 6 characters!");
 
       const { error } = await supabaseClient.rpc('admin_reset_user_password', {
         target_user_id: userId,
         new_password: newPassword
       });
 
-      if (error) {
-        alert("Failed to reset password: " + error.message);
-      } else {
+      if (error) alert("Failed to reset password: " + error.message);
+      else {
         alert(`Password for user updated successfully!\n\nNew Password: ${newPassword}`);
         closeAdminResetPwdModal();
       }
@@ -2213,7 +2260,7 @@
       loadAllUsers();
     }
 
-    // EXPORT USERS
+    // EXPORT USERS ROSTER
     async function exportUsersExcel() {
       if (!allLoadedUsers.length) return alert("No users loaded to export!");
       const data = allLoadedUsers.map((u, i) => ({
@@ -2283,8 +2330,11 @@
       generateMISReport('All');
     }
 
-    async function generateMISReport(filterStatus = 'All') {
-      currentMISReportStatus = filterStatus;
+    // ==============================================================
+    // ADVANCED MIS & SETTLEMENT TAT ANALYTICS GENERATOR
+    // ==============================================================
+    async function generateMISReport(filterType = 'All') {
+      currentMISReportFilter = filterType;
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const isViewer = userProfile?.role === 'viewer';
 
@@ -2308,25 +2358,155 @@
       const { data: claims } = await query;
       if (!claims) return;
 
-      $('misTotal').innerText = claims.length;
-      $('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
-      $('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
-      $('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
-      $('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
+      const todayStr = new Date().toISOString().split('T')[0];
 
-      currentMISClaimsList = (filterStatus === 'All') ? claims : claims.filter(c => c.claim_status === filterStatus);
+      // Primary Status Metrics
+      const totalCount = claims.length;
+      const pendingClaims = claims.filter(c => c.claim_status === 'Pending');
+      const inProgressClaims = claims.filter(c => c.claim_status === 'In Progress');
+      const settledClaims = claims.filter(c => c.claim_status === 'Settled');
+      const rejectedClaims = claims.filter(c => c.claim_status === 'Rejected');
 
-      $('misReportTableTitle').innerText = `Report Summary View (${filterStatus})`;
+      $('misTotal').innerText = totalCount;
+      $('misPending').innerText = pendingClaims.length;
+      $('misInProgress').innerText = inProgressClaims.length;
+      $('misSettled').innerText = settledClaims.length;
+      $('misRejected').innerText = rejectedClaims.length;
+
+      // 1. Compute Settled TAT Metrics
+      let totalTatSum = 0;
+      let settledCountWithDate = 0;
+      let settledLe3Count = 0;
+      let settled4to10Count = 0;
+      let settledGt10Count = 0;
+
+      settledClaims.forEach(c => {
+        const settleDate = c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null);
+        const days = calculateDaysDifference(c.txn_date, settleDate);
+        if (days !== null) {
+          totalTatSum += days;
+          settledCountWithDate++;
+          if (days <= 3) settledLe3Count++;
+          else if (days <= 10) settled4to10Count++;
+          else settledGt10Count++;
+        }
+      });
+
+      const avgTatDays = settledCountWithDate > 0 ? (totalTatSum / settledCountWithDate).toFixed(1) : "0";
+      $('misAvgTat').innerText = `${avgTatDays} Days`;
+      $('misSettledLe3').innerText = settledLe3Count;
+      $('misSettled4to10').innerText = settled4to10Count;
+      $('misSettledGt10').innerText = settledGt10Count;
+
+      // 2. Compute Pending Aging Metrics
+      let pendingLe10Count = 0;
+      let pending11to20Count = 0;
+      let pending21to30Count = 0;
+      let pendingGt30Count = 0;
+
+      pendingClaims.forEach(c => {
+        const days = calculateDaysDifference(c.txn_date, todayStr);
+        if (days !== null) {
+          if (days <= 10) pendingLe10Count++;
+          else if (days <= 20) pending11to20Count++;
+          else if (days <= 30) pending21to30Count++;
+          else pendingGt30Count++;
+        }
+      });
+
+      $('misPendingLe10').innerText = pendingLe10Count;
+      $('misPending11to20').innerText = pending11to20Count;
+      $('misPending21to30').innerText = pending21to30Count;
+      $('misPendingGt30').innerText = pendingGt30Count;
+
+      // Filter Current MIS Data based on active filter selection
+      if (filterType === 'All') {
+        currentMISClaimsList = claims;
+        $('misReportTableTitle').innerText = `Report Summary View: All Registered Claims (${claims.length})`;
+      } else if (filterType === 'Pending') {
+        currentMISClaimsList = pendingClaims;
+        $('misReportTableTitle').innerText = `Report Summary View: Pending Claims (${pendingClaims.length})`;
+      } else if (filterType === 'In Progress') {
+        currentMISClaimsList = inProgressClaims;
+        $('misReportTableTitle').innerText = `Report Summary View: In Progress Claims (${inProgressClaims.length})`;
+      } else if (filterType === 'Settled') {
+        currentMISClaimsList = settledClaims;
+        $('misReportTableTitle').innerText = `Report Summary View: All Settled Claims (${settledClaims.length})`;
+      } else if (filterType === 'Rejected') {
+        currentMISClaimsList = rejectedClaims;
+        $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
+      } 
+      // Settled TAT Filter Subsets
+      else if (filterType === 'Settled_le3') {
+        currentMISClaimsList = settledClaims.filter(c => {
+          const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+          return d !== null && d <= 3;
+        });
+        $('misReportTableTitle').innerText = `Settlement TAT Report: Settled within 3 Days (${currentMISClaimsList.length})`;
+      } else if (filterType === 'Settled_4to10') {
+        currentMISClaimsList = settledClaims.filter(c => {
+          const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+          return d !== null && d >= 4 && d <= 10;
+        });
+        $('misReportTableTitle').innerText = `Settlement TAT Report: Settled in 4 to 10 Days (${currentMISClaimsList.length})`;
+      } else if (filterType === 'Settled_gt10') {
+        currentMISClaimsList = settledClaims.filter(c => {
+          const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+          return d !== null && d > 10;
+        });
+        $('misReportTableTitle').innerText = `Settlement TAT Report: Settled in more than 10 Days (${currentMISClaimsList.length})`;
+      }
+      // Pending Aging Filter Subsets
+      else if (filterType === 'Pending_le10') {
+        currentMISClaimsList = pendingClaims.filter(c => {
+          const d = calculateDaysDifference(c.txn_date, todayStr);
+          return d !== null && d <= 10;
+        });
+        $('misReportTableTitle').innerText = `Pendency Aging Report: Pending for <= 10 Days (${currentMISClaimsList.length})`;
+      } else if (filterType === 'Pending_11to20') {
+        currentMISClaimsList = pendingClaims.filter(c => {
+          const d = calculateDaysDifference(c.txn_date, todayStr);
+          return d !== null && d >= 11 && d <= 20;
+        });
+        $('misReportTableTitle').innerText = `Pendency Aging Report: Pending for 11 to 20 Days (${currentMISClaimsList.length})`;
+      } else if (filterType === 'Pending_21to30') {
+        currentMISClaimsList = pendingClaims.filter(c => {
+          const d = calculateDaysDifference(c.txn_date, todayStr);
+          return d !== null && d >= 21 && d <= 30;
+        });
+        $('misReportTableTitle').innerText = `Pendency Aging Report: Pending for 21 to 30 Days (${currentMISClaimsList.length})`;
+      } else if (filterType === 'Pending_gt30') {
+        currentMISClaimsList = pendingClaims.filter(c => {
+          const d = calculateDaysDifference(c.txn_date, todayStr);
+          return d !== null && d > 30;
+        });
+        $('misReportTableTitle').innerText = `Pendency Aging Report: Pending for > 30 Days (${currentMISClaimsList.length})`;
+      }
+
+      // Render MIS Table
       const tbody = $('misReportTableBody');
       tbody.innerHTML = '';
 
       if (currentMISClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">No matching claims found for the selected filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">No matching claims found for this filter selection.</td></tr>`;
         return;
       }
 
       currentMISClaimsList.forEach(c => {
         const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
+        const isSettled = c.claim_status === 'Settled';
+        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
+        
+        let tatOrAgingDisplay = '-';
+        if (isSettled) {
+          const days = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+          tatOrAgingDisplay = days !== null ? `<span class="font-bold text-emerald-800">${days} Days (TAT)</span>` : '-';
+        } else if (c.claim_status === 'Pending' || c.claim_status === 'In Progress') {
+          const days = calculateDaysDifference(c.txn_date, todayStr);
+          const colorClass = days > 30 ? 'text-rose-700 font-extrabold' : (days > 10 ? 'text-amber-700 font-bold' : 'text-slate-700');
+          tatOrAgingDisplay = days !== null ? `<span class="${colorClass}">${days} Days (Age)</span>` : '-';
+        }
+
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
             <td class="p-3 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
@@ -2334,7 +2514,8 @@
             <td class="p-3 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
             <td class="p-3 whitespace-nowrap">${c.raised_for_office}</td>
             <td class="p-3 whitespace-nowrap">${c.txn_date}</td>
-            <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${formatDateTime(c.created_at)}</td>
+            <td class="p-3 whitespace-nowrap font-medium text-slate-700">${settleDate}</td>
+            <td class="p-3 whitespace-nowrap">${tatOrAgingDisplay}</td>
             <td class="p-3 font-semibold whitespace-nowrap">₹${c.txn_amount}</td>
             <td class="p-3 whitespace-nowrap"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
             <td class="p-3 text-xs text-slate-600">${c.reply_remarks_admin || '-'}</td>
@@ -2347,7 +2528,7 @@
       supabaseClient.channel('public:claims')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => {
           if (userProfile?.role !== 'viewer') loadClaimsSummary();
-          generateMISReport(currentMISReportStatus);
+          generateMISReport(currentMISReportFilter);
         })
         .subscribe();
     }
@@ -2366,31 +2547,47 @@
       if (session && !currentUser) initApp();
     });
 
+    // EXCEL EXPORT (INCLUDES SETTLEMENT DATE & TAT/AGING DAYS)
     async function exportMISExcel() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
-      const formattedData = currentMISClaimsList.map(c => ({
-        "Ref No (Txn ID)": c.txn_id_ref,
-        "Emp Name": c.profiles?.emp_name || "N/A",
-        "Emp ID": c.profiles?.emp_id || "N/A",
-        "Module": c.module,
-        "Office Name": c.raised_for_office,
-        "Txn Date": c.txn_date,
-        "Entry Date/Time": formatDateTime(c.created_at),
-        "Amount (INR)": c.txn_amount,
-        "Status": c.claim_status,
-        "Remarks": c.reply_remarks_admin || "N/A"
-      }));
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      const formattedData = currentMISClaimsList.map((c, index) => {
+        const isSettled = c.claim_status === 'Settled';
+        let tatDays = null;
+        if (isSettled) {
+          tatDays = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+        } else if (c.claim_status === 'Pending' || c.claim_status === 'In Progress') {
+          tatDays = calculateDaysDifference(c.txn_date, todayStr);
+        }
+
+        return {
+          "Sl. No.": index + 1,
+          "Ref No (Txn ID)": c.txn_id_ref,
+          "Raised By": c.profiles?.emp_name || "N/A",
+          "Module": c.module,
+          "Office Name": c.raised_for_office,
+          "Txn Date": c.txn_date,
+          "Settlement Date": c.settlement_date || (isSettled ? "Settled" : "Pending"),
+          "TAT / Aging (Days)": tatDays !== null ? tatDays : "N/A",
+          "Amount (INR)": c.txn_amount,
+          "Status": c.claim_status,
+          "Admin Remarks": c.reply_remarks_admin || "N/A"
+        };
+      });
+
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, `Report_${currentMISReportStatus}`);
-      XLSX.writeFile(workbook, `Report_${currentMISReportStatus}_${getFormattedTimestamp()}.xlsx`);
+      XLSX.utils.book_append_sheet(workbook, worksheet, `Report_${currentMISReportFilter}`);
+      XLSX.writeFile(workbook, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
-    // PDF EXPORT
+    // PDF EXPORT (INCLUDES SL.NO, SETTLEMENT DATE, TAT/AGING & LOGO IN TOP-RIGHT)
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
+      const todayStr = new Date().toISOString().split('T')[0];
 
       try {
         doc.addImage(currentAppLogo, 'PNG', 255, 8, 28, 28);
@@ -2400,25 +2597,39 @@
 
       doc.setFontSize(14);
       doc.setTextColor(168, 15, 40);
-      doc.text(`Refund Claims Report (${currentMISReportStatus}) - Chennai City Central`, 14, 15);
+      doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 14, 15);
       doc.setFontSize(10);
       doc.setTextColor(217, 119, 6);
       doc.text("Chennai City Central Division", 14, 21);
       doc.setFontSize(8.5);
       doc.setTextColor(80, 80, 80);
-      doc.text(`Generated on: ${new Date().toLocaleString()} | Visible Records: ${currentMISClaimsList.length}`, 14, 27);
+      doc.text(`Generated on: ${new Date().toLocaleString()} | Filtered Records: ${currentMISClaimsList.length}`, 14, 27);
 
-      const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
-      const rows = currentMISClaimsList.map((c, index) => [
-        index + 1,
-        c.txn_id_ref,
-        c.module,
-        c.raised_for_office,
-        c.txn_date,
-        `Rs. ${c.txn_amount}`,
-        c.claim_status,
-        c.reply_remarks_admin || "-"
-      ]);
+      const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
+      const rows = currentMISClaimsList.map((c, index) => {
+        const isSettled = c.claim_status === 'Settled';
+        let tatDays = "-";
+        if (isSettled) {
+          const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+          tatDays = d !== null ? `${d} d (TAT)` : "-";
+        } else if (c.claim_status === 'Pending' || c.claim_status === 'In Progress') {
+          const d = calculateDaysDifference(c.txn_date, todayStr);
+          tatDays = d !== null ? `${d} d (Age)` : "-";
+        }
+
+        return [
+          index + 1,
+          c.txn_id_ref,
+          c.module,
+          c.raised_for_office,
+          c.txn_date,
+          c.settlement_date || (isSettled ? "Settled" : "-"),
+          tatDays,
+          `Rs. ${c.txn_amount}`,
+          c.claim_status,
+          c.reply_remarks_admin || "-"
+        ];
+      });
 
       doc.autoTable({
         head: headers,
@@ -2426,9 +2637,9 @@
         startY: 32,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
-        styles: { fontSize: 8.5, cellPadding: 2.5 }
+        styles: { fontSize: 8, cellPadding: 2 }
       });
-      doc.save(`Report_${currentMISReportStatus}_${getFormattedTimestamp()}.pdf`);
+      doc.save(`Report_${currentMISReportFilter}_${getFormattedTimestamp()}.pdf`);
     }
   </script>
 </body>
