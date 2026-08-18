@@ -44,12 +44,12 @@
     <!-- NAVBAR -->
     <nav id="navbar" class="hidden bg-postRed-700 text-white px-4 py-2.5 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
       <div class="flex items-center gap-3">
-        <img id="navLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded shadow-xs">
+        <img id="navLogoImg" src="" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded shadow-xs">
         <div>
           <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">
             Refund Claims Management Portal
           </div>
-          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; डाक सेवा - जन सेवा</div>
+          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; Dak Sewa - Jan Sewa</div>
         </div>
       </div>
       <div class="flex items-center gap-3 text-xs">
@@ -65,7 +65,7 @@
       <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
         <div class="text-center mb-5">
           <div class="flex justify-center mb-2">
-            <img id="loginLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
+            <img id="loginLogoImg" src="" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
           </div>
           <h1 class="text-lg font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
           <p class="text-xs font-bold text-postGold-700 mt-0.5 uppercase tracking-wide">Chennai City Central Division</p>
@@ -201,7 +201,7 @@
             </div>
           </div>
 
-          <!-- TABLE: 2-LINE ACTIONS & DOCUMENTS -->
+          <!-- OVERVIEW TABLE -->
           <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <table class="w-full text-left text-xs border-collapse">
               <thead class="sticky top-0 z-10 shadow-xs">
@@ -221,7 +221,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: CLAIM REGISTRATION FORM (OPTIMIZED 2-PANEL LAYOUT) -->
+        <!-- TAB 2: CLAIM REGISTRATION FORM (WITH PREVIEW & CONDITIONAL RRN) -->
         <div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
           <div class="border-b pb-2 mb-3 border-amber-200">
             <h3 class="text-sm font-bold text-postRed-700 uppercase">New Claim Registration Form</h3>
@@ -229,7 +229,7 @@
           
           <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <!-- LEFT PANEL: TRANSACTION DETAILS & USER REMARKS (7 COLS) -->
+            <!-- LEFT PANEL (7 COLS): DETAILS & REMARKS -->
             <div class="lg:col-span-7 space-y-2.5">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
@@ -252,7 +252,7 @@
                   <input type="text" id="claimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Txn ID *</label>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Transaction ID *</label>
                   <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
                 </div>
                 <div>
@@ -272,7 +272,7 @@
                   </select>
                 </div>
                 
-                <!-- CONDITIONAL RRN NUMBER (ONLY VISIBLE ON SBI POS) -->
+                <!-- CONDITIONAL RRN NUMBER (ONLY FOR SBI POS) -->
                 <div id="rrnFieldContainer" class="hidden">
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
                   <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
@@ -291,7 +291,7 @@
               </div>
             </div>
 
-            <!-- RIGHT PANEL: ATTACHMENT CARD & FULL PREVIEW (5 COLS) -->
+            <!-- RIGHT PANEL (5 COLS): ATTACHMENT & LIVE PREVIEW -->
             <div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
               <div>
                 <div class="flex items-center justify-between mb-1.5">
@@ -302,7 +302,7 @@
                   </label>
                 </div>
 
-                <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+                <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileSelectPreview(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
                 
                 <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
                   <span class="text-xl">📋</span>
@@ -311,16 +311,24 @@
                 </div>
               </div>
 
-              <!-- GENEROUS PREVIEW BOX -->
+              <!-- LIVE ATTACHMENT PREVIEW CONTAINER -->
               <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
-                <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
-                <div class="flex items-center justify-between w-full mt-2 text-[11px]">
-                  <span class="font-bold text-emerald-800">✓ Screenshot Attached</span>
-                  <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove</button>
+                <div id="previewMediaWrapper" class="flex flex-col items-center justify-center w-full">
+                  <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
+                  <div id="pdfFilePreviewBlock" class="hidden flex items-center gap-2 bg-white px-3 py-2 rounded border border-emerald-300 shadow-xs">
+                    <span class="text-xl">📄</span>
+                    <div>
+                      <p id="pdfPreviewFileName" class="font-bold text-slate-800 text-xs">document.pdf</p>
+                      <p class="text-[10px] text-emerald-700 font-semibold">PDF Document Ready for Upload</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between w-full mt-2 text-[11px] pt-1 border-t border-emerald-200">
+                  <span id="userPastedImageSize" class="font-bold text-emerald-800 text-[10px]">✓ File Attached</span>
+                  <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove Attachment</button>
                 </div>
               </div>
 
-              <!-- SUBMIT BUTTON -->
               <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-md cursor-pointer transition uppercase tracking-wide">
                 Submit Claim Registration
               </button>
@@ -328,7 +336,7 @@
           </form>
         </div>
 
-        <!-- TAB 3: THEME CONVERTER TOOL TAB -->
+        <!-- TAB 3: THEME CONVERTER -->
         <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -378,7 +386,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: ADMIN USER MANAGEMENT -->
+        <!-- TAB 4: ADMIN USER MANAGEMENT (WITH SUPERADMIN LOGO CHANGER) -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -388,6 +396,22 @@
               <button type="button" onclick="exportUsersExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📊 Export Excel</button>
               <button type="button" onclick="exportUsersPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📄 Export PDF</button>
               <button type="button" onclick="loadAllUsers()" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔄 Refresh</button>
+            </div>
+          </div>
+
+          <!-- LOGO CHANGER FOR SUPERADMIN -->
+          <div id="superadminLogoPanel" class="hidden bg-amber-50/70 border border-amber-300 rounded-xl p-3.5 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+              <img id="adminLogoPreview" src="" alt="Division Logo" class="h-11 w-11 object-contain bg-white p-1 rounded border border-postGold-500 shadow-xs">
+              <div>
+                <h4 class="font-bold text-xs text-postRed-900 uppercase">Division Logo Branding &amp; PDF Header Seal</h4>
+                <p class="text-[11px] text-slate-600">Superadmin can upload custom logo to update the Navbar, Login screen, and Top-Right corner of exported PDFs.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="file" id="customLogoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+              <button type="button" onclick="$('customLogoFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📤 Upload Custom Logo</button>
+              <button type="button" onclick="resetDefaultLogo()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">↺ Default Logo</button>
             </div>
           </div>
 
@@ -490,7 +514,7 @@
             </div>
           </div>
 
-          <!-- SETTLED TAT (<=3, 4-15, >15) & IN-PROGRESS AGING -->
+          <!-- SETTLED TAT & IN-PROGRESS AGING -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
             <div class="bg-emerald-50/60 border border-emerald-300 rounded-xl p-3 space-y-2">
               <div class="flex justify-between items-center border-b border-emerald-200 pb-1">
@@ -654,11 +678,11 @@
         </div>
       </div>
 
-      <!-- USER CLAIM EDIT MODAL -->
+      <!-- USER CLAIM EDIT MODAL (REMARKS EDITING & ADDITIONAL DOCUMENT ATTACHMENT) -->
       <div id="userEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-2 border-amber-200">
-            <h3 class="font-bold text-sm text-postRed-700">Edit Claim Request &amp; Remarks</h3>
+            <h3 class="font-bold text-sm text-postRed-700 uppercase">Edit Claim Request &amp; Remarks</h3>
             <button type="button" onclick="closeUserEditModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
           </div>
           <form onsubmit="submitUserClaimEdit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -681,8 +705,8 @@
               <input type="text" id="editClaimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
             </div>
             <div>
-              <label class="block font-bold text-slate-700 mb-0.5">RRN Number *</label>
-              <input type="text" id="editClaimRrn" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
+              <label class="block font-bold text-slate-700 mb-0.5">RRN Number</label>
+              <input type="text" id="editClaimRrn" class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
             </div>
             <div>
               <label class="block font-bold text-slate-700 mb-0.5">Txn Date *</label>
@@ -708,10 +732,14 @@
               <label class="block font-bold text-slate-700 mb-0.5">Remarks by User (Edit/Update Details) *</label>
               <textarea id="editClaimRemarks" required class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs h-20 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/20"></textarea>
             </div>
-            <div class="md:col-span-2">
-              <label class="block font-bold text-slate-700 mb-0.5">Replace Document Attachment (Optional)</label>
-              <input type="file" id="editClaimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-amber-50/30">
+            
+            <!-- SUBMIT ADDITIONAL 1 DOCUMENT -->
+            <div class="md:col-span-2 bg-amber-50/60 p-2.5 rounded border border-amber-300">
+              <label class="block font-bold text-slate-800 mb-0.5">Attach Additional Supporting Document (Optional)</label>
+              <input type="file" id="editClaimAdditionalFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-white">
+              <p class="text-[10px] text-slate-500 mt-1">This will be saved to your claim record in addition to your original document attachment.</p>
             </div>
+
             <div class="md:col-span-2 flex justify-end gap-2 pt-2 border-t border-amber-200">
               <button type="button" onclick="closeUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
               <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
@@ -786,7 +814,7 @@
         </div>
       </div>
 
-      <!-- CLAIM DETAILS FULL VIEW MODAL -->
+      <!-- CLAIM DETAILS FULL VIEW MODAL (WITH ACCURATE TXN ID & RRN DISPLAY) -->
       <div id="detailsModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-2 border-amber-200">
@@ -820,10 +848,13 @@
 
     const $ = id => document.getElementById(id);
 
-    // FIXED SQUARE INDIA POST LOGO URL
+    // OFFICIAL INDIA POST LOGO URL & EMBEDDED RASTERIZER
     const OFFICIAL_INDIA_POST_LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
 
-    let currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
+    // HIGH-RES EMBEDDED DEFAULT BASE64 LOGO
+    const EMBEDDED_DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'><rect width='160' height='160' fill='%23C4122F' rx='10'/><path d='M25 45 L135 45 L80 95 Z' fill='%23F8B133'/><polygon points='25,52 80,102 25,126' fill='%23FFFDF5'/><polygon points='135,52 80,102 135,126' fill='%23FEF9C3'/><polygon points='27,126 80,98 133,126' fill='%23FACC15'/><rect x='16' y='132' width='128' height='20' rx='3' fill='%238A0C21' stroke='%23F8B133' stroke-width='1'/><text x='80' y='146' font-family='Arial,sans-serif' font-size='9' font-weight='bold' fill='%23FFFDF5' text-anchor='middle'>INDIA POST</text></svg>";
+
+    let currentAppLogo = localStorage.getItem('app_custom_logo') || OFFICIAL_INDIA_POST_LOGO_URL;
     let cachedPdfLogoBase64 = null;
 
     let currentUser = null;
@@ -883,24 +914,24 @@
       el.value = el.value.replace(/\D/g, '').slice(0, 10);
     }
 
-    // BASE64 LOGO RASTERIZER (SQUARE 1:1 RATIO FOR JSDPF)
+    // PRE-RENDER LOGO TO BASE64 PNG CANVAS TO ENSURE RELIABLE EMBEDDING IN JSDPF
     function cacheBase64Logo(url) {
       const img = new Image();
       img.crossOrigin = "Anonymous";
       img.onload = function() {
         const canvas = document.createElement("canvas");
-        canvas.width = 180;
-        canvas.height = 180;
+        canvas.width = 160;
+        canvas.height = 160;
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, 180, 180);
+        ctx.drawImage(img, 0, 0, 160, 160);
         try {
           cachedPdfLogoBase64 = canvas.toDataURL("image/png");
         } catch (e) {
-          cachedPdfLogoBase64 = DEFAULT_INDIA_POST_LOGO;
+          cachedPdfLogoBase64 = EMBEDDED_DEFAULT_LOGO;
         }
       };
       img.onerror = () => {
-        cachedPdfLogoBase64 = DEFAULT_INDIA_POST_LOGO;
+        cachedPdfLogoBase64 = EMBEDDED_DEFAULT_LOGO;
       };
       img.src = url;
     }
@@ -912,6 +943,27 @@
       cacheBase64Logo(currentAppLogo);
     }
     initLogos();
+
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        currentAppLogo = ev.target.result;
+        localStorage.setItem('app_custom_logo', currentAppLogo);
+        initLogos();
+        alert("Custom logo updated successfully!");
+      };
+      r.readAsDataURL(file);
+    }
+
+    function resetDefaultLogo() {
+      if (!confirm("Reset to official default India Post logo?")) return;
+      currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
+      localStorage.removeItem('app_custom_logo');
+      initLogos();
+      alert("Logo reset to official India Post emblem.");
+    }
 
     function showAuthView(view) {
       if (view === 'register') {
@@ -962,7 +1014,45 @@
       }
     }
 
-    // THEME CONVERTER
+    // ==========================================
+    // DOCUMENT SELECTION & CLIPBOARD PREVIEW
+    // ==========================================
+    async function handleFileSelectPreview(e) {
+      const file = e.target.files[0];
+      if (!file) {
+        clearUserPastedImage();
+        return;
+      }
+
+      userPastedImageBlob = null; // Clear clipboard blob if manual file chosen
+
+      const previewContainer = $('userPastedPreviewContainer');
+      const imgPreview = $('userPastedImagePreview');
+      const pdfPreview = $('pdfFilePreviewBlock');
+      const pdfFileName = $('pdfPreviewFileName');
+      const sizeText = $('userPastedImageSize');
+
+      previewContainer.classList.remove('hidden');
+
+      if (file.type.startsWith('image/')) {
+        let displayBlob = file;
+        if ($('autoConvertDark')?.checked) {
+          const res = await convertBlobDarkToLight(file);
+          displayBlob = res.blob;
+        }
+        imgPreview.src = URL.createObjectURL(displayBlob);
+        imgPreview.classList.remove('hidden');
+        pdfPreview.classList.add('hidden');
+        sizeText.innerText = `Image: ${(file.size / 1024).toFixed(1)} KB`;
+      } else if (file.type === 'application/pdf') {
+        imgPreview.classList.add('hidden');
+        pdfPreview.classList.remove('hidden');
+        pdfFileName.innerText = file.name;
+        sizeText.innerText = `PDF Document: ${(file.size / 1024).toFixed(1)} KB`;
+      }
+    }
+
+    // THEME CONVERTER ENGINE
     function rgbToHsl(r, g, b) {
       r /= 255; g /= 255; b /= 255;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -1128,7 +1218,7 @@
       a.click();
     }
 
-    // PASTE HANDLER
+    // CLIPBOARD PASTE PREVIEW
     window.addEventListener('paste', async (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       let blob = null;
@@ -1156,17 +1246,21 @@
         e.preventDefault();
       } else if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
         let isDark = false;
+        let displayBlob = blob;
         if ($('autoConvertDark')?.checked) {
           const res = await convertBlobDarkToLight(blob);
-          blob = res.blob;
+          displayBlob = res.blob;
           isDark = res.isDarkTheme;
         }
-        userPastedImageBlob = blob;
-        $('userPastedImagePreview').src = URL.createObjectURL(blob);
+        userPastedImageBlob = displayBlob;
+        
+        $('userPastedImagePreview').src = URL.createObjectURL(displayBlob);
+        $('userPastedImagePreview').classList.remove('hidden');
+        $('pdfFilePreviewBlock').classList.add('hidden');
         $('userPastedPreviewContainer').classList.remove('hidden');
         $('userPastedImageSize').innerText = isDark 
-          ? `Size: ${(blob.size / 1024).toFixed(1)} KB (Inverted Light PNG)` 
-          : `Size: ${(blob.size / 1024).toFixed(1)} KB (Original Light)`;
+          ? `Clipboard: ${(displayBlob.size / 1024).toFixed(1)} KB (Inverted Light PNG)` 
+          : `Clipboard: ${(displayBlob.size / 1024).toFixed(1)} KB (Light Image)`;
         $('claimFile').value = '';
         e.preventDefault();
       }
@@ -1182,6 +1276,7 @@
       userPastedImageBlob = null;
       $('userPastedPreviewContainer').classList.add('hidden');
       $('userPastedImagePreview').src = '';
+      $('claimFile').value = '';
     }
 
     function formatDateTimeCompact(isoStr) {
@@ -1395,6 +1490,7 @@
 
       const role = profile.role || 'user';
       const isAdmin = role === 'admin' || role === 'superadmin';
+      const isSuperadmin = role === 'superadmin';
       const isViewer = role === 'viewer';
 
       if (isAdmin) {
@@ -1403,6 +1499,7 @@
         $('tabBtnRegister').classList.remove('hidden');
         $('tabBtnConverter').classList.remove('hidden');
         $('tabBtnReports').classList.remove('hidden');
+        if (isSuperadmin) $('superadminLogoPanel').classList.remove('hidden');
       } else if (isViewer) {
         $('adminTabBtn').classList.add('hidden');
         $('tabBtnTrack').classList.add('hidden');
@@ -1467,7 +1564,7 @@
       }
     }
 
-    // SUBMIT CLAIM (RESPECTS PAYMENT CHANNEL & MOBILE NUMBER RULES)
+    // SUBMIT CLAIM WITH ATTACHMENT UPLOAD
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = $('claimFile').files[0];
@@ -1494,7 +1591,7 @@
         .maybeSingle();
 
       if (existingClaim) {
-        return alert(`Request ID '${txn_id_ref}' already exists with office: '${existingClaim.raised_for_office}'`);
+        return alert(`Transaction ID '${txn_id_ref}' already exists with office: '${existingClaim.raised_for_office}'`);
       }
 
       let publicUrl = null;
@@ -1547,11 +1644,11 @@
     }
 
     async function deleteClaim(claimId, txnId) {
-      if (!confirm(`Are you sure you want to delete Request ID '${txnId}'?`)) return;
+      if (!confirm(`Are you sure you want to delete Transaction ID '${txnId}'?`)) return;
       const { error } = await supabaseClient.from('claims').delete().eq('id', claimId);
       if (error) alert("Failed to delete claim: " + error.message);
       else {
-        alert("Request ID deleted successfully!");
+        alert("Transaction ID deleted successfully!");
         loadClaimsSummary();
         generateMISReport();
       }
@@ -1571,32 +1668,33 @@
       $('editClaimChannel').value = claim.payment_channel || 'DQR';
       $('editClaimMobile').value = claim.user_mobile || '';
       $('editClaimRemarks').value = claim.remarks_by_user || '';
-      $('editClaimFile').value = '';
+      $('editClaimAdditionalFile').value = '';
 
       $('userEditModal').classList.remove('hidden');
     }
 
     function closeUserEditModal() { $('userEditModal').classList.add('hidden'); }
 
+    // USER CLAIM EDIT: ACCEPTS ADDITIONAL DOCUMENT
     async function submitUserClaimEdit(e) {
       e.preventDefault();
       const claimId = $('editClaimId').value;
-      const fileInput = $('editClaimFile').files[0];
+      const additionalFileInput = $('editClaimAdditionalFile').files[0];
       const mobile_number = $('editClaimMobile').value.trim();
 
       if (!mobile_number || mobile_number.length !== 10) {
         return alert("Please enter a valid 10-digit mobile number!");
       }
 
-      let publicUrl = null;
+      let additional_file_url = null;
 
-      if (fileInput) {
-        const fileExt = fileInput.name.split('.').pop();
-        const filePath = `claims/edited-${claimId}-${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, fileInput, { upsert: true });
+      if (additionalFileInput) {
+        const fileExt = additionalFileInput.name.split('.').pop();
+        const filePath = `claims/additional-${claimId}-${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, additionalFileInput, { upsert: true });
 
-        if (uploadError) return alert("File upload failed: " + uploadError.message);
-        publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+        if (uploadError) return alert("Additional file upload failed: " + uploadError.message);
+        additional_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
       }
 
       const updateData = {
@@ -1611,14 +1709,16 @@
         remarks_by_user: $('editClaimRemarks').value.trim()
       };
 
-      if (publicUrl) updateData.file_url = publicUrl;
+      if (additional_file_url) {
+        updateData.additional_file_url = additional_file_url;
+      }
 
       const { error } = await supabaseClient.from('claims').update(updateData).eq('id', claimId);
 
       if (error) {
-        alert("Failed to update claim remarks/details: " + error.message);
+        alert("Failed to update claim: " + error.message);
       } else {
-        alert("Claim remarks & details updated successfully!");
+        alert("Claim remarks & additional document updated successfully!");
         closeUserEditModal();
         await loadClaimsSummary();
         await generateMISReport(currentMISReportFilter);
@@ -1667,8 +1767,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER TABLE WITH 2 DISTINCT ACTION ROWS:
-    // Row 1: Edit/Reply + User Doc | Row 2: Admin Doc + Print Docket
+    // RENDER TABLE WITH 2 DISTINCT ROWS OF ACTION BUTTONS
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1716,14 +1815,14 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
-            <!-- 1. REF NO & MODULE + COPY BUTTON -->
+            <!-- 1. TRANSACTION ID / REF NO & MODULE -->
             <td class="p-2 whitespace-nowrap">
               <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-xs block">
                 ${c.txn_id_ref}
               </button>
               <div class="flex items-center gap-1 mt-0.5">
                 <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border border-slate-200">${c.module}</span>
-                <button type="button" title="Copy Reference Number" onclick="copyToClipboard('${c.txn_id_ref}', this)" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-1.5 py-0.2 rounded text-[9.5px] font-bold cursor-pointer transition">
+                <button type="button" title="Copy Reference Number" onclick="copyToClipboard('${c.txn_id_ref}', this)" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer transition">
                   📋 Copy
                 </button>
               </div>
@@ -1759,10 +1858,10 @@
             <!-- 7. REMARKS -->
             <td class="p-2 min-w-[150px]">${remarksDisplay}</td>
             
-            <!-- 8. ACTIONS & DOCUMENTS IN 2 STRUCTURED ROWS -->
+            <!-- 8. ACTIONS: 2-ROW BALANCED BUTTONS -->
             <td class="p-2 text-center whitespace-nowrap min-w-[170px]">
               <div class="flex flex-col gap-1 w-[165px] mx-auto">
-                <!-- ROW 1: EDIT/REPLY & USER DOC -->
+                <!-- ROW 1: EDIT / REPLY & USER DOC -->
                 <div class="flex items-center justify-between gap-1">
                   ${isAdmin ? `
                     <button type="button" onclick="openReplyModal('${c.id}')" class="flex-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
@@ -1783,14 +1882,14 @@
                   </a>
                 </div>
 
-                <!-- ROW 2: ADMIN DOC & PRINT DOCKET -->
+                <!-- ROW 2: ADMIN DOC & DOCKET -->
                 <div class="flex items-center justify-between gap-1">
                   ${c.admin_file_url ? `
                     <a href="${c.admin_file_url}" target="_blank" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition text-center">
                       📎 Admin Doc
                     </a>
                   ` : `
-                    <span class="flex-1 text-[9.5px] text-slate-400 italic py-1 border border-dashed border-slate-200 rounded">No Admin Doc</span>
+                    <span class="flex-1 text-[9.5px] text-slate-400 italic py-1 border border-dashed border-slate-200 rounded text-center">No Admin Doc</span>
                   `}
                   <button type="button" onclick="printClaimDetails('${c.id}')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
                     🖨️ Docket
@@ -1817,6 +1916,7 @@
       applyOverviewFilters();
     }
 
+    // ACCURATE CLAIM DETAILS MODAL (CLEARLY LABELS TRANSACTION ID VS RRN)
     function openDetailsModal(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found!");
@@ -1828,14 +1928,14 @@
       const tatDays = isSettled && claim.settlement_date ? calculateDaysDifference(claim.txn_date, claim.settlement_date) : null;
 
       $('detailsModalContent').innerHTML = `
-        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Ref No:</strong> <span class="text-sm font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Transaction ID / Ref No:</strong> <span class="text-sm font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Created By:</strong> <span class="font-bold text-slate-800">${creatorEmpName} (${creatorEmpId})</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Entry Date &amp; Time:</strong> <span class="font-medium">${entryDateTime}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium font-mono">${claim.user_mobile || 'N/A'}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Module:</strong> <span class="font-bold text-postRed-700">${claim.module}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Article Number:</strong> <span class="font-medium">${claim.article_number}</span></div>
-        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">RRN:</strong> <span class="font-medium font-mono">${claim.rrn_number}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">RRN Number:</strong> <span class="font-medium font-mono">${claim.rrn_number || 'N/A'}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Date:</strong> <span class="font-medium">${claim.txn_date}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Amount:</strong> <span class="font-bold text-emerald-800">₹${claim.txn_amount}</span></div>
         <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Channel:</strong> <span class="font-medium">${claim.payment_channel}</span></div>
@@ -1860,11 +1960,16 @@
           ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 text-white px-2 py-0.5 rounded text-[11px] font-bold hover:bg-postRed-700 transition">📎 Admin Attached Doc</a>` : ''}
         </div>
         
-        <div class="col-span-1 md:col-span-2">
-          <strong class="text-slate-500 text-xs block mb-0.5">Uploaded User Document:</strong> 
-          <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold transition">
-            📄 User Submitted Document
+        <!-- DOCUMENTS SECTION -->
+        <div class="col-span-1 md:col-span-2 flex flex-wrap gap-3 pt-1 border-t border-slate-200">
+          <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded text-xs font-bold transition">
+            📄 Primary User Document
           </a>
+          ${claim.additional_file_url ? `
+            <a href="${claim.additional_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded text-xs font-bold transition">
+              📎 Additional Supporting Document
+            </a>
+          ` : ''}
         </div>
       `;
 
@@ -1875,7 +1980,7 @@
 
     function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
 
-    // PRINT COMPLETE DOCKET
+    // PRINT COMPLETE DOCKET (CORRECT TRANSACTION ID & RRN FIELDS)
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -1885,6 +1990,7 @@
       const entryDateTime = formatDateTime(claim.created_at);
 
       const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
+      const isAddImage = claim.additional_file_url && (claim.additional_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.additional_file_url.includes('blob:') || claim.additional_file_url.includes('claims/'));
       const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('admin-replies/'));
 
       const printWindow = window.open('', '_blank', 'width=950,height=850');
@@ -1917,11 +2023,10 @@
             .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
             
             .attachments-grid { display: flex; gap: 10px; margin-top: 6px; justify-content: space-between; align-items: flex-start; }
-            .attachment-col-left { flex: 0 0 37%; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
-            .attachment-col-right { flex: 0 0 61%; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
-            .attachment-col-left strong, .attachment-col-right strong { font-size: 10.5px; display: block; margin-bottom: 4px; text-align: left; }
+            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
+            .attachment-col strong { font-size: 10.5px; display: block; margin-bottom: 4px; text-align: left; }
             
-            .attachment-preview { max-width: 100%; max-height: 320px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
+            .attachment-preview { max-width: 100%; max-height: 260px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
             .attachment-link { font-size: 10.5px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
             
             .end-of-doc {
@@ -1939,7 +2044,7 @@
             @media print {
               body { padding: 0; }
               .no-print { display: none; }
-              .attachment-preview { max-height: 320px; }
+              .attachment-preview { max-height: 260px; }
             }
           </style>
         </head>
@@ -1955,7 +2060,7 @@
               <h2>Chennai City Central Division &bull; Complete Claim Registration Docket</h2>
             </div>
             <div class="ref-badge">
-              REF NO: ${claim.txn_id_ref}
+              TRANSACTION ID: ${claim.txn_id_ref}
             </div>
           </div>
 
@@ -1994,10 +2099,10 @@
               <td class="value"><strong>${claim.article_number}</strong></td>
             </tr>
             <tr>
-              <td class="label">Reference / Txn ID:</td>
+              <td class="label">Transaction ID / Ref:</td>
               <td class="value" style="font-family: monospace; font-weight:bold;">${claim.txn_id_ref}</td>
               <td class="label">RRN Number:</td>
-              <td class="value" style="font-family: monospace;">${claim.rrn_number}</td>
+              <td class="value" style="font-family: monospace;">${claim.rrn_number || 'N/A'}</td>
             </tr>
             <tr>
               <td class="label">Transaction Date:</td>
@@ -2022,23 +2127,33 @@
 
           <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
           <div class="attachments-grid">
-            <div class="attachment-col-left">
-              <strong>Applicant Submitted Document:</strong>
+            <div class="attachment-col">
+              <strong>Primary User Document:</strong>
               ${isUserImage 
-                ? `<img src="${claim.file_url}" class="attachment-preview" alt="Applicant Attachment">`
-                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View Attached File</a>` : '<em>No applicant file attached.</em>')
+                ? `<img src="${claim.file_url}" class="attachment-preview" alt="User Document">`
+                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View Primary File</a>` : '<em>No file attached.</em>')
               }
             </div>
 
-            <div class="attachment-col-right" style="${!claim.admin_file_url ? 'background:#f8fafc; color:#94a3b8;' : ''}">
-              <strong style="color: #991b1b;">Admin Attached Resolution / Landscape Document:</strong>
-              ${claim.admin_file_url 
-                ? (isAdminImage 
-                    ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
-                    : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`)
-                : '<em>No admin attachment uploaded.</em>'
-              }
-            </div>
+            ${claim.additional_file_url ? `
+              <div class="attachment-col">
+                <strong style="color: #1d4ed8;">Additional Supporting Document:</strong>
+                ${isAddImage 
+                  ? `<img src="${claim.additional_file_url}" class="attachment-preview" alt="Additional Doc">`
+                  : `<a href="${claim.additional_file_url}" target="_blank" class="attachment-link">📄 View Additional File</a>`
+                }
+              </div>
+            ` : ''}
+
+            ${claim.admin_file_url ? `
+              <div class="attachment-col">
+                <strong style="color: #991b1b;">Admin Resolution Document:</strong>
+                ${isAdminImage 
+                  ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
+                  : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`
+                }
+              </div>
+            ` : ''}
           </div>
 
           <div class="end-of-doc">
@@ -2183,7 +2298,7 @@
           : calculateDaysDifference(data.txn_date, new Date().toISOString().split('T')[0]);
 
         resCard.innerHTML = `
-          <p><strong>Ref ID (Txn ID):</strong> <span class="text-postRed-700 font-bold font-mono">${data.txn_id_ref}</span></p>
+          <p><strong>Transaction ID:</strong> <span class="text-postRed-700 font-bold font-mono">${data.txn_id_ref}</span></p>
           <p><strong>Created By:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
           <p><strong>Txn Date:</strong> ${data.txn_date} | <strong>${data.claim_status === 'Settled' ? 'Settled Date' : 'Aging'}:</strong> ${data.settlement_date || (tat + ' Days In-Progress')}</p>
           <p><strong>Module:</strong> <span class="font-bold text-postRed-700">${data.module}</span> | <strong>Office:</strong> ${data.raised_for_office}</p>
@@ -2191,8 +2306,9 @@
           <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
           <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
           <div class="flex gap-2 pt-2 flex-wrap">
-            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc</a>
-            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File</a>` : ''}
+            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Primary Doc</a>
+            ${data.additional_file_url ? `<a href="${data.additional_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-blue-700 hover:bg-blue-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Additional Doc</a>` : ''}
+            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Admin Doc</a>` : ''}
             <button type="button" onclick="printClaimDetails('${data.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">🖨️ Print Docket</button>
           </div>
         `;
@@ -2251,19 +2367,19 @@
         const role = u.role || 'user';
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-3 font-bold font-mono text-slate-800">${u.emp_id}</td>
-            <td class="p-3">
+            <td class="p-2.5 font-bold font-mono text-slate-800">${u.emp_id}</td>
+            <td class="p-2.5">
               <div class="font-bold text-slate-800">${u.emp_name}</div>
               <div class="mt-0.5">${getRoleBadge(role)}</div>
             </td>
-            <td class="p-3 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
-            <td class="p-3 font-medium">${u.office_name}</td>
-            <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
-            <td class="p-3 text-center">
+            <td class="p-2.5 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
+            <td class="p-2.5 font-medium">${u.office_name}</td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
+            <td class="p-2.5 text-center">
               <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
                 <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
                 <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
-                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2.5 py-1 rounded text-xs font-bold cursor-pointer">
+                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-1 rounded text-xs font-bold cursor-pointer">
                   ${isActive ? '🔒 Lock' : '🔓 Unlock'}
                 </button>
               </div>
@@ -2378,7 +2494,7 @@
       loadAllUsers();
     }
 
-    // EXPORT USERS ROSTER (CLEAN SQUARE LOGO TOP-RIGHT)
+    // EXPORT USERS ROSTER
     async function exportUsersExcel() {
       if (!allLoadedUsers.length) return alert("No users loaded to export!");
       const data = allLoadedUsers.map((u, i) => ({
@@ -2401,6 +2517,7 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "portrait" });
 
+      // SQUARE LOGO IN TOP-RIGHT (18mm x 18mm)
       if (cachedPdfLogoBase64) {
         try {
           doc.addImage(cachedPdfLogoBase64, 'PNG', 174, 8, 18, 18);
@@ -2409,7 +2526,6 @@
         }
       }
 
-      // CENTERED HEADERS
       doc.setFontSize(14);
       doc.setTextColor(168, 15, 40);
       doc.text("User Accounts & Roles Roster", 105, 16, { align: "center" });
@@ -2489,7 +2605,7 @@
 
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // Primary Status Metrics
+      // Status Metrics
       const totalCount = claims.length;
       const pendingClaims = claims.filter(c => c.claim_status === 'Pending');
       const inProgressClaims = claims.filter(c => c.claim_status === 'In Progress');
@@ -2527,7 +2643,7 @@
       $('misSettled4to15').innerText = settled4to15Count;
       $('misSettledGt15').innerText = settledGt15Count;
 
-      // 2. In-Progress Aging Buckets: <=10, 11-20, 21-30, >30 Days
+      // 2. In-Progress Aging Buckets
       let inProgressLe10Count = 0;
       let inProgress11to20Count = 0;
       let inProgress21to30Count = 0;
@@ -2564,9 +2680,7 @@
       } else if (filterType === 'Rejected') {
         currentMISClaimsList = rejectedClaims;
         $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
-      } 
-      // Settled TAT Filter Subsets (<=3, 4-15, >15)
-      else if (filterType === 'Settled_le3') {
+      } else if (filterType === 'Settled_le3') {
         currentMISClaimsList = settledClaims.filter(c => {
           const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
           return d !== null && d <= 3;
@@ -2584,9 +2698,7 @@
           return d !== null && d > 15;
         });
         $('misReportTableTitle').innerText = `Settlement TAT: Settled in > 15 Days (${currentMISClaimsList.length})`;
-      }
-      // In-Progress Aging Filter Subsets
-      else if (filterType === 'InProgress_le10') {
+      } else if (filterType === 'InProgress_le10') {
         currentMISClaimsList = inProgressClaims.filter(c => {
           const d = calculateDaysDifference(c.txn_date, todayStr);
           return d !== null && d <= 10;
@@ -2695,7 +2807,8 @@
 
         return {
           "Sl. No.": index + 1,
-          "Ref No (Txn ID)": c.txn_id_ref,
+          "Transaction ID (Ref No)": c.txn_id_ref,
+          "RRN": c.rrn_number || "N/A",
           "Raised By": c.profiles?.emp_name || "N/A",
           "Module": c.module,
           "Office Name": c.raised_for_office,
@@ -2714,23 +2827,23 @@
       XLSX.writeFile(workbook, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
-    // PDF EXPORT (REDUCED SQUARE LOGO TOP-RIGHT & CLEAN CENTERED TITLE)
+    // PDF EXPORT (PROPORTIONAL SQUARE LOGO & FORMATTED REPORT)
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // Top-Right Square Logo (16mm x 16mm)
+      // SQUARE LOGO EMBED (16mm x 16mm)
       if (cachedPdfLogoBase64) {
         try {
           doc.addImage(cachedPdfLogoBase64, 'PNG', 268, 6, 16, 16);
         } catch (err) {
-          console.warn("Logo embed warning:", err);
+          console.warn("Logo embed error:", err);
         }
       }
 
-      // CENTERED TITLES
+      // CENTERED HEADINGS
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
       doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 13, { align: "center" });
@@ -2739,7 +2852,7 @@
       doc.setTextColor(217, 119, 6);
       doc.text("Chennai City Central Division", 148.5, 19, { align: "center" });
 
-      const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
+      const headers = [["Sl. No.", "Txn ID (Ref)", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => {
         const isSettled = c.claim_status === 'Settled';
         let tatDays = "-";
@@ -2779,7 +2892,6 @@
         }
       });
 
-      // STATEMENT END LINE
       const finalY = doc.lastAutoTable.finalY + 8;
       doc.setFontSize(8.5);
       doc.setTextColor(100, 116, 139);
