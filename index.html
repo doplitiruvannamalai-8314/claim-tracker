@@ -124,7 +124,7 @@
       <!-- MAIN APPLICATION DASHBOARD -->
       <div id="mainDashboard" class="hidden space-y-6">
 
-        <!-- DASHBOARD NAVIGATION TABS (DYNAMICALLY RESTRICTED BY ROLE) -->
+        <!-- DASHBOARD NAVIGATION TABS -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
           <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer">Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
@@ -197,7 +197,7 @@
               </div>
             </div>
 
-            <!-- TABLE WITH SEPARATE TXN & ENTRY DATES -->
+            <!-- TABLE -->
             <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="sticky top-0 z-10 shadow-xs">
@@ -273,12 +273,13 @@
               <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks for claim..."></textarea>
             </div>
 
-            <!-- SWAPPED ROW: LEFT = USER MOBILE NUMBER, RIGHT = DOCUMENT ATTACHMENT -->
+            <!-- ROW: LEFT = USER MOBILE NUMBER, RIGHT = DOCUMENT ATTACHMENT -->
             <div class="flex flex-col justify-start">
               <label class="block text-xs font-bold text-slate-700 mb-1">User Mobile Number *</label>
               <input type="tel" id="claimUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border border-slate-300 p-2.5 rounded text-sm bg-amber-50/30 focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
 
+            <!-- RIGHT COLUMN: DOCUMENT ATTACHMENT -->
             <div class="space-y-2">
               <div class="flex items-center justify-between flex-wrap gap-1">
                 <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
@@ -313,7 +314,7 @@
           </form>
         </div>
 
-        <!-- TAB 3: STANDALONE THEME CONVERTER TOOL TAB -->
+        <!-- TAB 3: THEME CONVERTER -->
         <div id="converterTabView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="border-b pb-3 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -327,7 +328,6 @@
             </div>
           </div>
 
-          <!-- Previews Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[300px] relative">
               <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original Source</span>
@@ -345,7 +345,6 @@
             </div>
           </div>
 
-          <!-- Controls -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200 text-xs">
             <div>
               <label class="font-bold text-slate-700 block mb-1">Target Whiteness: <span id="valLightness" class="text-postRed-700 font-bold">96%</span></label>
@@ -365,7 +364,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: ADMIN USER MANAGEMENT (EDIT, PWD RESET, ROLE MODAL & EXPORT BUTTONS RESTORED) -->
+        <!-- TAB 4: ADMIN USER MANAGEMENT (ROLE RESTRICTED) -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
             <div>
@@ -418,7 +417,6 @@
             </div>
           </div>
           
-          <!-- COMPREHENSIVE FILTER SECTION -->
           <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">From Date</label>
@@ -456,7 +454,6 @@
             </div>
           </div>
 
-          <!-- METRIC CARDS -->
           <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
             <div onclick="generateMISReport('All')" class="bg-white border-2 border-postRed-600 p-4 rounded-xl text-center cursor-pointer hover:bg-postRed-50/50 transition shadow-xs">
               <p class="text-xs text-postRed-700 font-bold uppercase tracking-wider">Total Claims</p>
@@ -480,7 +477,6 @@
             </div>
           </div>
 
-          <!-- MIS TABLE -->
           <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-sm p-3 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
             <table class="w-full text-left text-sm border-collapse">
@@ -524,7 +520,7 @@
         </div>
       </div>
 
-      <!-- ADMIN USER EDIT MODAL (WITH DIRECT ROLE CHANGE DROPDOWN) -->
+      <!-- ADMIN USER EDIT MODAL -->
       <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-3 border-amber-200">
@@ -1200,7 +1196,6 @@
         $('tabBtnConverter').classList.remove('hidden');
         $('tabBtnReports').classList.remove('hidden');
       } else if (isViewer) {
-        // Viewer can ONLY access reports
         $('adminTabBtn').classList.add('hidden');
         $('tabBtnTrack').classList.add('hidden');
         $('tabBtnRegister').classList.add('hidden');
@@ -1208,7 +1203,6 @@
         $('tabBtnReports').classList.remove('hidden');
         currentActiveTab = 'reports';
       } else {
-        // Standard user
         $('adminTabBtn').classList.add('hidden');
         $('tabBtnTrack').classList.remove('hidden');
         $('tabBtnRegister').classList.remove('hidden');
@@ -1230,8 +1224,17 @@
     }
 
     function showTab(tabId) {
-      // Role enforcement guard
-      if (userProfile?.role === 'viewer' && tabId !== 'reports') {
+      const role = userProfile?.role || 'user';
+      const isAdmin = role === 'admin' || role === 'superadmin';
+      const isViewer = role === 'viewer';
+
+      // Strict role guard: non-admins cannot access adminRoleMgmt under any circumstance
+      if (tabId === 'adminRoleMgmt' && !isAdmin) {
+        alert("Access Denied: Only Admins and Superadmins can access User Management.");
+        tabId = isViewer ? 'reports' : 'track';
+      }
+
+      if (isViewer && tabId !== 'reports') {
         tabId = 'reports';
       }
 
@@ -1378,7 +1381,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER TABLE WITH SINGLE-ROW 4-ICON ACTION BAR
+    // RENDER TABLE WITH SEPARATE DATES & 4-ICON ROW
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1449,7 +1452,7 @@
             </td>
             <td class="p-3 min-w-[220px]">${adminReplyHtml}</td>
             
-            <!-- SINGLE-ROW 4-ICON ACTION BAR -->
+            <!-- 4-ICON HORIZONTAL ROW -->
             <td class="p-3 text-center whitespace-nowrap min-w-[150px]">
               <div class="inline-flex items-center justify-center gap-1.5">
                 ${isAdmin ? `
@@ -1732,6 +1735,9 @@
     }
 
     function openReplyModal(claimId) {
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) return alert("Access Denied: Only Admins can modify claim responses.");
+
       const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
       if (!claim) return alert("Claim record not found in memory.");
 
@@ -1751,6 +1757,9 @@
     }
 
     async function submitAdminReply() {
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) return alert("Unauthorized: Only Admins can update claim remarks.");
+
       const id = $('modalClaimId').value;
       const status = $('modalStatus').value;
       const moduleVal = $('modalModule').value;
@@ -1858,9 +1867,15 @@
     }
 
     // ==============================================================
-    // USER MANAGEMENT LOGIC (ROLES, BADGES, MODAL & EXPORT RESTORED)
+    // USER MANAGEMENT & SECURITY SAFEGUARDS
     // ==============================================================
     async function loadAllUsers() {
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) {
+        $('usersTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-600 font-bold">Unauthorized access: Admin rights required.</td></tr>`;
+        return;
+      }
+
       const { data: users, error } = await supabaseClient
         .from('profiles')
         .select('*')
@@ -1904,12 +1919,11 @@
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
             <td class="p-3 font-bold font-mono text-slate-800">${u.emp_id}</td>
-            <!-- EMP NAME & ROLE STACKED -->
             <td class="p-3">
               <div class="font-bold text-slate-800">${u.emp_name}</div>
               <div class="mt-0.5">${getRoleBadge(role)}</div>
             </td>
-            <td class="p-3">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
+            <td class="p-3 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
             <td class="p-3 font-medium">${u.office_name}</td>
             <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
             <td class="p-3 text-center">
@@ -1926,15 +1940,23 @@
       });
     }
 
+    // FIXED: PRESERVES MOBILE NUMBER AND PREVENTS ACCIDENTAL RESET
     function openAdminUserEditModal(userId) {
-      const user = allLoadedUsers.find(u => u.id === userId);
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) return alert("Access Denied: Only Admins can modify users.");
+
+      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
       if (!user) return alert("User not found!");
 
       $('editUserId').value = user.id;
-      $('editUserEmpId').value = user.emp_id;
-      $('editUserEmpName').value = user.emp_name;
-      $('editUserMobile').value = user.mobile_number || '';
-      $('editUserOffice').value = user.office_name;
+      $('editUserEmpId').value = user.emp_id || '';
+      $('editUserEmpName').value = user.emp_name || '';
+      
+      // Fallback preserves mobile number safely
+      const existingMobile = user.mobile_number || user.mobile_no || user.phone || '';
+      $('editUserMobile').value = existingMobile;
+      
+      $('editUserOffice').value = user.office_name || '';
       $('editUserRole').value = user.role || 'user';
 
       $('adminUserEditModal').classList.remove('hidden');
@@ -1946,11 +1968,18 @@
 
     async function submitAdminUserEdit(e) {
       e.preventDefault();
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) return alert("Unauthorized: Only Admins can modify user details.");
+
       const userId = $('editUserId').value;
       const emp_name = $('editUserEmpName').value.trim();
       const mobile_number = $('editUserMobile').value.trim();
       const office_name = $('editUserOffice').value;
       const role = $('editUserRole').value;
+
+      if (!mobile_number || mobile_number.length !== 10) {
+        return alert("Please enter a valid 10-digit mobile number!");
+      }
 
       const { error } = await supabaseClient
         .from('profiles')
@@ -1962,12 +1991,15 @@
       } else {
         alert("User details & role updated successfully!");
         closeAdminUserEditModal();
-        loadAllUsers();
+        await loadAllUsers();
       }
     }
 
     function openAdminResetPwdModal(userId) {
-      const user = allLoadedUsers.find(u => u.id === userId);
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) return alert("Access Denied: Only Admins can reset user passwords.");
+
+      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
       if (!user) return alert("User not found!");
 
       $('resetPwdUserId').value = user.id;
@@ -1991,6 +2023,9 @@
 
     async function submitAdminPasswordReset(e) {
       e.preventDefault();
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) return alert("Unauthorized: Only Admins can perform password resets.");
+
       const userId = $('resetPwdUserId').value;
       const newPassword = $('resetPwdInput').value.trim();
 
@@ -2012,12 +2047,15 @@
     }
 
     async function toggleUserLock(userId, currentActive) {
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin) return alert("Access Denied: Only Admins can lock/unlock user accounts.");
+
       if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user account?`)) return;
       await supabaseClient.from('profiles').update({ is_active: !currentActive }).eq('id', userId);
       loadAllUsers();
     }
 
-    // EXPORT USERS TO EXCEL & PDF
+    // EXPORT USERS
     async function exportUsersExcel() {
       if (!allLoadedUsers.length) return alert("No users loaded to export!");
       const data = allLoadedUsers.map((u, i) => ({
