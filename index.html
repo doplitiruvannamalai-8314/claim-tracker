@@ -124,7 +124,7 @@
       <!-- MAIN APPLICATION DASHBOARD -->
       <div id="mainDashboard" class="hidden space-y-6">
 
-        <!-- DASHBOARD NAVIGATION TABS -->
+        <!-- DASHBOARD NAVIGATION TABS (DYNAMICALLY RESTRICTED BY ROLE) -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
           <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer">Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
@@ -133,7 +133,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW (SEPARATED DATES & SINGLE-ROW ACTION ICONS) -->
+        <!-- TAB 1: TRACK CLAIM VIEW -->
         <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div>
             <div class="border-b pb-3 border-amber-200">
@@ -197,7 +197,7 @@
               </div>
             </div>
 
-            <!-- TABLE -->
+            <!-- TABLE WITH SEPARATE TXN & ENTRY DATES -->
             <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="sticky top-0 z-10 shadow-xs">
@@ -218,7 +218,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: CLAIM REGISTRATION FORM (SWAPPED: LEFT=MOBILE, RIGHT=DOC ATTACHMENT) -->
+        <!-- TAB 2: CLAIM REGISTRATION FORM -->
         <div id="registerClaimView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200">
           <div class="border-b pb-3 mb-4 border-amber-200">
             <h3 class="text-lg font-bold text-postRed-700">New Claim Registration Form</h3>
@@ -273,20 +273,18 @@
               <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks for claim..."></textarea>
             </div>
 
-            <!-- ROW: LEFT = USER MOBILE NUMBER, RIGHT = DOCUMENT ATTACHMENT & DROPZONE -->
+            <!-- SWAPPED ROW: LEFT = USER MOBILE NUMBER, RIGHT = DOCUMENT ATTACHMENT -->
             <div class="flex flex-col justify-start">
               <label class="block text-xs font-bold text-slate-700 mb-1">User Mobile Number *</label>
               <input type="tel" id="claimUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border border-slate-300 p-2.5 rounded text-sm bg-amber-50/30 focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
 
-            <!-- RIGHT COLUMN: DOCUMENT ATTACHMENT -->
             <div class="space-y-2">
               <div class="flex items-center justify-between flex-wrap gap-1">
                 <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
-                <!-- SIMPLE CHECKBOX LABEL -->
                 <label class="inline-flex items-center gap-1.5 text-xs font-bold text-postRed-800 bg-amber-100/70 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
                   <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
-                  <span>☀️ Auto Light Theme </span>
+                  <span>☀️ Auto Light Theme (Saves Ink)</span>
                 </label>
               </div>
 
@@ -315,11 +313,10 @@
           </form>
         </div>
 
-        <!-- TAB 3: STANDALONE THEME CONVERTER TOOL TAB (CLEAN UNICODE HEADER) -->
+        <!-- TAB 3: STANDALONE THEME CONVERTER TOOL TAB -->
         <div id="converterTabView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="border-b pb-3 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
-              <!-- CLEAN UNICODE HEADER -->
               <h3 class="text-lg font-bold text-postRed-700">☀️ Dark → Light Screenshot Theme Converter</h3>
               <p class="text-xs text-slate-500">Auto-detects dark backgrounds and converts them to crisp ink-saving white while preserving light screenshots untouched</p>
             </div>
@@ -330,7 +327,7 @@
             </div>
           </div>
 
-          <!-- Interactive Previews Grid -->
+          <!-- Previews Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[300px] relative">
               <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original Source</span>
@@ -348,7 +345,7 @@
             </div>
           </div>
 
-          <!-- Controls & Detection Status -->
+          <!-- Controls -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200 text-xs">
             <div>
               <label class="font-bold text-slate-700 block mb-1">Target Whiteness: <span id="valLightness" class="text-postRed-700 font-bold">96%</span></label>
@@ -368,14 +365,18 @@
           </div>
         </div>
 
-        <!-- TAB 4: ADMIN USER MANAGEMENT -->
+        <!-- TAB 4: ADMIN USER MANAGEMENT (EDIT, PWD RESET, ROLE MODAL & EXPORT BUTTONS RESTORED) -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
             <div>
               <h3 class="text-lg font-bold text-postRed-700">User Account &amp; Role Management</h3>
-              <p class="text-xs text-slate-500">Manage user roles, mobile numbers, and account accessibility</p>
+              <p class="text-xs text-slate-500">Manage user credentials, division permissions, roles and account access</p>
             </div>
-            <button type="button" onclick="loadAllUsers()" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">🔄 Refresh Users</button>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="exportUsersExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">📊 Export Excel</button>
+              <button type="button" onclick="exportUsersPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">📄 Export PDF</button>
+              <button type="button" onclick="loadAllUsers()" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">🔄 Refresh Users</button>
+            </div>
           </div>
 
           <div class="max-w-md bg-amber-50/60 p-3 rounded-xl border border-amber-200">
@@ -388,12 +389,11 @@
               <thead>
                 <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
                   <th class="p-3">Emp ID</th>
-                  <th class="p-3">Emp Name</th>
+                  <th class="p-3">Emp Name / Role</th>
                   <th class="p-3">Mobile No</th>
                   <th class="p-3">Office Name</th>
-                  <th class="p-3">Role</th>
                   <th class="p-3">Status</th>
-                  <th class="p-3">Admin Actions</th>
+                  <th class="p-3 text-center">Admin Actions</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody" class="divide-y divide-slate-200"></tbody>
@@ -524,11 +524,11 @@
         </div>
       </div>
 
-      <!-- ADMIN USER EDIT MODAL -->
+      <!-- ADMIN USER EDIT MODAL (WITH DIRECT ROLE CHANGE DROPDOWN) -->
       <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">Edit User Details</h3>
+            <h3 class="font-bold text-lg text-postRed-700">Edit User Details &amp; Role</h3>
             <button type="button" onclick="closeAdminUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
           </div>
           <form onsubmit="submitAdminUserEdit(event)" class="space-y-3">
@@ -538,7 +538,7 @@
               <input type="text" id="editUserEmpId" disabled class="w-full border border-slate-200 p-2 rounded text-sm bg-slate-100 font-semibold text-slate-600">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Employee Name</label>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Employee Name *</label>
               <input type="text" id="editUserEmpName" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
             <div>
@@ -548,6 +548,15 @@
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Office Name *</label>
               <select id="editUserOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Access Role *</label>
+              <select id="editUserRole" required class="w-full border-2 border-postGold-400 p-2 rounded text-sm bg-white font-bold text-postRed-700 focus:ring-2 focus:ring-postRed-600 outline-none">
+                <option value="user">User (Standard Access)</option>
+                <option value="viewer">Viewer (Reports &amp; MIS Only)</option>
+                <option value="admin">Admin (Full Management)</option>
+                <option value="superadmin">Superadmin (All Privileges)</option>
+              </select>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-amber-200">
               <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
@@ -738,7 +747,7 @@
   <footer class="w-full bg-white border-t border-amber-300 py-4 mt-12 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Designed and Developed : <span class="font-semibold text-slate-700">Krishnan K</span></div>
+      <div class="text-slate-500 font-medium">Designed and Developed for <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
     </div>
   </footer>
 
@@ -770,7 +779,6 @@
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
 
-    // RRN Auto Fill Sync
     const txnInput = $('claimTxnId');
     const rrnInput = $('claimRrn');
     if (txnInput && rrnInput) {
@@ -782,9 +790,7 @@
       });
     }
 
-    // ==============================================================
-    // SMART THEME DETECTOR & CONVERTER (PROTECTS LIGHT THEME IMAGES)
-    // ==============================================================
+    // THEME DETECTOR & CONVERTER
     function rgbToHsl(r, g, b) {
       r /= 255; g /= 255; b /= 255;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -826,7 +832,6 @@
       return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
 
-    // Evaluates whether an image has a predominant dark background
     function checkIsDarkTheme(data) {
       let darkPixels = 0;
       let totalSampled = 0;
@@ -851,15 +856,11 @@
       const imgData = ctx.getImageData(0, 0, c.width, c.height);
       const data = imgData.data;
 
-      // STEP 1: Check if the image is actually dark theme
       const isDark = checkIsDarkTheme(data);
-
-      // If it is ALREADY LIGHT THEME, DO NOT TOUCH IT! Return untouched original canvas.
       if (!isDark) {
         return { canvas: c, isDarkTheme: false };
       }
 
-      // STEP 2: It is dark theme, so safely invert dark background to paper white
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
         if (a === 0) continue;
@@ -902,9 +903,7 @@
       });
     }
 
-    // ==========================================
-    // STANDALONE THEME CONVERTER TAB HANDLERS
-    // ==========================================
+    // THEME CONVERTER TAB HANDLERS
     function handleConverterFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1189,8 +1188,33 @@
       $('mainDashboard').classList.remove('hidden');
       $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${profile.role.toUpperCase()})`;
 
-      const isAdmin = profile.role === 'admin' || profile.role === 'superadmin';
-      if (isAdmin) $('adminTabBtn').classList.remove('hidden');
+      const role = profile.role || 'user';
+      const isAdmin = role === 'admin' || role === 'superadmin';
+      const isViewer = role === 'viewer';
+
+      // ROLE BASED TAB RESTRICTIONS
+      if (isAdmin) {
+        $('adminTabBtn').classList.remove('hidden');
+        $('tabBtnTrack').classList.remove('hidden');
+        $('tabBtnRegister').classList.remove('hidden');
+        $('tabBtnConverter').classList.remove('hidden');
+        $('tabBtnReports').classList.remove('hidden');
+      } else if (isViewer) {
+        // Viewer can ONLY access reports
+        $('adminTabBtn').classList.add('hidden');
+        $('tabBtnTrack').classList.add('hidden');
+        $('tabBtnRegister').classList.add('hidden');
+        $('tabBtnConverter').classList.add('hidden');
+        $('tabBtnReports').classList.remove('hidden');
+        currentActiveTab = 'reports';
+      } else {
+        // Standard user
+        $('adminTabBtn').classList.add('hidden');
+        $('tabBtnTrack').classList.remove('hidden');
+        $('tabBtnRegister').classList.remove('hidden');
+        $('tabBtnConverter').classList.remove('hidden');
+        $('tabBtnReports').classList.remove('hidden');
+      }
 
       const mobileInput = $('claimUserMobile');
       if (mobileInput) mobileInput.value = profile.mobile_number || "";
@@ -1198,7 +1222,7 @@
       showTab(currentActiveTab);
 
       if (!isAppInitialized) {
-        loadClaimsSummary();
+        if (!isViewer) loadClaimsSummary();
         generateMISReport();
         subscribeRealtimeClaims();
         isAppInitialized = true;
@@ -1206,6 +1230,11 @@
     }
 
     function showTab(tabId) {
+      // Role enforcement guard
+      if (userProfile?.role === 'viewer' && tabId !== 'reports') {
+        tabId = 'reports';
+      }
+
       currentActiveTab = tabId;
       sessionStorage.setItem('activePortalTab', tabId);
 
@@ -1228,7 +1257,7 @@
       }
     }
 
-    // CLAIM SUBMISSION WITH SMART AUTO-CONVERT
+    // CLAIM SUBMISSION
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = $('claimFile').files[0];
@@ -1349,7 +1378,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER TABLE WITH SEPARATED DATES & SINGLE-ROW 4-ICON ACTION BAR
+    // RENDER TABLE WITH SINGLE-ROW 4-ICON ACTION BAR
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1516,7 +1545,7 @@
 
     function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
 
-    // PRINT COMPLETE DOCKET WITH ASYMMETRIC DOCUMENT PREVIEW
+    // PRINT COMPLETE DOCKET
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -1721,7 +1750,6 @@
       clearAdminPastedImage();
     }
 
-    // ROBUST ADMIN REPLY SUBMISSION
     async function submitAdminReply() {
       const id = $('modalClaimId').value;
       const status = $('modalStatus').value;
@@ -1829,6 +1857,9 @@
       }
     }
 
+    // ==============================================================
+    // USER MANAGEMENT LOGIC (ROLES, BADGES, MODAL & EXPORT RESTORED)
+    // ==============================================================
     async function loadAllUsers() {
       const { data: users, error } = await supabaseClient
         .from('profiles')
@@ -1836,7 +1867,7 @@
         .order('created_at', { ascending: false });
 
       if (error || !users) {
-        $('usersTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-center text-postRed-600">Failed to load users.</td></tr>`;
+        $('usersTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-postRed-600">Failed to load users.</td></tr>`;
         return;
       }
       allLoadedUsers = users;
@@ -1852,48 +1883,190 @@
       ));
     }
 
+    function getRoleBadge(role) {
+      if (role === 'superadmin') return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">SUPERADMIN</span>';
+      if (role === 'admin') return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-postRed-100 text-postRed-800 border border-postRed-200">ADMIN</span>';
+      if (role === 'viewer') return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">VIEWER</span>';
+      return '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">USER</span>';
+    }
+
     function renderUserAccounts(users) {
       const tbody = $('usersTableBody');
       tbody.innerHTML = '';
       if (!users || users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No user accounts found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No user accounts found.</td></tr>`;
         return;
       }
 
       users.forEach(u => {
         const isActive = u.is_active !== false;
+        const role = u.role || 'user';
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-3 font-bold font-mono">${u.emp_id}</td>
-            <td class="p-3 font-medium">${u.emp_name}</td>
-            <td class="p-3">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
-            <td class="p-3">${u.office_name}</td>
+            <td class="p-3 font-bold font-mono text-slate-800">${u.emp_id}</td>
+            <!-- EMP NAME & ROLE STACKED -->
             <td class="p-3">
-              <select onchange="updateUserRole('${u.id}', this.value)" class="border border-slate-300 p-1 rounded text-xs bg-white font-semibold">
-                <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
-                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-                <option value="superadmin" ${u.role === 'superadmin' ? 'selected' : ''}>Superadmin</option>
-              </select>
+              <div class="font-bold text-slate-800">${u.emp_name}</div>
+              <div class="mt-0.5">${getRoleBadge(role)}</div>
             </td>
+            <td class="p-3">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
+            <td class="p-3 font-medium">${u.office_name}</td>
             <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
-            <td class="p-3 flex items-center gap-2">
-              <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-1 rounded text-xs font-bold cursor-pointer">
-                ${isActive ? '🔒 Lock' : '🔓 Unlock'}
-              </button>
+            <td class="p-3 text-center">
+              <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
+                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
+                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
+                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2.5 py-1 rounded text-xs font-bold cursor-pointer">
+                  ${isActive ? '🔒 Lock' : '🔓 Unlock'}
+                </button>
+              </div>
             </td>
           </tr>
         `;
       });
     }
 
-    async function updateUserRole(userId, newRole) {
-      await supabaseClient.from('profiles').update({ role: newRole }).eq('id', userId);
+    function openAdminUserEditModal(userId) {
+      const user = allLoadedUsers.find(u => u.id === userId);
+      if (!user) return alert("User not found!");
+
+      $('editUserId').value = user.id;
+      $('editUserEmpId').value = user.emp_id;
+      $('editUserEmpName').value = user.emp_name;
+      $('editUserMobile').value = user.mobile_number || '';
+      $('editUserOffice').value = user.office_name;
+      $('editUserRole').value = user.role || 'user';
+
+      $('adminUserEditModal').classList.remove('hidden');
+    }
+
+    function closeAdminUserEditModal() {
+      $('adminUserEditModal').classList.add('hidden');
+    }
+
+    async function submitAdminUserEdit(e) {
+      e.preventDefault();
+      const userId = $('editUserId').value;
+      const emp_name = $('editUserEmpName').value.trim();
+      const mobile_number = $('editUserMobile').value.trim();
+      const office_name = $('editUserOffice').value;
+      const role = $('editUserRole').value;
+
+      const { error } = await supabaseClient
+        .from('profiles')
+        .update({ emp_name, mobile_number, office_name, role })
+        .eq('id', userId);
+
+      if (error) {
+        alert("Failed to update user: " + error.message);
+      } else {
+        alert("User details & role updated successfully!");
+        closeAdminUserEditModal();
+        loadAllUsers();
+      }
+    }
+
+    function openAdminResetPwdModal(userId) {
+      const user = allLoadedUsers.find(u => u.id === userId);
+      if (!user) return alert("User not found!");
+
+      $('resetPwdUserId').value = user.id;
+      $('resetPwdUserName').innerText = user.emp_name;
+      $('resetPwdUserEmpId').innerText = user.emp_id;
+      $('resetPwdInput').value = '';
+
+      $('adminResetPwdModal').classList.remove('hidden');
+    }
+
+    function closeAdminResetPwdModal() {
+      $('adminResetPwdModal').classList.add('hidden');
+    }
+
+    function generateRandomPassword() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
+      let pwd = "";
+      for (let i = 0; i < 10; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+      $('resetPwdInput').value = pwd;
+    }
+
+    async function submitAdminPasswordReset(e) {
+      e.preventDefault();
+      const userId = $('resetPwdUserId').value;
+      const newPassword = $('resetPwdInput').value.trim();
+
+      if (!newPassword || newPassword.length < 6) {
+        return alert("Password must be at least 6 characters!");
+      }
+
+      const { error } = await supabaseClient.rpc('admin_reset_user_password', {
+        target_user_id: userId,
+        new_password: newPassword
+      });
+
+      if (error) {
+        alert("Failed to reset password: " + error.message);
+      } else {
+        alert(`Password for user updated successfully!\n\nNew Password: ${newPassword}`);
+        closeAdminResetPwdModal();
+      }
     }
 
     async function toggleUserLock(userId, currentActive) {
-      if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user?`)) return;
+      if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user account?`)) return;
       await supabaseClient.from('profiles').update({ is_active: !currentActive }).eq('id', userId);
       loadAllUsers();
+    }
+
+    // EXPORT USERS TO EXCEL & PDF
+    async function exportUsersExcel() {
+      if (!allLoadedUsers.length) return alert("No users loaded to export!");
+      const data = allLoadedUsers.map((u, i) => ({
+        "Sl. No.": i + 1,
+        "Emp ID": u.emp_id,
+        "Employee Name": u.emp_name,
+        "Role": (u.role || 'user').toUpperCase(),
+        "Mobile Number": u.mobile_number || 'N/A',
+        "Office Name": u.office_name,
+        "Status": u.is_active !== false ? 'Active' : 'Locked'
+      }));
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Users");
+      XLSX.writeFile(wb, `Users_Roster_${getFormattedTimestamp()}.xlsx`);
+    }
+
+    async function exportUsersPDF() {
+      if (!allLoadedUsers.length) return alert("No users loaded to export!");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "portrait" });
+
+      doc.setFontSize(14);
+      doc.setTextColor(168, 15, 40);
+      doc.text("User Accounts & Roles Roster - Chennai City Central Division", 14, 15);
+      doc.setFontSize(9);
+      doc.setTextColor(51, 51, 51);
+      doc.text(`Generated on: ${new Date().toLocaleString()} | Total Users: ${allLoadedUsers.length}`, 14, 22);
+
+      const headers = [["Sl. No.", "Emp ID", "Employee Name", "Role", "Mobile", "Office", "Status"]];
+      const rows = allLoadedUsers.map((u, i) => [
+        i + 1,
+        u.emp_id,
+        u.emp_name,
+        (u.role || 'user').toUpperCase(),
+        u.mobile_number || "-",
+        u.office_name,
+        u.is_active !== false ? 'Active' : 'Locked'
+      ]);
+
+      doc.autoTable({
+        head: headers,
+        body: rows,
+        startY: 26,
+        theme: 'grid',
+        headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
+        styles: { fontSize: 8, cellPadding: 2 }
+      });
+      doc.save(`Users_Roster_${getFormattedTimestamp()}.pdf`);
     }
 
     function resetMISFilters() {
@@ -1908,9 +2081,12 @@
     async function generateMISReport(filterStatus = 'All') {
       currentMISReportStatus = filterStatus;
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      const isViewer = userProfile?.role === 'viewer';
 
       let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
-      if (!isAdmin) query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
+      if (!isAdmin && !isViewer) {
+        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
+      }
 
       const from = $('filterFromDate').value;
       const to = $('filterToDate').value;
@@ -1965,7 +2141,7 @@
     function subscribeRealtimeClaims() {
       supabaseClient.channel('public:claims')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => {
-          loadClaimsSummary();
+          if (userProfile?.role !== 'viewer') loadClaimsSummary();
           generateMISReport(currentMISReportStatus);
         })
         .subscribe();
@@ -2018,7 +2194,6 @@
       doc.setTextColor(51, 51, 51);
       doc.text(`Generated on: ${new Date().toLocaleString()} | Visible Records: ${currentMISClaimsList.length}`, 14, 22);
 
-      // Clean headers: Removed Emp Name & Entry Date, Added Sl. No.
       const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => [
         index + 1,
