@@ -33,24 +33,17 @@
       }
     }
   </script>
-  <!-- Excel Export Library (SheetJS) -->
+  <!-- Excel & PDF Export Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-  <!-- PDF Export Libraries (jsPDF + AutoTable) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-amber-50/40 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
 
   <div>
-    <!-- NAVBAR (RED WITH GOLD STRIP) -->
+    <!-- NAVBAR -->
     <nav id="navbar" class="hidden bg-postRed-700 text-white px-6 py-4 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
       <div class="flex items-center gap-3">
-        <!-- Official branding commented out until authorized:
-        <div class="bg-white text-postRed-700 font-extrabold text-xs px-2.5 py-1 rounded shadow-xs uppercase tracking-wider">
-          India Post
-        </div>
-        -->
         <div class="font-bold text-lg tracking-wide text-white drop-shadow-xs">
           Refund Claims Management Portal <span class="text-postGold-400 text-sm font-semibold hidden md:inline">| Chennai City Central Division</span>
         </div>
@@ -64,55 +57,33 @@
     <!-- MAIN CONTAINER -->
     <div class="max-w-7xl mx-auto p-4 md:p-6 w-full">
 
-      <!-- AUTHENTICATION CONTAINER (LOGIN / REGISTER) -->
+      <!-- AUTHENTICATION CONTAINER -->
       <div id="authSection" class="max-w-md mx-auto mt-10 bg-white p-8 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
-        
-        <!-- PORTAL TITLE ON LOGIN SCREEN -->
         <div class="text-center mb-6">
-          <!-- Official branding commented out until authorized:
-          <div class="inline-block bg-postRed-50 text-postRed-700 font-extrabold text-xs px-3 py-1 rounded-full mb-2 border border-postRed-200 uppercase tracking-widest">
-            Department of Posts
-          </div>
-          -->
-          <h1 class="text-xl font-extrabold text-postRed-700 uppercase tracking-tight">
-            Refund Claims Portal
-          </h1>
+          <h1 class="text-xl font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
           <p class="text-xs font-bold text-postGold-700 mt-1 uppercase">Chennai City Central Division</p>
           <div class="h-1 w-20 bg-postGold-500 mx-auto mt-2 rounded"></div>
         </div>
 
-        <!-- TAB SWITCHER -->
         <div class="flex justify-around mb-6 border-b border-amber-200 pb-2">
-          <button 
-            type="button" 
-            id="tabLoginBtn" 
-            onclick="switchAuthTab('login')" 
-            class="font-bold text-postRed-700 border-b-2 border-postRed-700 pb-2 cursor-pointer focus:outline-none">
-            Emp ID Login
-          </button>
-          <button 
-            type="button" 
-            id="tabRegisterBtn" 
-            onclick="switchAuthTab('register')" 
-            class="font-bold text-slate-400 hover:text-postRed-600 pb-2 cursor-pointer focus:outline-none">
-            Register User
-          </button>
+          <button type="button" id="tabLoginBtn" onclick="switchAuthTab('login')" class="font-bold text-postRed-700 border-b-2 border-postRed-700 pb-2 cursor-pointer focus:outline-none">Emp ID Login</button>
+          <button type="button" id="tabRegisterBtn" onclick="switchAuthTab('register')" class="font-bold text-slate-400 hover:text-postRed-600 pb-2 cursor-pointer focus:outline-none">Register User</button>
         </div>
 
-        <!-- 1. LOGIN FORM USING EMPLOYEE ID -->
+        <!-- LOGIN FORM -->
         <form id="loginForm" onsubmit="handleEmpIdLogin(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Employee ID *</label>
-            <input type="text" id="loginEmpId" placeholder="e.g. 12345678" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 focus:border-postRed-600 outline-none uppercase bg-amber-50/20">
+            <input type="text" id="loginEmpId" placeholder="e.g. 12345678" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 outline-none uppercase bg-amber-50/20">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password *</label>
-            <input type="password" id="loginPassword" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 focus:border-postRed-600 outline-none bg-amber-50/20">
+            <input type="password" id="loginPassword" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 outline-none bg-amber-50/20">
           </div>
           <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg transition shadow-md cursor-pointer">Log In</button>
         </form>
 
-        <!-- 2. REGISTRATION FORM WITH CONFIRM PASSWORD -->
+        <!-- REGISTER FORM -->
         <form id="registerForm" onsubmit="handleEmpIdRegister(event)" class="space-y-3 hidden">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Employee ID *</label>
@@ -152,11 +123,12 @@
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
           <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer">Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
+          <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
           <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">User Management</button>
-          <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS & Pendency Reports</button>
+          <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW -->
+        <!-- TAB 1: TRACK CLAIM VIEW (SEPARATED TXN & ENTRY DATES + COMPACT ICON ACTIONS) -->
         <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div>
             <div class="border-b pb-3 border-amber-200">
@@ -220,18 +192,19 @@
               </div>
             </div>
 
-            <!-- TABLE WITH VERTICAL + HORIZONTAL SCROLLBAR & 2*2 ACTION SQUARE -->
+            <!-- TABLE -->
             <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="sticky top-0 z-10 shadow-xs">
                   <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold whitespace-nowrap">
                     <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No / Module <span id="sort_txn_id_ref">⇅</span></th>
                     <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Raised By / Office <span id="sort_emp_name">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn / Entry Date <span id="sort_txn_date">⇅</span></th>
+                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn Date <span id="sort_txn_date">⇅</span></th>
+                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('created_at')">Entry Date/Time <span id="sort_created_at">⇅</span></th>
                     <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
                     <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status <span id="sort_claim_status">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 cursor-default min-w-[240px]">Admin Reply / Remarks</th> 
-                    <th class="p-3.5 bg-postRed-50 cursor-default text-center min-w-[170px]">Action &amp; Tools</th>
+                    <th class="p-3.5 bg-postRed-50 cursor-default min-w-[220px]">Admin Remarks</th> 
+                    <th class="p-3.5 bg-postRed-50 cursor-default text-center min-w-[110px]">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -240,7 +213,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: CLAIM REGISTRATION FORM -->
+        <!-- TAB 2: CLAIM REGISTRATION FORM (WITH AUTO CONVERT CHECKBOX) -->
         <div id="registerClaimView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200">
           <div class="border-b pb-3 mb-4 border-amber-200">
             <h3 class="text-lg font-bold text-postRed-700">New Claim Registration Form</h3>
@@ -295,9 +268,17 @@
               <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks for claim..."></textarea>
             </div>
 
-            <!-- FILE ATTACHMENT & CLIPBOARD PASTE -->
-            <div class="md:col-span-2 space-y-2 border-t pt-3 border-amber-200">
-              <label class="block text-xs font-bold text-slate-700">Document Attachment (File or Screenshot) *</label>
+            <!-- FILE ATTACHMENT, CLIPBOARD & DARK-TO-LIGHT CONVERSION CHECKBOX -->
+            <div class="md:col-span-2 space-y-3 border-t pt-3 border-amber-200">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <label class="block text-xs font-bold text-slate-700">Document Attachment (File or Screenshot) *</label>
+                <!-- AUTO CONVERT CHECKBOX -->
+                <label class="inline-flex items-center gap-1.5 text-xs font-bold text-postRed-800 bg-amber-100/70 border border-amber-300 px-2.5 py-1 rounded cursor-pointer">
+                  <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
+                  <span>☀️ Convert Dark Screenshot $\rightarrow$ Light (Saves Print Ink)</span>
+                </label>
+              </div>
+
               <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-2 rounded text-xs bg-amber-50/20">
               
               <div class="text-center text-xs text-slate-400 font-semibold my-1">— OR PASTE SCREENSHOT FROM CLIPBOARD —</div>
@@ -308,11 +289,13 @@
                 <p class="text-[11px] text-slate-500 mt-0.5">Snip using Windows Snipping Tool (<kbd class="bg-white px-1 py-0.5 border rounded text-[10px]">Win+Shift+S</kbd>) and paste directly</p>
               </div>
 
-              <div id="userPastedPreviewContainer" class="hidden relative border border-emerald-400 rounded-lg p-2.5 bg-emerald-50/40 flex items-center gap-3">
-                <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="h-16 w-24 object-cover rounded border border-emerald-300">
-                <div class="text-xs flex-1">
-                  <p class="font-bold text-emerald-800">✓ Screenshot Attached from Clipboard</p>
-                  <p id="userPastedImageSize" class="text-slate-600 text-[11px]"></p>
+              <div id="userPastedPreviewContainer" class="hidden relative border border-emerald-400 rounded-lg p-2.5 bg-emerald-50/40 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="h-16 w-24 object-contain rounded border border-emerald-300 bg-white">
+                  <div>
+                    <p class="font-bold text-emerald-800 text-xs">✓ Screenshot Ready for Upload</p>
+                    <p id="userPastedImageSize" class="text-slate-600 text-[11px]"></p>
+                  </div>
                 </div>
                 <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold p-1 underline cursor-pointer">Remove</button>
               </div>
@@ -328,7 +311,60 @@
           </form>
         </div>
 
-        <!-- TAB 3: ADMIN USER MANAGEMENT -->
+        <!-- TAB 3: STANDALONE THEME CONVERTER TOOL TAB -->
+        <div id="converterTabView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
+          <div class="border-b pb-3 border-amber-200 flex justify-between items-center flex-wrap gap-2">
+            <div>
+              <h3 class="text-lg font-bold text-postRed-700">☀️ Dark $\rightarrow$ Light Screenshot Theme Converter</h3>
+              <p class="text-xs text-slate-500">Inverts dark backgrounds to pure ink-saving white while keeping texts & colors legible</p>
+            </div>
+            <div class="flex gap-2">
+              <button type="button" onclick="$('converterFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">📂 Select Image</button>
+              <button type="button" onclick="downloadConvertedImage()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">💾 Download Light Image</button>
+              <input type="file" id="converterFileInput" accept="image/*" class="hidden" onchange="handleConverterFileSelect(event)">
+            </div>
+          </div>
+
+          <!-- Interactive Previews Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Left: Original Dark -->
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[300px] relative">
+              <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original (Dark)</span>
+              <img id="converterOriginalImg" class="max-h-[320px] max-w-full object-contain hidden" alt="Original">
+              <div id="converterDropNotice" class="text-center text-slate-400 text-xs">
+                <p class="text-2xl mb-1">🖼️</p>
+                <p>Drag &amp; drop dark image here or paste with <kbd class="bg-slate-700 px-1 py-0.5 rounded font-mono">Ctrl + V</kbd></p>
+              </div>
+            </div>
+
+            <!-- Right: Converted Light -->
+            <div class="border border-slate-300 rounded-lg p-3 bg-slate-50 flex flex-col items-center justify-center min-h-[300px] relative">
+              <span class="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Converted (Light)</span>
+              <img id="converterResultImg" class="max-h-[320px] max-w-full object-contain hidden" alt="Converted Light">
+              <p id="converterEmptyNotice" class="text-slate-400 text-xs">Converted light image will appear here</p>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200 text-xs">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Light Background Whiteness: <span id="valLightness" class="text-postRed-700 font-bold">96%</span></label>
+              <input type="range" id="sliderLightness" min="80" max="100" value="96" class="w-full accent-postRed-600" oninput="runThemeConverter()">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Text Dark Contrast: <span id="valDarkness" class="text-postRed-700 font-bold">12%</span></label>
+              <input type="range" id="sliderDarkness" min="0" max="30" value="12" class="w-full accent-postRed-600" oninput="runThemeConverter()">
+            </div>
+            <div class="flex items-center gap-2 pt-3">
+              <label class="inline-flex items-center gap-1.5 font-bold cursor-pointer">
+                <input type="checkbox" id="chkPreserveColor" checked class="accent-postRed-600" onchange="runThemeConverter()">
+                <span>Preserve Hue &amp; Badges</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: ADMIN USER MANAGEMENT -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
             <div>
@@ -362,7 +398,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: MIS & PENDENCY REPORTS -->
+        <!-- TAB 5: MIS & PENDENCY REPORTS -->
         <div id="reportsView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
             <div>
@@ -441,7 +477,7 @@
             </div>
           </div>
 
-          <!-- MIS FILTERED DETAILS TABLE -->
+          <!-- MIS TABLE -->
           <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-sm p-3 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
             <table class="w-full text-left text-sm border-collapse">
@@ -451,8 +487,8 @@
                   <th class="p-3 bg-postRed-50">Emp Name</th>
                   <th class="p-3 bg-postRed-50">Module</th>
                   <th class="p-3 bg-postRed-50">Office</th>
-                  <th class="p-3 bg-postRed-50">Entry Date/Time</th>
                   <th class="p-3 bg-postRed-50">Txn Date</th>
+                  <th class="p-3 bg-postRed-50">Entry Date/Time</th>
                   <th class="p-3 bg-postRed-50">Amount</th>
                   <th class="p-3 bg-postRed-50">Status</th>
                   <th class="p-3 bg-postRed-50">Admin Remarks</th>
@@ -467,151 +503,6 @@
 
       </div>
 
-      <!-- MANDATORY MOBILE NUMBER POPUP MODAL -->
-      <div id="mobilePromptModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
-          <div class="text-center">
-            <span class="text-3xl">📱</span>
-            <h3 class="font-bold text-lg text-postRed-700 mt-2">Mobile Number Required</h3>
-            <p class="text-xs text-slate-500 mt-1">Please enter your 10-digit mobile number to proceed further with the portal.</p>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mobile Number *</label>
-            <input type="tel" id="promptMobileNo" placeholder="Enter 10-digit mobile number" maxlength="10" pattern="[0-9]{10}" class="w-full border border-slate-300 p-2.5 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-          </div>
-          <button type="button" onclick="submitMandatoryMobile()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-sm transition cursor-pointer shadow-md">
-            Save & Continue
-          </button>
-        </div>
-      </div>
-
-      <!-- ADMIN USER EDIT MODAL -->
-      <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
-          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">Edit User Details</h3>
-            <button type="button" onclick="closeAdminUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
-          </div>
-          <form onsubmit="submitAdminUserEdit(event)" class="space-y-3">
-            <input type="hidden" id="editUserId">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Employee ID</label>
-              <input type="text" id="editUserEmpId" disabled class="w-full border border-slate-200 p-2 rounded text-sm bg-slate-100 font-semibold text-slate-600">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Employee Name</label>
-              <input type="text" id="editUserEmpName" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
-              <input type="tel" id="editUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Office Name *</label>
-              <select id="editUserOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none"></select>
-            </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-amber-200">
-              <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- ADMIN RESET PASSWORD MODAL -->
-      <div id="adminResetPwdModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postGold-500">
-          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">🔑 Reset User Password</h3>
-            <button type="button" onclick="closeAdminResetPwdModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
-          </div>
-          <form onsubmit="submitAdminPasswordReset(event)" class="space-y-4">
-            <input type="hidden" id="resetPwdUserId">
-            <div class="bg-amber-50/60 p-3 rounded-lg border border-amber-200 text-xs space-y-1">
-              <p><strong>Employee:</strong> <span id="resetPwdUserName"></span></p>
-              <p><strong>Emp ID:</strong> <span id="resetPwdUserEmpId" class="font-mono font-bold text-postRed-700"></span></p>
-            </div>
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="block text-xs font-bold text-slate-700">New Password *</label>
-                <button type="button" onclick="generateRandomPassword()" class="text-xs text-postRed-700 hover:underline font-bold">⚡ Generate Strong Password</button>
-              </div>
-              <input type="text" id="resetPwdInput" required minlength="6" placeholder="Enter or generate new password" class="w-full border border-slate-300 p-2 rounded text-sm font-mono focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
-              <button type="button" onclick="closeAdminResetPwdModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Update Password</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- USER CLAIM EDIT MODAL -->
-      <div id="userEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
-          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">Edit Claim Request</h3>
-            <button type="button" onclick="closeUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
-          </div>
-          <form onsubmit="submitUserClaimEdit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="hidden" id="editClaimId">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Raised for Office Name *</label>
-              <select id="editClaimOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none"></select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Module *</label>
-              <select id="editClaimModule" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                <option value="Booking">Booking</option>
-                <option value="Delivery">Delivery</option>
-                <option value="DSS">DSS</option>
-                <option value="Others">Others</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Article Number *</label>
-              <input type="text" id="editClaimArticleNo" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">RRN Number *</label>
-              <input type="text" id="editClaimRrn" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Date *</label>
-              <input type="date" id="editClaimTxnDate" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Amount (₹) *</label>
-              <input type="number" step="0.01" id="editClaimAmount" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Payment Channel *</label>
-              <select id="editClaimChannel" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                <option value="DQR">DQR</option>
-                <option value="SBI POS">SBI POS</option>
-                <option value="SBI ePay">SBI ePay</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">User Mobile *</label>
-              <input type="tel" id="editClaimMobile" pattern="[0-9]{10}" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 mb-1">Remarks by User *</label>
-              <textarea id="editClaimRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none"></textarea>
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 mb-1">Replace Document Attachment (Optional)</label>
-              <input type="file" id="editClaimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-2 rounded text-sm bg-amber-50/30">
-            </div>
-            <div class="md:col-span-2 flex justify-end gap-2 pt-2 border-t border-amber-200">
-              <button type="button" onclick="closeUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <!-- ADMIN REPLY MODAL -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
@@ -622,7 +513,6 @@
           
           <input type="hidden" id="modalClaimId">
 
-          <!-- ADMIN PROVISION TO UPDATE STATUS & MODULE -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Update Claim Status</label>
@@ -646,7 +536,7 @@
 
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Reply Remarks by Admin</label>
-            <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" required placeholder="Type reply remarks or instructions..."></textarea>
+            <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Type reply remarks or instructions..."></textarea>
           </div>
 
           <!-- ADMIN FILE ATTACHMENT & CLIPBOARD PASTE -->
@@ -659,13 +549,12 @@
             <div id="adminPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-amber-50/50 p-4 rounded-xl text-center cursor-pointer outline-none focus:ring-2 focus:ring-postRed-500 transition">
               <span class="text-xl">📋</span>
               <p class="text-xs font-bold text-postRed-800 mt-1">Click here and press <kbd class="bg-white px-1.5 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
-              <p class="text-[11px] text-slate-500 mt-0.5">Snip any screen with Snipping Tool (<kbd class="bg-white px-1 py-0.5 border rounded text-[10px]">Win+Shift+S</kbd>) and paste directly</p>
             </div>
 
             <div id="adminPastedPreviewContainer" class="hidden relative border border-amber-300 rounded-lg p-2 bg-amber-50/30 flex items-center gap-3">
               <img id="adminPastedImagePreview" src="" alt="Pasted Screenshot" class="h-16 w-24 object-cover rounded border border-amber-200">
               <div class="text-xs flex-1">
-                <p class="font-bold text-emerald-700">✓ Screenshot Attached from Clipboard</p>
+                <p class="font-bold text-emerald-700">✓ Screenshot Attached</p>
                 <p id="adminPastedImageSize" class="text-slate-500 text-[11px]"></p>
               </div>
               <button type="button" onclick="clearAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold p-1 underline cursor-pointer">Remove</button>
@@ -674,7 +563,7 @@
 
           <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
             <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-            <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
+            <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
           </div>
         </div>
       </div>
@@ -700,20 +589,18 @@
   <!-- FOOTER PANEL -->
   <footer class="w-full bg-white border-t border-amber-300 py-4 mt-12 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-      <div class="font-bold text-postRed-700">
-        Refund Claims Management Portal &bull; Chennai City Central Division
-      </div>
-      <div class="text-slate-500 font-medium">
-        Designed and Developed : <span class="font-semibold text-slate-700">Krishnan K, DSM, Chennai City Central Division</span>
-      </div>
+      <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
+      <div class="text-slate-500 font-medium">Designed and Developed for <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
     </div>
   </footer>
 
-  <!-- APPLICATION LOGIC -->
+  <!-- APPLICATION SCRIPT -->
   <script>
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const $ = id => document.getElementById(id);
 
     let currentUser = null;
     let userProfile = null;
@@ -729,29 +616,175 @@
 
     let adminPastedImageBlob = null;
     let userPastedImageBlob = null;
+    let standaloneConvertedBlob = null;
+    let standaloneImageSource = null;
 
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
 
-    const txnInput = document.getElementById('claimTxnId');
-    const rrnInput = document.getElementById('claimRrn');
+    // RRN Auto Fill Sync
+    const txnInput = $('claimTxnId');
+    const rrnInput = $('claimRrn');
     if (txnInput && rrnInput) {
       txnInput.addEventListener('input', (e) => {
-        if (!isRrnManuallyEdited) {
-          rrnInput.value = e.target.value;
-        }
+        if (!isRrnManuallyEdited) rrnInput.value = e.target.value;
       });
       rrnInput.addEventListener('input', (e) => {
-        if (rrnInput.value !== txnInput.value) {
-          isRrnManuallyEdited = true;
-        } else {
-          isRrnManuallyEdited = false;
-        }
+        isRrnManuallyEdited = (rrnInput.value !== txnInput.value);
       });
     }
 
-    // UNIFIED CLIPBOARD PASTE ROUTER
-    window.addEventListener('paste', (e) => {
+    // ==========================================
+    // ROBUST HIGH-ACCURACY THEME CONVERTER ENGINE
+    // ==========================================
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) {
+        h = s = 0; // achromatic
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return [h, s, l];
+    }
+
+    function hslToRgb(h, s, l) {
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l; // achromatic
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+
+    function processDarkToLightCanvas(sourceImg, maxBgLightness = 0.96, minTextDarkness = 0.12, preserveColor = true) {
+      const c = document.createElement('canvas');
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      c.width = sourceImg.naturalWidth || sourceImg.width;
+      c.height = sourceImg.naturalHeight || sourceImg.height;
+      ctx.drawImage(sourceImg, 0, 0);
+
+      const imgData = ctx.getImageData(0, 0, c.width, c.height);
+      const data = imgData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+        if (a === 0) continue;
+
+        const [h, s, l] = rgbToHsl(r, g, b);
+
+        // Check if pixel is a prominent colored UI element / badge
+        const isColored = s > 0.25 && l > 0.15 && l < 0.85;
+
+        if (preserveColor && isColored) {
+          // Adjust lightness of color to look natural on white background
+          const newL = l < 0.5 ? 0.35 + l * 0.4 : l;
+          const [nr, ng, nb] = hslToRgb(h, Math.min(1, s * 1.15), newL);
+          data[i] = nr;
+          data[i + 1] = ng;
+          data[i + 2] = nb;
+        } else {
+          // Invert lightness smoothly: dark background -> crisp light; light text -> dark charcoal
+          let newL = 1 - l;
+          // Scale against target paper white and deep black
+          newL = minTextDarkness + newL * (maxBgLightness - minTextDarkness);
+          
+          const [nr, ng, nb] = hslToRgb(h, s * 0.1, newL);
+          data[i] = nr;
+          data[i + 1] = ng;
+          data[i + 2] = nb;
+        }
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+      return c;
+    }
+
+    async function convertBlobDarkToLight(blob) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = processDarkToLightCanvas(img, 0.96, 0.12, true);
+          canvas.toBlob((convertedBlob) => resolve(convertedBlob), 'image/png');
+        };
+        img.src = URL.createObjectURL(blob);
+      });
+    }
+
+    // ==========================================
+    // STANDALONE THEME CONVERTER TAB HANDLERS
+    // ==========================================
+    function handleConverterFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      loadStandaloneImage(file);
+    }
+
+    function loadStandaloneImage(file) {
+      const r = new FileReader();
+      r.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          standaloneImageSource = img;
+          $('converterOriginalImg').src = e.target.result;
+          $('converterOriginalImg').classList.remove('hidden');
+          $('converterDropNotice').classList.add('hidden');
+          runThemeConverter();
+        };
+        img.src = e.target.result;
+      };
+      r.readAsDataURL(file);
+    }
+
+    function runThemeConverter() {
+      if (!standaloneImageSource) return;
+      const bgLight = parseFloat($('sliderLightness').value) / 100;
+      const textDark = parseFloat($('sliderDarkness').value) / 100;
+      const preserveColor = $('chkPreserveColor').checked;
+
+      $('valLightness').innerText = $('sliderLightness').value + '%';
+      $('valDarkness').innerText = $('sliderDarkness').value + '%';
+
+      const canvas = processDarkToLightCanvas(standaloneImageSource, bgLight, textDark, preserveColor);
+      canvas.toBlob(blob => {
+        standaloneConvertedBlob = blob;
+        $('converterResultImg').src = URL.createObjectURL(blob);
+        $('converterResultImg').classList.remove('hidden');
+        $('converterEmptyNotice').classList.add('hidden');
+      }, 'image/png');
+    }
+
+    function downloadConvertedImage() {
+      if (!standaloneConvertedBlob) return alert("Please select or paste an image to convert first!");
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(standaloneConvertedBlob);
+      a.download = `converted_light_screenshot_${Date.now()}.png`;
+      a.click();
+    }
+
+    // Paste event router
+    window.addEventListener('paste', async (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       let blob = null;
       for (let index in items) {
@@ -763,52 +796,43 @@
       }
       if (!blob) return;
 
-      const replyModal = document.getElementById('replyModal');
-      const registerClaimView = document.getElementById('registerClaimView');
+      const replyModal = $('replyModal');
+      const registerClaimView = $('registerClaimView');
+      const converterTabView = $('converterTabView');
 
       if (replyModal && !replyModal.classList.contains('hidden')) {
-        handleAdminPastedImage(blob);
+        adminPastedImageBlob = blob;
+        $('adminPastedImagePreview').src = URL.createObjectURL(blob);
+        $('adminPastedPreviewContainer').classList.remove('hidden');
+        $('modalAdminFile').value = '';
+        e.preventDefault();
+      } else if (converterTabView && !converterTabView.classList.contains('hidden')) {
+        loadStandaloneImage(blob);
         e.preventDefault();
       } else if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
-        handleUserPastedImage(blob);
+        // Auto convert checkbox check
+        if ($('autoConvertDark')?.checked) {
+          blob = await convertBlobDarkToLight(blob);
+        }
+        userPastedImageBlob = blob;
+        $('userPastedImagePreview').src = URL.createObjectURL(blob);
+        $('userPastedPreviewContainer').classList.remove('hidden');
+        $('userPastedImageSize').innerText = `Size: ${(blob.size / 1024).toFixed(1)} KB (Ink-Saving Light PNG)`;
+        $('claimFile').value = '';
         e.preventDefault();
       }
     });
 
-    function handleAdminPastedImage(blob) {
-      adminPastedImageBlob = blob;
-      const previewImg = document.getElementById('adminPastedImagePreview');
-      const sizeText = document.getElementById('adminPastedImageSize');
-      const container = document.getElementById('adminPastedPreviewContainer');
-
-      previewImg.src = URL.createObjectURL(blob);
-      sizeText.innerText = `Size: ${(blob.size / 1024).toFixed(1)} KB (image/png)`;
-      container.classList.remove('hidden');
-      document.getElementById('modalAdminFile').value = '';
-    }
-
     function clearAdminPastedImage() {
       adminPastedImageBlob = null;
-      document.getElementById('adminPastedPreviewContainer').classList.add('hidden');
-      document.getElementById('adminPastedImagePreview').src = '';
-    }
-
-    function handleUserPastedImage(blob) {
-      userPastedImageBlob = blob;
-      const previewImg = document.getElementById('userPastedImagePreview');
-      const sizeText = document.getElementById('userPastedImageSize');
-      const container = document.getElementById('userPastedPreviewContainer');
-
-      previewImg.src = URL.createObjectURL(blob);
-      sizeText.innerText = `Size: ${(blob.size / 1024).toFixed(1)} KB (image/png)`;
-      container.classList.remove('hidden');
-      document.getElementById('claimFile').value = '';
+      $('adminPastedPreviewContainer').classList.add('hidden');
+      $('adminPastedImagePreview').src = '';
     }
 
     function clearUserPastedImage() {
       userPastedImageBlob = null;
-      document.getElementById('userPastedPreviewContainer').classList.add('hidden');
-      document.getElementById('userPastedImagePreview').src = '';
+      $('userPastedPreviewContainer').classList.add('hidden');
+      $('userPastedImagePreview').src = '';
     }
 
     function formatDateTime(isoStr) {
@@ -832,12 +856,12 @@
         .select('office_name')
         .order('office_name', { ascending: true });
 
-      const regSelect = document.getElementById('regOfficeName');
-      const claimSelect = document.getElementById('claimOffice');
-      const editClaimSelect = document.getElementById('editClaimOffice');
-      const editUserOfficeSelect = document.getElementById('editUserOffice');
-      const filterOfficeSelect = document.getElementById('filterOfficeName');
-      const overviewFilterOfficeSelect = document.getElementById('overviewFilterOffice');
+      const regSelect = $('regOfficeName');
+      const claimSelect = $('claimOffice');
+      const editClaimSelect = $('editClaimOffice');
+      const editUserOfficeSelect = $('editUserOffice');
+      const filterOfficeSelect = $('filterOfficeName');
+      const overviewFilterOfficeSelect = $('overviewFilterOffice');
 
       if (offices) {
         let optionsHtml = '<option value="">-- Select Office Name --</option>';
@@ -860,8 +884,8 @@
         .select('id, emp_id, emp_name')
         .order('emp_name', { ascending: true });
 
-      const filterUserSelect = document.getElementById('filterEmpUser');
-      const overviewFilterEmpUser = document.getElementById('overviewFilterEmpUser');
+      const filterUserSelect = $('filterEmpUser');
+      const overviewFilterEmpUser = $('overviewFilterEmpUser');
 
       if (users) {
         let userOptsHtml = '<option value="">-- All Users --</option>';
@@ -878,10 +902,10 @@
     }
 
     function switchAuthTab(tab) {
-      const loginForm = document.getElementById('loginForm');
-      const registerForm = document.getElementById('registerForm');
-      const tabLoginBtn = document.getElementById('tabLoginBtn');
-      const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+      const loginForm = $('loginForm');
+      const registerForm = $('registerForm');
+      const tabLoginBtn = $('tabLoginBtn');
+      const tabRegisterBtn = $('tabRegisterBtn');
 
       if (!loginForm || !registerForm) return;
 
@@ -900,8 +924,8 @@
 
     async function handleEmpIdLogin(e) {
       e.preventDefault();
-      const empId = document.getElementById('loginEmpId').value.trim().toUpperCase();
-      const password = document.getElementById('loginPassword').value;
+      const empId = $('loginEmpId').value.trim().toUpperCase();
+      const password = $('loginPassword').value;
       const shadowEmail = empIdToEmail(empId);
 
       const { data, error } = await supabaseClient.auth.signInWithPassword({ 
@@ -909,9 +933,7 @@
         password 
       });
 
-      if (error) {
-        return alert("Login failed: Invalid Employee ID or Password");
-      }
+      if (error) return alert("Login failed: Invalid Employee ID or Password");
 
       const { data: profile } = await supabaseClient
         .from('profiles')
@@ -921,7 +943,7 @@
 
       if (profile && profile.is_active === false) {
         await supabaseClient.auth.signOut();
-        return alert("ACCESS DENIED: Your account has been locked/disabled by an Admin. Please contact the administrator.");
+        return alert("ACCESS DENIED: Your account has been locked/disabled by an Admin.");
       }
 
       initApp();
@@ -929,53 +951,29 @@
 
     async function handleEmpIdRegister(e) {
       e.preventDefault();
-      
-      const emp_id = document.getElementById('regEmpId').value.trim().toUpperCase();
-      const emp_name = document.getElementById('regEmpName').value.trim();
-      const mobile_number = document.getElementById('regMobile').value.trim();
-      const office_name = document.getElementById('regOfficeName').value;
-      const password = document.getElementById('regPassword').value;
-      const confirmPassword = document.getElementById('regConfirmPassword').value;
+      const emp_id = $('regEmpId').value.trim().toUpperCase();
+      const emp_name = $('regEmpName').value.trim();
+      const mobile_number = $('regMobile').value.trim();
+      const office_name = $('regOfficeName').value;
+      const password = $('regPassword').value;
+      const confirmPassword = $('regConfirmPassword').value;
 
-      if (!emp_id || !emp_name || !mobile_number || !office_name || !password || !confirmPassword) {
-        return alert("Please fill in all required fields!");
-      }
-
-      if (password !== confirmPassword) {
-        return alert("Password and Confirm Password do not match!");
-      }
+      if (password !== confirmPassword) return alert("Password and Confirm Password do not match!");
 
       const shadowEmail = empIdToEmail(emp_id);
-
-      const { data: existing } = await supabaseClient
-        .from('profiles')
-        .select('emp_id')
-        .eq('emp_id', emp_id)
-        .maybeSingle();
-
-      if (existing) {
-        return alert(`Employee ID '${emp_id}' is already registered! Please log in.`);
-      }
-
       const { data, error } = await supabaseClient.auth.signUp({ 
         email: shadowEmail, 
         password: password,
         options: {
-          data: {
-            emp_id: emp_id,
-            emp_name: emp_name,
-            mobile_number: mobile_number,
-            office_name: office_name
-          }
+          data: { emp_id, emp_name, mobile_number, office_name }
         }
       });
 
-      if (error) {
-        alert("Registration failed: " + error.message);
-      } else {
-        alert(`Account created successfully for Employee ID '${emp_id}'! You can now log in.`);
+      if (error) alert("Registration failed: " + error.message);
+      else {
+        alert(`Account created successfully for Employee ID '${emp_id}'! Please log in.`);
         switchAuthTab('login');
-        document.getElementById('loginEmpId').value = emp_id;
+        $('loginEmpId').value = emp_id;
       }
     }
 
@@ -988,7 +986,6 @@
     async function initApp() {
       const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
       if (authError || !user) return;
-
       currentUser = user;
 
       let { data: profile } = await supabaseClient
@@ -997,71 +994,19 @@
         .eq('id', user.id)
         .maybeSingle();
 
-      if (!profile) {
-        const fallbackEmpId = user.user_metadata?.emp_id || `EMP-${user.id.substring(0, 5)}`.toUpperCase();
-        const fallbackName = user.user_metadata?.emp_name || "Employee";
-        const fallbackMobile = user.user_metadata?.mobile_number || user.user_metadata?.mobile_no || "";
-        const fallbackOffice = user.user_metadata?.office_name || "Head Office";
-
-        const { data: newProfile, error: insertError } = await supabaseClient
-          .from('profiles')
-          .insert([{
-            id: user.id,
-            emp_id: fallbackEmpId,
-            emp_name: fallbackName,
-            mobile_number: fallbackMobile,
-            office_name: fallbackOffice,
-            role: 'user',
-            is_active: true
-          }])
-          .select()
-          .single();
-
-        if (insertError) {
-          alert("Could not load user profile. Please try logging in again.");
-          return;
-        }
-        profile = newProfile;
-      }
-
-      if (profile.is_active === false) {
-        await supabaseClient.auth.signOut();
-        return alert("ACCESS DENIED: Your account has been locked/disabled by an Admin.");
-      }
-
-      const metaMobile = user.user_metadata?.mobile_number || user.user_metadata?.mobile_no;
-      if (metaMobile && (!profile.mobile_number || profile.mobile_number.trim() === '')) {
-        const { data: updatedProfile } = await supabaseClient
-          .from('profiles')
-          .update({ mobile_number: metaMobile })
-          .eq('id', user.id)
-          .select()
-          .single();
-        if (updatedProfile) profile = updatedProfile;
-      }
-
+      if (!profile) return;
       userProfile = profile;
 
-      document.getElementById('authSection').classList.add('hidden');
-      document.getElementById('navbar').classList.remove('hidden');
-      document.getElementById('mainDashboard').classList.remove('hidden');
-      document.getElementById('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${profile.role.toUpperCase()})`;
+      $('authSection').classList.add('hidden');
+      $('navbar').classList.remove('hidden');
+      $('mainDashboard').classList.remove('hidden');
+      $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${profile.role.toUpperCase()})`;
 
       const isAdmin = profile.role === 'admin' || profile.role === 'superadmin';
+      if (isAdmin) $('adminTabBtn').classList.remove('hidden');
 
-      if (!isAdmin && (!profile.mobile_number || profile.mobile_number.trim() === '')) {
-        document.getElementById('mobilePromptModal').classList.remove('hidden');
-      } else {
-        document.getElementById('mobilePromptModal').classList.add('hidden');
-      }
-
-      const mobileInput = document.getElementById('claimUserMobile');
-      mobileInput.value = profile.mobile_number || "";
-
-      if (isAdmin) {
-        document.getElementById('adminTabBtn').classList.remove('hidden');
-        loadAllUsers();
-      }
+      const mobileInput = $('claimUserMobile');
+      if (mobileInput) mobileInput.value = profile.mobile_number || "";
 
       showTab(currentActiveTab);
 
@@ -1070,29 +1015,6 @@
         generateMISReport();
         subscribeRealtimeClaims();
         isAppInitialized = true;
-      }
-    }
-
-    async function submitMandatoryMobile() {
-      const mobileVal = document.getElementById('promptMobileNo').value.trim();
-      const mobileRegex = /^[0-9]{10}$/;
-
-      if (!mobileRegex.test(mobileVal)) {
-        return alert("Please enter a valid 10-digit mobile number!");
-      }
-
-      const { error } = await supabaseClient
-        .from('profiles')
-        .update({ mobile_number: mobileVal })
-        .eq('id', currentUser.id);
-
-      if (error) {
-        alert("Failed to update mobile number: " + error.message);
-      } else {
-        alert("Mobile number saved successfully!");
-        userProfile.mobile_number = mobileVal;
-        document.getElementById('claimUserMobile').value = mobileVal;
-        document.getElementById('mobilePromptModal').classList.add('hidden');
       }
     }
 
@@ -1105,32 +1027,28 @@
         el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer";
       });
 
-      if (tabId === 'track') {
-        document.getElementById('trackView').classList.remove('hidden');
-        document.getElementById('tabBtnTrack').className = "tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer";
-      }
-      if (tabId === 'registerClaim') {
-        document.getElementById('registerClaimView').classList.remove('hidden');
-        document.getElementById('tabBtnRegister').className = "tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer";
-      }
-      if (tabId === 'adminRoleMgmt') {
-        document.getElementById('adminRoleMgmtView').classList.remove('hidden');
-        document.getElementById('adminTabBtn').className = "tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer";
-      }
-      if (tabId === 'reports') {
-        document.getElementById('reportsView').classList.remove('hidden');
-        document.getElementById('tabBtnReports').className = "tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer";
+      const map = {
+        'track': ['trackView', 'tabBtnTrack'],
+        'registerClaim': ['registerClaimView', 'tabBtnRegister'],
+        'converterTab': ['converterTabView', 'tabBtnConverter'],
+        'adminRoleMgmt': ['adminRoleMgmtView', 'adminTabBtn'],
+        'reports': ['reportsView', 'tabBtnReports']
+      };
+
+      if (map[tabId]) {
+        $(map[tabId][0]).classList.remove('hidden');
+        $(map[tabId][1]).className = "tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer";
       }
     }
 
+    // CLAIM SUBMISSION WITH AUTO-CONVERTED LIGHT THEME SUPPORT
     async function submitClaim(e) {
       e.preventDefault();
-      const fileInput = document.getElementById('claimFile').files[0];
-      const txn_id_ref = document.getElementById('claimTxnId').value.trim();
-      const raised_office = document.getElementById('claimOffice').value;
-      const user_mobile = document.getElementById('claimUserMobile').value.trim();
+      const fileInput = $('claimFile').files[0];
+      const txn_id_ref = $('claimTxnId').value.trim();
+      const raised_office = $('claimOffice').value;
+      const user_mobile = $('claimUserMobile').value.trim();
 
-      if (!user_mobile) return alert("Mobile number is mandatory!");
       if (!fileInput && !userPastedImageBlob) return alert("Please attach a document or paste a screenshot!");
 
       const { data: existingClaim } = await supabaseClient
@@ -1140,51 +1058,52 @@
         .maybeSingle();
 
       if (existingClaim) {
-        return alert(`Request ID '${txn_id_ref}' already exists with office name: '${existingClaim.raised_for_office}'`);
+        return alert(`Request ID '${txn_id_ref}' already exists with office: '${existingClaim.raised_for_office}'`);
       }
 
       let publicUrl = null;
+      let uploadBlob = userPastedImageBlob;
 
-      if (userPastedImageBlob) {
-        const filePath = `claims/snip-${txn_id_ref}-${Date.now()}.png`;
-        const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, userPastedImageBlob, { contentType: 'image/png' });
-        if (uploadError) return alert("Clipboard image upload failed: " + uploadError.message);
-        publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-      } else if (fileInput) {
-        const fileExt = fileInput.name.split('.').pop();
-        const filePath = `claims/${txn_id_ref}-${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, fileInput);
-        if (uploadError) return alert("File upload failed: " + uploadError.message);
-        publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+      // If user uploaded a raw file and auto-convert is checked
+      if (!uploadBlob && fileInput) {
+        if ($('autoConvertDark')?.checked && fileInput.type.startsWith('image/')) {
+          uploadBlob = await convertBlobDarkToLight(fileInput);
+        } else {
+          uploadBlob = fileInput;
+        }
       }
+
+      const fileExt = (uploadBlob instanceof Blob && !fileInput) ? 'png' : fileInput.name.split('.').pop();
+      const filePath = `claims/${txn_id_ref}-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, uploadBlob, { upsert: true });
+      if (uploadError) return alert("File upload failed: " + uploadError.message);
+
+      publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
 
       const { error } = await supabaseClient.from('claims').insert([{
         txn_id_ref,
         raised_for_office: raised_office,
-        module: document.getElementById('claimModule').value,
-        article_number: document.getElementById('claimArticleNo').value,
-        rrn_number: document.getElementById('claimRrn').value,
-        txn_date: document.getElementById('claimTxnDate').value,
-        txn_amount: document.getElementById('claimAmount').value,
-        payment_channel: document.getElementById('claimChannel').value,
-        remarks_by_user: document.getElementById('claimUserRemarks').value,
+        module: $('claimModule').value,
+        article_number: $('claimArticleNo').value,
+        rrn_number: $('claimRrn').value,
+        txn_date: $('claimTxnDate').value,
+        txn_amount: $('claimAmount').value,
+        payment_channel: $('claimChannel').value,
+        remarks_by_user: $('claimUserRemarks').value,
         user_mobile: user_mobile,
         file_url: publicUrl,
         created_by: currentUser.id
       }]);
 
       if (error) {
-        if (error.code === '23505' || error.message.includes('claims_txn_id_ref_key')) {
-          alert(`Request ID '${txn_id_ref}' already exists with office name: '${raised_office}'`);
-        } else {
-          alert("Error submitting claim: " + error.message);
-        }
+        alert("Error submitting claim: " + error.message);
       } else {
-        alert("Claim registered successfully!");
+        alert("Claim registered successfully with ink-saving light document!");
         e.target.reset();
         clearUserPastedImage();
         isRrnManuallyEdited = false;
-        document.getElementById('claimUserMobile').value = userProfile.mobile_number || user_mobile;
+        $('claimUserMobile').value = userProfile.mobile_number || user_mobile;
         showTab('track');
         loadClaimsSummary();
       }
@@ -1192,89 +1111,21 @@
 
     async function deleteClaim(claimId, txnId) {
       if (!confirm(`Are you sure you want to delete Request ID '${txnId}'?`)) return;
-
       const { error } = await supabaseClient.from('claims').delete().eq('id', claimId);
-      if (error) {
-        alert("Failed to delete claim: " + error.message);
-      } else {
+      if (error) alert("Failed to delete claim: " + error.message);
+      else {
         alert("Request ID deleted successfully!");
         loadClaimsSummary();
         generateMISReport();
       }
     }
 
-    function openUserEditModal(claimId) {
-      const claim = rawClaimsList.find(c => c.id === claimId);
-      if (!claim) return alert("Claim details not found!");
-
-      document.getElementById('editClaimId').value = claim.id;
-      document.getElementById('editClaimOffice').value = claim.raised_for_office;
-      document.getElementById('editClaimModule').value = claim.module;
-      document.getElementById('editClaimArticleNo').value = claim.article_number;
-      document.getElementById('editClaimRrn').value = claim.rrn_number;
-      document.getElementById('editClaimTxnDate').value = claim.txn_date;
-      document.getElementById('editClaimAmount').value = claim.txn_amount;
-      document.getElementById('editClaimChannel').value = claim.payment_channel;
-      document.getElementById('editClaimMobile').value = claim.user_mobile || '';
-      document.getElementById('editClaimRemarks').value = claim.remarks_by_user;
-      document.getElementById('editClaimFile').value = '';
-
-      document.getElementById('userEditModal').classList.remove('hidden');
-    }
-
-    function closeUserEditModal() {
-      document.getElementById('userEditModal').classList.add('hidden');
-    }
-
-    async function submitUserClaimEdit(e) {
-      e.preventDefault();
-      const claimId = document.getElementById('editClaimId').value;
-      const fileInput = document.getElementById('editClaimFile').files[0];
-
-      let publicUrl = null;
-
-      if (fileInput) {
-        const fileExt = fileInput.name.split('.').pop();
-        const filePath = `claims/edited-${claimId}-${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, fileInput);
-
-        if (uploadError) return alert("File upload failed: " + uploadError.message);
-        publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-      }
-
-      const updateData = {
-        raised_for_office: document.getElementById('editClaimOffice').value,
-        module: document.getElementById('editClaimModule').value,
-        article_number: document.getElementById('editClaimArticleNo').value,
-        rrn_number: document.getElementById('editClaimRrn').value,
-        txn_date: document.getElementById('editClaimTxnDate').value,
-        txn_amount: document.getElementById('editClaimAmount').value,
-        payment_channel: document.getElementById('editClaimChannel').value,
-        user_mobile: document.getElementById('editClaimMobile').value.trim(),
-        remarks_by_user: document.getElementById('editClaimRemarks').value
-      };
-
-      if (publicUrl) updateData.file_url = publicUrl;
-
-      const { error } = await supabaseClient.from('claims').update(updateData).eq('id', claimId);
-
-      if (error) {
-        alert("Failed to update claim: " + error.message);
-      } else {
-        alert("Claim request updated successfully!");
-        closeUserEditModal();
-        loadClaimsSummary();
-        generateMISReport();
-      }
-    }
-
-    // INSTANT SEARCH & FILTER COMBINED
     function applyOverviewFilters() {
-      const query = (document.getElementById('overviewInstantSearch')?.value || '').trim().toLowerCase();
-      const selectedModule = document.getElementById('overviewFilterModule')?.value;
-      const office = document.getElementById('overviewFilterOffice')?.value;
-      const selectedUser = document.getElementById('overviewFilterEmpUser')?.value;
-      const status = document.getElementById('overviewFilterStatus')?.value;
+      const query = ($('overviewInstantSearch')?.value || '').trim().toLowerCase();
+      const selectedModule = $('overviewFilterModule')?.value;
+      const office = $('overviewFilterOffice')?.value;
+      const selectedUser = $('overviewFilterEmpUser')?.value;
+      const status = $('overviewFilterStatus')?.value;
 
       currentClaimsList = rawClaimsList.filter(c => {
         if (query) {
@@ -1296,46 +1147,41 @@
     }
 
     function resetOverviewFilters() {
-      if (document.getElementById('overviewInstantSearch')) document.getElementById('overviewInstantSearch').value = '';
-      if (document.getElementById('overviewFilterModule')) document.getElementById('overviewFilterModule').value = '';
-      if (document.getElementById('overviewFilterOffice')) document.getElementById('overviewFilterOffice').value = '';
-      if (document.getElementById('overviewFilterEmpUser')) document.getElementById('overviewFilterEmpUser').value = '';
-      if (document.getElementById('overviewFilterStatus')) document.getElementById('overviewFilterStatus').value = '';
+      if ($('overviewInstantSearch')) $('overviewInstantSearch').value = '';
+      if ($('overviewFilterModule')) $('overviewFilterModule').value = '';
+      if ($('overviewFilterOffice')) $('overviewFilterOffice').value = '';
+      if ($('overviewFilterEmpUser')) $('overviewFilterEmpUser').value = '';
+      if ($('overviewFilterStatus')) $('overviewFilterStatus').value = '';
       currentClaimsList = [...rawClaimsList];
       renderClaimsSummaryTable();
     }
 
     function sortTable(col) {
-      if (currentSortCol === col) {
-        currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentSortCol = col;
-        currentSortDir = 'asc';
-      }
+      currentSortDir = (currentSortCol === col && currentSortDir === 'asc') ? 'desc' : 'asc';
+      currentSortCol = col;
       renderClaimsSummaryTable();
     }
 
-    // RENDER SUMMARY TABLE (WITH 2x2 SQUARE ACTION BUTTONS)
+    // RENDER TABLE WITH SEPARATED DATES & COMPACT 2X2 ICON ACTION SQUARES
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-      const tbody = document.getElementById('claimsTableBody');
+      const tbody = $('claimsTableBody');
       tbody.innerHTML = '';
 
-      ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'created_at', 'txn_date', 'txn_amount', 'claim_status'].forEach(c => {
-        const iconEl = document.getElementById('sort_' + c);
+      ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'txn_date', 'created_at', 'txn_amount', 'claim_status'].forEach(c => {
+        const iconEl = $('sort_' + c);
         if (iconEl) iconEl.innerText = '⇅';
       });
-      const activeIcon = document.getElementById('sort_' + currentSortCol);
+      const activeIcon = $('sort_' + currentSortCol);
       if (activeIcon) activeIcon.innerText = currentSortDir === 'asc' ? '▲' : '▼';
 
       if (!currentClaimsList || currentClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
         return;
       }
 
       currentClaimsList.sort((a, b) => {
         let valA, valB;
-
         if (currentSortCol === 'emp_name') {
           valA = (a.profiles?.emp_name || '').toLowerCase();
           valB = (b.profiles?.emp_name || '').toLowerCase();
@@ -1346,7 +1192,6 @@
           valA = (a[currentSortCol] || '').toString().toLowerCase();
           valB = (b[currentSortCol] || '').toString().toLowerCase();
         }
-
         if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
         if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
         return 0;
@@ -1359,69 +1204,68 @@
         const isOwner = c.created_by === currentUser?.id;
 
         let adminReplyHtml = c.reply_remarks_admin 
-          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-2.5 rounded text-xs font-medium whitespace-normal break-words leading-relaxed">${c.reply_remarks_admin}</div>`
+          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-2 rounded text-xs font-medium whitespace-normal break-words leading-relaxed">${c.reply_remarks_admin}</div>`
           : `<span class="text-slate-400 italic text-xs">Pending Response</span>`;
 
         if (c.admin_file_url) {
-          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-2xs mt-2 transition whitespace-nowrap">📎 Admin Attached File</a>`;
+          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[10px] font-bold shadow-2xs mt-1 transition whitespace-nowrap">📎 Admin Doc</a>`;
         }
 
         tbody.innerHTML += `
-          <tr class="hover:bg-amber-50/40 transition align-top">
-            <!-- 1. REF NO & MODULE STACKED -->
-            <td class="p-3.5 whitespace-nowrap">
+          <tr class="hover:bg-amber-50/40 transition align-middle">
+            <!-- 1. REF NO & MODULE -->
+            <td class="p-3 whitespace-nowrap">
               <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-sm block">
                 ${c.txn_id_ref}
               </button>
-              <span class="inline-block bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-xs mt-1 border border-slate-200">${c.module}</span>
+              <span class="inline-block bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-[11px] mt-0.5 border border-slate-200">${c.module}</span>
             </td>
-            <!-- 2. EMP NAME/ID & OFFICE STACKED -->
-            <td class="p-3.5 whitespace-nowrap">
+            <!-- 2. EMP NAME/ID & OFFICE -->
+            <td class="p-3 whitespace-nowrap">
               <div class="font-bold text-slate-800">${empNameOnly} <span class="text-xs text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
-              <div class="text-xs text-slate-600 font-medium mt-0.5">${c.raised_for_office}</div>
+              <div class="text-xs text-slate-600 font-medium">${c.raised_for_office}</div>
             </td>
-            <!-- 3. TXN DATE & ENTRY TIME STACKED -->
-            <td class="p-3.5 whitespace-nowrap text-xs">
-              <div class="font-bold text-slate-800">${c.txn_date}</div>
-              <div class="text-slate-500 text-[11px] mt-0.5">${entryDateTime}</div>
-            </td>
-            <!-- 4. AMOUNT -->
-            <td class="p-3.5 font-bold text-slate-900 whitespace-nowrap text-sm">₹${c.txn_amount}</td>
-            <!-- 5. STATUS -->
-            <td class="p-3.5 whitespace-nowrap">
-              <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
+            <!-- 3. TXN DATE (SEPARATE) -->
+            <td class="p-3 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
+            <!-- 4. ENTRY DATE/TIME (SEPARATE) -->
+            <td class="p-3 whitespace-nowrap text-xs text-slate-600 font-medium">${entryDateTime}</td>
+            <!-- 5. AMOUNT -->
+            <td class="p-3 font-bold text-slate-900 whitespace-nowrap text-sm">₹${c.txn_amount}</td>
+            <!-- 6. STATUS -->
+            <td class="p-3 whitespace-nowrap">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
               </span>
             </td>
-            <!-- 6. FULL ADMIN REPLY -->
-            <td class="p-3.5 min-w-[240px]">${adminReplyHtml}</td>
+            <!-- 7. ADMIN REMARKS -->
+            <td class="p-3 min-w-[220px]">${adminReplyHtml}</td>
             
-            <!-- 7. ACTIONS (2x2 SQUARE GRID) -->
-            <td class="p-3.5 text-center whitespace-nowrap min-w-[170px]">
-              <div class="grid grid-cols-2 gap-1.5 w-[160px] mx-auto">
-                <!-- Row 1: Reply / Edit & Delete -->
+            <!-- 8. COMPACT ICON-ONLY 2x2 ACTION SQUARE -->
+            <td class="p-3 text-center whitespace-nowrap min-w-[110px]">
+              <div class="grid grid-cols-2 gap-1 w-[88px] mx-auto">
+                <!-- Row 1: Reply & Delete -->
                 ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}')" class="flex items-center justify-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
-                    ✏️ Reply
+                  <button type="button" title="Reply / Update Claim" onclick="openReplyModal('${c.id}')" class="h-8 w-10 flex items-center justify-center bg-postRed-600 hover:bg-postRed-700 text-white rounded text-sm shadow-xs transition cursor-pointer">
+                    ✏️
                   </button>
-                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="flex items-center justify-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
-                    🗑️ Delete
+                  <button type="button" title="Delete Claim" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="h-8 w-10 flex items-center justify-center bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 rounded text-sm shadow-xs transition cursor-pointer">
+                    🗑️
                   </button>
                 ` : `
                   ${isOwner ? `
-                    <button type="button" onclick="openUserEditModal('${c.id}')" class="flex items-center justify-center gap-1 bg-postGold-500 hover:bg-postGold-600 text-postRed-900 py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
-                      ✏️ Edit
+                    <button type="button" title="Edit Claim" onclick="openUserEditModal('${c.id}')" class="h-8 w-10 flex items-center justify-center bg-postGold-500 hover:bg-postGold-600 text-postRed-900 rounded text-sm shadow-xs transition cursor-pointer">
+                      ✏️
                     </button>
-                  ` : `<div class="py-1.5"></div>`}
-                  <div class="py-1.5"></div>
+                  ` : `<div class="h-8 w-10"></div>`}
+                  <div class="h-8 w-10"></div>
                 `}
 
-                <!-- Row 2: View Doc & Print -->
-                <a href="${c.file_url}" target="_blank" class="flex items-center justify-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white py-1.5 rounded text-xs font-bold shadow-xs transition">
-                  📄 Doc
+                <!-- Row 2: View Document & Print Docket -->
+                <a href="${c.file_url}" target="_blank" title="View Uploaded Document" class="h-8 w-10 flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white rounded text-sm shadow-xs transition">
+                  📄
                 </a>
-                <button type="button" onclick="printClaimDetails('${c.id}')" class="flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-900 text-white py-1.5 rounded text-xs font-bold shadow-xs transition cursor-pointer">
-                  🖨️ Print
+                <button type="button" title="Print Complete Docket" onclick="printClaimDetails('${c.id}')" class="h-8 w-10 flex items-center justify-center bg-slate-800 hover:bg-slate-900 text-white rounded text-sm shadow-xs transition cursor-pointer">
+                  🖨️
                 </button>
               </div>
             </td>
@@ -1432,15 +1276,10 @@
 
     async function loadClaimsSummary() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-
-      let query = supabaseClient
-        .from('claims')
-        .select('*, profiles:created_by(emp_id, emp_name)')
-        .order('created_at', { ascending: false });
+      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)').order('created_at', { ascending: false });
 
       if (!isAdmin) {
-        const userOffice = userProfile.office_name;
-        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userOffice}"`);
+        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
       }
 
       const { data: claims, error } = await query;
@@ -1457,11 +1296,10 @@
       const creatorEmpName = claim.profiles?.emp_name || 'N/A';
       const entryDateTime = formatDateTime(claim.created_at);
 
-      const container = document.getElementById('detailsModalContent');
-      container.innerHTML = `
+      $('detailsModalContent').innerHTML = `
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Created By Employee:</strong> <span class="font-bold text-slate-800">${creatorEmpName} (${creatorEmpId})</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Date & Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
+        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Date &amp; Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium">${claim.user_mobile || 'N/A'}</span></div>
         <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium text-postRed-700 font-bold">${claim.module}</span></div>
@@ -1495,19 +1333,14 @@
         </div>
       `;
 
-      const printBtn = document.getElementById('modalPrintBtn');
-      if (printBtn) {
-        printBtn.onclick = () => printClaimDetails(claim.id);
-      }
-
-      document.getElementById('detailsModal').classList.remove('hidden');
+      const printBtn = $('modalPrintBtn');
+      if (printBtn) printBtn.onclick = () => printClaimDetails(claim.id);
+      $('detailsModal').classList.remove('hidden');
     }
 
-    function closeDetailsModal() {
-      document.getElementById('detailsModal').classList.add('hidden');
-    }
+    function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
 
-    // PRINT COMPLETE CLAIM DOCKET WITH END OF DOCUMENT LINE
+    // PRINT COMPLETE DOCKET WITH ASYMMETRIC DOCUMENT PREVIEW
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -1516,13 +1349,11 @@
       const creatorEmpName = claim.profiles?.emp_name || 'N/A';
       const entryDateTime = formatDateTime(claim.created_at);
 
-      const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/snip-'));
-      const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('admin-replies/snip-'));
+      const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
+      const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('admin-replies/'));
 
       const printWindow = window.open('', '_blank', 'width=950,height=850');
-      if (!printWindow) {
-        return alert("Popup blocked! Please allow popups for this site to print.");
-      }
+      if (!printWindow) return alert("Popup blocked! Please allow popups for this site to print.");
 
       const printHtml = `
         <!DOCTYPE html>
@@ -1550,7 +1381,6 @@
             .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; background: #fafaf9; margin-bottom: 6px; font-size: 11px; min-height: 26px; white-space: pre-wrap; word-break: break-word; }
             .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
             
-            /* ASYMMETRIC GRID: Left reduced by 25% (37%), Right expanded (61%) */
             .attachments-grid { display: flex; gap: 10px; margin-top: 6px; justify-content: space-between; align-items: flex-start; }
             .attachment-col-left { flex: 0 0 37%; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
             .attachment-col-right { flex: 0 0 61%; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
@@ -1559,7 +1389,6 @@
             .attachment-preview { max-width: 100%; max-height: 320px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
             .attachment-link { font-size: 10.5px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
             
-            /* END OF DOCUMENT LINE */
             .end-of-doc {
               margin-top: 20px;
               padding-top: 10px;
@@ -1658,7 +1487,7 @@
 
           <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
           <div class="attachments-grid">
-            <!-- Left Side: User Attachment Column (Reduced by 25%) -->
+            <!-- Left Side: User Document (37% width) -->
             <div class="attachment-col-left">
               <strong>Applicant Submitted Document:</strong>
               ${isUserImage 
@@ -1667,7 +1496,7 @@
               }
             </div>
 
-            <!-- Right Side: Admin Attachment Column (Expanded for Landscape) -->
+            <!-- Right Side: Admin Document (61% width for landscape) -->
             <div class="attachment-col-right" style="${!claim.admin_file_url ? 'background:#f8fafc; color:#94a3b8;' : ''}">
               <strong style="color: #991b1b;">Admin Attached Resolution / Landscape Document:</strong>
               ${claim.admin_file_url 
@@ -1679,7 +1508,6 @@
             </div>
           </div>
 
-          <!-- END OF DOCUMENT LINE -->
           <div class="end-of-doc">
             *** END OF DOCUMENT ***
           </div>
@@ -1700,53 +1528,39 @@
       printWindow.document.close();
     }
 
-    // OPEN REPLY MODAL (PULLS FRESH CLAIM DATA VIA ID)
     function openReplyModal(claimId) {
       const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
-      if (!claim) {
-        return alert("Error: Claim record not found in current memory list.");
-      }
+      if (!claim) return alert("Claim record not found in memory.");
 
-      document.getElementById('modalClaimId').value = claim.id;
-      document.getElementById('modalStatus').value = claim.claim_status || 'Pending';
-      
-      const moduleSelect = document.getElementById('modalModule');
-      if (moduleSelect) {
-        moduleSelect.value = claim.module || 'Booking';
-      }
-
-      document.getElementById('modalAdminRemarks').value = claim.reply_remarks_admin || '';
-      
-      const fileInput = document.getElementById('modalAdminFile');
-      if (fileInput) fileInput.value = '';
+      $('modalClaimId').value = claim.id;
+      $('modalStatus').value = claim.claim_status || 'Pending';
+      $('modalModule').value = claim.module || 'Booking';
+      $('modalAdminRemarks').value = claim.reply_remarks_admin || '';
+      $('modalAdminFile').value = '';
       
       clearAdminPastedImage();
-      
-      const modal = document.getElementById('replyModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-      }
+      $('replyModal').classList.remove('hidden');
     }
 
     function closeModal() {
-      const modal = document.getElementById('replyModal');
-      if (modal) {
-        modal.classList.add('hidden');
-      }
+      $('replyModal').classList.add('hidden');
       clearAdminPastedImage();
     }
 
-    // SAVE ADMIN REPLY WITH VALIDATION AND ROW CHECK
+    // ROBUST ADMIN REPLY SUBMISSION
     async function submitAdminReply() {
-      const id = document.getElementById('modalClaimId').value;
-      const status = document.getElementById('modalStatus').value;
-      const moduleEl = document.getElementById('modalModule');
-      const moduleVal = moduleEl ? moduleEl.value : null;
-      const reply_remarks_admin = (document.getElementById('modalAdminRemarks').value || '').trim();
-      const adminFileInput = document.getElementById('modalAdminFile')?.files[0];
+      const id = $('modalClaimId').value;
+      const status = $('modalStatus').value;
+      const moduleVal = $('modalModule').value;
+      const reply_remarks_admin = ($('modalAdminRemarks').value || '').trim();
+      const adminFileInput = $('modalAdminFile')?.files[0];
 
-      if (!id) {
-        return alert("Error: Claim ID is missing. Please close and re-open the modal.");
+      if (!id) return alert("Error: Claim ID is missing.");
+
+      const saveBtn = $('btnAdminSave');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerText = "Saving...";
       }
 
       let admin_file_url = null;
@@ -1756,51 +1570,39 @@
           const filePath = `admin-replies/snip-${id}-${Date.now()}.png`;
           const { error: uploadErr } = await supabaseClient.storage
             .from('claim-attachments')
-            .upload(filePath, adminPastedImageBlob, { contentType: 'image/png' });
+            .upload(filePath, adminPastedImageBlob, { contentType: 'image/png', upsert: true });
 
-          if (uploadErr) {
-            return alert("Failed to upload screenshot: " + uploadErr.message);
+          if (!uploadErr) {
+            admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
           }
-          admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
         } else if (adminFileInput) {
           const fileExt = adminFileInput.name.split('.').pop();
           const filePath = `admin-replies/${id}-${Date.now()}.${fileExt}`;
           const { error: uploadErr } = await supabaseClient.storage
             .from('claim-attachments')
-            .upload(filePath, adminFileInput);
+            .upload(filePath, adminFileInput, { upsert: true });
 
-          if (uploadErr) {
-            return alert("Failed to upload document: " + uploadErr.message);
+          if (!uploadErr) {
+            admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
           }
-          admin_file_url = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
         }
 
         const updateData = {
           claim_status: status,
+          module: moduleVal,
           reply_remarks_admin: reply_remarks_admin
         };
 
-        if (moduleVal) {
-          updateData.module = moduleVal;
-        }
+        if (admin_file_url) updateData.admin_file_url = admin_file_url;
 
-        if (admin_file_url) {
-          updateData.admin_file_url = admin_file_url;
-        }
-
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
           .from('claims')
           .update(updateData)
-          .eq('id', id)
-          .select();
+          .eq('id', id);
 
         if (error) {
-          console.error("Database Update Error:", error);
-          return alert("Failed to save changes: " + error.message);
-        }
-
-        if (!data || data.length === 0) {
-          return alert("Notice: Update could not be applied. Please check that your user account has Admin role permissions in the database.");
+          alert("Database Error: " + error.message);
+          return;
         }
 
         alert("Claim updated successfully!");
@@ -1809,8 +1611,47 @@
         await generateMISReport(currentMISReportStatus);
 
       } catch (err) {
-        console.error("Unexpected Error:", err);
-        alert("An unexpected error occurred: " + err.message);
+        alert("Unexpected Error: " + err.message);
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerText = "Save Changes";
+        }
+      }
+    }
+
+    async function trackClaim() {
+      const refNo = $('searchRefNo').value.trim();
+      if (!refNo) return alert("Please enter a reference number");
+
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)').eq('txn_id_ref', refNo);
+
+      if (!isAdmin) {
+        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
+      }
+
+      const { data } = await query.maybeSingle();
+      const resCard = $('trackResult');
+      resCard.classList.remove('hidden');
+
+      if (data) {
+        resCard.innerHTML = `
+          <p><strong>Ref ID (Txn ID):</strong> <span class="text-postRed-700 font-bold font-mono">${data.txn_id_ref}</span></p>
+          <p><strong>Created By Employee:</strong> ${data.profiles?.emp_name || 'N/A'} (${data.profiles?.emp_id || 'N/A'})</p>
+          <p><strong>Txn Date:</strong> ${data.txn_date} | <strong>Entry Date:</strong> ${formatDateTime(data.created_at)}</p>
+          <p><strong>Module:</strong> <span class="font-bold text-postRed-700">${data.module}</span> | <strong>Office:</strong> ${data.raised_for_office}</p>
+          <p><strong>Status:</strong> <span class="font-bold px-2 py-0.5 rounded ${getStatusColor(data.claim_status)}">${data.claim_status}</span></p>
+          <p><strong>Remarks by User:</strong> ${data.remarks_by_user}</p>
+          <p><strong>Admin Remarks:</strong> ${data.reply_remarks_admin || 'Pending Response'}</p>
+          <div class="flex gap-2 pt-2 flex-wrap">
+            <a href="${data.file_url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Download User Doc</a>
+            ${data.admin_file_url ? `<a href="${data.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Download Admin File</a>` : ''}
+            <button type="button" onclick="printClaimDetails('${data.id}')" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">🖨️ Print Docket</button>
+          </div>
+        `;
+      } else {
+        resCard.innerHTML = `<p class="text-postRed-700 font-bold">No record found with Reference ID: ${refNo} under your access.</p>`;
       }
     }
 
@@ -1821,42 +1662,32 @@
         .order('created_at', { ascending: false });
 
       if (error || !users) {
-        document.getElementById('usersTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-center text-postRed-600">Failed to load users.</td></tr>`;
+        $('usersTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-center text-postRed-600">Failed to load users.</td></tr>`;
         return;
       }
-
       allLoadedUsers = users;
       renderUserAccounts(users);
     }
 
     function filterUserAccounts() {
-      const query = (document.getElementById('userInstantSearch')?.value || '').trim().toLowerCase();
-      if (!query) {
-        renderUserAccounts(allLoadedUsers);
-        return;
-      }
-      const filtered = allLoadedUsers.filter(u => 
+      const query = ($('userInstantSearch')?.value || '').trim().toLowerCase();
+      if (!query) return renderUserAccounts(allLoadedUsers);
+      renderUserAccounts(allLoadedUsers.filter(u => 
         (u.emp_id || '').toLowerCase().includes(query) ||
         (u.emp_name || '').toLowerCase().includes(query)
-      );
-      renderUserAccounts(filtered);
+      ));
     }
 
     function renderUserAccounts(users) {
-      const tbody = document.getElementById('usersTableBody');
+      const tbody = $('usersTableBody');
       tbody.innerHTML = '';
-
       if (!users || users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No user accounts found matching search.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No user accounts found.</td></tr>`;
         return;
       }
 
       users.forEach(u => {
         const isActive = u.is_active !== false;
-        const statusBadge = isActive 
-          ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Active</span>`
-          : `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800">Locked</span>`;
-
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
             <td class="p-3 font-bold font-mono">${u.emp_id}</td>
@@ -1870,12 +1701,10 @@
                 <option value="superadmin" ${u.role === 'superadmin' ? 'selected' : ''}>Superadmin</option>
               </select>
             </td>
-            <td class="p-3">${statusBadge}</td>
-            <td class="p-3 flex items-center gap-2 flex-wrap">
-              <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
-              <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
+            <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
+            <td class="p-3 flex items-center gap-2">
               <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-1 rounded text-xs font-bold cursor-pointer">
-                ${isActive ? '🔒 Lock Access' : '🔓 Unlock Access'}
+                ${isActive ? '🔒 Lock' : '🔓 Unlock'}
               </button>
             </td>
           </tr>
@@ -1884,119 +1713,21 @@
     }
 
     async function updateUserRole(userId, newRole) {
-      const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', userId);
-      if (error) alert("Role update failed: " + error.message);
-      else alert("User role updated successfully!");
+      await supabaseClient.from('profiles').update({ role: newRole }).eq('id', userId);
     }
 
     async function toggleUserLock(userId, currentActive) {
-      const actionText = currentActive ? 'LOCK and disable' : 'UNLOCK and enable';
-      if (!confirm(`Are you sure you want to ${actionText} this user account?`)) return;
-
-      const { error } = await supabaseClient
-        .from('profiles')
-        .update({ is_active: !currentActive })
-        .eq('id', userId);
-
-      if (error) {
-        alert("Failed to update status: " + error.message);
-      } else {
-        alert(`User account ${currentActive ? 'locked' : 'unlocked'} successfully!`);
-        loadAllUsers();
-      }
-    }
-
-    function openAdminUserEditModal(userId) {
-      const user = allLoadedUsers.find(u => u.id === userId);
-      if (!user) return alert("User not found!");
-
-      document.getElementById('editUserId').value = user.id;
-      document.getElementById('editUserEmpId').value = user.emp_id;
-      document.getElementById('editUserEmpName').value = user.emp_name;
-      document.getElementById('editUserMobile').value = user.mobile_number || '';
-      document.getElementById('editUserOffice').value = user.office_name;
-
-      document.getElementById('adminUserEditModal').classList.remove('hidden');
-    }
-
-    function closeAdminUserEditModal() {
-      document.getElementById('adminUserEditModal').classList.add('hidden');
-    }
-
-    async function submitAdminUserEdit(e) {
-      e.preventDefault();
-      const userId = document.getElementById('editUserId').value;
-      const emp_name = document.getElementById('editUserEmpName').value.trim();
-      const mobile_number = document.getElementById('editUserMobile').value.trim();
-      const office_name = document.getElementById('editUserOffice').value;
-
-      const { error } = await supabaseClient
-        .from('profiles')
-        .update({ emp_name, mobile_number, office_name })
-        .eq('id', userId);
-
-      if (error) {
-        alert("Failed to update user details: " + error.message);
-      } else {
-        alert("User details updated successfully!");
-        closeAdminUserEditModal();
-        loadAllUsers();
-      }
-    }
-
-    function openAdminResetPwdModal(userId) {
-      const user = allLoadedUsers.find(u => u.id === userId);
-      if (!user) return alert("User not found!");
-
-      document.getElementById('resetPwdUserId').value = user.id;
-      document.getElementById('resetPwdUserName').innerText = user.emp_name;
-      document.getElementById('resetPwdUserEmpId').innerText = user.emp_id;
-      document.getElementById('resetPwdInput').value = '';
-
-      document.getElementById('adminResetPwdModal').classList.remove('hidden');
-    }
-
-    function closeAdminResetPwdModal() {
-      document.getElementById('adminResetPwdModal').classList.add('hidden');
-    }
-
-    function generateRandomPassword() {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
-      let pwd = "";
-      for (let i = 0; i < 10; i++) {
-        pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      document.getElementById('resetPwdInput').value = pwd;
-    }
-
-    async function submitAdminPasswordReset(e) {
-      e.preventDefault();
-      const userId = document.getElementById('resetPwdUserId').value;
-      const newPassword = document.getElementById('resetPwdInput').value.trim();
-
-      if (!newPassword || newPassword.length < 6) {
-        return alert("Password must be at least 6 characters!");
-      }
-
-      const { data, error } = await supabaseClient.rpc('admin_reset_user_password', {
-        target_user_id: userId,
-        new_password: newPassword
-      });
-
-      if (error) {
-        alert("Failed to reset password: " + error.message);
-      } else {
-        alert(`Password for user updated successfully!\n\nNew Password: ${newPassword}`);
-        closeAdminResetPwdModal();
-      }
+      if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user?`)) return;
+      await supabaseClient.from('profiles').update({ is_active: !currentActive }).eq('id', userId);
+      loadAllUsers();
     }
 
     function resetMISFilters() {
-      document.getElementById('filterFromDate').value = '';
-      document.getElementById('filterToDate').value = '';
-      document.getElementById('filterModule').value = '';
-      document.getElementById('filterOfficeName').value = '';
-      document.getElementById('filterEmpUser').value = '';
+      $('filterFromDate').value = '';
+      $('filterToDate').value = '';
+      $('filterModule').value = '';
+      $('filterOfficeName').value = '';
+      $('filterEmpUser').value = '';
       generateMISReport('All');
     }
 
@@ -2005,17 +1736,13 @@
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
 
       let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
+      if (!isAdmin) query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
 
-      if (!isAdmin) {
-        const userOffice = userProfile.office_name;
-        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userOffice}"`);
-      }
-
-      const from = document.getElementById('filterFromDate').value;
-      const to = document.getElementById('filterToDate').value;
-      const selectedModule = document.getElementById('filterModule').value;
-      const selectedOffice = document.getElementById('filterOfficeName').value;
-      const selectedUser = document.getElementById('filterEmpUser').value;
+      const from = $('filterFromDate').value;
+      const to = $('filterToDate').value;
+      const selectedModule = $('filterModule').value;
+      const selectedOffice = $('filterOfficeName').value;
+      const selectedUser = $('filterEmpUser').value;
 
       if (from) query = query.gte('txn_date', from);
       if (to) query = query.lte('txn_date', to);
@@ -2026,19 +1753,16 @@
       const { data: claims } = await query;
       if (!claims) return;
 
-      document.getElementById('misTotal').innerText = claims.length;
-      document.getElementById('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
-      document.getElementById('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
-      document.getElementById('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
-      document.getElementById('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
+      $('misTotal').innerText = claims.length;
+      $('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
+      $('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
+      $('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
+      $('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
 
-      currentMISClaimsList = claims;
-      if (filterStatus !== 'All') {
-        currentMISClaimsList = claims.filter(c => c.claim_status === filterStatus);
-      }
+      currentMISClaimsList = (filterStatus === 'All') ? claims : claims.filter(c => c.claim_status === filterStatus);
 
-      document.getElementById('misReportTableTitle').innerText = `Report Summary View (${filterStatus})`;
-      const tbody = document.getElementById('misReportTableBody');
+      $('misReportTableTitle').innerText = `Report Summary View (${filterStatus})`;
+      const tbody = $('misReportTableBody');
       tbody.innerHTML = '';
 
       if (currentMISClaimsList.length === 0) {
@@ -2048,21 +1772,16 @@
 
       currentMISClaimsList.forEach(c => {
         const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
-
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
             <td class="p-3 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
             <td class="p-3 font-semibold text-slate-700 whitespace-nowrap">${creatorName}</td>
             <td class="p-3 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
             <td class="p-3 whitespace-nowrap">${c.raised_for_office}</td>
-            <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${formatDateTime(c.created_at)}</td>
             <td class="p-3 whitespace-nowrap">${c.txn_date}</td>
+            <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${formatDateTime(c.created_at)}</td>
             <td class="p-3 font-semibold whitespace-nowrap">₹${c.txn_amount}</td>
-            <td class="p-3 whitespace-nowrap">
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
-                ${c.claim_status}
-              </span>
-            </td>
+            <td class="p-3 whitespace-nowrap"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
             <td class="p-3 text-xs text-slate-600">${c.reply_remarks_admin || '-'}</td>
           </tr>
         `;
@@ -2089,73 +1808,49 @@
     loadFilterDropdowns();
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (session && !currentUser) {
-        initApp();
-      }
+      if (session && !currentUser) initApp();
     });
 
-    function buildExportFileName(ext) {
-      const from = document.getElementById('filterFromDate').value || 'ALL';
-      const to = document.getElementById('filterToDate').value || 'ALL';
-      const status = currentMISReportStatus || 'All';
-      const timestamp = getFormattedTimestamp();
-      return `Report Summary View (${status})_${from}_to_${to}_${timestamp}.${ext}`;
-    }
-
     async function exportMISExcel() {
-      if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
-        return alert("No claim data currently visible to export!");
-      }
-
+      if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const formattedData = currentMISClaimsList.map(c => ({
         "Ref No (Txn ID)": c.txn_id_ref,
         "Emp Name": c.profiles?.emp_name || "N/A",
         "Emp ID": c.profiles?.emp_id || "N/A",
         "Module": c.module,
-        "Entry Date/Time": formatDateTime(c.created_at),
         "Office Name": c.raised_for_office,
-        "Article No": c.article_number,
-        "RRN": c.rrn_number,
         "Txn Date": c.txn_date,
+        "Entry Date/Time": formatDateTime(c.created_at),
         "Amount (INR)": c.txn_amount,
-        "Payment Channel": c.payment_channel,
         "Status": c.claim_status,
-        "User Remarks": c.remarks_by_user,
-        "Admin Remarks": c.reply_remarks_admin || "N/A"
+        "Remarks": c.reply_remarks_admin || "N/A"
       }));
-
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, `Report_${currentMISReportStatus}`);
-
-      const fileName = buildExportFileName('xlsx');
-      XLSX.writeFile(workbook, fileName);
+      XLSX.writeFile(workbook, `Report_${currentMISReportStatus}_${getFormattedTimestamp()}.xlsx`);
     }
 
     async function exportMISPDF() {
-      if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
-        return alert("No claim data currently visible to export!");
-      }
-
+      if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
 
       doc.setFontSize(14);
       doc.setTextColor(168, 15, 40);
-      doc.text(`Report Summary View (${currentMISReportStatus}) - Chennai City Central Division`, 14, 15);
+      doc.text(`Refund Claims Report (${currentMISReportStatus}) - Chennai City Central`, 14, 15);
       doc.setFontSize(9);
       doc.setTextColor(51, 51, 51);
-      /* Official header comment: Department of Posts */
       doc.text(`Generated on: ${new Date().toLocaleString()} | Visible Records: ${currentMISClaimsList.length}`, 14, 22);
 
-      const headers = [["Ref No", "Emp Name", "Module", "Entry Date/Time", "Office", "Txn Date", "Amount (Rs)", "Status", "Admin Remarks"]];
+      const headers = [["Ref No", "Emp Name", "Module", "Office", "Txn Date", "Entry Date", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map(c => [
         c.txn_id_ref,
         c.profiles?.emp_name || "N/A",
         c.module,
-        formatDateTime(c.created_at),
         c.raised_for_office,
         c.txn_date,
+        formatDateTime(c.created_at),
         `Rs. ${c.txn_amount}`,
         c.claim_status,
         c.reply_remarks_admin || "-"
@@ -2164,14 +1859,12 @@
       doc.autoTable({
         head: headers,
         body: rows,
-        startY: 28,
+        startY: 26,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
         styles: { fontSize: 8, cellPadding: 2 }
       });
-
-      const fileName = buildExportFileName('pdf');
-      doc.save(fileName);
+      doc.save(`Report_${currentMISReportStatus}_${getFormattedTimestamp()}.pdf`);
     }
   </script>
 </body>
