@@ -128,7 +128,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW (SEPARATED TXN & ENTRY DATES + COMPACT ICON ACTIONS) -->
+        <!-- TAB 1: TRACK CLAIM VIEW -->
         <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
           <div>
             <div class="border-b pb-3 border-amber-200">
@@ -213,7 +213,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: CLAIM REGISTRATION FORM (WITH AUTO CONVERT CHECKBOX) -->
+        <!-- TAB 2: CLAIM REGISTRATION FORM -->
         <div id="registerClaimView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200">
           <div class="border-b pb-3 mb-4 border-amber-200">
             <h3 class="text-lg font-bold text-postRed-700">New Claim Registration Form</h3>
@@ -268,14 +268,14 @@
               <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks for claim..."></textarea>
             </div>
 
-            <!-- FILE ATTACHMENT, CLIPBOARD & DARK-TO-LIGHT CONVERSION CHECKBOX -->
+            <!-- FILE ATTACHMENT, CLIPBOARD & SMART DARK-TO-LIGHT CONVERSION -->
             <div class="md:col-span-2 space-y-3 border-t pt-3 border-amber-200">
               <div class="flex items-center justify-between flex-wrap gap-2">
                 <label class="block text-xs font-bold text-slate-700">Document Attachment (File or Screenshot) *</label>
                 <!-- AUTO CONVERT CHECKBOX -->
                 <label class="inline-flex items-center gap-1.5 text-xs font-bold text-postRed-800 bg-amber-100/70 border border-amber-300 px-2.5 py-1 rounded cursor-pointer">
                   <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
-                  <span>☀️ Convert Dark Screenshot $\rightarrow$ Light (Saves Print Ink)</span>
+                  <span>☀️ Auto-Convert Dark Screenshot $\rightarrow$ Light (Saves Print Ink)</span>
                 </label>
               </div>
 
@@ -316,7 +316,7 @@
           <div class="border-b pb-3 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
               <h3 class="text-lg font-bold text-postRed-700">☀️ Dark $\rightarrow$ Light Screenshot Theme Converter</h3>
-              <p class="text-xs text-slate-500">Inverts dark backgrounds to pure ink-saving white while keeping texts & colors legible</p>
+              <p class="text-xs text-slate-500">Auto-detects dark backgrounds and converts them to crisp ink-saving white while preserving light screenshots untouched</p>
             </div>
             <div class="flex gap-2">
               <button type="button" onclick="$('converterFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">📂 Select Image</button>
@@ -327,9 +327,9 @@
 
           <!-- Interactive Previews Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Left: Original Dark -->
+            <!-- Left: Original Image -->
             <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[300px] relative">
-              <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original (Dark)</span>
+              <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original Source</span>
               <img id="converterOriginalImg" class="max-h-[320px] max-w-full object-contain hidden" alt="Original">
               <div id="converterDropNotice" class="text-center text-slate-400 text-xs">
                 <p class="text-2xl mb-1">🖼️</p>
@@ -337,25 +337,26 @@
               </div>
             </div>
 
-            <!-- Right: Converted Light -->
+            <!-- Right: Converted Light / Untouched Result -->
             <div class="border border-slate-300 rounded-lg p-3 bg-slate-50 flex flex-col items-center justify-center min-h-[300px] relative">
-              <span class="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Converted (Light)</span>
+              <span id="converterResultBadge" class="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Processed Result</span>
               <img id="converterResultImg" class="max-h-[320px] max-w-full object-contain hidden" alt="Converted Light">
               <p id="converterEmptyNotice" class="text-slate-400 text-xs">Converted light image will appear here</p>
             </div>
           </div>
 
-          <!-- Controls -->
+          <!-- Controls & Detection Status -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200 text-xs">
             <div>
-              <label class="font-bold text-slate-700 block mb-1">Light Background Whiteness: <span id="valLightness" class="text-postRed-700 font-bold">96%</span></label>
+              <label class="font-bold text-slate-700 block mb-1">Target Whiteness: <span id="valLightness" class="text-postRed-700 font-bold">96%</span></label>
               <input type="range" id="sliderLightness" min="80" max="100" value="96" class="w-full accent-postRed-600" oninput="runThemeConverter()">
             </div>
             <div>
               <label class="font-bold text-slate-700 block mb-1">Text Dark Contrast: <span id="valDarkness" class="text-postRed-700 font-bold">12%</span></label>
               <input type="range" id="sliderDarkness" min="0" max="30" value="12" class="w-full accent-postRed-600" oninput="runThemeConverter()">
             </div>
-            <div class="flex items-center gap-2 pt-3">
+            <div class="flex flex-col justify-center gap-1">
+              <span id="detectionStatusText" class="font-bold text-slate-700">Detection Status: <span class="text-slate-500 font-normal">Waiting for image...</span></span>
               <label class="inline-flex items-center gap-1.5 font-bold cursor-pointer">
                 <input type="checkbox" id="chkPreserveColor" checked class="accent-postRed-600" onchange="runThemeConverter()">
                 <span>Preserve Hue &amp; Badges</span>
@@ -503,6 +504,151 @@
 
       </div>
 
+      <!-- MANDATORY MOBILE NUMBER POPUP MODAL -->
+      <div id="mobilePromptModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
+          <div class="text-center">
+            <span class="text-3xl">📱</span>
+            <h3 class="font-bold text-lg text-postRed-700 mt-2">Mobile Number Required</h3>
+            <p class="text-xs text-slate-500 mt-1">Please enter your 10-digit mobile number to proceed further with the portal.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mobile Number *</label>
+            <input type="tel" id="promptMobileNo" placeholder="Enter 10-digit mobile number" maxlength="10" pattern="[0-9]{10}" class="w-full border border-slate-300 p-2.5 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+          </div>
+          <button type="button" onclick="submitMandatoryMobile()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-sm transition cursor-pointer shadow-md">
+            Save & Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ADMIN USER EDIT MODAL -->
+      <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
+          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
+            <h3 class="font-bold text-lg text-postRed-700">Edit User Details</h3>
+            <button type="button" onclick="closeAdminUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+          </div>
+          <form onsubmit="submitAdminUserEdit(event)" class="space-y-3">
+            <input type="hidden" id="editUserId">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Employee ID</label>
+              <input type="text" id="editUserEmpId" disabled class="w-full border border-slate-200 p-2 rounded text-sm bg-slate-100 font-semibold text-slate-600">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Employee Name</label>
+              <input type="text" id="editUserEmpName" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
+              <input type="tel" id="editUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Office Name *</label>
+              <select id="editUserOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none"></select>
+            </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-amber-200">
+              <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ADMIN RESET PASSWORD MODAL -->
+      <div id="adminResetPwdModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postGold-500">
+          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
+            <h3 class="font-bold text-lg text-postRed-700">🔑 Reset User Password</h3>
+            <button type="button" onclick="closeAdminResetPwdModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+          </div>
+          <form onsubmit="submitAdminPasswordReset(event)" class="space-y-4">
+            <input type="hidden" id="resetPwdUserId">
+            <div class="bg-amber-50/60 p-3 rounded-lg border border-amber-200 text-xs space-y-1">
+              <p><strong>Employee:</strong> <span id="resetPwdUserName"></span></p>
+              <p><strong>Emp ID:</strong> <span id="resetPwdUserEmpId" class="font-mono font-bold text-postRed-700"></span></p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-bold text-slate-700">New Password *</label>
+                <button type="button" onclick="generateRandomPassword()" class="text-xs text-postRed-700 hover:underline font-bold">⚡ Generate Strong Password</button>
+              </div>
+              <input type="text" id="resetPwdInput" required minlength="6" placeholder="Enter or generate new password" class="w-full border border-slate-300 p-2 rounded text-sm font-mono focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
+              <button type="button" onclick="closeAdminResetPwdModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Update Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- USER CLAIM EDIT MODAL -->
+      <div id="userEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
+          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
+            <h3 class="font-bold text-lg text-postRed-700">Edit Claim Request</h3>
+            <button type="button" onclick="closeUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+          </div>
+          <form onsubmit="submitUserClaimEdit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="hidden" id="editClaimId">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Raised for Office Name *</label>
+              <select id="editClaimOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Module *</label>
+              <select id="editClaimModule" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+                <option value="Booking">Booking</option>
+                <option value="Delivery">Delivery</option>
+                <option value="DSS">DSS</option>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Article Number *</label>
+              <input type="text" id="editClaimArticleNo" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">RRN Number *</label>
+              <input type="text" id="editClaimRrn" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Date *</label>
+              <input type="date" id="editClaimTxnDate" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Amount (₹) *</label>
+              <input type="number" step="0.01" id="editClaimAmount" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Payment Channel *</label>
+              <select id="editClaimChannel" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+                <option value="DQR">DQR</option>
+                <option value="SBI POS">SBI POS</option>
+                <option value="SBI ePay">SBI ePay</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">User Mobile *</label>
+              <input type="tel" id="editClaimMobile" pattern="[0-9]{10}" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Remarks by User *</label>
+              <textarea id="editClaimRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none"></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Replace Document Attachment (Optional)</label>
+              <input type="file" id="editClaimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-2 rounded text-sm bg-amber-50/30">
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-2 pt-2 border-t border-amber-200">
+              <button type="button" onclick="closeUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- ADMIN REPLY MODAL -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
@@ -634,15 +780,15 @@
       });
     }
 
-    // ==========================================
-    // ROBUST HIGH-ACCURACY THEME CONVERTER ENGINE
-    // ==========================================
+    // ==============================================================
+    // SMART THEME DETECTOR & CONVERTER (PROTECTS LIGHT THEME IMAGES)
+    // ==============================================================
     function rgbToHsl(r, g, b) {
       r /= 255; g /= 255; b /= 255;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
       let h, s, l = (max + min) / 2;
       if (max === min) {
-        h = s = 0; // achromatic
+        h = s = 0;
       } else {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -659,7 +805,7 @@
     function hslToRgb(h, s, l) {
       let r, g, b;
       if (s === 0) {
-        r = g = b = l; // achromatic
+        r = g = b = l;
       } else {
         const hue2rgb = (p, q, t) => {
           if (t < 0) t += 1;
@@ -678,6 +824,22 @@
       return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
 
+    // Evaluates whether an image has a predominant dark background
+    function checkIsDarkTheme(data) {
+      let darkPixels = 0;
+      let totalSampled = 0;
+      // Step across pixels for fast calculation
+      for (let i = 0; i < data.length; i += 16) {
+        const a = data[i + 3];
+        if (a < 128) continue; // Skip transparent
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        if (luminance < 115) darkPixels++;
+        totalSampled++;
+      }
+      return totalSampled > 0 && (darkPixels / totalSampled) > 0.45;
+    }
+
     function processDarkToLightCanvas(sourceImg, maxBgLightness = 0.96, minTextDarkness = 0.12, preserveColor = true) {
       const c = document.createElement('canvas');
       const ctx = c.getContext('2d', { willReadFrequently: true });
@@ -688,29 +850,32 @@
       const imgData = ctx.getImageData(0, 0, c.width, c.height);
       const data = imgData.data;
 
+      // STEP 1: Check if the image is actually dark theme
+      const isDark = checkIsDarkTheme(data);
+
+      // If it is ALREADY LIGHT THEME, DO NOT TOUCH IT! Return untouched original canvas.
+      if (!isDark) {
+        return { canvas: c, isDarkTheme: false };
+      }
+
+      // STEP 2: It is dark theme, so safely invert dark background to paper white
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
         if (a === 0) continue;
 
         const [h, s, l] = rgbToHsl(r, g, b);
-
-        // Check if pixel is a prominent colored UI element / badge
         const isColored = s > 0.25 && l > 0.15 && l < 0.85;
 
         if (preserveColor && isColored) {
-          // Adjust lightness of color to look natural on white background
           const newL = l < 0.5 ? 0.35 + l * 0.4 : l;
           const [nr, ng, nb] = hslToRgb(h, Math.min(1, s * 1.15), newL);
           data[i] = nr;
           data[i + 1] = ng;
           data[i + 2] = nb;
         } else {
-          // Invert lightness smoothly: dark background -> crisp light; light text -> dark charcoal
           let newL = 1 - l;
-          // Scale against target paper white and deep black
           newL = minTextDarkness + newL * (maxBgLightness - minTextDarkness);
-          
-          const [nr, ng, nb] = hslToRgb(h, s * 0.1, newL);
+          const [nr, ng, nb] = hslToRgb(h, s * 0.08, newL);
           data[i] = nr;
           data[i + 1] = ng;
           data[i + 2] = nb;
@@ -718,15 +883,21 @@
       }
 
       ctx.putImageData(imgData, 0, 0);
-      return c;
+      return { canvas: c, isDarkTheme: true };
     }
 
     async function convertBlobDarkToLight(blob) {
       return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
-          const canvas = processDarkToLightCanvas(img, 0.96, 0.12, true);
-          canvas.toBlob((convertedBlob) => resolve(convertedBlob), 'image/png');
+          const { canvas, isDarkTheme } = processDarkToLightCanvas(img, 0.96, 0.12, true);
+          if (!isDarkTheme) {
+            // Already light theme -> return original untouched blob
+            resolve({ blob, isDarkTheme: false });
+          } else {
+            // Dark theme converted -> return new light PNG blob
+            canvas.toBlob((convertedBlob) => resolve({ blob: convertedBlob, isDarkTheme: true }), 'image/png');
+          }
         };
         img.src = URL.createObjectURL(blob);
       });
@@ -766,7 +937,20 @@
       $('valLightness').innerText = $('sliderLightness').value + '%';
       $('valDarkness').innerText = $('sliderDarkness').value + '%';
 
-      const canvas = processDarkToLightCanvas(standaloneImageSource, bgLight, textDark, preserveColor);
+      const { canvas, isDarkTheme } = processDarkToLightCanvas(standaloneImageSource, bgLight, textDark, preserveColor);
+      
+      const badge = $('converterResultBadge');
+      const statusText = $('detectionStatusText');
+      if (isDarkTheme) {
+        badge.className = "absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold";
+        badge.innerText = "✓ Dark Theme Detected → Converted to Light";
+        statusText.innerHTML = `Detection Status: <span class="text-emerald-700 font-bold">Dark Theme Detected (Inverted to White)</span>`;
+      } else {
+        badge.className = "absolute top-2 left-2 bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold";
+        badge.innerText = "ℹ️ Light Theme Detected (Kept Untouched)";
+        statusText.innerHTML = `Detection Status: <span class="text-blue-700 font-bold">Already Light Theme (Protected & Untouched)</span>`;
+      }
+
       canvas.toBlob(blob => {
         standaloneConvertedBlob = blob;
         $('converterResultImg').src = URL.createObjectURL(blob);
@@ -779,11 +963,11 @@
       if (!standaloneConvertedBlob) return alert("Please select or paste an image to convert first!");
       const a = document.createElement('a');
       a.href = URL.createObjectURL(standaloneConvertedBlob);
-      a.download = `converted_light_screenshot_${Date.now()}.png`;
+      a.download = `screenshot_${Date.now()}.png`;
       a.click();
     }
 
-    // Paste event router
+    // PASTE HANDLER
     window.addEventListener('paste', async (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       let blob = null;
@@ -810,14 +994,18 @@
         loadStandaloneImage(blob);
         e.preventDefault();
       } else if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
-        // Auto convert checkbox check
+        let isDark = false;
         if ($('autoConvertDark')?.checked) {
-          blob = await convertBlobDarkToLight(blob);
+          const res = await convertBlobDarkToLight(blob);
+          blob = res.blob;
+          isDark = res.isDarkTheme;
         }
         userPastedImageBlob = blob;
         $('userPastedImagePreview').src = URL.createObjectURL(blob);
         $('userPastedPreviewContainer').classList.remove('hidden');
-        $('userPastedImageSize').innerText = `Size: ${(blob.size / 1024).toFixed(1)} KB (Ink-Saving Light PNG)`;
+        $('userPastedImageSize').innerText = isDark 
+          ? `Size: ${(blob.size / 1024).toFixed(1)} KB (Dark screenshot converted to light)` 
+          : `Size: ${(blob.size / 1024).toFixed(1)} KB (Light image kept untouched)`;
         $('claimFile').value = '';
         e.preventDefault();
       }
@@ -1041,7 +1229,7 @@
       }
     }
 
-    // CLAIM SUBMISSION WITH AUTO-CONVERTED LIGHT THEME SUPPORT
+    // CLAIM SUBMISSION WITH SMART AUTO-CONVERT
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = $('claimFile').files[0];
@@ -1064,10 +1252,10 @@
       let publicUrl = null;
       let uploadBlob = userPastedImageBlob;
 
-      // If user uploaded a raw file and auto-convert is checked
       if (!uploadBlob && fileInput) {
         if ($('autoConvertDark')?.checked && fileInput.type.startsWith('image/')) {
-          uploadBlob = await convertBlobDarkToLight(fileInput);
+          const res = await convertBlobDarkToLight(fileInput);
+          uploadBlob = res.blob;
         } else {
           uploadBlob = fileInput;
         }
@@ -1099,7 +1287,7 @@
       if (error) {
         alert("Error submitting claim: " + error.message);
       } else {
-        alert("Claim registered successfully with ink-saving light document!");
+        alert("Claim registered successfully!");
         e.target.reset();
         clearUserPastedImage();
         isRrnManuallyEdited = false;
@@ -1213,34 +1401,27 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
-            <!-- 1. REF NO & MODULE -->
             <td class="p-3 whitespace-nowrap">
               <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-sm block">
                 ${c.txn_id_ref}
               </button>
               <span class="inline-block bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-[11px] mt-0.5 border border-slate-200">${c.module}</span>
             </td>
-            <!-- 2. EMP NAME/ID & OFFICE -->
             <td class="p-3 whitespace-nowrap">
               <div class="font-bold text-slate-800">${empNameOnly} <span class="text-xs text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
               <div class="text-xs text-slate-600 font-medium">${c.raised_for_office}</div>
             </td>
-            <!-- 3. TXN DATE (SEPARATE) -->
             <td class="p-3 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
-            <!-- 4. ENTRY DATE/TIME (SEPARATE) -->
             <td class="p-3 whitespace-nowrap text-xs text-slate-600 font-medium">${entryDateTime}</td>
-            <!-- 5. AMOUNT -->
             <td class="p-3 font-bold text-slate-900 whitespace-nowrap text-sm">₹${c.txn_amount}</td>
-            <!-- 6. STATUS -->
             <td class="p-3 whitespace-nowrap">
               <span class="px-2.5 py-1 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
               </span>
             </td>
-            <!-- 7. ADMIN REMARKS -->
             <td class="p-3 min-w-[220px]">${adminReplyHtml}</td>
             
-            <!-- 8. COMPACT ICON-ONLY 2x2 ACTION SQUARE -->
+            <!-- COMPACT ICON-ONLY 2x2 ACTION SQUARE -->
             <td class="p-3 text-center whitespace-nowrap min-w-[110px]">
               <div class="grid grid-cols-2 gap-1 w-[88px] mx-auto">
                 <!-- Row 1: Reply & Delete -->
@@ -1487,7 +1668,6 @@
 
           <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
           <div class="attachments-grid">
-            <!-- Left Side: User Document (37% width) -->
             <div class="attachment-col-left">
               <strong>Applicant Submitted Document:</strong>
               ${isUserImage 
@@ -1496,7 +1676,6 @@
               }
             </div>
 
-            <!-- Right Side: Admin Document (61% width for landscape) -->
             <div class="attachment-col-right" style="${!claim.admin_file_url ? 'background:#f8fafc; color:#94a3b8;' : ''}">
               <strong style="color: #991b1b;">Admin Attached Resolution / Landscape Document:</strong>
               ${claim.admin_file_url 
