@@ -44,7 +44,7 @@
     <!-- NAVBAR -->
     <nav id="navbar" class="hidden bg-postRed-700 text-white px-4 py-2.5 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
       <div class="flex items-center gap-3">
-        <img id="navLogoImg" src="" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded-full shadow-xs">
+        <img id="navLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded shadow-xs">
         <div>
           <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">
             Refund Claims Management Portal
@@ -65,7 +65,7 @@
       <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
         <div class="text-center mb-5">
           <div class="flex justify-center mb-2">
-            <img id="loginLogoImg" src="" alt="India Post Logo" class="h-16 w-16 object-contain bg-white p-1 rounded-full border-2 border-postGold-500 shadow-sm">
+            <img id="loginLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
           </div>
           <h1 class="text-lg font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
           <p class="text-xs font-bold text-postGold-700 mt-0.5 uppercase tracking-wide">Chennai City Central Division</p>
@@ -147,7 +147,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW (HORIZONTAL FIT OPTIMIZED) -->
+        <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW -->
         <div id="trackView" class="tab-content bg-white p-4 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex gap-2 max-w-md w-full">
@@ -201,7 +201,7 @@
             </div>
           </div>
 
-          <!-- TABLE: COMPACT & FIT IN HORIZONTAL VIEWPORT -->
+          <!-- TABLE: 2-LINE ACTIONS & DOCUMENTS -->
           <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <table class="w-full text-left text-xs border-collapse">
               <thead class="sticky top-0 z-10 shadow-xs">
@@ -212,8 +212,8 @@
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition max-w-[85px]" onclick="sortTable('created_at')">Entry Date <span id="sort_created_at">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status / Settle Date <span id="sort_claim_status">⇅</span></th>
-                  <th class="p-2 bg-postRed-50 cursor-default min-w-[160px]">Remarks</th> 
-                  <th class="p-2 bg-postRed-50 cursor-default text-center min-w-[180px]">Actions &amp; Documents</th>
+                  <th class="p-2 bg-postRed-50 cursor-default min-w-[150px]">Remarks</th> 
+                  <th class="p-2 bg-postRed-50 cursor-default text-center min-w-[170px]">Actions &amp; Documents</th>
                 </tr>
               </thead>
               <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -221,95 +221,109 @@
           </div>
         </div>
 
-        <!-- TAB 2: CLAIM REGISTRATION FORM -->
+        <!-- TAB 2: CLAIM REGISTRATION FORM (OPTIMIZED 2-PANEL LAYOUT) -->
         <div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
           <div class="border-b pb-2 mb-3 border-amber-200">
             <h3 class="text-sm font-bold text-postRed-700 uppercase">New Claim Registration Form</h3>
           </div>
-          <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">Raised for Office Name *</label>
-              <select id="claimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
-                <option value="">-- Loading Offices... --</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">Module *</label>
-              <select id="claimModule" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
-                <option value="Booking">Booking</option>
-                <option value="Delivery">Delivery</option>
-                <option value="DSS">DSS</option>
-                <option value="Others">Others</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">Article Number *</label>
-              <input type="text" id="claimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Txn ID *</label>
-              <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number *</label>
-              <input type="text" id="claimRrn" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Date *</label>
-              <input type="date" id="claimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
-              <input type="number" step="0.01" id="claimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">Payment Channel *</label>
-              <select id="claimChannel" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
-                <option value="DQR">DQR</option>
-                <option value="SBI POS">SBI POS</option>
-                <option value="SBI ePay">SBI ePay</option>
-              </select>
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">Remarks by User *</label>
-              <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Enter remarks for claim..."></textarea>
-            </div>
-
-            <!-- ROW: LEFT = USER MOBILE (10 DIGITS STRICT), RIGHT = DOCUMENT ATTACHMENT -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-0.5">User Mobile Number (10 Digits) *</label>
-              <input type="tel" id="claimUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required placeholder="10-digit mobile" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-amber-50/30 font-mono outline-none">
-            </div>
-
-            <div class="space-y-1.5">
-              <div class="flex items-center justify-between flex-wrap gap-1">
-                <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
-                <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100/70 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
-                  <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
-                  <span>☀️ Auto Light Theme</span>
-                </label>
-              </div>
-
-              <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-amber-50/20">
-              
-              <div id="userPasteDropZone" tabindex="0" class="border border-dashed border-amber-400 hover:border-postRed-600 bg-amber-50/50 p-2 rounded text-center cursor-pointer outline-none">
-                <p class="text-xs font-bold text-postRed-800">📋 Click &amp; press <kbd class="bg-white px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
-              </div>
-
-              <div id="userPastedPreviewContainer" class="hidden relative border border-emerald-400 rounded p-1.5 bg-emerald-50/40 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="h-10 w-16 object-contain rounded border border-emerald-300 bg-white">
-                  <div>
-                    <p class="font-bold text-emerald-800 text-xs">✓ Attached</p>
-                    <p id="userPastedImageSize" class="text-slate-600 text-[10px]"></p>
-                  </div>
+          
+          <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- LEFT PANEL: TRANSACTION DETAILS & USER REMARKS (7 COLS) -->
+            <div class="lg:col-span-7 space-y-2.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Raised for Office Name *</label>
+                  <select id="claimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                    <option value="">-- Loading Offices... --</option>
+                  </select>
                 </div>
-                <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold p-1 underline cursor-pointer">Remove</button>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Module *</label>
+                  <select id="claimModule" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                    <option value="Booking">Booking</option>
+                    <option value="Delivery">Delivery</option>
+                    <option value="DSS">DSS</option>
+                    <option value="Others">Others</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Article Number *</label>
+                  <input type="text" id="claimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Txn ID *</label>
+                  <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Date *</label>
+                  <input type="date" id="claimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
+                  <input type="number" step="0.01" id="claimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Payment Channel *</label>
+                  <select id="claimChannel" onchange="handlePaymentChannelChange()" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-800">
+                    <option value="DQR">DQR</option>
+                    <option value="SBI POS">SBI POS</option>
+                    <option value="SBI ePay">SBI ePay</option>
+                  </select>
+                </div>
+                
+                <!-- CONDITIONAL RRN NUMBER (ONLY VISIBLE ON SBI POS) -->
+                <div id="rrnFieldContainer" class="hidden">
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
+                  <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-0.5">User Mobile Number (10 Digits) *</label>
+                  <input type="tel" id="claimUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required placeholder="10-digit mobile" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-amber-50/30 font-mono outline-none">
+                </div>
+              </div>
+
+              <!-- USER REMARKS -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-0.5">Remarks by User *</label>
+                <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-xs h-24 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/10" placeholder="Enter reason and description for claim..."></textarea>
               </div>
             </div>
 
-            <div class="md:col-span-2 pt-1 border-t border-amber-200">
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white font-bold px-5 py-2 rounded-lg text-xs shadow-md cursor-pointer transition">Submit Claim</button>
+            <!-- RIGHT PANEL: ATTACHMENT CARD & FULL PREVIEW (5 COLS) -->
+            <div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
+                  <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
+                    <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
+                    <span>☀️ Auto Light Theme</span>
+                  </label>
+                </div>
+
+                <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+                
+                <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
+                  <span class="text-xl">📋</span>
+                  <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
+                  <p class="text-[10px] text-slate-500">Capture with Snipping Tool (<kbd class="text-[9px]">Win+Shift+S</kbd>) and paste</p>
+                </div>
+              </div>
+
+              <!-- GENEROUS PREVIEW BOX -->
+              <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
+                <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
+                <div class="flex items-center justify-between w-full mt-2 text-[11px]">
+                  <span class="font-bold text-emerald-800">✓ Screenshot Attached</span>
+                  <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove</button>
+                </div>
+              </div>
+
+              <!-- SUBMIT BUTTON -->
+              <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-md cursor-pointer transition uppercase tracking-wide">
+                Submit Claim Registration
+              </button>
             </div>
           </form>
         </div>
@@ -476,9 +490,8 @@
             </div>
           </div>
 
-          <!-- TIME TAKEN TO SETTLE (TAT) & IN-PROGRESS AGING REPORT RIBBONS -->
+          <!-- SETTLED TAT (<=3, 4-15, >15) & IN-PROGRESS AGING -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
-            <!-- 1. SETTLED CLAIMS TAT BREAKDOWN (<=3, 4-15, >15) -->
             <div class="bg-emerald-50/60 border border-emerald-300 rounded-xl p-3 space-y-2">
               <div class="flex justify-between items-center border-b border-emerald-200 pb-1">
                 <span class="font-bold text-[11px] text-emerald-900 uppercase">⏱️ Settled Claims TAT Breakdown</span>
@@ -500,7 +513,6 @@
               </div>
             </div>
 
-            <!-- 2. IN-PROGRESS CLAIMS AGING BREAKDOWN -->
             <div class="bg-blue-50/60 border border-blue-300 rounded-xl p-3 space-y-2">
               <div class="flex justify-between items-center border-b border-blue-200 pb-1">
                 <span class="font-bold text-[11px] text-blue-900 uppercase">⏳ In-Progress Claims Aging Buckets</span>
@@ -642,7 +654,7 @@
         </div>
       </div>
 
-      <!-- USER CLAIM EDIT MODAL (REMARKS EDITING FIXED) -->
+      <!-- USER CLAIM EDIT MODAL -->
       <div id="userEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-2 border-amber-200">
@@ -808,10 +820,10 @@
 
     const $ = id => document.getElementById(id);
 
-    // EMBEDDED HIGH-RES VECTOR LOGO BASE64
-    const DEFAULT_INDIA_POST_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'><circle cx='80' cy='80' r='76' fill='%23C4122F' stroke='%23F8B133' stroke-width='6'/><path d='M30 46 L130 46 L80 92 Z' fill='%23F8B133'/><polygon points='30,52 80,98 30,120' fill='%23FFFDF5'/><polygon points='130,52 80,98 130,120' fill='%23FEF9C3'/><polygon points='32,120 80,94 128,120' fill='%23FACC15'/><rect x='16' y='126' width='128' height='22' rx='4' fill='%238A0C21' stroke='%23F8B133' stroke-width='1.2'/><text x='80' y='141' font-family='Arial,sans-serif' font-size='9' font-weight='bold' fill='%23FFFDF5' text-anchor='middle'>डाक सेवा - जन सेवा</text></svg>";
+    // FIXED SQUARE INDIA POST LOGO URL
+    const OFFICIAL_INDIA_POST_LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
 
-    let currentAppLogo = localStorage.getItem('app_custom_logo') || DEFAULT_INDIA_POST_LOGO;
+    let currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
     let cachedPdfLogoBase64 = null;
 
     let currentUser = null;
@@ -834,40 +846,63 @@
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
 
-    // RRN Auto Fill Sync
+    // RRN AUTO-FILL SYNC & CONDITIONAL VISIBILITY
     const txnInput = $('claimTxnId');
     const rrnInput = $('claimRrn');
     if (txnInput && rrnInput) {
       txnInput.addEventListener('input', (e) => {
-        if (!isRrnManuallyEdited) rrnInput.value = e.target.value;
+        if (!isRrnManuallyEdited && $('claimChannel')?.value === 'SBI POS') {
+          rrnInput.value = e.target.value;
+        }
       });
       rrnInput.addEventListener('input', (e) => {
         isRrnManuallyEdited = (rrnInput.value !== txnInput.value);
       });
     }
 
-    // STRICT 10-DIGIT PHONE CLEANER
+    // PAYMENT CHANNEL SWITCH HANDLER (ONLY SBI POS SHOWS RRN)
+    function handlePaymentChannelChange() {
+      const channel = $('claimChannel').value;
+      const rrnContainer = $('rrnFieldContainer');
+      const rrnInputField = $('claimRrn');
+
+      if (channel === 'SBI POS') {
+        rrnContainer.classList.remove('hidden');
+        rrnInputField.required = true;
+        if (!rrnInputField.value && txnInput?.value) {
+          rrnInputField.value = txnInput.value;
+        }
+      } else {
+        rrnContainer.classList.add('hidden');
+        rrnInputField.required = false;
+        rrnInputField.value = '';
+      }
+    }
+
     function cleanPhoneInput(el) {
       el.value = el.value.replace(/\D/g, '').slice(0, 10);
     }
 
-    // PRE-RENDER LOGO TO PNG DATA-URL FOR JSDPF (ELIMINATES CORS FAILURES)
-    function cacheBase64Logo(svgOrUrl) {
+    // BASE64 LOGO RASTERIZER (SQUARE 1:1 RATIO FOR JSDPF)
+    function cacheBase64Logo(url) {
       const img = new Image();
       img.crossOrigin = "Anonymous";
       img.onload = function() {
         const canvas = document.createElement("canvas");
-        canvas.width = 160;
-        canvas.height = 160;
+        canvas.width = 180;
+        canvas.height = 180;
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, 160, 160);
+        ctx.drawImage(img, 0, 0, 180, 180);
         try {
           cachedPdfLogoBase64 = canvas.toDataURL("image/png");
         } catch (e) {
-          cachedPdfLogoBase64 = null;
+          cachedPdfLogoBase64 = DEFAULT_INDIA_POST_LOGO;
         }
       };
-      img.src = svgOrUrl;
+      img.onerror = () => {
+        cachedPdfLogoBase64 = DEFAULT_INDIA_POST_LOGO;
+      };
+      img.src = url;
     }
 
     function initLogos() {
@@ -927,7 +962,7 @@
       }
     }
 
-    // THEME CONVERTER ENGINE
+    // THEME CONVERTER
     function rgbToHsl(r, g, b) {
       r /= 255; g /= 255; b /= 255;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -1149,7 +1184,6 @@
       $('userPastedImagePreview').src = '';
     }
 
-    // COMPACT DATE & TIME SPLIT
     function formatDateTimeCompact(isoStr) {
       if (!isoStr) return '<span class="text-slate-400">N/A</span>';
       const d = new Date(isoStr);
@@ -1403,7 +1437,7 @@
       const isViewer = role === 'viewer';
 
       if (tabId === 'adminRoleMgmt' && !isAdmin) {
-        alert("Access Denied: Only Admins can access User Management.");
+        alert("Access Denied: Only Admins and Superadmins can access User Management.");
         tabId = isViewer ? 'reports' : 'track';
       }
 
@@ -1433,15 +1467,22 @@
       }
     }
 
+    // SUBMIT CLAIM (RESPECTS PAYMENT CHANNEL & MOBILE NUMBER RULES)
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = $('claimFile').files[0];
       const txn_id_ref = $('claimTxnId').value.trim();
       const raised_office = $('claimOffice').value;
+      const channel = $('claimChannel').value;
+      const rrn_number = (channel === 'SBI POS') ? $('claimRrn').value.trim() : 'N/A';
       const user_mobile = $('claimUserMobile').value.trim();
 
       if (!user_mobile || user_mobile.length !== 10) {
         return alert("Please enter a valid 10-digit mobile number!");
+      }
+
+      if (channel === 'SBI POS' && (!rrn_number || rrn_number === 'N/A')) {
+        return alert("Please enter the RRN Number for SBI POS transaction!");
       }
 
       if (!fileInput && !userPastedImageBlob) return alert("Please attach a document or paste a screenshot!");
@@ -1481,10 +1522,10 @@
         raised_for_office: raised_office,
         module: $('claimModule').value,
         article_number: $('claimArticleNo').value,
-        rrn_number: $('claimRrn').value,
+        rrn_number: rrn_number,
         txn_date: $('claimTxnDate').value,
         txn_amount: $('claimAmount').value,
-        payment_channel: $('claimChannel').value,
+        payment_channel: channel,
         remarks_by_user: $('claimUserRemarks').value,
         user_mobile: user_mobile,
         file_url: publicUrl,
@@ -1498,6 +1539,7 @@
         e.target.reset();
         clearUserPastedImage();
         isRrnManuallyEdited = false;
+        handlePaymentChannelChange();
         $('claimUserMobile').value = userProfile.mobile_number || user_mobile;
         showTab('track');
         loadClaimsSummary();
@@ -1515,7 +1557,6 @@
       }
     }
 
-    // FIXED: REMARKS BY USER IS FULLY EDITABLE & PERSISTENT
     function openUserEditModal(claimId) {
       const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
       if (!claim) return alert("Claim details not found!");
@@ -1535,9 +1576,7 @@
       $('userEditModal').classList.remove('hidden');
     }
 
-    function closeUserEditModal() {
-      $('userEditModal').classList.add('hidden');
-    }
+    function closeUserEditModal() { $('userEditModal').classList.add('hidden'); }
 
     async function submitUserClaimEdit(e) {
       e.preventDefault();
@@ -1628,7 +1667,8 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER SUMMARY TABLE: HORIZONTAL FIT OPTIMIZED & EXPLICIT BUTTONS
+    // RENDER TABLE WITH 2 DISTINCT ACTION ROWS:
+    // Row 1: Edit/Reply + User Doc | Row 2: Admin Doc + Print Docket
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1671,8 +1711,8 @@
         const isSettled = c.claim_status === 'Settled';
 
         let remarksDisplay = c.reply_remarks_admin 
-          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[200px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
-          : `<div class="text-slate-600 italic text-[11px] truncate max-w-[180px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user}</div>`;
+          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
+          : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user}</div>`;
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
@@ -1682,8 +1722,8 @@
                 ${c.txn_id_ref}
               </button>
               <div class="flex items-center gap-1 mt-0.5">
-                <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1 py-0.2 rounded text-[10px] border border-slate-200">${c.module}</span>
-                <button type="button" title="Copy Reference Number" onclick="copyToClipboard('${c.txn_id_ref}', this)" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer transition">
+                <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border border-slate-200">${c.module}</span>
+                <button type="button" title="Copy Reference Number" onclick="copyToClipboard('${c.txn_id_ref}', this)" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-1.5 py-0.2 rounded text-[9.5px] font-bold cursor-pointer transition">
                   📋 Copy
                 </button>
               </div>
@@ -1698,7 +1738,7 @@
             <!-- 3. TXN DATE -->
             <td class="p-2 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
 
-            <!-- 4. ENTRY DATE/TIME (SHRUNK COMPACT 2-LINE) -->
+            <!-- 4. ENTRY DATE/TIME -->
             <td class="p-1.5 whitespace-nowrap max-w-[85px]">${entryCompact}</td>
 
             <!-- 5. AMOUNT -->
@@ -1717,36 +1757,45 @@
             </td>
 
             <!-- 7. REMARKS -->
-            <td class="p-2 min-w-[160px]">${remarksDisplay}</td>
+            <td class="p-2 min-w-[150px]">${remarksDisplay}</td>
             
-            <!-- 8. ACTIONS: BUTTONS WITH TEXT & BOTH DOCS -->
-            <td class="p-2 text-center whitespace-nowrap min-w-[180px]">
-              <div class="flex items-center justify-center gap-1 flex-wrap">
-                ${isAdmin ? `
-                  <button type="button" onclick="openReplyModal('${c.id}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
-                    ✏️ Reply
-                  </button>
-                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-1.5 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
-                    🗑️ Delete
-                  </button>
-                ` : `
-                  ${isOwner ? `
-                    <button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
-                      ✏️ Edit
+            <!-- 8. ACTIONS & DOCUMENTS IN 2 STRUCTURED ROWS -->
+            <td class="p-2 text-center whitespace-nowrap min-w-[170px]">
+              <div class="flex flex-col gap-1 w-[165px] mx-auto">
+                <!-- ROW 1: EDIT/REPLY & USER DOC -->
+                <div class="flex items-center justify-between gap-1">
+                  ${isAdmin ? `
+                    <button type="button" onclick="openReplyModal('${c.id}')" class="flex-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
+                      ✏️ Reply
                     </button>
-                  ` : ''}
-                `}
-                <a href="${c.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition">
-                  📄 User Doc
-                </a>
-                ${c.admin_file_url ? `
-                  <a href="${c.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition">
-                    📎 Admin Doc
+                    <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" title="Delete Claim" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-1.5 py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
+                      🗑️
+                    </button>
+                  ` : `
+                    ${isOwner ? `
+                      <button type="button" onclick="openUserEditModal('${c.id}')" class="flex-1 bg-postGold-500 hover:bg-postGold-600 text-postRed-900 py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
+                        ✏️ Edit
+                      </button>
+                    ` : `<div class="flex-1"></div>`}
+                  `}
+                  <a href="${c.file_url}" target="_blank" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition text-center">
+                    📄 User Doc
                   </a>
-                ` : ''}
-                <button type="button" onclick="printClaimDetails('${c.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
-                  🖨️ Docket
-                </button>
+                </div>
+
+                <!-- ROW 2: ADMIN DOC & PRINT DOCKET -->
+                <div class="flex items-center justify-between gap-1">
+                  ${c.admin_file_url ? `
+                    <a href="${c.admin_file_url}" target="_blank" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition text-center">
+                      📎 Admin Doc
+                    </a>
+                  ` : `
+                    <span class="flex-1 text-[9.5px] text-slate-400 italic py-1 border border-dashed border-slate-200 rounded">No Admin Doc</span>
+                  `}
+                  <button type="button" onclick="printClaimDetails('${c.id}')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
+                    🖨️ Docket
+                  </button>
+                </div>
               </div>
             </td>
           </tr>
@@ -2202,19 +2251,19 @@
         const role = u.role || 'user';
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-2.5 font-bold font-mono text-slate-800">${u.emp_id}</td>
-            <td class="p-2.5">
+            <td class="p-3 font-bold font-mono text-slate-800">${u.emp_id}</td>
+            <td class="p-3">
               <div class="font-bold text-slate-800">${u.emp_name}</div>
               <div class="mt-0.5">${getRoleBadge(role)}</div>
             </td>
-            <td class="p-2.5 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
-            <td class="p-2.5 font-medium">${u.office_name}</td>
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
-            <td class="p-2.5 text-center">
+            <td class="p-3 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
+            <td class="p-3 font-medium">${u.office_name}</td>
+            <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
+            <td class="p-3 text-center">
               <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
-                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
-                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
-                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-1 rounded text-xs font-bold cursor-pointer">
+                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
+                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
+                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2.5 py-1 rounded text-xs font-bold cursor-pointer">
                   ${isActive ? '🔒 Lock' : '🔓 Unlock'}
                 </button>
               </div>
@@ -2329,7 +2378,7 @@
       loadAllUsers();
     }
 
-    // EXPORT USERS ROSTER
+    // EXPORT USERS ROSTER (CLEAN SQUARE LOGO TOP-RIGHT)
     async function exportUsersExcel() {
       if (!allLoadedUsers.length) return alert("No users loaded to export!");
       const data = allLoadedUsers.map((u, i) => ({
@@ -2354,7 +2403,7 @@
 
       if (cachedPdfLogoBase64) {
         try {
-          doc.addImage(cachedPdfLogoBase64, 'PNG', 170, 8, 24, 24);
+          doc.addImage(cachedPdfLogoBase64, 'PNG', 174, 8, 18, 18);
         } catch (err) {
           console.warn("Logo embed error:", err);
         }
@@ -2387,14 +2436,12 @@
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
         styles: { fontSize: 8, cellPadding: 2 },
         didDrawPage: function (data) {
-          // Footer on each page
           doc.setFontSize(8);
           doc.setTextColor(120, 120, 120);
           doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`, 105, 290, { align: "center" });
         }
       });
 
-      // END OF STATEMENT LINE IN PDF
       const finalY = doc.lastAutoTable.finalY + 10;
       doc.setFontSize(9);
       doc.setTextColor(100, 116, 139);
@@ -2667,30 +2714,30 @@
       XLSX.writeFile(workbook, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
-    // PDF EXPORT (CENTERED TITLE, LOGO, STATEMENT END & FOOTER DATE)
+    // PDF EXPORT (REDUCED SQUARE LOGO TOP-RIGHT & CLEAN CENTERED TITLE)
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // Top-Right Logo Embedding
+      // Top-Right Square Logo (16mm x 16mm)
       if (cachedPdfLogoBase64) {
         try {
-          doc.addImage(cachedPdfLogoBase64, 'PNG', 255, 7, 26, 26);
+          doc.addImage(cachedPdfLogoBase64, 'PNG', 268, 6, 16, 16);
         } catch (err) {
           console.warn("Logo embed warning:", err);
         }
       }
 
       // CENTERED TITLES
-      doc.setFontSize(14);
+      doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
-      doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 14, { align: "center" });
+      doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 13, { align: "center" });
       
-      doc.setFontSize(10);
+      doc.setFontSize(9.5);
       doc.setTextColor(217, 119, 6);
-      doc.text("Chennai City Central Division", 148.5, 20, { align: "center" });
+      doc.text("Chennai City Central Division", 148.5, 19, { align: "center" });
 
       const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => {
@@ -2721,19 +2768,18 @@
       doc.autoTable({
         head: headers,
         body: rows,
-        startY: 28,
+        startY: 25,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
         styles: { fontSize: 8, cellPadding: 2 },
         didDrawPage: function (data) {
-          // BOTTOM FOOTER: Generated on & Page numbers
           doc.setFontSize(8);
           doc.setTextColor(120, 120, 120);
           doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`, 148.5, 202, { align: "center" });
         }
       });
 
-      // END OF STATEMENT LINE AT TABLE BOTTOM
+      // STATEMENT END LINE
       const finalY = doc.lastAutoTable.finalY + 8;
       doc.setFontSize(8.5);
       doc.setTextColor(100, 116, 139);
