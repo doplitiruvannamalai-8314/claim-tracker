@@ -38,56 +38,56 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-amber-50/40 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-amber-50/40 text-slate-800 font-sans min-h-screen text-xs flex flex-col justify-between">
 
   <div>
     <!-- NAVBAR -->
-    <nav id="navbar" class="hidden bg-postRed-700 text-white px-6 py-3.5 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
+    <nav id="navbar" class="hidden bg-postRed-700 text-white px-4 py-2.5 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
       <div class="flex items-center gap-3">
-        <img id="navLogoImg" src="" alt="India Post Logo" class="h-10 w-10 object-contain bg-white p-0.5 rounded-full shadow-xs">
+        <img id="navLogoImg" src="" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded-full shadow-xs">
         <div>
-          <div class="font-bold text-base md:text-lg tracking-wide text-white drop-shadow-xs leading-tight">
+          <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">
             Refund Claims Management Portal
           </div>
-          <div class="text-postGold-300 text-xs font-semibold">Chennai City Central Division</div>
+          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; डाक सेवा - जन सेवा</div>
         </div>
       </div>
-      <div class="flex items-center gap-4 text-sm">
-        <span id="userInfo" class="bg-postRed-900 border border-postGold-500/40 px-3 py-1 rounded text-postGold-100 font-medium text-xs"></span>
-        <button type="button" onclick="handleLogout()" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-3.5 py-1 rounded font-bold transition shadow-xs cursor-pointer text-xs">Logout</button>
+      <div class="flex items-center gap-3 text-xs">
+        <span id="userInfo" class="bg-postRed-900 border border-postGold-500/40 px-2.5 py-1 rounded text-postGold-100 font-medium"></span>
+        <button type="button" onclick="handleLogout()" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-3 py-1 rounded font-bold transition shadow-xs cursor-pointer">Logout</button>
       </div>
     </nav>
 
     <!-- MAIN CONTAINER -->
-    <div class="max-w-7xl mx-auto p-4 md:p-6 w-full">
+    <div class="max-w-7xl mx-auto p-3 md:p-4 w-full">
 
       <!-- AUTHENTICATION CONTAINER -->
-      <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 md:p-8 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
+      <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
         <div class="text-center mb-5">
           <div class="flex justify-center mb-2">
-            <img id="loginLogoImg" src="" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded-full border-2 border-postGold-500 shadow-sm">
+            <img id="loginLogoImg" src="" alt="India Post Logo" class="h-16 w-16 object-contain bg-white p-1 rounded-full border-2 border-postGold-500 shadow-sm">
           </div>
-          <h1 class="text-xl font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
+          <h1 class="text-lg font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
           <p class="text-xs font-bold text-postGold-700 mt-0.5 uppercase tracking-wide">Chennai City Central Division</p>
-          <div class="h-1 w-20 bg-postGold-500 mx-auto mt-2 rounded"></div>
+          <div class="h-1 w-16 bg-postGold-500 mx-auto mt-1.5 rounded"></div>
         </div>
 
         <div id="loginFormContainer">
-          <form id="loginForm" onsubmit="handleEmpIdLogin(event)" class="space-y-4">
+          <form id="loginForm" onsubmit="handleEmpIdLogin(event)" class="space-y-3.5">
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Employee ID *</label>
-              <input type="text" id="loginEmpId" placeholder="e.g. 12345678" required class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 outline-none uppercase bg-amber-50/20 font-mono text-sm">
+              <input type="text" id="loginEmpId" placeholder="e.g. 12345678" required class="w-full border border-slate-300 p-2 rounded focus:ring-2 focus:ring-postRed-600 outline-none uppercase bg-amber-50/20 font-mono text-xs">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password *</label>
-              <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full border border-slate-300 p-2.5 rounded focus:ring-2 focus:ring-postRed-600 outline-none bg-amber-50/20 text-sm">
+              <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full border border-slate-300 p-2 rounded focus:ring-2 focus:ring-postRed-600 outline-none bg-amber-50/20 text-xs">
             </div>
-            <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg transition shadow-md cursor-pointer text-sm">Log In</button>
+            <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2 rounded-lg transition shadow-md cursor-pointer text-xs">Log In</button>
           </form>
 
-          <div class="text-center mt-4 pt-3 border-t border-amber-200">
+          <div class="text-center mt-3 pt-3 border-t border-amber-200">
             <p class="text-xs text-slate-600">
-              New employee without an account? 
+              New employee? 
               <button type="button" onclick="showAuthView('register')" class="text-postRed-700 hover:text-postRed-900 font-bold underline cursor-pointer ml-1 focus:outline-none">
                 Register User here
               </button>
@@ -97,156 +97,77 @@
 
         <div id="registerFormContainer" class="hidden">
           <div class="mb-3 pb-2 border-b border-amber-200 flex justify-between items-center">
-            <h2 class="text-sm font-bold text-postRed-700 uppercase">New Staff Registration</h2>
+            <h2 class="text-xs font-bold text-postRed-700 uppercase">New Staff Registration</h2>
             <button type="button" onclick="showAuthView('login')" class="text-xs text-slate-500 hover:text-postRed-700 font-bold">&larr; Back to Login</button>
           </div>
-          <form id="registerForm" onsubmit="handleEmpIdRegister(event)" class="space-y-3">
+          <form id="registerForm" onsubmit="handleEmpIdRegister(event)" class="space-y-2.5">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Employee ID *</label>
-              <input type="text" id="regEmpId" placeholder="e.g. 12345678" required class="w-full border border-slate-300 p-2 rounded text-sm uppercase focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Employee ID *</label>
+              <input type="text" id="regEmpId" placeholder="e.g. 12345678" required class="w-full border border-slate-300 p-1.5 rounded text-xs uppercase focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Employee Name *</label>
-              <input type="text" id="regEmpName" placeholder="Full Name" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Employee Name *</label>
+              <input type="text" id="regEmpName" placeholder="Full Name" required class="w-full border border-slate-300 p-1.5 rounded text-xs focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
-              <input type="tel" id="regMobile" placeholder="10-digit mobile number" pattern="[0-9]{10}" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Mobile Number (10 Digits) *</label>
+              <input type="tel" id="regMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" placeholder="10-digit mobile" required class="w-full border border-slate-300 p-1.5 rounded text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Office Name *</label>
-              <select id="regOfficeName" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Office Name *</label>
+              <select id="regOfficeName" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
                 <option value="">-- Loading Offices... --</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Password *</label>
-              <input type="password" id="regPassword" placeholder="Minimum 6 characters" minlength="6" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Password *</label>
+              <input type="password" id="regPassword" placeholder="Min 6 characters" minlength="6" required class="w-full border border-slate-300 p-1.5 rounded text-xs focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Confirm Password *</label>
-              <input type="password" id="regConfirmPassword" placeholder="Re-enter password" minlength="6" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Confirm Password *</label>
+              <input type="password" id="regConfirmPassword" placeholder="Re-enter password" minlength="6" required class="w-full border border-slate-300 p-1.5 rounded text-xs focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
-            <p class="text-[11px] text-slate-500">Default role assigned is <strong>User</strong>. Admins can update roles.</p>
-            <button type="submit" class="w-full bg-postGold-500 hover:bg-postGold-600 text-postRed-900 font-bold py-2 rounded-lg transition shadow-md cursor-pointer text-sm">Create Account</button>
-            <div class="text-center pt-2">
-              <button type="button" onclick="showAuthView('login')" class="text-xs text-postRed-700 hover:underline font-bold">Already registered? Log in here</button>
+            <button type="submit" class="w-full bg-postGold-500 hover:bg-postGold-600 text-postRed-900 font-bold py-2 rounded-lg transition shadow-md cursor-pointer text-xs">Create Account</button>
+            <div class="text-center pt-1">
+              <button type="button" onclick="showAuthView('login')" class="text-xs text-postRed-700 hover:underline font-bold">Already registered? Log in</button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- MAIN APPLICATION DASHBOARD -->
-      <div id="mainDashboard" class="hidden space-y-6">
+      <!-- MAIN DASHBOARD -->
+      <div id="mainDashboard" class="hidden space-y-4">
 
         <!-- TABS -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
-          <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer">Track Claim</button>
-          <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
-          <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
-          <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">User Management</button>
-          <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
+          <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer">Track Claim</button>
+          <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
+          <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
+          <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">User Management</button>
+          <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
         </div>
 
-        <!-- TAB 1: TRACK CLAIM VIEW (WITH SETTLEMENT DATE DISPLAY UNDER STATUS) -->
-        <div id="trackView" class="tab-content bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
-          <div>
-            <div class="border-b pb-3 border-amber-200">
-              <h3 class="text-lg font-bold text-postRed-700">Track Single Claim Status</h3>
-              <p class="text-xs text-slate-500">Search specific reference number for complete history and details</p>
+        <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW (HORIZONTAL FIT OPTIMIZED) -->
+        <div id="trackView" class="tab-content bg-white p-4 rounded-xl shadow-md border border-amber-200 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex gap-2 max-w-md w-full">
+              <input type="text" id="searchRefNo" placeholder="Enter 12-Digit Reference No (Txn ID)" class="border border-slate-300 p-1.5 rounded-lg w-full text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <button type="button" onclick="trackClaim()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer whitespace-nowrap">Track</button>
             </div>
-            <div class="flex gap-2 max-w-md mt-4">
-              <input type="text" id="searchRefNo" placeholder="Enter 12-Digit Reference No (Txn ID)" class="border border-slate-300 p-2 rounded-lg w-full text-sm focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
-              <button type="button" onclick="trackClaim()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer">Search</button>
-            </div>
-            <div id="trackResult" class="hidden border border-postGold-400 p-4 rounded-lg bg-amber-50/40 mt-3 space-y-2 text-sm"></div>
+            <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live Filter Active</span>
           </div>
+          <div id="trackResult" class="hidden border border-postGold-400 p-3 rounded-lg bg-amber-50/40 space-y-1 text-xs"></div>
 
-          <!-- OVERVIEW TABLE -->
-          <div class="border-t pt-6 border-amber-200">
-            <div class="flex justify-between items-center flex-wrap gap-2 mb-3">
-              <h4 class="font-bold text-md text-slate-800">Submitted Claims Overview <span class="text-xs text-slate-400 font-normal">(Click headers to sort)</span></h4>
-              <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live Instant Filter Active</span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200 mb-4">
-              <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-postRed-800 mb-1">⚡ Instant Search (Ref / Article / Name)</label>
-                <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type Ref No, Article or Name..." class="w-full border-2 border-postGold-400 p-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none shadow-xs font-mono">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Module</label>
-                <select id="overviewFilterModule" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                  <option value="">-- All Modules --</option>
-                  <option value="Booking">Booking</option>
-                  <option value="Delivery">Delivery</option>
-                  <option value="DSS">DSS</option>
-                  <option value="Others">Others</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Office</label>
-                <select id="overviewFilterOffice" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                  <option value="">-- All Offices --</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Entry By User</label>
-                <select id="overviewFilterEmpUser" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                  <option value="">-- All Users --</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
-                <select id="overviewFilterStatus" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                  <option value="">-- All Statuses --</option>
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Settled">Settled</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
-              </div>
-              <div>
-                <button type="button" onclick="resetOverviewFilters()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 p-2 rounded-lg font-bold text-sm cursor-pointer transition">Reset</button>
-              </div>
-            </div>
-
-            <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
-              <table class="w-full text-left text-sm border-collapse">
-                <thead class="sticky top-0 z-10 shadow-xs">
-                  <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold whitespace-nowrap">
-                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No / Module <span id="sort_txn_id_ref">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Raised By / Office <span id="sort_emp_name">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn Date <span id="sort_txn_date">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('created_at')">Entry Date/Time <span id="sort_created_at">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status / Settled Date <span id="sort_claim_status">⇅</span></th>
-                    <th class="p-3.5 bg-postRed-50 cursor-default min-w-[220px]">Admin Remarks</th> 
-                    <th class="p-3.5 bg-postRed-50 cursor-default text-center min-w-[150px]">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 2: CLAIM REGISTRATION FORM -->
-        <div id="registerClaimView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200">
-          <div class="border-b pb-3 mb-4 border-amber-200">
-            <h3 class="text-lg font-bold text-postRed-700">New Claim Registration Form</h3>
-            <p class="text-xs text-slate-500">Submit refund claim with details and supporting screenshot/document</p>
-          </div>
-          <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Raised for Office Name *</label>
-              <select id="claimOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                <option value="">-- Loading Offices... --</option>
-              </select>
+          <!-- FILTERS -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
+            <div class="col-span-2">
+              <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Search (Ref / Article / Name)</label>
+              <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type to filter..." class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Module *</label>
-              <select id="claimModule" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Module</label>
+              <select id="overviewFilterModule" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Modules --</option>
                 <option value="Booking">Booking</option>
                 <option value="Delivery">Delivery</option>
                 <option value="DSS">DSS</option>
@@ -254,62 +175,130 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Article Number *</label>
-              <input type="text" id="claimArticleNo" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Office</label>
+              <select id="overviewFilterOffice" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Offices --</option>
+              </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">12-Digit Reference / Txn ID *</label>
-              <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Entry By</label>
+              <select id="overviewFilterEmpUser" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Users --</option>
+              </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">RRN Number * <span class="text-slate-400 font-normal">(Auto-filled from Txn ID)</span></label>
-              <input type="text" id="claimRrn" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Status</label>
+              <select id="overviewFilterStatus" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Statuses --</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Settled">Settled</option>
+                <option value="Rejected">Rejected</option>
+              </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Date *</label>
-              <input type="date" id="claimTxnDate" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <button type="button" onclick="resetOverviewFilters()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 p-1.5 rounded font-bold text-xs cursor-pointer transition">Reset</button>
+            </div>
+          </div>
+
+          <!-- TABLE: COMPACT & FIT IN HORIZONTAL VIEWPORT -->
+          <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="sticky top-0 z-10 shadow-xs">
+                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold whitespace-nowrap">
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No / Module <span id="sort_txn_id_ref">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Raised By / Office <span id="sort_emp_name">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn Date <span id="sort_txn_date">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition max-w-[85px]" onclick="sortTable('created_at')">Entry Date <span id="sort_created_at">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status / Settle Date <span id="sort_claim_status">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 cursor-default min-w-[160px]">Remarks</th> 
+                  <th class="p-2 bg-postRed-50 cursor-default text-center min-w-[180px]">Actions &amp; Documents</th>
+                </tr>
+              </thead>
+              <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: CLAIM REGISTRATION FORM -->
+        <div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
+          <div class="border-b pb-2 mb-3 border-amber-200">
+            <h3 class="text-sm font-bold text-postRed-700 uppercase">New Claim Registration Form</h3>
+          </div>
+          <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Raised for Office Name *</label>
+              <select id="claimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- Loading Offices... --</option>
+              </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Amount (₹) *</label>
-              <input type="number" step="0.01" id="claimAmount" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Module *</label>
+              <select id="claimModule" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="Booking">Booking</option>
+                <option value="Delivery">Delivery</option>
+                <option value="DSS">DSS</option>
+                <option value="Others">Others</option>
+              </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Payment Channel *</label>
-              <select id="claimChannel" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Article Number *</label>
+              <input type="text" id="claimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Txn ID *</label>
+              <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number *</label>
+              <input type="text" id="claimRrn" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Date *</label>
+              <input type="date" id="claimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
+              <input type="number" step="0.01" id="claimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Payment Channel *</label>
+              <select id="claimChannel" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="DQR">DQR</option>
                 <option value="SBI POS">SBI POS</option>
                 <option value="SBI ePay">SBI ePay</option>
               </select>
             </div>
             <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 mb-1">Remarks by User *</label>
-              <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Enter remarks for claim..."></textarea>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">Remarks by User *</label>
+              <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Enter remarks for claim..."></textarea>
             </div>
 
-            <div class="flex flex-col justify-start">
-              <label class="block text-xs font-bold text-slate-700 mb-1">User Mobile Number *</label>
-              <input type="tel" id="claimUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border border-slate-300 p-2.5 rounded text-sm bg-amber-50/30 focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+            <!-- ROW: LEFT = USER MOBILE (10 DIGITS STRICT), RIGHT = DOCUMENT ATTACHMENT -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-0.5">User Mobile Number (10 Digits) *</label>
+              <input type="tel" id="claimUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required placeholder="10-digit mobile" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-amber-50/30 font-mono outline-none">
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y-1.5">
               <div class="flex items-center justify-between flex-wrap gap-1">
                 <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
-                <label class="inline-flex items-center gap-1.5 text-xs font-bold text-postRed-800 bg-amber-100/70 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
+                <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100/70 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
                   <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
-                  <span>☀️ Auto Light Theme (Saves Ink)</span>
+                  <span>☀️ Auto Light Theme</span>
                 </label>
               </div>
 
-              <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-2 rounded text-xs bg-amber-50/20">
+              <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-amber-50/20">
               
-              <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-amber-50/50 p-3 rounded-lg text-center cursor-pointer outline-none focus:ring-2 focus:ring-postRed-500 transition">
-                <span class="text-lg">📋</span>
-                <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-white px-1.5 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
+              <div id="userPasteDropZone" tabindex="0" class="border border-dashed border-amber-400 hover:border-postRed-600 bg-amber-50/50 p-2 rounded text-center cursor-pointer outline-none">
+                <p class="text-xs font-bold text-postRed-800">📋 Click &amp; press <kbd class="bg-white px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
               </div>
 
-              <div id="userPastedPreviewContainer" class="hidden relative border border-emerald-400 rounded-lg p-2 bg-emerald-50/40 flex items-center justify-between">
+              <div id="userPastedPreviewContainer" class="hidden relative border border-emerald-400 rounded p-1.5 bg-emerald-50/40 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="h-12 w-20 object-contain rounded border border-emerald-300 bg-white">
+                  <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="h-10 w-16 object-contain rounded border border-emerald-300 bg-white">
                   <div>
                     <p class="font-bold text-emerald-800 text-xs">✓ Attached</p>
                     <p id="userPastedImageSize" class="text-slate-600 text-[10px]"></p>
@@ -319,55 +308,55 @@
               </div>
             </div>
 
-            <div class="md:col-span-2 pt-2 border-t border-amber-200">
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white font-bold px-6 py-2.5 rounded-lg text-sm shadow-md cursor-pointer transition">Submit Claim</button>
+            <div class="md:col-span-2 pt-1 border-t border-amber-200">
+              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white font-bold px-5 py-2 rounded-lg text-xs shadow-md cursor-pointer transition">Submit Claim</button>
             </div>
           </form>
         </div>
 
         <!-- TAB 3: THEME CONVERTER TOOL TAB -->
-        <div id="converterTabView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
-          <div class="border-b pb-3 border-amber-200 flex justify-between items-center flex-wrap gap-2">
+        <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
+          <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
-              <h3 class="text-lg font-bold text-postRed-700">☀️ Dark → Light Screenshot Theme Converter</h3>
-              <p class="text-xs text-slate-500">Auto-detects dark backgrounds and converts them to crisp ink-saving white while preserving light screenshots untouched</p>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">☀️ Dark → Light Screenshot Theme Converter</h3>
+              <p class="text-[11px] text-slate-500">Auto-converts dark backgrounds to ink-saving white while preserving light screenshots untouched</p>
             </div>
             <div class="flex gap-2">
-              <button type="button" onclick="$('converterFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">📂 Select Image</button>
-              <button type="button" onclick="downloadConvertedImage()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">💾 Download Light Image</button>
+              <button type="button" onclick="$('converterFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📂 Select Image</button>
+              <button type="button" onclick="downloadConvertedImage()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">💾 Download PNG</button>
               <input type="file" id="converterFileInput" accept="image/*" class="hidden" onchange="handleConverterFileSelect(event)">
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[300px] relative">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[260px] relative">
               <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original Source</span>
-              <img id="converterOriginalImg" class="max-h-[320px] max-w-full object-contain hidden" alt="Original">
+              <img id="converterOriginalImg" class="max-h-[260px] max-w-full object-contain hidden" alt="Original">
               <div id="converterDropNotice" class="text-center text-slate-400 text-xs">
-                <p class="text-2xl mb-1">🖼️</p>
+                <p class="text-xl mb-1">🖼️</p>
                 <p>Drag &amp; drop dark image here or paste with <kbd class="bg-slate-700 px-1 py-0.5 rounded font-mono">Ctrl + V</kbd></p>
               </div>
             </div>
 
-            <div class="border border-slate-300 rounded-lg p-3 bg-slate-50 flex flex-col items-center justify-center min-h-[300px] relative">
+            <div class="border border-slate-300 rounded-lg p-3 bg-slate-50 flex flex-col items-center justify-center min-h-[260px] relative">
               <span id="converterResultBadge" class="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Processed Result</span>
-              <img id="converterResultImg" class="max-h-[320px] max-w-full object-contain hidden" alt="Converted Light">
+              <img id="converterResultImg" class="max-h-[260px] max-w-full object-contain hidden" alt="Converted Light">
               <p id="converterEmptyNotice" class="text-slate-400 text-xs">Converted light image will appear here</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-amber-50/50 p-2.5 rounded-lg border border-amber-200 text-xs">
             <div>
-              <label class="font-bold text-slate-700 block mb-1">Target Whiteness: <span id="valLightness" class="text-postRed-700 font-bold">96%</span></label>
+              <label class="font-bold text-slate-700 block mb-0.5">Target Whiteness: <span id="valLightness" class="text-postRed-700 font-bold">96%</span></label>
               <input type="range" id="sliderLightness" min="80" max="100" value="96" class="w-full accent-postRed-600" oninput="runThemeConverter()">
             </div>
             <div>
-              <label class="font-bold text-slate-700 block mb-1">Text Dark Contrast: <span id="valDarkness" class="text-postRed-700 font-bold">12%</span></label>
+              <label class="font-bold text-slate-700 block mb-0.5">Text Dark Contrast: <span id="valDarkness" class="text-postRed-700 font-bold">12%</span></label>
               <input type="range" id="sliderDarkness" min="0" max="30" value="12" class="w-full accent-postRed-600" oninput="runThemeConverter()">
             </div>
-            <div class="flex flex-col justify-center gap-1">
-              <span id="detectionStatusText" class="font-bold text-slate-700">Detection Status: <span class="text-slate-500 font-normal">Waiting for image...</span></span>
-              <label class="inline-flex items-center gap-1.5 font-bold cursor-pointer">
+            <div class="flex flex-col justify-center">
+              <span id="detectionStatusText" class="font-bold text-slate-700 text-[11px]">Status: <span class="text-slate-500 font-normal">Waiting...</span></span>
+              <label class="inline-flex items-center gap-1.5 font-bold cursor-pointer mt-0.5">
                 <input type="checkbox" id="chkPreserveColor" checked class="accent-postRed-600" onchange="runThemeConverter()">
                 <span>Preserve Hue &amp; Badges</span>
               </label>
@@ -376,50 +365,32 @@
         </div>
 
         <!-- TAB 4: ADMIN USER MANAGEMENT -->
-        <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-4">
-          <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
+        <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
+          <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
-              <h3 class="text-lg font-bold text-postRed-700">User Account &amp; Role Management</h3>
-              <p class="text-xs text-slate-500">Manage user credentials, division permissions, roles, and division branding</p>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">User Account &amp; Role Management</h3>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
-              <button type="button" onclick="exportUsersExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">📊 Export Excel</button>
-              <button type="button" onclick="exportUsersPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer">📄 Export PDF</button>
-              <button type="button" onclick="loadAllUsers()" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">🔄 Refresh Users</button>
+              <button type="button" onclick="exportUsersExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📊 Export Excel</button>
+              <button type="button" onclick="exportUsersPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📄 Export PDF</button>
+              <button type="button" onclick="loadAllUsers()" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔄 Refresh</button>
             </div>
           </div>
 
-          <!-- SUPERADMIN LOGO MANAGEMENT PANEL -->
-          <div id="superadminLogoPanel" class="hidden bg-amber-50/70 border border-amber-300 rounded-xl p-3.5 flex items-center justify-between flex-wrap gap-3">
-            <div class="flex items-center gap-3">
-              <img id="adminLogoPreview" src="" alt="Division Logo" class="h-11 w-11 object-contain bg-white p-1 rounded-full border border-postGold-500 shadow-xs">
-              <div>
-                <h4 class="font-bold text-xs text-postRed-900 uppercase">Division Logo Branding &amp; PDF Header Seal</h4>
-                <p class="text-[11px] text-slate-600">Customized logo renders on Navbar, Login screen, and Top-Right corner of all exported PDF reports.</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <input type="file" id="customLogoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-              <button type="button" onclick="$('customLogoFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📤 Upload New Logo</button>
-              <button type="button" onclick="resetDefaultLogo()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">↺ Default</button>
-            </div>
-          </div>
-
-          <div class="max-w-md bg-amber-50/60 p-3 rounded-xl border border-amber-200">
-            <label class="block text-xs font-bold text-postRed-800 mb-1">⚡ Instant User Search (Emp Name or Emp ID)</label>
-            <input type="text" id="userInstantSearch" oninput="filterUserAccounts()" placeholder="Type Emp Name or Emp ID..." class="w-full border-2 border-postGold-400 p-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+          <div class="max-w-md bg-amber-50/60 p-2 rounded border border-amber-200">
+            <input type="text" id="userInstantSearch" oninput="filterUserAccounts()" placeholder="Filter Emp Name or ID..." class="w-full border border-postGold-400 p-1 rounded text-xs bg-white outline-none font-mono">
           </div>
 
           <div class="overflow-x-auto border border-slate-200 rounded-lg">
-            <table class="w-full text-left text-sm border-collapse">
+            <table class="w-full text-left text-xs border-collapse">
               <thead>
                 <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
-                  <th class="p-3">Emp ID</th>
-                  <th class="p-3">Emp Name / Role</th>
-                  <th class="p-3">Mobile No</th>
-                  <th class="p-3">Office Name</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3 text-center">Admin Actions</th>
+                  <th class="p-2">Emp ID</th>
+                  <th class="p-2">Emp Name / Role</th>
+                  <th class="p-2">Mobile No</th>
+                  <th class="p-2">Office Name</th>
+                  <th class="p-2">Status</th>
+                  <th class="p-2 text-center">Admin Actions</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody" class="divide-y divide-slate-200"></tbody>
@@ -427,36 +398,35 @@
           </div>
         </div>
 
-        <!-- TAB 5: MIS & PENDENCY REPORTS (WITH 3, 4-15, >15 SLABS & IN-PROGRESS AGING) -->
-        <div id="reportsView" class="tab-content hidden bg-white p-6 rounded-xl shadow-md border border-amber-200 space-y-6">
-          <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
+        <!-- TAB 5: MIS & PENDENCY REPORTS -->
+        <div id="reportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
-              <h3 class="text-lg font-bold text-postRed-700">MIS &amp; Settlement Turnaround Time (TAT) Reports</h3>
-              <p class="text-xs text-slate-500">Aging analytics, SLA monitoring, and claim resolution metrics</p>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">MIS &amp; Settlement Turnaround Time (TAT) Reports</h3>
             </div>
             <div class="flex gap-2">
-              <button type="button" onclick="exportMISExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer transition">
+              <button type="button" onclick="exportMISExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
                 📊 Export Excel (.xlsx)
               </button>
-              <button type="button" onclick="exportMISPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer transition">
+              <button type="button" onclick="exportMISPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
                 📄 Export PDF
               </button>
             </div>
           </div>
           
           <!-- FILTERS -->
-          <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-amber-50/60 p-4 rounded-xl border border-amber-200">
+          <div class="grid grid-cols-1 md:grid-cols-6 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">From Date</label>
-              <input type="date" id="filterFromDate" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">From Date</label>
+              <input type="date" id="filterFromDate" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">To Date</label>
-              <input type="date" id="filterToDate" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">To Date</label>
+              <input type="date" id="filterToDate" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Module</label>
-              <select id="filterModule" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Module</label>
+              <select id="filterModule" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Modules --</option>
                 <option value="Booking">Booking</option>
                 <option value="Delivery">Delivery</option>
@@ -465,120 +435,118 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Office Name</label>
-              <select id="filterOfficeName" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Office Name</label>
+              <select id="filterOfficeName" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Offices --</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Entry By User</label>
-              <select id="filterEmpUser" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Entry By User</label>
+              <select id="filterEmpUser" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Users --</option>
               </select>
             </div>
-            <div class="flex gap-2">
-              <button type="button" onclick="generateMISReport()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-2 rounded-lg font-bold text-sm cursor-pointer shadow-xs transition">Filter</button>
-              <button type="button" onclick="resetMISFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-2 rounded-lg font-bold text-sm cursor-pointer transition">Reset</button>
+            <div class="flex gap-1.5">
+              <button type="button" onclick="generateMISReport()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs transition">Filter</button>
+              <button type="button" onclick="resetMISFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-1.5 rounded font-bold text-xs cursor-pointer transition">Reset</button>
             </div>
           </div>
 
           <!-- PRIMARY STATUS CARDS -->
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <div onclick="generateMISReport('All')" class="bg-white border-2 border-postRed-600 p-3 rounded-xl text-center cursor-pointer hover:bg-postRed-50/50 transition shadow-xs">
-              <p class="text-[11px] text-postRed-700 font-bold uppercase tracking-wider">Total Claims</p>
-              <p id="misTotal" class="text-xl font-extrabold text-slate-900 mt-0.5">0</p>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <div onclick="generateMISReport('All')" class="bg-white border-2 border-postRed-600 p-2.5 rounded-xl text-center cursor-pointer hover:bg-postRed-50/50 transition shadow-xs">
+              <p class="text-[10px] text-postRed-700 font-bold uppercase">Total Claims</p>
+              <p id="misTotal" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('Pending')" class="bg-white border-2 border-postGold-500 p-3 rounded-xl text-center cursor-pointer hover:bg-amber-50/60 transition shadow-xs">
-              <p class="text-[11px] text-postGold-700 font-bold uppercase tracking-wider">Pending</p>
-              <p id="misPending" class="text-xl font-extrabold text-postGold-700 mt-0.5">0</p>
+            <div onclick="generateMISReport('Pending')" class="bg-white border-2 border-postGold-500 p-2.5 rounded-xl text-center cursor-pointer hover:bg-amber-50/60 transition shadow-xs">
+              <p class="text-[10px] text-postGold-700 font-bold uppercase">Pending</p>
+              <p id="misPending" class="text-base font-extrabold text-postGold-700 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('In Progress')" class="bg-white border-2 border-blue-500 p-3 rounded-xl text-center cursor-pointer hover:bg-blue-50/50 transition shadow-xs">
-              <p class="text-[11px] text-blue-700 font-bold uppercase tracking-wider">In Progress</p>
-              <p id="misInProgress" class="text-xl font-extrabold text-blue-900 mt-0.5">0</p>
+            <div onclick="generateMISReport('In Progress')" class="bg-white border-2 border-blue-500 p-2.5 rounded-xl text-center cursor-pointer hover:bg-blue-50/50 transition shadow-xs">
+              <p class="text-[10px] text-blue-700 font-bold uppercase">In Progress</p>
+              <p id="misInProgress" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('Settled')" class="bg-white border-2 border-emerald-600 p-3 rounded-xl text-center cursor-pointer hover:bg-emerald-50/50 transition shadow-xs">
-              <p class="text-[11px] text-emerald-700 font-bold uppercase tracking-wider">Settled</p>
-              <p id="misSettled" class="text-xl font-extrabold text-emerald-900 mt-0.5">0</p>
+            <div onclick="generateMISReport('Settled')" class="bg-white border-2 border-emerald-600 p-2.5 rounded-xl text-center cursor-pointer hover:bg-emerald-50/50 transition shadow-xs">
+              <p class="text-[10px] text-emerald-700 font-bold uppercase">Settled</p>
+              <p id="misSettled" class="text-base font-extrabold text-emerald-900 mt-0.5">0</p>
             </div>
-            <div onclick="generateMISReport('Rejected')" class="bg-white border-2 border-rose-600 p-4 rounded-xl text-center cursor-pointer hover:bg-rose-50/50 transition shadow-xs">
-              <p class="text-[11px] text-rose-700 font-bold uppercase tracking-wider">Rejected</p>
-              <p id="misRejected" class="text-xl font-extrabold text-rose-900 mt-0.5">0</p>
+            <div onclick="generateMISReport('Rejected')" class="bg-white border-2 border-rose-600 p-2.5 rounded-xl text-center cursor-pointer hover:bg-rose-50/50 transition shadow-xs">
+              <p class="text-[10px] text-rose-700 font-bold uppercase">Rejected</p>
+              <p id="misRejected" class="text-base font-extrabold text-rose-900 mt-0.5">0</p>
             </div>
           </div>
 
           <!-- TIME TAKEN TO SETTLE (TAT) & IN-PROGRESS AGING REPORT RIBBONS -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
             <!-- 1. SETTLED CLAIMS TAT BREAKDOWN (<=3, 4-15, >15) -->
-            <div class="bg-emerald-50/60 border border-emerald-300 rounded-xl p-3.5 space-y-2.5">
-              <div class="flex justify-between items-center border-b border-emerald-200 pb-1.5">
-                <span class="font-bold text-xs text-emerald-900 uppercase">⏱️ Settled Claims TAT Breakdown</span>
-                <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Avg: <strong id="misAvgTat">0 Days</strong></span>
+            <div class="bg-emerald-50/60 border border-emerald-300 rounded-xl p-3 space-y-2">
+              <div class="flex justify-between items-center border-b border-emerald-200 pb-1">
+                <span class="font-bold text-[11px] text-emerald-900 uppercase">⏱️ Settled Claims TAT Breakdown</span>
+                <span class="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Avg: <strong id="misAvgTat">0 Days</strong></span>
               </div>
               <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                <div onclick="generateMISReport('Settled_le3')" class="bg-white border border-emerald-300 p-2 rounded-lg cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">Settled &le; 3 Days</span>
-                  <span id="misSettledLe3" class="text-base font-extrabold text-emerald-800">0</span>
+                <div onclick="generateMISReport('Settled_le3')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&le; 3 Days</span>
+                  <span id="misSettledLe3" class="text-sm font-extrabold text-emerald-800">0</span>
                 </div>
-                <div onclick="generateMISReport('Settled_4to15')" class="bg-white border border-emerald-300 p-2 rounded-lg cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">Settled 4 - 15 Days</span>
-                  <span id="misSettled4to15" class="text-base font-extrabold text-amber-700">0</span>
+                <div onclick="generateMISReport('Settled_4to15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">4 - 15 Days</span>
+                  <span id="misSettled4to15" class="text-sm font-extrabold text-amber-700">0</span>
                 </div>
-                <div onclick="generateMISReport('Settled_gt15')" class="bg-white border border-emerald-300 p-2 rounded-lg cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">Settled &gt; 15 Days</span>
-                  <span id="misSettledGt15" class="text-base font-extrabold text-rose-700">0</span>
+                <div onclick="generateMISReport('Settled_gt15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&gt; 15 Days</span>
+                  <span id="misSettledGt15" class="text-sm font-extrabold text-rose-700">0</span>
                 </div>
               </div>
             </div>
 
             <!-- 2. IN-PROGRESS CLAIMS AGING BREAKDOWN -->
-            <div class="bg-blue-50/60 border border-blue-300 rounded-xl p-3.5 space-y-2.5">
-              <div class="flex justify-between items-center border-b border-blue-200 pb-1.5">
-                <span class="font-bold text-xs text-blue-900 uppercase">⏳ In-Progress Claims Aging Buckets</span>
-                <span class="text-[11px] text-slate-500">Aging calculated from Txn Date</span>
+            <div class="bg-blue-50/60 border border-blue-300 rounded-xl p-3 space-y-2">
+              <div class="flex justify-between items-center border-b border-blue-200 pb-1">
+                <span class="font-bold text-[11px] text-blue-900 uppercase">⏳ In-Progress Claims Aging Buckets</span>
+                <span class="text-[10px] text-slate-500">From Txn Date</span>
               </div>
-              <div class="grid grid-cols-4 gap-1.5 text-center text-xs">
-                <div onclick="generateMISReport('InProgress_le10')" class="bg-white border border-blue-300 p-2 rounded-lg cursor-pointer hover:bg-blue-100/50 transition">
+              <div class="grid grid-cols-4 gap-1 text-center text-xs">
+                <div onclick="generateMISReport('InProgress_le10')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">&le; 10 Days</span>
-                  <span id="misInProgressLe10" class="text-base font-extrabold text-slate-800">0</span>
+                  <span id="misInProgressLe10" class="text-sm font-extrabold text-slate-800">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_11to20')" class="bg-white border border-blue-300 p-2 rounded-lg cursor-pointer hover:bg-blue-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">11 - 20 Days</span>
-                  <span id="misInProgress11to20" class="text-base font-extrabold text-amber-700">0</span>
+                <div onclick="generateMISReport('InProgress_11to20')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">11-20 Days</span>
+                  <span id="misInProgress11to20" class="text-sm font-extrabold text-amber-700">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_21to30')" class="bg-white border border-blue-300 p-2 rounded-lg cursor-pointer hover:bg-blue-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">21 - 30 Days</span>
-                  <span id="misInProgress21to30" class="text-base font-extrabold text-orange-700">0</span>
+                <div onclick="generateMISReport('InProgress_21to30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">21-30 Days</span>
+                  <span id="misInProgress21to30" class="text-sm font-extrabold text-orange-700">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_gt30')" class="bg-white border border-blue-300 p-2 rounded-lg cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_gt30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">&gt; 30 Days</span>
-                  <span id="misInProgressGt30" class="text-base font-extrabold text-rose-700">0</span>
+                  <span id="misInProgressGt30" class="text-sm font-extrabold text-rose-700">0</span>
                 </div>
               </div>
             </div>
-
           </div>
 
           <!-- MIS TABLE -->
           <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
-            <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-sm p-3 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
-            <table class="w-full text-left text-sm border-collapse">
-              <thead class="sticky top-[45px] z-10 shadow-xs">
+            <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-xs p-2.5 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="sticky top-[38px] z-10 shadow-xs">
                 <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
-                  <th class="p-3 bg-postRed-50">Ref No</th>
-                  <th class="p-3 bg-postRed-50">Emp Name</th>
-                  <th class="p-3 bg-postRed-50">Module</th>
-                  <th class="p-3 bg-postRed-50">Office</th>
-                  <th class="p-3 bg-postRed-50">Txn Date</th>
-                  <th class="p-3 bg-postRed-50">Settlement Date</th>
-                  <th class="p-3 bg-postRed-50">TAT / Aging</th>
-                  <th class="p-3 bg-postRed-50">Amount</th>
-                  <th class="p-3 bg-postRed-50">Status</th>
-                  <th class="p-3 bg-postRed-50">Admin Remarks</th>
+                  <th class="p-2 bg-postRed-50">Ref No</th>
+                  <th class="p-2 bg-postRed-50">Emp Name</th>
+                  <th class="p-2 bg-postRed-50">Module</th>
+                  <th class="p-2 bg-postRed-50">Office</th>
+                  <th class="p-2 bg-postRed-50">Txn Date</th>
+                  <th class="p-2 bg-postRed-50">Settlement Date</th>
+                  <th class="p-2 bg-postRed-50">TAT / Aging</th>
+                  <th class="p-2 bg-postRed-50">Amount</th>
+                  <th class="p-2 bg-postRed-50">Status</th>
+                  <th class="p-2 bg-postRed-50">Admin Remarks</th>
                 </tr>
               </thead>
               <tbody id="misReportTableBody" class="divide-y divide-slate-200">
-                <tr><td colspan="10" class="p-4 text-center text-slate-400">Loading Report...</td></tr>
+                <tr><td colspan="10" class="p-3 text-center text-slate-400">Loading Report...</td></tr>
               </tbody>
             </table>
           </div>
@@ -588,59 +556,59 @@
 
       <!-- MANDATORY MOBILE NUMBER POPUP MODAL -->
       <div id="mobilePromptModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
           <div class="text-center">
             <span class="text-3xl">📱</span>
-            <h3 class="font-bold text-lg text-postRed-700 mt-2">Mobile Number Required</h3>
-            <p class="text-xs text-slate-500 mt-1">Please enter your 10-digit mobile number to proceed further with the portal.</p>
+            <h3 class="font-bold text-base text-postRed-700 mt-1">Mobile Number Required</h3>
+            <p class="text-xs text-slate-500">Please enter your 10-digit mobile number to proceed.</p>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mobile Number *</label>
-            <input type="tel" id="promptMobileNo" placeholder="Enter 10-digit mobile number" maxlength="10" pattern="[0-9]{10}" class="w-full border border-slate-300 p-2.5 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mobile Number (10 Digits) *</label>
+            <input type="tel" id="promptMobileNo" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" placeholder="Enter 10-digit mobile number" class="w-full border border-slate-300 p-2 rounded text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
           </div>
-          <button type="button" onclick="submitMandatoryMobile()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-sm transition cursor-pointer shadow-md">
-            Save & Continue
+          <button type="button" onclick="submitMandatoryMobile()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2 rounded-lg text-xs transition cursor-pointer shadow-md">
+            Save &amp; Continue
           </button>
         </div>
       </div>
 
       <!-- ADMIN USER EDIT MODAL -->
       <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
-          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">Edit User Details &amp; Role</h3>
-            <button type="button" onclick="closeAdminUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+        <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
+          <div class="flex justify-between items-center border-b pb-2 border-amber-200">
+            <h3 class="font-bold text-sm text-postRed-700">Edit User Details &amp; Role</h3>
+            <button type="button" onclick="closeAdminUserEditModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
           </div>
-          <form onsubmit="submitAdminUserEdit(event)" class="space-y-3">
+          <form onsubmit="submitAdminUserEdit(event)" class="space-y-2.5 text-xs">
             <input type="hidden" id="editUserId">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Employee ID</label>
-              <input type="text" id="editUserEmpId" disabled class="w-full border border-slate-200 p-2 rounded text-sm bg-slate-100 font-semibold text-slate-600 font-mono">
+              <label class="block font-bold text-slate-700 mb-0.5">Employee ID</label>
+              <input type="text" id="editUserEmpId" disabled class="w-full border border-slate-200 p-1.5 rounded text-xs bg-slate-100 font-semibold text-slate-600 font-mono">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Employee Name *</label>
-              <input type="text" id="editUserEmpName" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">Employee Name *</label>
+              <input type="text" id="editUserEmpName" required class="w-full border border-slate-300 p-1.5 rounded text-xs focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
-              <input type="tel" id="editUserMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number" class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <label class="block font-bold text-slate-700 mb-0.5">Mobile Number (10 Digits) *</label>
+              <input type="tel" id="editUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required placeholder="10-digit mobile" class="w-full border border-slate-300 p-1.5 rounded text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Office Name *</label>
-              <select id="editUserOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none"></select>
+              <label class="block font-bold text-slate-700 mb-0.5">Office Name *</label>
+              <select id="editUserOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none"></select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Access Role *</label>
-              <select id="editUserRole" required class="w-full border-2 border-postGold-400 p-2 rounded text-sm bg-white font-bold text-postRed-700 focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">Access Role *</label>
+              <select id="editUserRole" required class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white font-bold text-postRed-700 outline-none">
                 <option value="user">User (Standard Access)</option>
                 <option value="viewer">Viewer (Reports &amp; MIS Only)</option>
                 <option value="admin">Admin (Full Management)</option>
                 <option value="superadmin">Superadmin (All Privileges)</option>
               </select>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-amber-200">
-              <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
+            <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
+              <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
             </div>
           </form>
         </div>
@@ -648,48 +616,48 @@
 
       <!-- ADMIN RESET PASSWORD MODAL -->
       <div id="adminResetPwdModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl border-t-8 border-postGold-500">
-          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">🔑 Reset User Password</h3>
-            <button type="button" onclick="closeAdminResetPwdModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+        <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postGold-500">
+          <div class="flex justify-between items-center border-b pb-2 border-amber-200">
+            <h3 class="font-bold text-sm text-postRed-700">🔑 Reset User Password</h3>
+            <button type="button" onclick="closeAdminResetPwdModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
           </div>
-          <form onsubmit="submitAdminPasswordReset(event)" class="space-y-4">
+          <form onsubmit="submitAdminPasswordReset(event)" class="space-y-3 text-xs">
             <input type="hidden" id="resetPwdUserId">
-            <div class="bg-amber-50/60 p-3 rounded-lg border border-amber-200 text-xs space-y-1">
+            <div class="bg-amber-50/60 p-2 rounded border border-amber-200 space-y-0.5">
               <p><strong>Employee:</strong> <span id="resetPwdUserName"></span></p>
               <p><strong>Emp ID:</strong> <span id="resetPwdUserEmpId" class="font-mono font-bold text-postRed-700"></span></p>
             </div>
             <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="block text-xs font-bold text-slate-700">New Password *</label>
-                <button type="button" onclick="generateRandomPassword()" class="text-xs text-postRed-700 hover:underline font-bold">⚡ Generate Strong Password</button>
+              <div class="flex justify-between items-center mb-0.5">
+                <label class="block font-bold text-slate-700">New Password *</label>
+                <button type="button" onclick="generateRandomPassword()" class="text-[11px] text-postRed-700 hover:underline font-bold">⚡ Generate</button>
               </div>
-              <input type="text" id="resetPwdInput" required minlength="6" placeholder="Enter or generate new password" class="w-full border border-slate-300 p-2 rounded text-sm font-mono focus:ring-2 focus:ring-postRed-600 outline-none">
+              <input type="text" id="resetPwdInput" required minlength="6" placeholder="Enter new password" class="w-full border border-slate-300 p-1.5 rounded text-xs font-mono focus:ring-2 focus:ring-postRed-600 outline-none">
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
-              <button type="button" onclick="closeAdminResetPwdModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Update Password</button>
+              <button type="button" onclick="closeAdminResetPwdModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-3 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Update</button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- USER CLAIM EDIT MODAL -->
+      <!-- USER CLAIM EDIT MODAL (REMARKS EDITING FIXED) -->
       <div id="userEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
-          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">Edit Claim Request</h3>
-            <button type="button" onclick="closeUserEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+        <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
+          <div class="flex justify-between items-center border-b pb-2 border-amber-200">
+            <h3 class="font-bold text-sm text-postRed-700">Edit Claim Request &amp; Remarks</h3>
+            <button type="button" onclick="closeUserEditModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
           </div>
-          <form onsubmit="submitUserClaimEdit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onsubmit="submitUserClaimEdit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <input type="hidden" id="editClaimId">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Raised for Office Name *</label>
-              <select id="editClaimOffice" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none"></select>
+              <label class="block font-bold text-slate-700 mb-0.5">Raised for Office Name *</label>
+              <select id="editClaimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none"></select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Module *</label>
-              <select id="editClaimModule" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">Module *</label>
+              <select id="editClaimModule" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="Booking">Booking</option>
                 <option value="Delivery">Delivery</option>
                 <option value="DSS">DSS</option>
@@ -697,63 +665,63 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Article Number *</label>
-              <input type="text" id="editClaimArticleNo" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">Article Number *</label>
+              <input type="text" id="editClaimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">RRN Number *</label>
-              <input type="text" id="editClaimRrn" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">RRN Number *</label>
+              <input type="text" id="editClaimRrn" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Date *</label>
-              <input type="date" id="editClaimTxnDate" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">Txn Date *</label>
+              <input type="date" id="editClaimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Txn Amount (₹) *</label>
-              <input type="number" step="0.01" id="editClaimAmount" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
+              <input type="number" step="0.01" id="editClaimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Payment Channel *</label>
-              <select id="editClaimChannel" required class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <label class="block font-bold text-slate-700 mb-0.5">Payment Channel *</label>
+              <select id="editClaimChannel" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="DQR">DQR</option>
                 <option value="SBI POS">SBI POS</option>
                 <option value="SBI ePay">SBI ePay</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">User Mobile *</label>
-              <input type="tel" id="editClaimMobile" pattern="[0-9]{10}" required class="w-full border border-slate-300 p-2 rounded text-sm focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <label class="block font-bold text-slate-700 mb-0.5">User Mobile (10 Digits) *</label>
+              <input type="tel" id="editClaimMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
             </div>
             <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 mb-1">Remarks by User *</label>
-              <textarea id="editClaimRemarks" required class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none"></textarea>
+              <label class="block font-bold text-slate-700 mb-0.5">Remarks by User (Edit/Update Details) *</label>
+              <textarea id="editClaimRemarks" required class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs h-20 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/20"></textarea>
             </div>
             <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 mb-1">Replace Document Attachment (Optional)</label>
-              <input type="file" id="editClaimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-2 rounded text-sm bg-amber-50/30">
+              <label class="block font-bold text-slate-700 mb-0.5">Replace Document Attachment (Optional)</label>
+              <input type="file" id="editClaimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-amber-50/30">
             </div>
             <div class="md:col-span-2 flex justify-end gap-2 pt-2 border-t border-amber-200">
-              <button type="button" onclick="closeUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
+              <button type="button" onclick="closeUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- ADMIN REPLY MODAL (CAPTURES SETTLEMENT DATE) -->
+      <!-- ADMIN REPLY MODAL -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-postRed-600">
+        <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
-            <h3 class="font-bold text-lg text-postRed-700">Admin Action &amp; Reply Remarks</h3>
-            <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer leading-none">&times;</button>
+            <h3 class="font-bold text-sm text-postRed-700">Admin Action &amp; Reply Remarks</h3>
+            <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer leading-none">&times;</button>
           </div>
           
           <input type="hidden" id="modalClaimId">
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Update Claim Status</label>
-              <select id="modalStatus" onchange="toggleSettlementDateField()" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-bold">
+              <label class="block font-bold text-slate-700 mb-0.5">Update Status</label>
+              <select id="modalStatus" onchange="toggleSettlementDateField()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold">
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Settled">Settled</option>
@@ -761,8 +729,8 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Change Module (Admin)</label>
-              <select id="modalModule" class="w-full border border-slate-300 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-semibold text-postRed-700">
+              <label class="block font-bold text-slate-700 mb-0.5">Module</label>
+              <select id="modalModule" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-semibold text-postRed-700">
                 <option value="Booking">Booking</option>
                 <option value="Delivery">Delivery</option>
                 <option value="DSS">DSS</option>
@@ -771,57 +739,52 @@
             </div>
           </div>
 
-          <div id="modalSettlementDateContainer" class="hidden bg-emerald-50/70 p-3 rounded-lg border border-emerald-300">
-            <label class="block text-xs font-bold text-emerald-900 mb-1">📅 Date of Settlement (Actual Refund Date) *</label>
-            <input type="date" id="modalSettlementDate" class="w-full border border-emerald-400 p-2 rounded text-sm bg-white focus:ring-2 focus:ring-emerald-600 outline-none font-bold text-emerald-900">
-            <p class="text-[11px] text-emerald-700 mt-1">Enter actual refund credit date to compute true Turnaround Time (TAT).</p>
+          <div id="modalSettlementDateContainer" class="hidden bg-emerald-50/70 p-2.5 rounded border border-emerald-300 text-xs">
+            <label class="block font-bold text-emerald-900 mb-0.5">📅 Actual Date of Settlement *</label>
+            <input type="date" id="modalSettlementDate" class="w-full border border-emerald-400 p-1 rounded text-xs bg-white outline-none font-bold text-emerald-900">
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Reply Remarks by Admin</label>
-            <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-2 rounded text-sm h-20 focus:ring-2 focus:ring-postRed-600 outline-none" placeholder="Type reply remarks or instructions..."></textarea>
+            <label class="block text-xs font-bold text-slate-700 mb-0.5">Reply Remarks by Admin</label>
+            <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Type reply remarks..."></textarea>
           </div>
 
           <!-- ADMIN FILE ATTACHMENT & CLIPBOARD PASTE -->
-          <div class="space-y-2 border-t pt-3 border-amber-200">
-            <label class="block text-xs font-bold text-slate-700">Attach Document or Screenshot</label>
-            <input type="file" id="modalAdminFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-2 rounded text-xs bg-white">
+          <div class="space-y-1.5 border-t pt-2 border-amber-200 text-xs">
+            <label class="block font-bold text-slate-700">Attach Resolution Document / Screenshot</label>
+            <input type="file" id="modalAdminFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-white">
             
-            <div class="text-center text-xs text-slate-400 font-semibold my-1">— OR PASTE SCREENSHOT —</div>
-
-            <div id="adminPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-amber-50/50 p-4 rounded-xl text-center cursor-pointer outline-none focus:ring-2 focus:ring-postRed-500 transition">
-              <span class="text-xl">📋</span>
-              <p class="text-xs font-bold text-postRed-800 mt-1">Click here and press <kbd class="bg-white px-1.5 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
+            <div id="adminPasteDropZone" tabindex="0" class="border border-dashed border-amber-400 hover:border-postRed-600 bg-amber-50/50 p-2 rounded text-center cursor-pointer outline-none">
+              <p class="text-[11px] font-bold text-postRed-800">📋 Click &amp; press <kbd class="bg-white px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
             </div>
 
-            <div id="adminPastedPreviewContainer" class="hidden relative border border-amber-300 rounded-lg p-2 bg-amber-50/30 flex items-center gap-3">
-              <img id="adminPastedImagePreview" src="" alt="Pasted Screenshot" class="h-16 w-24 object-cover rounded border border-amber-200">
-              <div class="text-xs flex-1">
-                <p class="font-bold text-emerald-700">✓ Screenshot Attached</p>
-                <p id="adminPastedImageSize" class="text-slate-500 text-[11px]"></p>
+            <div id="adminPastedPreviewContainer" class="hidden relative border border-amber-300 rounded p-1.5 bg-amber-50/30 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img id="adminPastedImagePreview" src="" alt="Pasted Screenshot" class="h-10 w-16 object-cover rounded border border-amber-200">
+                <span class="text-emerald-700 font-bold text-xs">✓ Attached</span>
               </div>
               <button type="button" onclick="clearAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold p-1 underline cursor-pointer">Remove</button>
             </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
-            <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer">Cancel</button>
-            <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer shadow-xs">Save Changes</button>
+            <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+            <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
           </div>
         </div>
       </div>
 
       <!-- CLAIM DETAILS FULL VIEW MODAL -->
       <div id="detailsModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
-          <div class="flex justify-between items-center border-b pb-3 border-amber-200">
-            <h3 class="font-bold text-lg text-postRed-700">Complete Claim Registration Details</h3>
-            <button type="button" onclick="closeDetailsModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
+        <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
+          <div class="flex justify-between items-center border-b pb-2 border-amber-200">
+            <h3 class="font-bold text-sm text-postRed-700 uppercase">Complete Claim Registration Details</h3>
+            <button type="button" onclick="closeDetailsModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
           </div>
-          <div id="detailsModalContent" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"></div>
-          <div class="flex justify-end gap-2 border-t pt-3 border-amber-200">
-            <button type="button" id="modalPrintBtn" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded text-sm font-bold cursor-pointer transition">🖨️ Print Docket</button>
-            <button type="button" onclick="closeDetailsModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded text-sm font-bold cursor-pointer transition">Close</button>
+          <div id="detailsModalContent" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
+          <div class="flex justify-end gap-2 border-t pt-2 border-amber-200">
+            <button type="button" id="modalPrintBtn" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer transition">🖨️ Print Docket</button>
+            <button type="button" onclick="closeDetailsModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer transition">Close</button>
           </div>
         </div>
       </div>
@@ -830,10 +793,10 @@
   </div>
 
   <!-- FOOTER PANEL -->
-  <footer class="w-full bg-white border-t border-amber-300 py-4 mt-12 text-center text-xs text-slate-600 shadow-inner">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+  <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Designed and Developed for <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
+      <div class="text-slate-500 font-medium">Department of Posts &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
     </div>
   </footer>
 
@@ -845,8 +808,8 @@
 
     const $ = id => document.getElementById(id);
 
-    // OFFICIAL INDIA POST LOGO URL
-    const DEFAULT_INDIA_POST_LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
+    // EMBEDDED HIGH-RES VECTOR LOGO BASE64
+    const DEFAULT_INDIA_POST_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'><circle cx='80' cy='80' r='76' fill='%23C4122F' stroke='%23F8B133' stroke-width='6'/><path d='M30 46 L130 46 L80 92 Z' fill='%23F8B133'/><polygon points='30,52 80,98 30,120' fill='%23FFFDF5'/><polygon points='130,52 80,98 130,120' fill='%23FEF9C3'/><polygon points='32,120 80,94 128,120' fill='%23FACC15'/><rect x='16' y='126' width='128' height='22' rx='4' fill='%238A0C21' stroke='%23F8B133' stroke-width='1.2'/><text x='80' y='141' font-family='Arial,sans-serif' font-size='9' font-weight='bold' fill='%23FFFDF5' text-anchor='middle'>डाक सेवा - जन सेवा</text></svg>";
 
     let currentAppLogo = localStorage.getItem('app_custom_logo') || DEFAULT_INDIA_POST_LOGO;
     let cachedPdfLogoBase64 = null;
@@ -883,28 +846,28 @@
       });
     }
 
-    // CORS-SAFE BASE64 CONVERTER FOR PDF EXPORTS
-    function cacheBase64Logo(url) {
-      if (url.startsWith('data:image')) {
-        cachedPdfLogoBase64 = url;
-        return;
-      }
+    // STRICT 10-DIGIT PHONE CLEANER
+    function cleanPhoneInput(el) {
+      el.value = el.value.replace(/\D/g, '').slice(0, 10);
+    }
+
+    // PRE-RENDER LOGO TO PNG DATA-URL FOR JSDPF (ELIMINATES CORS FAILURES)
+    function cacheBase64Logo(svgOrUrl) {
       const img = new Image();
       img.crossOrigin = "Anonymous";
       img.onload = function() {
         const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
+        canvas.width = 160;
+        canvas.height = 160;
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0, 160, 160);
         try {
           cachedPdfLogoBase64 = canvas.toDataURL("image/png");
         } catch (e) {
           cachedPdfLogoBase64 = null;
         }
       };
-      img.onerror = () => { cachedPdfLogoBase64 = null; };
-      img.src = url;
+      img.src = svgOrUrl;
     }
 
     function initLogos() {
@@ -914,27 +877,6 @@
       cacheBase64Logo(currentAppLogo);
     }
     initLogos();
-
-    function handleLogoUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const r = new FileReader();
-      r.onload = ev => {
-        currentAppLogo = ev.target.result;
-        localStorage.setItem('app_custom_logo', currentAppLogo);
-        initLogos();
-        alert("Logo updated! It will render on the portal and in all exported PDF dockets.");
-      };
-      r.readAsDataURL(file);
-    }
-
-    function resetDefaultLogo() {
-      if (!confirm("Reset to official default India Post logo?")) return;
-      currentAppLogo = DEFAULT_INDIA_POST_LOGO;
-      localStorage.removeItem('app_custom_logo');
-      initLogos();
-      alert("Logo reset to default India Post emblem.");
-    }
 
     function showAuthView(view) {
       if (view === 'register') {
@@ -1127,12 +1069,12 @@
       const statusText = $('detectionStatusText');
       if (isDarkTheme) {
         badge.className = "absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold";
-        badge.innerText = "✓ Dark Theme Detected → Converted to Light";
-        statusText.innerHTML = `Detection Status: <span class="text-emerald-700 font-bold">Dark Theme Detected (Inverted to White)</span>`;
+        badge.innerText = "✓ Dark Theme Inverted to Light";
+        statusText.innerHTML = `Status: <span class="text-emerald-700 font-bold">Dark Theme Inverted</span>`;
       } else {
         badge.className = "absolute top-2 left-2 bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold";
-        badge.innerText = "ℹ️ Light Theme Detected (Kept Untouched)";
-        statusText.innerHTML = `Detection Status: <span class="text-blue-700 font-bold">Already Light Theme (Protected & Untouched)</span>`;
+        badge.innerText = "ℹ️ Light Theme Kept Untouched";
+        statusText.innerHTML = `Status: <span class="text-blue-700 font-bold">Protected Untouched</span>`;
       }
 
       canvas.toBlob(blob => {
@@ -1147,10 +1089,11 @@
       if (!standaloneConvertedBlob) return alert("Please select or paste an image to convert first!");
       const a = document.createElement('a');
       a.href = URL.createObjectURL(standaloneConvertedBlob);
-      a.download = `screenshot_${Date.now()}.png`;
+      a.download = `converted_light_screenshot_${Date.now()}.png`;
       a.click();
     }
 
+    // PASTE HANDLER
     window.addEventListener('paste', async (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       let blob = null;
@@ -1187,8 +1130,8 @@
         $('userPastedImagePreview').src = URL.createObjectURL(blob);
         $('userPastedPreviewContainer').classList.remove('hidden');
         $('userPastedImageSize').innerText = isDark 
-          ? `Size: ${(blob.size / 1024).toFixed(1)} KB (Dark screenshot converted to light)` 
-          : `Size: ${(blob.size / 1024).toFixed(1)} KB (Light image kept untouched)`;
+          ? `Size: ${(blob.size / 1024).toFixed(1)} KB (Inverted Light PNG)` 
+          : `Size: ${(blob.size / 1024).toFixed(1)} KB (Original Light)`;
         $('claimFile').value = '';
         e.preventDefault();
       }
@@ -1204,6 +1147,15 @@
       userPastedImageBlob = null;
       $('userPastedPreviewContainer').classList.add('hidden');
       $('userPastedImagePreview').src = '';
+    }
+
+    // COMPACT DATE & TIME SPLIT
+    function formatDateTimeCompact(isoStr) {
+      if (!isoStr) return '<span class="text-slate-400">N/A</span>';
+      const d = new Date(isoStr);
+      const datePart = d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' });
+      const timePart = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      return `<div class="font-bold text-slate-700 leading-tight">${datePart}</div><div class="text-[10px] text-slate-400 leading-tight">${timePart}</div>`;
     }
 
     function formatDateTime(isoStr) {
@@ -1409,7 +1361,6 @@
 
       const role = profile.role || 'user';
       const isAdmin = role === 'admin' || role === 'superadmin';
-      const isSuperadmin = role === 'superadmin';
       const isViewer = role === 'viewer';
 
       if (isAdmin) {
@@ -1418,7 +1369,6 @@
         $('tabBtnRegister').classList.remove('hidden');
         $('tabBtnConverter').classList.remove('hidden');
         $('tabBtnReports').classList.remove('hidden');
-        if (isSuperadmin) $('superadminLogoPanel').classList.remove('hidden');
       } else if (isViewer) {
         $('adminTabBtn').classList.add('hidden');
         $('tabBtnTrack').classList.add('hidden');
@@ -1453,7 +1403,7 @@
       const isViewer = role === 'viewer';
 
       if (tabId === 'adminRoleMgmt' && !isAdmin) {
-        alert("Access Denied: Only Admins and Superadmins can access User Management.");
+        alert("Access Denied: Only Admins can access User Management.");
         tabId = isViewer ? 'reports' : 'track';
       }
 
@@ -1466,7 +1416,7 @@
 
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(el => {
-        el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-amber-100/50 cursor-pointer";
+        el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer";
       });
 
       const map = {
@@ -1479,7 +1429,7 @@
 
       if (map[tabId]) {
         $(map[tabId][0]).classList.remove('hidden');
-        $(map[tabId][1]).className = "tab-btn bg-postRed-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-xs cursor-pointer";
+        $(map[tabId][1]).className = "tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer";
       }
     }
 
@@ -1489,6 +1439,10 @@
       const txn_id_ref = $('claimTxnId').value.trim();
       const raised_office = $('claimOffice').value;
       const user_mobile = $('claimUserMobile').value.trim();
+
+      if (!user_mobile || user_mobile.length !== 10) {
+        return alert("Please enter a valid 10-digit mobile number!");
+      }
 
       if (!fileInput && !userPastedImageBlob) return alert("Please attach a document or paste a screenshot!");
 
@@ -1561,6 +1515,77 @@
       }
     }
 
+    // FIXED: REMARKS BY USER IS FULLY EDITABLE & PERSISTENT
+    function openUserEditModal(claimId) {
+      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
+      if (!claim) return alert("Claim details not found!");
+
+      $('editClaimId').value = claim.id;
+      $('editClaimOffice').value = claim.raised_for_office || '';
+      $('editClaimModule').value = claim.module || 'Booking';
+      $('editClaimArticleNo').value = claim.article_number || '';
+      $('editClaimRrn').value = claim.rrn_number || '';
+      $('editClaimTxnDate').value = claim.txn_date || '';
+      $('editClaimAmount').value = claim.txn_amount || '';
+      $('editClaimChannel').value = claim.payment_channel || 'DQR';
+      $('editClaimMobile').value = claim.user_mobile || '';
+      $('editClaimRemarks').value = claim.remarks_by_user || '';
+      $('editClaimFile').value = '';
+
+      $('userEditModal').classList.remove('hidden');
+    }
+
+    function closeUserEditModal() {
+      $('userEditModal').classList.add('hidden');
+    }
+
+    async function submitUserClaimEdit(e) {
+      e.preventDefault();
+      const claimId = $('editClaimId').value;
+      const fileInput = $('editClaimFile').files[0];
+      const mobile_number = $('editClaimMobile').value.trim();
+
+      if (!mobile_number || mobile_number.length !== 10) {
+        return alert("Please enter a valid 10-digit mobile number!");
+      }
+
+      let publicUrl = null;
+
+      if (fileInput) {
+        const fileExt = fileInput.name.split('.').pop();
+        const filePath = `claims/edited-${claimId}-${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, fileInput, { upsert: true });
+
+        if (uploadError) return alert("File upload failed: " + uploadError.message);
+        publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+      }
+
+      const updateData = {
+        raised_for_office: $('editClaimOffice').value,
+        module: $('editClaimModule').value,
+        article_number: $('editClaimArticleNo').value,
+        rrn_number: $('editClaimRrn').value,
+        txn_date: $('editClaimTxnDate').value,
+        txn_amount: $('editClaimAmount').value,
+        payment_channel: $('editClaimChannel').value,
+        user_mobile: mobile_number,
+        remarks_by_user: $('editClaimRemarks').value.trim()
+      };
+
+      if (publicUrl) updateData.file_url = publicUrl;
+
+      const { error } = await supabaseClient.from('claims').update(updateData).eq('id', claimId);
+
+      if (error) {
+        alert("Failed to update claim remarks/details: " + error.message);
+      } else {
+        alert("Claim remarks & details updated successfully!");
+        closeUserEditModal();
+        await loadClaimsSummary();
+        await generateMISReport(currentMISReportFilter);
+      }
+    }
+
     function applyOverviewFilters() {
       const query = ($('overviewInstantSearch')?.value || '').trim().toLowerCase();
       const selectedModule = $('overviewFilterModule')?.value;
@@ -1603,7 +1628,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER TABLE WITH SETTLED DATE UNDER STATUS
+    // RENDER SUMMARY TABLE: HORIZONTAL FIT OPTIMIZED & EXPLICIT BUTTONS
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1617,7 +1642,7 @@
       if (activeIcon) activeIcon.innerText = currentSortDir === 'asc' ? '▲' : '▼';
 
       if (!currentClaimsList || currentClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500">No requests found matching search criteria.</td></tr>`;
         return;
       }
 
@@ -1641,74 +1666,86 @@
       currentClaimsList.forEach(c => {
         const empNameOnly = c.profiles?.emp_name || 'N/A';
         const empIdOnly = c.profiles?.emp_id ? `[${c.profiles.emp_id}]` : '';
-        const entryDateTime = formatDateTime(c.created_at);
+        const entryCompact = formatDateTimeCompact(c.created_at);
         const isOwner = c.created_by === currentUser?.id;
         const isSettled = c.claim_status === 'Settled';
 
-        let adminReplyHtml = c.reply_remarks_admin 
-          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-2 rounded text-xs font-medium whitespace-normal break-words leading-relaxed">${c.reply_remarks_admin}</div>`
-          : `<span class="text-slate-400 italic text-xs">Pending Response</span>`;
-
-        if (c.admin_file_url) {
-          adminReplyHtml += `<a href="${c.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[10px] font-bold shadow-2xs mt-1 transition whitespace-nowrap">📎 Admin Doc</a>`;
-        }
+        let remarksDisplay = c.reply_remarks_admin 
+          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[200px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
+          : `<div class="text-slate-600 italic text-[11px] truncate max-w-[180px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user}</div>`;
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
-            <td class="p-3 whitespace-nowrap">
-              <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-sm block">
+            <!-- 1. REF NO & MODULE + COPY BUTTON -->
+            <td class="p-2 whitespace-nowrap">
+              <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-xs block">
                 ${c.txn_id_ref}
               </button>
-              <div class="flex items-center gap-1.5 mt-1">
-                <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[11px] border border-slate-200">${c.module}</span>
-                <button type="button" title="Copy Reference Number" onclick="copyToClipboard('${c.txn_id_ref}', this)" class="inline-flex items-center gap-0.5 bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer transition">
+              <div class="flex items-center gap-1 mt-0.5">
+                <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1 py-0.2 rounded text-[10px] border border-slate-200">${c.module}</span>
+                <button type="button" title="Copy Reference Number" onclick="copyToClipboard('${c.txn_id_ref}', this)" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer transition">
                   📋 Copy
                 </button>
               </div>
             </td>
-            <td class="p-3 whitespace-nowrap">
-              <div class="font-bold text-slate-800">${empNameOnly} <span class="text-xs text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
-              <div class="text-xs text-slate-600 font-medium">${c.raised_for_office}</div>
+
+            <!-- 2. EMP NAME/ID & OFFICE -->
+            <td class="p-2 whitespace-nowrap">
+              <div class="font-bold text-slate-800 leading-tight">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
+              <div class="text-[10.5px] text-slate-600 leading-tight">${c.raised_for_office}</div>
             </td>
-            <td class="p-3 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
-            <td class="p-3 whitespace-nowrap text-xs text-slate-600 font-medium">${entryDateTime}</td>
-            <td class="p-3 font-bold text-slate-900 whitespace-nowrap text-sm">₹${c.txn_amount}</td>
+
+            <!-- 3. TXN DATE -->
+            <td class="p-2 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
+
+            <!-- 4. ENTRY DATE/TIME (SHRUNK COMPACT 2-LINE) -->
+            <td class="p-1.5 whitespace-nowrap max-w-[85px]">${entryCompact}</td>
+
+            <!-- 5. AMOUNT -->
+            <td class="p-2 font-bold text-slate-900 whitespace-nowrap text-xs">₹${c.txn_amount}</td>
             
-            <!-- STATUS WITH SETTLEMENT DATE DISPLAY DIRECTLY BELOW -->
-            <td class="p-3 whitespace-nowrap">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold inline-block ${getStatusColor(c.claim_status)}">
+            <!-- 6. STATUS WITH SETTLEMENT DATE -->
+            <td class="p-2 whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
               </span>
               ${isSettled && c.settlement_date ? `
-                <div class="text-[11px] text-emerald-800 font-bold mt-1 flex items-center gap-1">
-                  <span>📅 Settled:</span> <span>${c.settlement_date}</span>
+                <div class="text-[10px] text-emerald-800 font-bold mt-0.5">
+                  📅 ${c.settlement_date}
                 </div>
               ` : ''}
             </td>
 
-            <td class="p-3 min-w-[220px]">${adminReplyHtml}</td>
+            <!-- 7. REMARKS -->
+            <td class="p-2 min-w-[160px]">${remarksDisplay}</td>
             
-            <td class="p-3 text-center whitespace-nowrap min-w-[150px]">
-              <div class="inline-flex items-center justify-center gap-1.5">
+            <!-- 8. ACTIONS: BUTTONS WITH TEXT & BOTH DOCS -->
+            <td class="p-2 text-center whitespace-nowrap min-w-[180px]">
+              <div class="flex items-center justify-center gap-1 flex-wrap">
                 ${isAdmin ? `
-                  <button type="button" title="Reply / Update Claim" onclick="openReplyModal('${c.id}')" class="h-8 w-8 inline-flex items-center justify-center bg-postRed-600 hover:bg-postRed-700 text-white rounded-md text-sm shadow-xs transition cursor-pointer">
-                    ✏️
+                  <button type="button" onclick="openReplyModal('${c.id}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
+                    ✏️ Reply
                   </button>
-                  <button type="button" title="Delete Claim" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="h-8 w-8 inline-flex items-center justify-center bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 rounded-md text-sm shadow-xs transition cursor-pointer">
-                    🗑️
+                  <button type="button" onclick="deleteClaim('${c.id}', '${c.txn_id_ref}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-1.5 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
+                    🗑️ Delete
                   </button>
                 ` : `
                   ${isOwner ? `
-                    <button type="button" title="Edit Claim" onclick="openUserEditModal('${c.id}')" class="h-8 w-8 inline-flex items-center justify-center bg-postGold-500 hover:bg-postGold-600 text-postRed-900 rounded-md text-sm shadow-xs transition cursor-pointer">
-                      ✏️
+                    <button type="button" onclick="openUserEditModal('${c.id}')" class="bg-postGold-500 hover:bg-postGold-600 text-postRed-900 px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
+                      ✏️ Edit
                     </button>
                   ` : ''}
                 `}
-                <a href="${c.file_url}" target="_blank" title="View Uploaded Document" class="h-8 w-8 inline-flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white rounded-md text-sm shadow-xs transition">
-                  📄
+                <a href="${c.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition">
+                  📄 User Doc
                 </a>
-                <button type="button" title="Print Complete Docket" onclick="printClaimDetails('${c.id}')" class="h-8 w-8 inline-flex items-center justify-center bg-slate-800 hover:bg-slate-900 text-white rounded-md text-sm shadow-xs transition cursor-pointer">
-                  🖨️
+                ${c.admin_file_url ? `
+                  <a href="${c.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition">
+                    📎 Admin Doc
+                  </a>
+                ` : ''}
+                <button type="button" onclick="printClaimDetails('${c.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10.5px] font-bold shadow-2xs transition cursor-pointer">
+                  🖨️ Docket
                 </button>
               </div>
             </td>
@@ -1742,42 +1779,41 @@
       const tatDays = isSettled && claim.settlement_date ? calculateDaysDifference(claim.txn_date, claim.settlement_date) : null;
 
       $('detailsModalContent').innerHTML = `
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">12-Digit Ref No / Txn ID:</strong> <span class="text-base font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Created By Employee:</strong> <span class="font-bold text-slate-800">${creatorEmpName} (${creatorEmpId})</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Date &amp; Time of Entry:</strong> <span class="font-medium">${entryDateTime}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Raised For Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium">${claim.user_mobile || 'N/A'}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Module Name:</strong> <span class="font-medium text-postRed-700 font-bold">${claim.module}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Article Number:</strong> <span class="font-medium">${claim.article_number}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">RRN Number:</strong> <span class="font-medium">${claim.rrn_number}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Date:</strong> <span class="font-medium">${claim.txn_date}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Amount:</strong> <span class="font-bold text-emerald-800">₹${claim.txn_amount}</span></div>
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200"><strong class="text-slate-500 text-xs block">Payment Channel:</strong> <span class="font-medium">${claim.payment_channel}</span></div>
-        
-        <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-200">
-          <strong class="text-slate-500 text-xs block">Settlement Info:</strong> 
-          <span class="font-bold text-slate-800">${claim.settlement_date ? `${claim.settlement_date} (${tatDays !== null ? tatDays + ' Days TAT' : ''})` : 'Pending Settlement'}</span>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Ref No:</strong> <span class="text-sm font-bold text-postRed-700 font-mono">${claim.txn_id_ref}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Created By:</strong> <span class="font-bold text-slate-800">${creatorEmpName} (${creatorEmpId})</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Entry Date &amp; Time:</strong> <span class="font-medium">${entryDateTime}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Office:</strong> <span class="font-medium">${claim.raised_for_office}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">User Mobile:</strong> <span class="font-medium font-mono">${claim.user_mobile || 'N/A'}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Module:</strong> <span class="font-bold text-postRed-700">${claim.module}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Article Number:</strong> <span class="font-medium">${claim.article_number}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">RRN:</strong> <span class="font-medium font-mono">${claim.rrn_number}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Txn Date:</strong> <span class="font-medium">${claim.txn_date}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Amount:</strong> <span class="font-bold text-emerald-800">₹${claim.txn_amount}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200"><strong class="text-slate-500 text-xs block">Channel:</strong> <span class="font-medium">${claim.payment_channel}</span></div>
+        <div class="bg-amber-50/50 p-2.5 rounded border border-amber-200">
+          <strong class="text-slate-500 text-xs block">Settlement:</strong> 
+          <span class="font-bold text-slate-800">${claim.settlement_date ? `${claim.settlement_date} (${tatDays !== null ? tatDays + ' Days TAT' : ''})` : 'Pending'}</span>
         </div>
 
         <div class="col-span-1 md:col-span-2">
-          <strong class="text-slate-500 text-xs block mb-1">Claim Status:</strong> 
-          <span class="px-3 py-1 rounded-full text-xs font-bold inline-block ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span>
+          <strong class="text-slate-500 text-xs block mb-0.5">Status:</strong> 
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold inline-block ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span>
         </div>
         
-        <div class="col-span-1 md:col-span-2 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-          <strong class="text-slate-600 text-xs block mb-1">Remarks by User:</strong> 
-          <p class="text-slate-800">${claim.remarks_by_user}</p>
+        <div class="col-span-1 md:col-span-2 bg-slate-50 p-2.5 rounded border border-slate-200">
+          <strong class="text-slate-600 text-xs block mb-0.5">Remarks by User:</strong> 
+          <p class="text-slate-800 whitespace-pre-wrap">${claim.remarks_by_user}</p>
         </div>
         
-        <div class="col-span-1 md:col-span-2 bg-amber-50 p-3.5 rounded-lg border border-amber-300 space-y-2">
+        <div class="col-span-1 md:col-span-2 bg-amber-50 p-2.5 rounded border border-amber-300 space-y-1">
           <strong class="text-postRed-800 text-xs block">Reply Remarks by Admin:</strong> 
           <p class="text-slate-800 whitespace-pre-wrap">${claim.reply_remarks_admin || 'Pending Response'}</p>
-          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-postRed-600 text-white px-2.5 py-1 rounded text-xs font-bold hover:bg-postRed-700 transition shadow-xs">📎 Admin Attached File</a>` : ''}
+          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 text-white px-2 py-0.5 rounded text-[11px] font-bold hover:bg-postRed-700 transition">📎 Admin Attached Doc</a>` : ''}
         </div>
         
         <div class="col-span-1 md:col-span-2">
-          <strong class="text-slate-500 text-xs block mb-1">Uploaded User Document:</strong> 
-          <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-xs">
+          <strong class="text-slate-500 text-xs block mb-0.5">Uploaded User Document:</strong> 
+          <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold transition">
             📄 User Submitted Document
           </a>
         </div>
@@ -1886,7 +1922,7 @@
               <td class="label">Raised For Office:</td>
               <td class="value">${claim.raised_for_office}</td>
               <td class="label">User Contact Mobile:</td>
-              <td class="value">${claim.user_mobile || 'N/A'}</td>
+              <td class="value font-mono">${claim.user_mobile || 'N/A'}</td>
             </tr>
             <tr>
               <td class="label">Date &amp; Time of Entry:</td>
@@ -2166,19 +2202,19 @@
         const role = u.role || 'user';
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-3 font-bold font-mono text-slate-800">${u.emp_id}</td>
-            <td class="p-3">
+            <td class="p-2.5 font-bold font-mono text-slate-800">${u.emp_id}</td>
+            <td class="p-2.5">
               <div class="font-bold text-slate-800">${u.emp_name}</div>
               <div class="mt-0.5">${getRoleBadge(role)}</div>
             </td>
-            <td class="p-3 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
-            <td class="p-3 font-medium">${u.office_name}</td>
-            <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
-            <td class="p-3 text-center">
+            <td class="p-2.5 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
+            <td class="p-2.5 font-medium">${u.office_name}</td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
+            <td class="p-2.5 text-center">
               <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
-                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
-                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
-                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2.5 py-1 rounded text-xs font-bold cursor-pointer">
+                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
+                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
+                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-1 rounded text-xs font-bold cursor-pointer">
                   ${isActive ? '🔒 Lock' : '🔓 Unlock'}
                 </button>
               </div>
@@ -2316,24 +2352,21 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "portrait" });
 
-      // Embed Base64 Logo in Top-Right
       if (cachedPdfLogoBase64) {
         try {
-          doc.addImage(cachedPdfLogoBase64, 'PNG', 165, 8, 30, 24);
+          doc.addImage(cachedPdfLogoBase64, 'PNG', 170, 8, 24, 24);
         } catch (err) {
-          console.warn("Logo embed warning:", err);
+          console.warn("Logo embed error:", err);
         }
       }
 
+      // CENTERED HEADERS
       doc.setFontSize(14);
       doc.setTextColor(168, 15, 40);
-      doc.text("User Accounts & Roles Roster", 14, 16);
+      doc.text("User Accounts & Roles Roster", 105, 16, { align: "center" });
       doc.setFontSize(10);
       doc.setTextColor(217, 119, 6);
-      doc.text("Chennai City Central Division", 14, 22);
-      doc.setFontSize(8.5);
-      doc.setTextColor(80, 80, 80);
-      doc.text(`Generated on: ${new Date().toLocaleString()} | Total Users: ${allLoadedUsers.length}`, 14, 28);
+      doc.text("Chennai City Central Division", 105, 22, { align: "center" });
 
       const headers = [["Sl. No.", "Emp ID", "Employee Name", "Role", "Mobile", "Office", "Status"]];
       const rows = allLoadedUsers.map((u, i) => [
@@ -2349,11 +2382,24 @@
       doc.autoTable({
         head: headers,
         body: rows,
-        startY: 34,
+        startY: 32,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
-        styles: { fontSize: 8, cellPadding: 2 }
+        styles: { fontSize: 8, cellPadding: 2 },
+        didDrawPage: function (data) {
+          // Footer on each page
+          doc.setFontSize(8);
+          doc.setTextColor(120, 120, 120);
+          doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`, 105, 290, { align: "center" });
+        }
       });
+
+      // END OF STATEMENT LINE IN PDF
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`*** END OF STATEMENT - TOTAL USERS: ${allLoadedUsers.length} ***`, 105, finalY < 280 ? finalY : 280, { align: "center" });
+
       doc.save(`Users_Roster_${getFormattedTimestamp()}.pdf`);
     }
 
@@ -2367,7 +2413,7 @@
     }
 
     // ==============================================================
-    // MIS & SETTLEMENT TAT ANALYTICS (<=3, 4-15, >15 & IN PROGRESS AGING)
+    // MIS & SETTLEMENT TAT ANALYTICS GENERATOR
     // ==============================================================
     async function generateMISReport(filterType = 'All') {
       currentMISReportFilter = filterType;
@@ -2524,7 +2570,7 @@
       tbody.innerHTML = '';
 
       if (currentMISClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">No matching claims found for this filter selection.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-500">No matching claims found for this filter selection.</td></tr>`;
         return;
       }
 
@@ -2548,16 +2594,16 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-3 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
-            <td class="p-3 font-semibold text-slate-700 whitespace-nowrap">${creatorName}</td>
-            <td class="p-3 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
-            <td class="p-3 whitespace-nowrap">${c.raised_for_office}</td>
-            <td class="p-3 whitespace-nowrap">${c.txn_date}</td>
-            <td class="p-3 whitespace-nowrap font-medium text-slate-700">${settleDate}</td>
-            <td class="p-3 whitespace-nowrap">${tatOrAgingDisplay}</td>
-            <td class="p-3 font-semibold whitespace-nowrap">₹${c.txn_amount}</td>
-            <td class="p-3 whitespace-nowrap"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
-            <td class="p-3 text-xs text-slate-600">${c.reply_remarks_admin || '-'}</td>
+            <td class="p-2.5 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
+            <td class="p-2.5 font-semibold text-slate-700 whitespace-nowrap">${creatorName}</td>
+            <td class="p-2.5 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
+            <td class="p-2.5 whitespace-nowrap">${c.raised_for_office}</td>
+            <td class="p-2.5 whitespace-nowrap">${c.txn_date}</td>
+            <td class="p-2.5 whitespace-nowrap font-medium text-slate-700">${settleDate}</td>
+            <td class="p-2.5 whitespace-nowrap">${tatOrAgingDisplay}</td>
+            <td class="p-2.5 font-semibold whitespace-nowrap">₹${c.txn_amount}</td>
+            <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
+            <td class="p-2.5 text-xs text-slate-600">${c.reply_remarks_admin || '-'}</td>
           </tr>
         `;
       });
@@ -2621,31 +2667,30 @@
       XLSX.writeFile(workbook, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
-    // PDF EXPORT (WITH LOGO EMBEDDED IN TOP-RIGHT)
+    // PDF EXPORT (CENTERED TITLE, LOGO, STATEMENT END & FOOTER DATE)
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // Embed Base64 Logo in Top-Right
+      // Top-Right Logo Embedding
       if (cachedPdfLogoBase64) {
         try {
-          doc.addImage(cachedPdfLogoBase64, 'PNG', 248, 7, 34, 25);
+          doc.addImage(cachedPdfLogoBase64, 'PNG', 255, 7, 26, 26);
         } catch (err) {
           console.warn("Logo embed warning:", err);
         }
       }
 
+      // CENTERED TITLES
       doc.setFontSize(14);
       doc.setTextColor(168, 15, 40);
-      doc.text(`Refund Claims & Settlement Report (${currentMISReportFilter})`, 14, 15);
+      doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 14, { align: "center" });
+      
       doc.setFontSize(10);
       doc.setTextColor(217, 119, 6);
-      doc.text("Chennai City Central Division", 14, 21);
-      doc.setFontSize(9);
-      doc.setTextColor(80, 80, 80);
-      doc.text(`Generated on: ${new Date().toLocaleString()} | Filtered Records: ${currentMISClaimsList.length}`, 14, 27);
+      doc.text("Chennai City Central Division", 148.5, 20, { align: "center" });
 
       const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => {
@@ -2654,7 +2699,7 @@
         if (isSettled) {
           const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
           tatDays = d !== null ? `${d} d (TAT)` : "-";
-        } else if (c.claim_status === 'In Progress' || c.claim_status === 'Pending') {
+        } else if (c.claim_status === 'In Progress') {
           const d = calculateDaysDifference(c.txn_date, todayStr);
           tatDays = d !== null ? `${d} d (Age)` : "-";
         }
@@ -2676,11 +2721,24 @@
       doc.autoTable({
         head: headers,
         body: rows,
-        startY: 32,
+        startY: 28,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
-        styles: { fontSize: 8.5, cellPadding: 2.5 }
+        styles: { fontSize: 8, cellPadding: 2 },
+        didDrawPage: function (data) {
+          // BOTTOM FOOTER: Generated on & Page numbers
+          doc.setFontSize(8);
+          doc.setTextColor(120, 120, 120);
+          doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`, 148.5, 202, { align: "center" });
+        }
       });
+
+      // END OF STATEMENT LINE AT TABLE BOTTOM
+      const finalY = doc.lastAutoTable.finalY + 8;
+      doc.setFontSize(8.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`*** END OF STATEMENT - TOTAL CLAIMS: ${currentMISClaimsList.length} ***`, 148.5, finalY < 195 ? finalY : 195, { align: "center" });
+
       doc.save(`Report_${currentMISReportFilter}_${getFormattedTimestamp()}.pdf`);
     }
   </script>
