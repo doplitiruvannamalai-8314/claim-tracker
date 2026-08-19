@@ -44,12 +44,12 @@
     <!-- NAVBAR -->
     <nav id="navbar" class="hidden bg-postRed-700 text-white px-4 py-2.5 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
       <div class="flex items-center gap-3">
-        <img id="navLogoImg" src="" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded shadow-xs">
+        <img id="navLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded shadow-xs">
         <div>
           <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">
             Refund Claims Management Portal
           </div>
-          <div class="text-postGold-300 text-[11px] font-semibold">&bull;Chennai City Central Division &bull; </div>
+          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; Dak Sewa - Jan Sewa</div>
         </div>
       </div>
       <div class="flex items-center gap-3 text-xs">
@@ -65,7 +65,7 @@
       <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
         <div class="text-center mb-5">
           <div class="flex justify-center mb-2">
-            <img id="loginLogoImg" src="" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
+            <img id="loginLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
           </div>
           <h1 class="text-lg font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
           <p class="text-xs font-bold text-postGold-700 mt-0.5 uppercase tracking-wide">Chennai City Central Division</p>
@@ -201,7 +201,7 @@
             </div>
           </div>
 
-          <!-- OVERVIEW TABLE -->
+          <!-- TABLE -->
           <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <table class="w-full text-left text-xs border-collapse">
               <thead class="sticky top-0 z-10 shadow-xs">
@@ -221,7 +221,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: CLAIM REGISTRATION FORM (WITH PREVIEW & CONDITIONAL RRN) -->
+        <!-- TAB 2: CLAIM REGISTRATION FORM -->
         <div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
           <div class="border-b pb-2 mb-3 border-amber-200">
             <h3 class="text-sm font-bold text-postRed-700 uppercase">New Claim Registration Form</h3>
@@ -229,7 +229,7 @@
           
           <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <!-- LEFT PANEL (7 COLS): DETAILS & REMARKS -->
+            <!-- LEFT PANEL: DETAILS -->
             <div class="lg:col-span-7 space-y-2.5">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
@@ -272,7 +272,7 @@
                   </select>
                 </div>
                 
-                <!-- CONDITIONAL RRN NUMBER (ONLY FOR SBI POS) -->
+                <!-- CONDITIONAL RRN -->
                 <div id="rrnFieldContainer" class="hidden">
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
                   <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
@@ -284,14 +284,13 @@
                 </div>
               </div>
 
-              <!-- USER REMARKS -->
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-0.5">Remarks by User *</label>
                 <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-xs h-24 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/10" placeholder="Enter reason and description for claim..."></textarea>
               </div>
             </div>
 
-            <!-- RIGHT PANEL (5 COLS): ATTACHMENT & LIVE PREVIEW -->
+            <!-- RIGHT PANEL: ATTACHMENT & PREVIEW -->
             <div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
               <div>
                 <div class="flex items-center justify-between mb-1.5">
@@ -307,11 +306,10 @@
                 <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
                   <span class="text-xl">📋</span>
                   <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
-                  <p class="text-[10px] text-slate-500">Capture with Snipping Tool (<kbd class="text-[9px]">Win+Shift+S</kbd>) and paste</p>
                 </div>
               </div>
 
-              <!-- LIVE ATTACHMENT PREVIEW CONTAINER -->
+              <!-- PREVIEW BOX -->
               <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
                 <div id="previewMediaWrapper" class="flex flex-col items-center justify-center w-full">
                   <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
@@ -336,7 +334,7 @@
           </form>
         </div>
 
-        <!-- TAB 3: THEME CONVERTER -->
+        <!-- TAB 3: THEME CONVERTER TOOL TAB -->
         <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -386,7 +384,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: ADMIN USER MANAGEMENT (WITH SUPERADMIN LOGO CHANGER) -->
+        <!-- TAB 4: USER MANAGEMENT (ACCESSIBLE TO ADMIN & SUPERADMIN) -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -436,7 +434,7 @@
           </div>
         </div>
 
-        <!-- TAB 5: MIS & PENDENCY REPORTS -->
+        <!-- TAB 5: MIS REPORTS (SORTABLE ON ALL FIELDS + CONSOLIDATED SUMMARIES) -->
         <div id="reportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -563,22 +561,69 @@
             </div>
           </div>
 
-          <!-- MIS TABLE -->
+          <!-- MODULE-WISE & STATUS-WISE CONSOLIDATION (WHEN "ALL" IS SELECTED) -->
+          <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
+            <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
+              <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
+            </h4>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
+              <!-- Module-wise Summary Table -->
+              <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+                <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
+                  1. Module-wise Breakdown
+                </div>
+                <table class="w-full text-left text-[11px] border-collapse">
+                  <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                    <tr>
+                      <th class="p-1.5">Module</th>
+                      <th class="p-1.5 text-center">Total</th>
+                      <th class="p-1.5 text-center text-amber-700">Pending</th>
+                      <th class="p-1.5 text-center text-blue-700">In Prog</th>
+                      <th class="p-1.5 text-center text-emerald-700">Settled</th>
+                      <th class="p-1.5 text-right">Total Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="moduleSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+
+              <!-- Status-wise Summary Table -->
+              <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+                <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
+                  2. Status-wise Financial Summary
+                </div>
+                <table class="w-full text-left text-[11px] border-collapse">
+                  <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                    <tr>
+                      <th class="p-1.5">Status</th>
+                      <th class="p-1.5 text-center">Count</th>
+                      <th class="p-1.5 text-center">Share (%)</th>
+                      <th class="p-1.5 text-right">Total Amount (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="statusSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- MIS TABLE WITH FULL SORTABILITY ON ALL COLUMNS -->
           <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-xs p-2.5 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
             <table class="w-full text-left text-xs border-collapse">
               <thead class="sticky top-[38px] z-10 shadow-xs">
-                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
-                  <th class="p-2 bg-postRed-50">Ref No</th>
-                  <th class="p-2 bg-postRed-50">Emp Name</th>
-                  <th class="p-2 bg-postRed-50">Module</th>
-                  <th class="p-2 bg-postRed-50">Office</th>
-                  <th class="p-2 bg-postRed-50">Txn Date</th>
-                  <th class="p-2 bg-postRed-50">Settlement Date</th>
-                  <th class="p-2 bg-postRed-50">TAT / Aging</th>
-                  <th class="p-2 bg-postRed-50">Amount</th>
-                  <th class="p-2 bg-postRed-50">Status</th>
-                  <th class="p-2 bg-postRed-50">Admin Remarks</th>
+                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap cursor-pointer select-none">
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('txn_id_ref')">Ref No <span id="sort_mis_txn_id_ref">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('emp_name')">Raised By <span id="sort_mis_emp_name">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('module')">Module <span id="sort_mis_module">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('raised_for_office')">Office <span id="sort_mis_raised_for_office">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('txn_date')">Txn Date <span id="sort_mis_txn_date">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('settlement_date')">Settlement Date <span id="sort_mis_settlement_date">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('tat_aging')">TAT / Aging <span id="sort_mis_tat_aging">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('txn_amount')">Amount <span id="sort_mis_txn_amount">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('claim_status')">Status <span id="sort_mis_claim_status">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 cursor-default">Admin Remarks</th>
                 </tr>
               </thead>
               <tbody id="misReportTableBody" class="divide-y divide-slate-200">
@@ -644,7 +689,7 @@
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
               <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
+              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
             </div>
           </form>
         </div>
@@ -678,7 +723,7 @@
         </div>
       </div>
 
-      <!-- USER CLAIM EDIT MODAL (REMARKS EDITING & ADDITIONAL DOCUMENT ATTACHMENT) -->
+      <!-- USER CLAIM EDIT MODAL -->
       <div id="userEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-2 border-amber-200">
@@ -705,15 +750,15 @@
               <input type="text" id="editClaimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
             </div>
             <div>
-              <label class="block font-bold text-slate-700 mb-0.5">Transaction ID</label>
+              <label class="block font-bold text-slate-700 mb-0.5">RRN Number</label>
               <input type="text" id="editClaimRrn" class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
             </div>
             <div>
-              <label class="block font-bold text-slate-700 mb-0.5">Transaction Date *</label>
+              <label class="block font-bold text-slate-700 mb-0.5">Txn Date *</label>
               <input type="date" id="editClaimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
             </div>
             <div>
-              <label class="block font-bold text-slate-700 mb-0.5">Transaction Amount (₹) *</label>
+              <label class="block font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
               <input type="number" step="0.01" id="editClaimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
             </div>
             <div>
@@ -733,11 +778,9 @@
               <textarea id="editClaimRemarks" required class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs h-20 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/20"></textarea>
             </div>
             
-            <!-- SUBMIT ADDITIONAL 1 DOCUMENT -->
             <div class="md:col-span-2 bg-amber-50/60 p-2.5 rounded border border-amber-300">
               <label class="block font-bold text-slate-800 mb-0.5">Attach Additional Supporting Document (Optional)</label>
               <input type="file" id="editClaimAdditionalFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-white">
-              <p class="text-[10px] text-slate-500 mt-1">This will be saved to your claim record in addition to your original document attachment.</p>
             </div>
 
             <div class="md:col-span-2 flex justify-end gap-2 pt-2 border-t border-amber-200">
@@ -789,7 +832,7 @@
             <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Type reply remarks..."></textarea>
           </div>
 
-          <!-- ADMIN FILE ATTACHMENT & CLIPBOARD PASTE -->
+          <!-- ADMIN ATTACHMENT -->
           <div class="space-y-1.5 border-t pt-2 border-amber-200 text-xs">
             <label class="block font-bold text-slate-700">Attach Resolution Document / Screenshot</label>
             <input type="file" id="modalAdminFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1 rounded text-xs bg-white">
@@ -814,7 +857,7 @@
         </div>
       </div>
 
-      <!-- CLAIM DETAILS FULL VIEW MODAL (WITH ACCURATE TXN ID & RRN DISPLAY) -->
+      <!-- CLAIM DETAILS FULL VIEW MODAL -->
       <div id="detailsModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto border-t-8 border-postRed-600">
           <div class="flex justify-between items-center border-b pb-2 border-amber-200">
@@ -832,15 +875,15 @@
     </div>
   </div>
 
-  <!-- FOOTER PANEL -->
+  <!-- FOOTER -->
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Developed and Maintained by &bull; <span class="font-semibold text-slate-700">Krishnan K</span></div>
+      <div class="text-slate-500 font-medium">Designed: Krishnan K, DSM - &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
     </div>
   </footer>
 
-  <!-- APPLICATION LOGIC SCRIPT -->
+  <!-- APPLICATION SCRIPT -->
   <script>
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
@@ -848,10 +891,7 @@
 
     const $ = id => document.getElementById(id);
 
-    // OFFICIAL INDIA POST LOGO URL & EMBEDDED RASTERIZER
     const OFFICIAL_INDIA_POST_LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
-
-    // HIGH-RES EMBEDDED DEFAULT BASE64 LOGO
     const EMBEDDED_DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'><rect width='160' height='160' fill='%23C4122F' rx='10'/><path d='M25 45 L135 45 L80 95 Z' fill='%23F8B133'/><polygon points='25,52 80,102 25,126' fill='%23FFFDF5'/><polygon points='135,52 80,102 135,126' fill='%23FEF9C3'/><polygon points='27,126 80,98 133,126' fill='%23FACC15'/><rect x='16' y='132' width='128' height='20' rx='3' fill='%238A0C21' stroke='%23F8B133' stroke-width='1'/><text x='80' y='146' font-family='Arial,sans-serif' font-size='9' font-weight='bold' fill='%23FFFDF5' text-anchor='middle'>INDIA POST</text></svg>";
 
     let currentAppLogo = localStorage.getItem('app_custom_logo') || OFFICIAL_INDIA_POST_LOGO_URL;
@@ -862,6 +902,7 @@
     let rawClaimsList = [];
     let currentClaimsList = [];
     let currentMISClaimsList = [];
+    let rawMISMasterList = [];
     let currentMISReportFilter = 'All';
     let allLoadedUsers = [];
     let isRrnManuallyEdited = false;
@@ -877,7 +918,10 @@
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
 
-    // RRN AUTO-FILL SYNC & CONDITIONAL VISIBILITY
+    let currentMISSortCol = 'txn_date';
+    let currentMISSortDir = 'desc';
+
+    // RRN AUTO-FILL SYNC
     const txnInput = $('claimTxnId');
     const rrnInput = $('claimRrn');
     if (txnInput && rrnInput) {
@@ -891,7 +935,6 @@
       });
     }
 
-    // PAYMENT CHANNEL SWITCH HANDLER (ONLY SBI POS SHOWS RRN)
     function handlePaymentChannelChange() {
       const channel = $('claimChannel').value;
       const rrnContainer = $('rrnFieldContainer');
@@ -914,7 +957,6 @@
       el.value = el.value.replace(/\D/g, '').slice(0, 10);
     }
 
-    // PRE-RENDER LOGO TO BASE64 PNG CANVAS TO ENSURE RELIABLE EMBEDDING IN JSDPF
     function cacheBase64Logo(url) {
       const img = new Image();
       img.crossOrigin = "Anonymous";
@@ -1014,18 +1056,14 @@
       }
     }
 
-    // ==========================================
-    // DOCUMENT SELECTION & CLIPBOARD PREVIEW
-    // ==========================================
+    // LIVE PREVIEW ON FILE SELECTION
     async function handleFileSelectPreview(e) {
       const file = e.target.files[0];
       if (!file) {
         clearUserPastedImage();
         return;
       }
-
-      userPastedImageBlob = null; // Clear clipboard blob if manual file chosen
-
+      userPastedImageBlob = null;
       const previewContainer = $('userPastedPreviewContainer');
       const imgPreview = $('userPastedImagePreview');
       const pdfPreview = $('pdfFilePreviewBlock');
@@ -1052,7 +1090,7 @@
       }
     }
 
-    // THEME CONVERTER ENGINE
+    // THEME CONVERTER
     function rgbToHsl(r, g, b) {
       r /= 255; g /= 255; b /= 255;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -1218,7 +1256,6 @@
       a.click();
     }
 
-    // CLIPBOARD PASTE PREVIEW
     window.addEventListener('paste', async (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       let blob = null;
@@ -1493,6 +1530,7 @@
       const isSuperadmin = role === 'superadmin';
       const isViewer = role === 'viewer';
 
+      // ROLE BASED TAB RESTRICTIONS (BOTH ADMIN & SUPERADMIN ACCESS USER MGMT)
       if (isAdmin) {
         $('adminTabBtn').classList.remove('hidden');
         $('tabBtnTrack').classList.remove('hidden');
@@ -1564,7 +1602,6 @@
       }
     }
 
-    // SUBMIT CLAIM WITH ATTACHMENT UPLOAD
     async function submitClaim(e) {
       e.preventDefault();
       const fileInput = $('claimFile').files[0];
@@ -1675,7 +1712,6 @@
 
     function closeUserEditModal() { $('userEditModal').classList.add('hidden'); }
 
-    // USER CLAIM EDIT: ACCEPTS ADDITIONAL DOCUMENT
     async function submitUserClaimEdit(e) {
       e.preventDefault();
       const claimId = $('editClaimId').value;
@@ -1716,7 +1752,7 @@
       const { error } = await supabaseClient.from('claims').update(updateData).eq('id', claimId);
 
       if (error) {
-        alert("Failed to update claim: " + error.message);
+        alert("Failed to update claim remarks/details: " + error.message);
       } else {
         alert("Claim remarks & additional document updated successfully!");
         closeUserEditModal();
@@ -1767,7 +1803,6 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER TABLE WITH 2 DISTINCT ROWS OF ACTION BUTTONS
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1815,7 +1850,6 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
-            <!-- 1. TRANSACTION ID / REF NO & MODULE -->
             <td class="p-2 whitespace-nowrap">
               <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-xs block">
                 ${c.txn_id_ref}
@@ -1827,23 +1861,14 @@
                 </button>
               </div>
             </td>
-
-            <!-- 2. EMP NAME/ID & OFFICE -->
             <td class="p-2 whitespace-nowrap">
               <div class="font-bold text-slate-800 leading-tight">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
               <div class="text-[10.5px] text-slate-600 leading-tight">${c.raised_for_office}</div>
             </td>
-
-            <!-- 3. TXN DATE -->
             <td class="p-2 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
-
-            <!-- 4. ENTRY DATE/TIME -->
             <td class="p-1.5 whitespace-nowrap max-w-[85px]">${entryCompact}</td>
-
-            <!-- 5. AMOUNT -->
             <td class="p-2 font-bold text-slate-900 whitespace-nowrap text-xs">₹${c.txn_amount}</td>
             
-            <!-- 6. STATUS WITH SETTLEMENT DATE -->
             <td class="p-2 whitespace-nowrap">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
@@ -1855,13 +1880,10 @@
               ` : ''}
             </td>
 
-            <!-- 7. REMARKS -->
             <td class="p-2 min-w-[150px]">${remarksDisplay}</td>
             
-            <!-- 8. ACTIONS: 2-ROW BALANCED BUTTONS -->
             <td class="p-2 text-center whitespace-nowrap min-w-[170px]">
               <div class="flex flex-col gap-1 w-[165px] mx-auto">
-                <!-- ROW 1: EDIT / REPLY & USER DOC -->
                 <div class="flex items-center justify-between gap-1">
                   ${isAdmin ? `
                     <button type="button" onclick="openReplyModal('${c.id}')" class="flex-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
@@ -1882,7 +1904,6 @@
                   </a>
                 </div>
 
-                <!-- ROW 2: ADMIN DOC & DOCKET -->
                 <div class="flex items-center justify-between gap-1">
                   ${c.admin_file_url ? `
                     <a href="${c.admin_file_url}" target="_blank" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition text-center">
@@ -1916,7 +1937,6 @@
       applyOverviewFilters();
     }
 
-    // ACCURATE CLAIM DETAILS MODAL (CLEARLY LABELS TRANSACTION ID VS RRN)
     function openDetailsModal(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found!");
@@ -1960,7 +1980,6 @@
           ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 text-white px-2 py-0.5 rounded text-[11px] font-bold hover:bg-postRed-700 transition">📎 Admin Attached Doc</a>` : ''}
         </div>
         
-        <!-- DOCUMENTS SECTION -->
         <div class="col-span-1 md:col-span-2 flex flex-wrap gap-3 pt-1 border-t border-slate-200">
           <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded text-xs font-bold transition">
             📄 Primary User Document
@@ -1980,7 +1999,6 @@
 
     function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
 
-    // PRINT COMPLETE DOCKET (CORRECT TRANSACTION ID & RRN FIELDS)
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -2379,7 +2397,7 @@
               <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
                 <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">✏️ Edit Details</button>
                 <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔑 Reset Password</button>
-                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-1 rounded text-xs font-bold cursor-pointer">
+                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2.5 py-1 rounded text-xs font-bold cursor-pointer">
                   ${isActive ? '🔒 Lock' : '🔓 Unlock'}
                 </button>
               </div>
@@ -2404,7 +2422,10 @@
       $('editUserId').value = user.id;
       $('editUserEmpId').value = user.emp_id || '';
       $('editUserEmpName').value = user.emp_name || '';
-      $('editUserMobile').value = user.mobile_number || user.mobile_no || user.phone || '';
+      
+      const existingMobile = user.mobile_number || user.mobile_no || user.phone || '';
+      $('editUserMobile').value = existingMobile;
+      
       $('editUserOffice').value = user.office_name || '';
       $('editUserRole').value = user.role || 'user';
 
@@ -2517,7 +2538,6 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "portrait" });
 
-      // SQUARE LOGO IN TOP-RIGHT (18mm x 18mm)
       if (cachedPdfLogoBase64) {
         try {
           doc.addImage(cachedPdfLogoBase64, 'PNG', 174, 8, 18, 18);
@@ -2526,6 +2546,7 @@
         }
       }
 
+      // CENTERED HEADERS
       doc.setFontSize(14);
       doc.setTextColor(168, 15, 40);
       doc.text("User Accounts & Roles Roster", 105, 16, { align: "center" });
@@ -2576,7 +2597,7 @@
     }
 
     // ==============================================================
-    // MIS & SETTLEMENT TAT ANALYTICS GENERATOR
+    // MIS & SETTLEMENT TAT ANALYTICS GENERATOR + CONSOLIDATION
     // ==============================================================
     async function generateMISReport(filterType = 'All') {
       currentMISReportFilter = filterType;
@@ -2603,9 +2624,10 @@
       const { data: claims } = await query;
       if (!claims) return;
 
+      rawMISMasterList = claims;
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // Status Metrics
+      // Primary Status Metrics
       const totalCount = claims.length;
       const pendingClaims = claims.filter(c => c.claim_status === 'Pending');
       const inProgressClaims = claims.filter(c => c.claim_status === 'In Progress');
@@ -2618,7 +2640,7 @@
       $('misSettled').innerText = settledClaims.length;
       $('misRejected').innerText = rejectedClaims.length;
 
-      // 1. Settled TAT Slabs: <=3, 4-15, >15 Days
+      // Settled TAT Slabs: <=3, 4-15, >15 Days
       let totalTatSum = 0;
       let settledCountWithDate = 0;
       let settledLe3Count = 0;
@@ -2643,7 +2665,7 @@
       $('misSettled4to15').innerText = settled4to15Count;
       $('misSettledGt15').innerText = settledGt15Count;
 
-      // 2. In-Progress Aging Buckets
+      // In-Progress Aging Buckets
       let inProgressLe10Count = 0;
       let inProgress11to20Count = 0;
       let inProgress21to30Count = 0;
@@ -2668,70 +2690,226 @@
       if (filterType === 'All') {
         currentMISClaimsList = claims;
         $('misReportTableTitle').innerText = `Report Summary View: All Registered Claims (${claims.length})`;
-      } else if (filterType === 'Pending') {
-        currentMISClaimsList = pendingClaims;
-        $('misReportTableTitle').innerText = `Report Summary View: Pending Claims (${pendingClaims.length})`;
-      } else if (filterType === 'In Progress') {
-        currentMISClaimsList = inProgressClaims;
-        $('misReportTableTitle').innerText = `Report Summary View: In Progress Claims (${inProgressClaims.length})`;
-      } else if (filterType === 'Settled') {
-        currentMISClaimsList = settledClaims;
-        $('misReportTableTitle').innerText = `Report Summary View: All Settled Claims (${settledClaims.length})`;
-      } else if (filterType === 'Rejected') {
-        currentMISClaimsList = rejectedClaims;
-        $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
-      } else if (filterType === 'Settled_le3') {
-        currentMISClaimsList = settledClaims.filter(c => {
-          const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-          return d !== null && d <= 3;
-        });
-        $('misReportTableTitle').innerText = `Settlement TAT: Settled within 3 Days (${currentMISClaimsList.length})`;
-      } else if (filterType === 'Settled_4to15') {
-        currentMISClaimsList = settledClaims.filter(c => {
-          const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-          return d !== null && d >= 4 && d <= 15;
-        });
-        $('misReportTableTitle').innerText = `Settlement TAT: Settled in 4 to 15 Days (${currentMISClaimsList.length})`;
-      } else if (filterType === 'Settled_gt15') {
-        currentMISClaimsList = settledClaims.filter(c => {
-          const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-          return d !== null && d > 15;
-        });
-        $('misReportTableTitle').innerText = `Settlement TAT: Settled in > 15 Days (${currentMISClaimsList.length})`;
-      } else if (filterType === 'InProgress_le10') {
-        currentMISClaimsList = inProgressClaims.filter(c => {
-          const d = calculateDaysDifference(c.txn_date, todayStr);
-          return d !== null && d <= 10;
-        });
-        $('misReportTableTitle').innerText = `In-Progress Aging: <= 10 Days (${currentMISClaimsList.length})`;
-      } else if (filterType === 'InProgress_11to20') {
-        currentMISClaimsList = inProgressClaims.filter(c => {
-          const d = calculateDaysDifference(c.txn_date, todayStr);
-          return d !== null && d >= 11 && d <= 20;
-        });
-        $('misReportTableTitle').innerText = `In-Progress Aging: 11 to 20 Days (${currentMISClaimsList.length})`;
-      } else if (filterType === 'InProgress_21to30') {
-        currentMISClaimsList = inProgressClaims.filter(c => {
-          const d = calculateDaysDifference(c.txn_date, todayStr);
-          return d !== null && d >= 21 && d <= 30;
-        });
-        $('misReportTableTitle').innerText = `In-Progress Aging: 21 to 30 Days (${currentMISClaimsList.length})`;
-      } else if (filterType === 'InProgress_gt30') {
-        currentMISClaimsList = inProgressClaims.filter(c => {
-          const d = calculateDaysDifference(c.txn_date, todayStr);
-          return d !== null && d > 30;
-        });
-        $('misReportTableTitle').innerText = `In-Progress Aging: > 30 Days (${currentMISClaimsList.length})`;
+        $('allReportConsolidationContainer').classList.remove('hidden');
+        renderConsolidatedSummaries(claims);
+      } else {
+        $('allReportConsolidationContainer').classList.add('hidden');
+
+        if (filterType === 'Pending') {
+          currentMISClaimsList = pendingClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: Pending Claims (${pendingClaims.length})`;
+        } else if (filterType === 'In Progress') {
+          currentMISClaimsList = inProgressClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: In Progress Claims (${inProgressClaims.length})`;
+        } else if (filterType === 'Settled') {
+          currentMISClaimsList = settledClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: All Settled Claims (${settledClaims.length})`;
+        } else if (filterType === 'Rejected') {
+          currentMISClaimsList = rejectedClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
+        } else if (filterType === 'Settled_le3') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d <= 3;
+          });
+          $('misReportTableTitle').innerText = `Settlement TAT: Settled within 3 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_4to15') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d >= 4 && d <= 15;
+          });
+          $('misReportTableTitle').innerText = `Settlement TAT: Settled in 4 to 15 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_gt15') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d > 15;
+          });
+          $('misReportTableTitle').innerText = `Settlement TAT: Settled in > 15 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_le10') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d <= 10;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: <= 10 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_11to20') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d >= 11 && d <= 20;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: 11 to 20 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_21to30') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d >= 21 && d <= 30;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: 21 to 30 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_gt30') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d > 30;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: > 30 Days (${currentMISClaimsList.length})`;
+        }
       }
 
-      // Render MIS Table
+      renderMISTableRows();
+    }
+
+    // CONSOLIDATED BREAKDOWNS MATRIX (MODULE-WISE & STATUS-WISE)
+    function renderConsolidatedSummaries(claims) {
+      const moduleStats = {
+        'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 },
+        'Delivery': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 },
+        'DSS': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 },
+        'Others': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 }
+      };
+
+      const statusStats = {
+        'Pending': { count: 0, amount: 0 },
+        'In Progress': { count: 0, amount: 0 },
+        'Settled': { count: 0, amount: 0 },
+        'Rejected': { count: 0, amount: 0 }
+      };
+
+      let grandTotalAmount = 0;
+
+      claims.forEach(c => {
+        const mod = moduleStats[c.module] ? c.module : 'Others';
+        const amt = parseFloat(c.txn_amount) || 0;
+        grandTotalAmount += amt;
+
+        moduleStats[mod].total++;
+        moduleStats[mod].amount += amt;
+        if (c.claim_status === 'Pending') moduleStats[mod].pending++;
+        else if (c.claim_status === 'In Progress') moduleStats[mod].inprogress++;
+        else if (c.claim_status === 'Settled') moduleStats[mod].settled++;
+
+        if (statusStats[c.claim_status]) {
+          statusStats[c.claim_status].count++;
+          statusStats[c.claim_status].amount += amt;
+        }
+      });
+
+      // 1. Module Table Render
+      const modTbody = $('moduleSummaryTableBody');
+      modTbody.innerHTML = '';
+      let modTotalSum = 0, modPendSum = 0, modInpSum = 0, modSetSum = 0, modAmtSum = 0;
+
+      Object.keys(moduleStats).forEach(m => {
+        const s = moduleStats[m];
+        modTotalSum += s.total;
+        modPendSum += s.pending;
+        modInpSum += s.inprogress;
+        modSetSum += s.settled;
+        modAmtSum += s.amount;
+
+        modTbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-1.5 font-bold text-slate-800">${m}</td>
+            <td class="p-1.5 text-center font-bold">${s.total}</td>
+            <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
+            <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
+            <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
+            <td class="p-1.5 text-right font-bold">₹${s.amount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      // Total Module Row
+      modTbody.innerHTML += `
+        <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
+          <td class="p-1.5">Total</td>
+          <td class="p-1.5 text-center">${modTotalSum}</td>
+          <td class="p-1.5 text-center text-amber-800">${modPendSum}</td>
+          <td class="p-1.5 text-center text-blue-800">${modInpSum}</td>
+          <td class="p-1.5 text-center text-emerald-800">${modSetSum}</td>
+          <td class="p-1.5 text-right text-postRed-700">₹${modAmtSum.toFixed(2)}</td>
+        </tr>
+      `;
+
+      // 2. Status Table Render
+      const statTbody = $('statusSummaryTableBody');
+      statTbody.innerHTML = '';
+      let statCountSum = 0, statAmtSum = 0;
+
+      Object.keys(statusStats).forEach(st => {
+        const s = statusStats[st];
+        statCountSum += s.count;
+        statAmtSum += s.amount;
+        const sharePct = claims.length > 0 ? ((s.count / claims.length) * 100).toFixed(1) : "0.0";
+
+        statTbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-1.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusColor(st)}">${st}</span></td>
+            <td class="p-1.5 text-center font-bold">${s.count}</td>
+            <td class="p-1.5 text-center font-semibold text-slate-600">${sharePct}%</td>
+            <td class="p-1.5 text-right font-bold text-slate-800">₹${s.amount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      // Total Status Row
+      statTbody.innerHTML += `
+        <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
+          <td class="p-1.5">Total</td>
+          <td class="p-1.5 text-center">${statCountSum}</td>
+          <td class="p-1.5 text-center">100%</td>
+          <td class="p-1.5 text-right text-postRed-700">₹${statAmtSum.toFixed(2)}</td>
+        </tr>
+      `;
+    }
+
+    // MIS SORTING ON ALL COLUMNS
+    function sortMISReport(col) {
+      if (currentMISSortCol === col) {
+        currentMISSortDir = currentMISSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentMISSortCol = col;
+        currentMISSortDir = 'asc';
+      }
+      renderMISTableRows();
+    }
+
+    function renderMISTableRows() {
+      const todayStr = new Date().toISOString().split('T')[0];
       const tbody = $('misReportTableBody');
       tbody.innerHTML = '';
 
-      if (currentMISClaimsList.length === 0) {
+      ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'txn_date', 'settlement_date', 'tat_aging', 'txn_amount', 'claim_status'].forEach(c => {
+        const iconEl = $('sort_mis_' + c);
+        if (iconEl) iconEl.innerText = '⇅';
+      });
+      const activeIcon = $('sort_mis_' + currentMISSortCol);
+      if (activeIcon) activeIcon.innerText = currentMISSortDir === 'asc' ? '▲' : '▼';
+
+      if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-500">No matching claims found for this filter selection.</td></tr>`;
         return;
       }
+
+      currentMISClaimsList.sort((a, b) => {
+        let valA, valB;
+        if (currentMISSortCol === 'emp_name') {
+          valA = (a.profiles?.emp_name || '').toLowerCase();
+          valB = (b.profiles?.emp_name || '').toLowerCase();
+        } else if (currentMISSortCol === 'txn_amount') {
+          valA = parseFloat(a.txn_amount) || 0;
+          valB = parseFloat(b.txn_amount) || 0;
+        } else if (currentMISSortCol === 'tat_aging') {
+          const isSettledA = a.claim_status === 'Settled';
+          const isSettledB = b.claim_status === 'Settled';
+          valA = isSettledA ? calculateDaysDifference(a.txn_date, a.settlement_date || a.created_at?.split('T')[0]) : calculateDaysDifference(a.txn_date, todayStr);
+          valB = isSettledB ? calculateDaysDifference(b.txn_date, b.settlement_date || b.created_at?.split('T')[0]) : calculateDaysDifference(b.txn_date, todayStr);
+          valA = valA !== null ? valA : 0;
+          valB = valB !== null ? valB : 0;
+        } else {
+          valA = (a[currentMISSortCol] || '').toString().toLowerCase();
+          valB = (b[currentMISSortCol] || '').toString().toLowerCase();
+        }
+        if (valA < valB) return currentMISSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
 
       currentMISClaimsList.forEach(c => {
         const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
@@ -2791,7 +2969,7 @@
       if (session && !currentUser) initApp();
     });
 
-    // EXCEL EXPORT
+    // EXCEL EXPORT (INCLUDES DETAILED CONSOLIDATION SHEET IF ALL REPORT)
     async function exportMISExcel() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const todayStr = new Date().toISOString().split('T')[0];
@@ -2808,7 +2986,6 @@
         return {
           "Sl. No.": index + 1,
           "Transaction ID (Ref No)": c.txn_id_ref,
-          "RRN": c.rrn_number || "N/A",
           "Raised By": c.profiles?.emp_name || "N/A",
           "Module": c.module,
           "Office Name": c.raised_for_office,
@@ -2821,20 +2998,40 @@
         };
       });
 
-      const worksheet = XLSX.utils.json_to_sheet(formattedData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, `Report_${currentMISReportFilter}`);
-      XLSX.writeFile(workbook, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
+      const wb = XLSX.utils.book_new();
+      const wsClaims = XLSX.utils.json_to_sheet(formattedData);
+      XLSX.utils.book_append_sheet(wb, wsClaims, "Claims Details");
+
+      // IF ALL REPORT, ADD CONSOLIDATION SHEET
+      if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
+        const modSummary = [];
+        ['Booking', 'Delivery', 'DSS', 'Others'].forEach(m => {
+          const list = rawMISMasterList.filter(c => c.module === m);
+          const amt = list.reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
+          modSummary.push({
+            "Module": m,
+            "Total Claims": list.length,
+            "Pending": list.filter(c => c.claim_status === 'Pending').length,
+            "In Progress": list.filter(c => c.claim_status === 'In Progress').length,
+            "Settled": list.filter(c => c.claim_status === 'Settled').length,
+            "Total Amount (INR)": amt
+          });
+        });
+        const wsSummary = XLSX.utils.json_to_sheet(modSummary);
+        XLSX.utils.book_append_sheet(wb, wsSummary, "Consolidated Summary");
+      }
+
+      XLSX.writeFile(wb, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
-    // PDF EXPORT (PROPORTIONAL SQUARE LOGO & FORMATTED REPORT)
+    // PDF EXPORT (WITH CONSOLIDATION TABLES FOR "ALL" REPORTS)
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // SQUARE LOGO EMBED (16mm x 16mm)
+      // Embed Square Logo
       if (cachedPdfLogoBase64) {
         try {
           doc.addImage(cachedPdfLogoBase64, 'PNG', 268, 6, 16, 16);
@@ -2846,13 +3043,40 @@
       // CENTERED HEADINGS
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
-      doc.text(`Digital Transactions - Refund Claims & Settlement Report (${currentMISReportFilter})`, 148.5, 13, { align: "center" });
+      doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 13, { align: "center" });
       
-      doc.setFontSize(10.5);
+      doc.setFontSize(9.5);
       doc.setTextColor(217, 119, 6);
       doc.text("Chennai City Central Division", 148.5, 19, { align: "center" });
 
-      const headers = [["Sl. No.", "Txn ID (Ref)", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
+      let startYPos = 25;
+
+      // CONSOLIDATION TABLES IF REPORT IS "ALL"
+      if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
+        doc.setFontSize(9);
+        doc.setTextColor(138, 12, 33);
+        doc.text("CONSOLIDATED SUMMARY (MODULE-WISE & STATUS-WISE)", 14, startYPos);
+
+        const modRows = ['Booking', 'Delivery', 'DSS', 'Others'].map(m => {
+          const list = rawMISMasterList.filter(c => c.module === m);
+          const amt = list.reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
+          return [m, list.length, list.filter(c => c.claim_status === 'Pending').length, list.filter(c => c.claim_status === 'In Progress').length, list.filter(c => c.claim_status === 'Settled').length, `Rs. ${amt.toFixed(2)}`];
+        });
+
+        doc.autoTable({
+          head: [["Module", "Total Claims", "Pending", "In Progress", "Settled", "Total Value (Rs)"]],
+          body: modRows,
+          startY: startYPos + 3,
+          theme: 'grid',
+          headStyles: { fillColor: [138, 12, 33], textColor: [255, 255, 255], fontSize: 7.5 },
+          styles: { fontSize: 7, cellPadding: 1.5 },
+          margin: { left: 14, right: 14 }
+        });
+
+        startYPos = doc.lastAutoTable.finalY + 6;
+      }
+
+      const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => {
         const isSettled = c.claim_status === 'Settled';
         let tatDays = "-";
@@ -2881,7 +3105,7 @@
       doc.autoTable({
         head: headers,
         body: rows,
-        startY: 25,
+        startY: startYPos,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
         styles: { fontSize: 8, cellPadding: 2 },
@@ -2892,6 +3116,7 @@
         }
       });
 
+      // STATEMENT END LINE
       const finalY = doc.lastAutoTable.finalY + 8;
       doc.setFontSize(8.5);
       doc.setTextColor(100, 116, 139);
