@@ -38,13 +38,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-amber-50/40 text-slate-800 font-sans min-h-screen text-xs flex flex-col justify-between">
+<body class="bg-amber-50/40 text-slate-900 font-sans min-h-screen text-xs flex flex-col justify-between">
 
   <div>
     <!-- NAVBAR -->
     <nav id="navbar" class="hidden bg-postRed-700 text-white px-4 py-2.5 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
       <div class="flex items-center gap-3">
-        <img id="navLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded shadow-xs">
+        <img id="navLogoImg" src="" alt="India Post Logo" class="h-9 w-9 object-contain bg-white p-0.5 rounded shadow-xs">
         <div>
           <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">
             Refund Claims Management Portal
@@ -65,7 +65,7 @@
       <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
         <div class="text-center mb-5">
           <div class="flex justify-center mb-2">
-            <img id="loginLogoImg" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
+            <img id="loginLogoImg" src="" alt="India Post Logo" class="h-20 w-20 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
           </div>
           <h1 class="text-lg font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
           <p class="text-xs font-bold text-postGold-700 mt-0.5 uppercase tracking-wide">Chennai City Central Division</p>
@@ -115,7 +115,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-0.5">Office Name *</label>
-              <select id="regOfficeName" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+              <select id="regOfficeName" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
                 <option value="">-- Loading Offices... --</option>
               </select>
             </div>
@@ -201,7 +201,7 @@
             </div>
           </div>
 
-          <!-- OVERVIEW TABLE -->
+          <!-- TABLE -->
           <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <table class="w-full text-left text-xs border-collapse">
               <thead class="sticky top-0 z-10 shadow-xs">
@@ -272,7 +272,7 @@
                   </select>
                 </div>
                 
-                <!-- CONDITIONAL RRN (ONLY SBI POS) -->
+                <!-- CONDITIONAL RRN -->
                 <div id="rrnFieldContainer" class="hidden">
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
                   <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
@@ -334,7 +334,7 @@
           </form>
         </div>
 
-        <!-- TAB 3: THEME CONVERTER -->
+        <!-- TAB 3: THEME CONVERTER TOOL TAB -->
         <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -384,7 +384,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: ADMIN USER MANAGEMENT -->
+        <!-- TAB 4: USER MANAGEMENT (WITH REGISTERED ON DATE/TIME COLUMN) -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -423,6 +423,7 @@
                 <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
                   <th class="p-2">Emp ID</th>
                   <th class="p-2">Emp Name / Role</th>
+                  <th class="p-2">Registered On</th>
                   <th class="p-2">Mobile No</th>
                   <th class="p-2">Office Name</th>
                   <th class="p-2">Status</th>
@@ -434,7 +435,7 @@
           </div>
         </div>
 
-        <!-- TAB 5: MIS REPORTS (SORTABLE ON ALL FIELDS + CONSOLIDATED SUMMARIES) -->
+        <!-- TAB 5: MIS REPORTS (SORTABLE ON ALL FIELDS + CONSOLIDATED SUMMARIES + OFFICE-WISE MATRIX) -->
         <div id="reportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -561,14 +562,14 @@
             </div>
           </div>
 
-          <!-- MODULE-WISE & STATUS-WISE CONSOLIDATION (PENDING + IN PROGRESS VALUE) -->
+          <!-- CONSOLIDATED SUMMARY MATRICES: MODULE-WISE, STATUS-WISE & OFFICE-WISE -->
           <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
             <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
               <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
             </h4>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
-              <!-- Module-wise Summary Table -->
+              <!-- 1. Module-wise Breakdown -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
                   1. Module-wise Breakdown (Pending + In-Progress Financial Value)
@@ -588,7 +589,7 @@
                 </table>
               </div>
 
-              <!-- Status-wise Summary Table -->
+              <!-- 2. Status-wise Summary -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
                   2. Status-wise Financial Summary
@@ -604,6 +605,30 @@
                   </thead>
                   <tbody id="statusSummaryTableBody" class="divide-y divide-slate-100"></tbody>
                 </table>
+              </div>
+
+              <!-- 3. Office-wise Pendency & Status Matrix -->
+              <div class="lg:col-span-2 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+                <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center">
+                  <span>3. Office-wise Pendency &amp; Status Breakdown</span>
+                  <span class="text-[10px] text-slate-500 font-normal">Active Pendency Amount = Pending + In Progress</span>
+                </div>
+                <div class="max-h-60 overflow-y-auto">
+                  <table class="w-full text-left text-[11px] border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
+                      <tr>
+                        <th class="p-1.5">Office Name</th>
+                        <th class="p-1.5 text-center">Registered</th>
+                        <th class="p-1.5 text-center text-amber-700">Pending</th>
+                        <th class="p-1.5 text-center text-blue-700">In Progress</th>
+                        <th class="p-1.5 text-center text-emerald-700">Settled</th>
+                        <th class="p-1.5 text-center text-rose-700">Rejected</th>
+                        <th class="p-1.5 text-right font-bold text-postRed-800">Pending + In Prog Amt (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody id="officeSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -879,7 +904,7 @@
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Krishnan K, DSM &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
+      <div class="text-slate-500 font-medium">Designed and Maintained by &bull; <span class="font-semibold text-slate-700">Krishnan K,Chennai City Central Division</span></div>
     </div>
   </footer>
 
@@ -892,7 +917,6 @@
     const $ = id => document.getElementById(id);
 
     const OFFICIAL_INDIA_POST_LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
-    const EMBEDDED_DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'><rect width='160' height='160' fill='%23C4122F' rx='10'/><path d='M25 45 L135 45 L80 95 Z' fill='%23F8B133'/><polygon points='25,52 80,102 25,126' fill='%23FFFDF5'/><polygon points='135,52 80,102 135,126' fill='%23FEF9C3'/><polygon points='27,126 80,98 133,126' fill='%23FACC15'/><rect x='16' y='132' width='128' height='20' rx='3' fill='%238A0C21' stroke='%23F8B133' stroke-width='1'/><text x='80' y='146' font-family='Arial,sans-serif' font-size='9' font-weight='bold' fill='%23FFFDF5' text-anchor='middle'>INDIA POST</text></svg>";
 
     let currentAppLogo = localStorage.getItem('app_custom_logo') || OFFICIAL_INDIA_POST_LOGO_URL;
     let cachedPdfLogoBase64 = null;
@@ -957,32 +981,63 @@
       el.value = el.value.replace(/\D/g, '').slice(0, 10);
     }
 
-    function cacheBase64Logo(url) {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.onload = function() {
-        const canvas = document.createElement("canvas");
-        canvas.width = 160;
-        canvas.height = 160;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, 160, 160);
-        try {
-          cachedPdfLogoBase64 = canvas.toDataURL("image/png");
-        } catch (e) {
-          cachedPdfLogoBase64 = EMBEDDED_DEFAULT_LOGO;
-        }
-      };
-      img.onerror = () => {
-        cachedPdfLogoBase64 = EMBEDDED_DEFAULT_LOGO;
-      };
-      img.src = url;
+    // SYNCHRONOUS EMBEDDED HIGH-RES CANVAS BASE64 RASTERIZER
+    function getSynchronousBase64Logo() {
+      if (cachedPdfLogoBase64 && cachedPdfLogoBase64.startsWith('data:image/png')) {
+        return cachedPdfLogoBase64;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = 160;
+      canvas.height = 160;
+      const ctx = canvas.getContext("2d");
+      
+      // Draw India Post square red badge with gold post horns
+      ctx.fillStyle = "#C4122F";
+      ctx.fillRect(0, 0, 160, 160);
+      ctx.strokeStyle = "#F8B133";
+      ctx.lineWidth = 6;
+      ctx.strokeRect(3, 3, 154, 154);
+      
+      ctx.fillStyle = "#F8B133";
+      ctx.beginPath();
+      ctx.moveTo(25, 45); ctx.lineTo(135, 45); ctx.lineTo(80, 95); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.beginPath();
+      ctx.moveTo(25, 52); ctx.lineTo(80, 102); ctx.lineTo(25, 126); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#FEF9C3";
+      ctx.beginPath();
+      ctx.moveTo(135, 52); ctx.lineTo(80, 102); ctx.lineTo(135, 126); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#FACC15";
+      ctx.beginPath();
+      ctx.moveTo(27, 126); ctx.lineTo(80, 98); ctx.lineTo(133, 126); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#8A0C21";
+      ctx.fillRect(14, 132, 132, 20);
+      ctx.strokeStyle = "#F8B133";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(14, 132, 132, 20);
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 9px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("INDIA POST", 80, 146);
+
+      cachedPdfLogoBase64 = canvas.toDataURL("image/png");
+      return cachedPdfLogoBase64;
     }
 
     function initLogos() {
       if ($('navLogoImg')) $('navLogoImg').src = currentAppLogo;
       if ($('loginLogoImg')) $('loginLogoImg').src = currentAppLogo;
       if ($('adminLogoPreview')) $('adminLogoPreview').src = currentAppLogo;
-      cacheBase64Logo(currentAppLogo);
+      getSynchronousBase64Logo();
     }
     initLogos();
 
@@ -992,6 +1047,7 @@
       const r = new FileReader();
       r.onload = ev => {
         currentAppLogo = ev.target.result;
+        cachedPdfLogoBase64 = ev.target.result;
         localStorage.setItem('app_custom_logo', currentAppLogo);
         initLogos();
         alert("Custom logo updated successfully!");
@@ -1003,6 +1059,7 @@
       if (!confirm("Reset to official default India Post logo?")) return;
       currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
       localStorage.removeItem('app_custom_logo');
+      cachedPdfLogoBase64 = null;
       initLogos();
       alert("Logo reset to official India Post emblem.");
     }
@@ -1322,7 +1379,7 @@
       const d = new Date(isoStr);
       const datePart = d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' });
       const timePart = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-      return `<div class="font-bold text-slate-700 leading-tight">${datePart}</div><div class="text-[10px] text-slate-400 leading-tight">${timePart}</div>`;
+      return `<div class="font-bold text-slate-800 leading-tight">${datePart}</div><div class="text-[10px] text-slate-600 leading-tight">${timePart}</div>`;
     }
 
     function formatDateTime(isoStr) {
@@ -1531,7 +1588,7 @@
       const isSuperadmin = role === 'superadmin';
       const isViewer = role === 'viewer';
 
-      // BOTH ADMIN & SUPERADMIN ACCESS USER MGMT
+      // BOTH ADMIN & SUPERADMIN ACCESS USER MANAGEMENT
       if (isAdmin) {
         $('adminTabBtn').classList.remove('hidden');
         $('tabBtnTrack').classList.remove('hidden');
@@ -1713,6 +1770,7 @@
 
     function closeUserEditModal() { $('userEditModal').classList.add('hidden'); }
 
+    // USER CLAIM EDIT WITH ADDITIONAL SUPPORTING DOCUMENT
     async function submitUserClaimEdit(e) {
       e.preventDefault();
       const claimId = $('editClaimId').value;
@@ -1804,7 +1862,7 @@
       renderClaimsSummaryTable();
     }
 
-    // RENDER TABLE
+    // RENDER TABLE WITH 2 DISTINCT ROWS OF ACTION BUTTONS
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1852,6 +1910,7 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
+            <!-- 1. TRANSACTION ID / REF NO & MODULE -->
             <td class="p-2 whitespace-nowrap">
               <button type="button" onclick="openDetailsModal('${c.id}')" class="text-postRed-700 hover:text-postRed-900 hover:underline font-bold cursor-pointer font-mono text-xs block">
                 ${c.txn_id_ref}
@@ -1864,17 +1923,22 @@
               </div>
             </td>
 
+            <!-- 2. EMP NAME/ID & OFFICE -->
             <td class="p-2 whitespace-nowrap">
               <div class="font-bold text-slate-800 leading-tight">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
               <div class="text-[10.5px] text-slate-600 leading-tight">${c.raised_for_office}</div>
             </td>
 
+            <!-- 3. TXN DATE -->
             <td class="p-2 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
 
+            <!-- 4. ENTRY DATE/TIME -->
             <td class="p-1.5 whitespace-nowrap max-w-[85px]">${entryCompact}</td>
 
+            <!-- 5. AMOUNT -->
             <td class="p-2 font-bold text-slate-900 whitespace-nowrap text-xs">₹${c.txn_amount}</td>
             
+            <!-- 6. STATUS WITH SETTLEMENT DATE -->
             <td class="p-2 whitespace-nowrap">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${getStatusColor(c.claim_status)}">
                 ${c.claim_status}
@@ -1886,10 +1950,13 @@
               ` : ''}
             </td>
 
+            <!-- 7. REMARKS -->
             <td class="p-2 min-w-[150px]">${remarksDisplay}</td>
             
+            <!-- 8. ACTIONS: 2-ROW BALANCED BUTTONS -->
             <td class="p-2 text-center whitespace-nowrap min-w-[170px]">
               <div class="flex flex-col gap-1 w-[165px] mx-auto">
+                <!-- ROW 1: EDIT / REPLY & USER DOC -->
                 <div class="flex items-center justify-between gap-1">
                   ${isAdmin ? `
                     <button type="button" onclick="openReplyModal('${c.id}')" class="flex-1 bg-postRed-600 hover:bg-postRed-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition cursor-pointer">
@@ -1910,6 +1977,7 @@
                   </a>
                 </div>
 
+                <!-- ROW 2: ADMIN DOC & DOCKET -->
                 <div class="flex items-center justify-between gap-1">
                   ${c.admin_file_url ? `
                     <a href="${c.admin_file_url}" target="_blank" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-1 rounded text-[10px] font-bold shadow-2xs transition text-center">
@@ -1986,6 +2054,7 @@
           ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="inline-flex items-center gap-1 bg-postRed-600 text-white px-2 py-0.5 rounded text-[11px] font-bold hover:bg-postRed-700 transition">📎 Admin Attached Doc</a>` : ''}
         </div>
         
+        <!-- DOCUMENTS SECTION -->
         <div class="col-span-1 md:col-span-2 flex flex-wrap gap-3 pt-1 border-t border-slate-200">
           <a href="${claim.file_url}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded text-xs font-bold transition">
             📄 Primary User Document
@@ -2005,6 +2074,7 @@
 
     function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
 
+    // PRINT COMPLETE DOCKET
     function printClaimDetails(claimId) {
       const claim = rawClaimsList.find(c => c.id === claimId);
       if (!claim) return alert("Claim details not found for printing!");
@@ -2345,7 +2415,7 @@
     async function loadAllUsers() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       if (!isAdmin) {
-        $('usersTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-600 font-bold">Unauthorized access: Admin rights required.</td></tr>`;
+        $('usersTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-center text-rose-600 font-bold">Unauthorized access: Admin rights required.</td></tr>`;
         return;
       }
 
@@ -2355,7 +2425,7 @@
         .order('created_at', { ascending: false });
 
       if (error || !users) {
-        $('usersTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-postRed-600">Failed to load users.</td></tr>`;
+        $('usersTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-center text-postRed-600">Failed to load users.</td></tr>`;
         return;
       }
       allLoadedUsers = users;
@@ -2382,13 +2452,14 @@
       const tbody = $('usersTableBody');
       tbody.innerHTML = '';
       if (!users || users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No user accounts found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No user accounts found.</td></tr>`;
         return;
       }
 
       users.forEach(u => {
         const isActive = u.is_active !== false;
         const role = u.role || 'user';
+        const regDateTime = formatDateTime(u.created_at);
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
             <td class="p-2.5 font-bold font-mono text-slate-800">${u.emp_id}</td>
@@ -2396,6 +2467,8 @@
               <div class="font-bold text-slate-800">${u.emp_name}</div>
               <div class="mt-0.5">${getRoleBadge(role)}</div>
             </td>
+            <!-- REGISTERED ON DATE/TIME -->
+            <td class="p-2.5 text-slate-700 whitespace-nowrap">${regDateTime}</td>
             <td class="p-2.5 font-mono">${u.mobile_number || '<span class="text-slate-400">N/A</span>'}</td>
             <td class="p-2.5 font-medium">${u.office_name}</td>
             <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isActive ? 'Active' : 'Locked'}</span></td>
@@ -2526,6 +2599,7 @@
         "Emp ID": u.emp_id,
         "Employee Name": u.emp_name,
         "Role": (u.role || 'user').toUpperCase(),
+        "Registered On": formatDateTime(u.created_at),
         "Mobile Number": u.mobile_number || 'N/A',
         "Office Name": u.office_name,
         "Status": u.is_active !== false ? 'Active' : 'Locked'
@@ -2541,9 +2615,10 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "portrait" });
 
-      if (cachedPdfLogoBase64) {
+      const logoData = getSynchronousBase64Logo();
+      if (logoData) {
         try {
-          doc.addImage(cachedPdfLogoBase64, 'PNG', 174, 8, 18, 18);
+          doc.addImage(logoData, 'PNG', 174, 8, 18, 18);
         } catch (err) {
           console.warn("Logo embed error:", err);
         }
@@ -2557,12 +2632,13 @@
       doc.setTextColor(217, 119, 6);
       doc.text("Chennai City Central Division", 105, 22, { align: "center" });
 
-      const headers = [["Sl. No.", "Emp ID", "Employee Name", "Role", "Mobile", "Office", "Status"]];
+      const headers = [["Sl. No.", "Emp ID", "Employee Name", "Role", "Registered On", "Mobile", "Office", "Status"]];
       const rows = allLoadedUsers.map((u, i) => [
         i + 1,
         u.emp_id,
         u.emp_name,
         (u.role || 'user').toUpperCase(),
+        formatDateTime(u.created_at),
         u.mobile_number || "-",
         u.office_name,
         u.is_active !== false ? 'Active' : 'Locked'
@@ -2574,17 +2650,22 @@
         startY: 32,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
-        styles: { fontSize: 8, cellPadding: 2 },
-        didDrawPage: function (data) {
-          doc.setFontSize(8);
-          doc.setTextColor(120, 120, 120);
-          doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`, 105, 290, { align: "center" });
-        }
+        styles: { fontSize: 7.5, cellPadding: 2, textColor: [15, 23, 42] }
       });
 
-      const finalY = doc.lastAutoTable.finalY + 10;
+      // ACCURATE TOTAL PAGE NUMBERING & FOOTER
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(30, 41, 59);
+        doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Page ${i} of ${totalPages}`, 105, 290, { align: "center" });
+      }
+
+      const finalY = doc.lastAutoTable.finalY + 8;
+      doc.setPage(totalPages);
       doc.setFontSize(9);
-      doc.setTextColor(100, 116, 139);
+      doc.setTextColor(30, 41, 59);
       doc.text(`*** END OF STATEMENT - TOTAL USERS: ${allLoadedUsers.length} ***`, 105, finalY < 280 ? finalY : 280, { align: "center" });
 
       doc.save(`Users_Roster_${getFormattedTimestamp()}.pdf`);
@@ -2630,7 +2711,7 @@
       rawMISMasterList = claims;
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // Primary Status Metrics
+      // Status Metrics
       const totalCount = claims.length;
       const pendingClaims = claims.filter(c => c.claim_status === 'Pending');
       const inProgressClaims = claims.filter(c => c.claim_status === 'In Progress');
@@ -2758,7 +2839,7 @@
       renderMISTableRows();
     }
 
-    // CONSOLIDATED BREAKDOWNS MATRIX (SHOWS PENDING + IN-PROGRESS PENDENCY AMOUNT)
+    // CONSOLIDATED BREAKDOWNS MATRIX (MODULE-WISE, STATUS-WISE & OFFICE-WISE)
     function renderConsolidatedSummaries(claims) {
       const moduleStats = {
         'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
@@ -2774,19 +2855,35 @@
         'Rejected': { count: 0, amount: 0 }
       };
 
+      const officeStats = {};
+
       claims.forEach(c => {
         const mod = moduleStats[c.module] ? c.module : 'Others';
         const amt = parseFloat(c.txn_amount) || 0;
+        const off = c.raised_for_office || 'Unassigned';
 
+        if (!officeStats[off]) {
+          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+
+        officeStats[off].registered++;
         moduleStats[mod].total++;
+
         if (c.claim_status === 'Pending') {
           moduleStats[mod].pending++;
           moduleStats[mod].activePendingAmount += amt;
+          officeStats[off].pending++;
+          officeStats[off].activePendingAmount += amt;
         } else if (c.claim_status === 'In Progress') {
           moduleStats[mod].inprogress++;
           moduleStats[mod].activePendingAmount += amt;
+          officeStats[off].inprogress++;
+          officeStats[off].activePendingAmount += amt;
         } else if (c.claim_status === 'Settled') {
           moduleStats[mod].settled++;
+          officeStats[off].settled++;
+        } else if (c.claim_status === 'Rejected') {
+          officeStats[off].rejected++;
         }
 
         if (statusStats[c.claim_status]) {
@@ -2820,7 +2917,6 @@
         `;
       });
 
-      // Total Module Row
       modTbody.innerHTML += `
         <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
           <td class="p-1.5">Total</td>
@@ -2853,7 +2949,6 @@
         `;
       });
 
-      // Total Status Row
       statTbody.innerHTML += `
         <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
           <td class="p-1.5">Total</td>
@@ -2862,6 +2957,26 @@
           <td class="p-1.5 text-right text-postRed-700">₹${statAmtSum.toFixed(2)}</td>
         </tr>
       `;
+
+      // 3. Office-wise Matrix Render
+      const offTbody = $('officeSummaryTableBody');
+      offTbody.innerHTML = '';
+      const sortedOffices = Object.keys(officeStats).sort();
+
+      sortedOffices.forEach(off => {
+        const s = officeStats[off];
+        offTbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-1.5 font-bold text-slate-800">${off}</td>
+            <td class="p-1.5 text-center font-bold">${s.registered}</td>
+            <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
+            <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
+            <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
+            <td class="p-1.5 text-center text-rose-700 font-semibold">${s.rejected}</td>
+            <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
     }
 
     // MIS SORTING ON ALL COLUMNS
@@ -2927,25 +3042,25 @@
           tatOrAgingDisplay = days !== null ? `<span class="font-bold text-emerald-800">${days} Days (TAT)</span>` : '-';
         } else if (c.claim_status === 'In Progress') {
           const days = calculateDaysDifference(c.txn_date, todayStr);
-          const colorClass = days > 30 ? 'text-rose-700 font-extrabold' : (days > 15 ? 'text-amber-700 font-bold' : 'text-slate-700');
+          const colorClass = days > 30 ? 'text-rose-700 font-extrabold' : (days > 15 ? 'text-amber-700 font-bold' : 'text-slate-800 font-semibold');
           tatOrAgingDisplay = days !== null ? `<span class="${colorClass}">${days} Days (Age)</span>` : '-';
         } else if (c.claim_status === 'Pending') {
           const days = calculateDaysDifference(c.txn_date, todayStr);
-          tatOrAgingDisplay = days !== null ? `<span class="text-slate-500">${days} Days (Age)</span>` : '-';
+          tatOrAgingDisplay = days !== null ? `<span class="text-slate-700 font-medium">${days} Days (Age)</span>` : '-';
         }
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition">
             <td class="p-2.5 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
-            <td class="p-2.5 font-semibold text-slate-700 whitespace-nowrap">${creatorName}</td>
-            <td class="p-2.5 font-medium text-slate-700 whitespace-nowrap">${c.module}</td>
-            <td class="p-2.5 whitespace-nowrap">${c.raised_for_office}</td>
-            <td class="p-2.5 whitespace-nowrap">${c.txn_date}</td>
-            <td class="p-2.5 whitespace-nowrap font-medium text-slate-700">${settleDate}</td>
+            <td class="p-2.5 font-semibold text-slate-800 whitespace-nowrap">${creatorName}</td>
+            <td class="p-2.5 font-medium text-slate-800 whitespace-nowrap">${c.module}</td>
+            <td class="p-2.5 whitespace-nowrap text-slate-800">${c.raised_for_office}</td>
+            <td class="p-2.5 whitespace-nowrap text-slate-800">${c.txn_date}</td>
+            <td class="p-2.5 whitespace-nowrap font-medium text-slate-800">${settleDate}</td>
             <td class="p-2.5 whitespace-nowrap">${tatOrAgingDisplay}</td>
-            <td class="p-2.5 font-semibold whitespace-nowrap">₹${c.txn_amount}</td>
+            <td class="p-2.5 font-semibold whitespace-nowrap text-slate-900">₹${c.txn_amount}</td>
             <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
-            <td class="p-2.5 text-xs text-slate-600">${c.reply_remarks_admin || '-'}</td>
+            <td class="p-2.5 text-xs text-slate-800">${c.reply_remarks_admin || '-'}</td>
           </tr>
         `;
       });
@@ -2974,7 +3089,7 @@
       if (session && !currentUser) initApp();
     });
 
-    // EXCEL EXPORT (EXACT FILTERED LIST + OPTIONAL CONSOLIDATION SHEET)
+    // EXCEL EXPORT (EXACT FILTERED SLICE + CONSOLIDATION IF ALL)
     async function exportMISExcel() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const todayStr = new Date().toISOString().split('T')[0];
@@ -3007,7 +3122,7 @@
       const wsClaims = XLSX.utils.json_to_sheet(formattedData);
       XLSX.utils.book_append_sheet(wb, wsClaims, "Claims Details");
 
-      // IF ALL REPORT, ADD CONSOLIDATION SHEET (PENDING + IN PROGRESS VALUE)
+      // IF ALL REPORT, ADD CONSOLIDATION SHEET WITH MODULE-WISE & OFFICE-WISE
       if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
         const modSummary = [];
         ['Booking', 'Delivery', 'DSS', 'Others'].forEach(m => {
@@ -3026,44 +3141,79 @@
           });
         });
         const wsSummary = XLSX.utils.json_to_sheet(modSummary);
-        XLSX.utils.book_append_sheet(wb, wsSummary, "Consolidated Summary");
+        XLSX.utils.book_append_sheet(wb, wsSummary, "Module Summary");
+
+        // Office-wise sheet
+        const officeStats = {};
+        rawMISMasterList.forEach(c => {
+          const off = c.raised_for_office || 'Unassigned';
+          const amt = parseFloat(c.txn_amount) || 0;
+          if (!officeStats[off]) {
+            officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+          }
+          officeStats[off].registered++;
+          if (c.claim_status === 'Pending') { officeStats[off].pending++; officeStats[off].activePendingAmount += amt; }
+          else if (c.claim_status === 'In Progress') { officeStats[off].inprogress++; officeStats[off].activePendingAmount += amt; }
+          else if (c.claim_status === 'Settled') { officeStats[off].settled++; }
+          else if (c.claim_status === 'Rejected') { officeStats[off].rejected++; }
+        });
+
+        const offRows = Object.keys(officeStats).sort().map(off => ({
+          "Office Name": off,
+          "Registered": officeStats[off].registered,
+          "Pending": officeStats[off].pending,
+          "In Progress": officeStats[off].inprogress,
+          "Settled": officeStats[off].settled,
+          "Rejected": officeStats[off].rejected,
+          "Pending + In Progress Amt (INR)": officeStats[off].activePendingAmount
+        }));
+        const wsOffice = XLSX.utils.json_to_sheet(offRows);
+        XLSX.utils.book_append_sheet(wb, wsOffice, "Office-wise Pendency");
       }
 
       XLSX.writeFile(wb, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
-    // PDF EXPORT (STRICT FILTER INTEGRITY + CONSOLIDATION IF "ALL")
+    // PDF EXPORT (HIGH-CONTRAST FONT, SYNCHRONOUS LOGO, CORRECT TOTAL PAGES & DATES HEADING)
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // Embed Square Logo
-      if (cachedPdfLogoBase64) {
+      const fromDateVal = $('filterFromDate').value || 'Inception';
+      const toDateVal = $('filterToDate').value || 'Current Date';
+
+      // 1. EMBED LOGO IN TOP RIGHT CORNER
+      const logoData = getSynchronousBase64Logo();
+      if (logoData) {
         try {
-          doc.addImage(cachedPdfLogoBase64, 'PNG', 268, 6, 16, 16);
+          doc.addImage(logoData, 'PNG', 268, 6, 16, 16);
         } catch (err) {
           console.warn("Logo embed error:", err);
         }
       }
 
-      // CENTERED HEADINGS (MATCHES FILTER CRITERIA STRICTLY)
+      // 2. CENTERED HEADINGS WITH EXTRACTION PERIOD DATES
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
-      doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 13, { align: "center" });
+      doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 12, { align: "center" });
       
       doc.setFontSize(9.5);
-      doc.setTextColor(217, 119, 6);
-      doc.text("Chennai City Central Division", 148.5, 19, { align: "center" });
+      doc.setTextColor(180, 83, 9);
+      doc.text("Chennai City Central Division", 148.5, 17, { align: "center" });
 
-      let startYPos = 25;
+      doc.setFontSize(8.5);
+      doc.setTextColor(30, 41, 59);
+      doc.text(`Period: ${fromDateVal} to ${toDateVal} | Filter: ${currentMISReportFilter} | Visible Records: ${currentMISClaimsList.length}`, 148.5, 22, { align: "center" });
 
-      // CONSOLIDATION TABLES IF REPORT IS "ALL"
+      let startYPos = 26;
+
+      // 3. CONSOLIDATION TABLES IF REPORT IS "ALL"
       if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
         doc.setFontSize(8.5);
         doc.setTextColor(138, 12, 33);
-        doc.text("CONSOLIDATED SUMMARY (MODULE-WISE ACTIVE PENDENCY VALUE)", 14, startYPos);
+        doc.text("1. CONSOLIDATED MODULE BREAKDOWN (ACTIVE PENDENCY VALUE)", 14, startYPos);
 
         const modRows = ['Booking', 'Delivery', 'DSS', 'Others'].map(m => {
           const list = rawMISMasterList.filter(c => c.module === m);
@@ -3077,17 +3227,17 @@
         doc.autoTable({
           head: [["Module", "Total Claims", "Pending", "In Progress", "Settled", "Pending + In Prog Amt (Rs)"]],
           body: modRows,
-          startY: startYPos + 2.5,
+          startY: startYPos + 2,
           theme: 'grid',
           headStyles: { fillColor: [138, 12, 33], textColor: [255, 255, 255], fontSize: 7.5 },
-          styles: { fontSize: 7, cellPadding: 1.5 },
+          styles: { fontSize: 7, cellPadding: 1.5, textColor: [15, 23, 42] },
           margin: { left: 14, right: 14 }
         });
 
         startYPos = doc.lastAutoTable.finalY + 6;
       }
 
-      // FILTERED CLAIMS ROWS (ONLY EXPORTS CURRENT SELECTION)
+      // 4. MAIN CLAIMS TABLE (STRICTLY FILTERED TO CURRENT SELECTION)
       const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => {
         const isSettled = c.claim_status === 'Settled';
@@ -3123,19 +3273,24 @@
         startY: startYPos,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
-        styles: { fontSize: 8, cellPadding: 2 },
-        didDrawPage: function (data) {
-          doc.setFontSize(8);
-          doc.setTextColor(120, 120, 120);
-          doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`, 148.5, 202, { align: "center" });
-        }
+        styles: { fontSize: 8, cellPadding: 2, textColor: [15, 23, 42] }
       });
 
-      // STATEMENT END LINE
-      const finalY = doc.lastAutoTable.finalY + 8;
+      // 5. ACCURATE TWO-PASS TOTAL PAGE NUMBERING
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(30, 41, 59);
+        doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Page ${i} of ${totalPages}`, 148.5, 202, { align: "center" });
+      }
+
+      // 6. END OF STATEMENT LINE ON LAST PAGE
+      const finalY = doc.lastAutoTable.finalY + 7;
+      doc.setPage(totalPages);
       doc.setFontSize(8.5);
-      doc.setTextColor(100, 116, 139);
-      doc.text(`*** END OF STATEMENT - TOTAL CLAIMS: ${currentMISClaimsList.length} ***`, 148.5, finalY < 195 ? finalY : 195, { align: "center" });
+      doc.setTextColor(30, 41, 59);
+      doc.text(`*** END OF STATEMENT - TOTAL CLAIMS: ${currentMISClaimsList.length} ***`, 148.5, finalY < 196 ? finalY : 196, { align: "center" });
 
       doc.save(`Report_${currentMISReportFilter}_${getFormattedTimestamp()}.pdf`);
     }
