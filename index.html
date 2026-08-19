@@ -115,7 +115,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-0.5">Office Name *</label>
-              <select id="regOfficeName" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
+              <select id="regOfficeName" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- Loading Offices... --</option>
               </select>
             </div>
@@ -201,7 +201,7 @@
             </div>
           </div>
 
-          <!-- TABLE -->
+          <!-- OVERVIEW TABLE -->
           <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <table class="w-full text-left text-xs border-collapse">
               <thead class="sticky top-0 z-10 shadow-xs">
@@ -272,7 +272,7 @@
                   </select>
                 </div>
                 
-                <!-- CONDITIONAL RRN -->
+                <!-- CONDITIONAL RRN (ONLY SBI POS) -->
                 <div id="rrnFieldContainer" class="hidden">
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
                   <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
@@ -334,7 +334,7 @@
           </form>
         </div>
 
-        <!-- TAB 3: THEME CONVERTER TOOL TAB -->
+        <!-- TAB 3: THEME CONVERTER -->
         <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -384,7 +384,7 @@
           </div>
         </div>
 
-        <!-- TAB 4: USER MANAGEMENT (ACCESSIBLE TO ADMIN & SUPERADMIN) -->
+        <!-- TAB 4: ADMIN USER MANAGEMENT -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -561,7 +561,7 @@
             </div>
           </div>
 
-          <!-- MODULE-WISE & STATUS-WISE CONSOLIDATION (WHEN "ALL" IS SELECTED) -->
+          <!-- MODULE-WISE & STATUS-WISE CONSOLIDATION (PENDING + IN PROGRESS VALUE) -->
           <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
             <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
               <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
@@ -571,7 +571,7 @@
               <!-- Module-wise Summary Table -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
-                  1. Module-wise Breakdown
+                  1. Module-wise Breakdown (Pending + In-Progress Financial Value)
                 </div>
                 <table class="w-full text-left text-[11px] border-collapse">
                   <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
@@ -581,7 +581,7 @@
                       <th class="p-1.5 text-center text-amber-700">Pending</th>
                       <th class="p-1.5 text-center text-blue-700">In Prog</th>
                       <th class="p-1.5 text-center text-emerald-700">Settled</th>
-                      <th class="p-1.5 text-right">Total Amount</th>
+                      <th class="p-1.5 text-right font-bold text-postRed-800">Pending + In Prog Amt (₹)</th>
                     </tr>
                   </thead>
                   <tbody id="moduleSummaryTableBody" class="divide-y divide-slate-100"></tbody>
@@ -608,7 +608,7 @@
             </div>
           </div>
 
-          <!-- MIS TABLE WITH FULL SORTABILITY ON ALL COLUMNS -->
+          <!-- MIS TABLE -->
           <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <h4 id="misReportTableTitle" class="sticky top-0 z-20 font-bold text-xs p-2.5 bg-amber-50 text-postRed-900 border-b border-amber-200">Report Summary View (All)</h4>
             <table class="w-full text-left text-xs border-collapse">
@@ -689,7 +689,7 @@
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
               <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
-              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
+              <button type="submit" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
             </div>
           </form>
         </div>
@@ -879,7 +879,7 @@
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Designed: Krishnan K, DSM - &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
+      <div class="text-slate-500 font-medium">Krishnan K, DSM &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
     </div>
   </footer>
 
@@ -1256,6 +1256,7 @@
       a.click();
     }
 
+    // CLIPBOARD PASTE PREVIEW
     window.addEventListener('paste', async (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       let blob = null;
@@ -1530,7 +1531,7 @@
       const isSuperadmin = role === 'superadmin';
       const isViewer = role === 'viewer';
 
-      // ROLE BASED TAB RESTRICTIONS (BOTH ADMIN & SUPERADMIN ACCESS USER MGMT)
+      // BOTH ADMIN & SUPERADMIN ACCESS USER MGMT
       if (isAdmin) {
         $('adminTabBtn').classList.remove('hidden');
         $('tabBtnTrack').classList.remove('hidden');
@@ -1803,6 +1804,7 @@
       renderClaimsSummaryTable();
     }
 
+    // RENDER TABLE
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
@@ -1861,12 +1863,16 @@
                 </button>
               </div>
             </td>
+
             <td class="p-2 whitespace-nowrap">
               <div class="font-bold text-slate-800 leading-tight">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono font-semibold">${empIdOnly}</span></div>
               <div class="text-[10.5px] text-slate-600 leading-tight">${c.raised_for_office}</div>
             </td>
+
             <td class="p-2 whitespace-nowrap font-bold text-slate-800 text-xs">${c.txn_date}</td>
+
             <td class="p-1.5 whitespace-nowrap max-w-[85px]">${entryCompact}</td>
+
             <td class="p-2 font-bold text-slate-900 whitespace-nowrap text-xs">₹${c.txn_amount}</td>
             
             <td class="p-2 whitespace-nowrap">
@@ -2422,10 +2428,7 @@
       $('editUserId').value = user.id;
       $('editUserEmpId').value = user.emp_id || '';
       $('editUserEmpName').value = user.emp_name || '';
-      
-      const existingMobile = user.mobile_number || user.mobile_no || user.phone || '';
-      $('editUserMobile').value = existingMobile;
-      
+      $('editUserMobile').value = user.mobile_number || user.mobile_no || user.phone || '';
       $('editUserOffice').value = user.office_name || '';
       $('editUserRole').value = user.role || 'user';
 
@@ -2755,13 +2758,13 @@
       renderMISTableRows();
     }
 
-    // CONSOLIDATED BREAKDOWNS MATRIX (MODULE-WISE & STATUS-WISE)
+    // CONSOLIDATED BREAKDOWNS MATRIX (SHOWS PENDING + IN-PROGRESS PENDENCY AMOUNT)
     function renderConsolidatedSummaries(claims) {
       const moduleStats = {
-        'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 },
-        'Delivery': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 },
-        'DSS': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 },
-        'Others': { total: 0, pending: 0, inprogress: 0, settled: 0, amount: 0 }
+        'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
+        'Delivery': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
+        'DSS': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
+        'Others': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 }
       };
 
       const statusStats = {
@@ -2771,18 +2774,20 @@
         'Rejected': { count: 0, amount: 0 }
       };
 
-      let grandTotalAmount = 0;
-
       claims.forEach(c => {
         const mod = moduleStats[c.module] ? c.module : 'Others';
         const amt = parseFloat(c.txn_amount) || 0;
-        grandTotalAmount += amt;
 
         moduleStats[mod].total++;
-        moduleStats[mod].amount += amt;
-        if (c.claim_status === 'Pending') moduleStats[mod].pending++;
-        else if (c.claim_status === 'In Progress') moduleStats[mod].inprogress++;
-        else if (c.claim_status === 'Settled') moduleStats[mod].settled++;
+        if (c.claim_status === 'Pending') {
+          moduleStats[mod].pending++;
+          moduleStats[mod].activePendingAmount += amt;
+        } else if (c.claim_status === 'In Progress') {
+          moduleStats[mod].inprogress++;
+          moduleStats[mod].activePendingAmount += amt;
+        } else if (c.claim_status === 'Settled') {
+          moduleStats[mod].settled++;
+        }
 
         if (statusStats[c.claim_status]) {
           statusStats[c.claim_status].count++;
@@ -2790,10 +2795,10 @@
         }
       });
 
-      // 1. Module Table Render
+      // 1. Module Table Render (Pending + In Progress Value)
       const modTbody = $('moduleSummaryTableBody');
       modTbody.innerHTML = '';
-      let modTotalSum = 0, modPendSum = 0, modInpSum = 0, modSetSum = 0, modAmtSum = 0;
+      let modTotalSum = 0, modPendSum = 0, modInpSum = 0, modSetSum = 0, modActiveAmtSum = 0;
 
       Object.keys(moduleStats).forEach(m => {
         const s = moduleStats[m];
@@ -2801,7 +2806,7 @@
         modPendSum += s.pending;
         modInpSum += s.inprogress;
         modSetSum += s.settled;
-        modAmtSum += s.amount;
+        modActiveAmtSum += s.activePendingAmount;
 
         modTbody.innerHTML += `
           <tr class="hover:bg-slate-50">
@@ -2810,7 +2815,7 @@
             <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
             <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
             <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
-            <td class="p-1.5 text-right font-bold">₹${s.amount.toFixed(2)}</td>
+            <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
           </tr>
         `;
       });
@@ -2823,7 +2828,7 @@
           <td class="p-1.5 text-center text-amber-800">${modPendSum}</td>
           <td class="p-1.5 text-center text-blue-800">${modInpSum}</td>
           <td class="p-1.5 text-center text-emerald-800">${modSetSum}</td>
-          <td class="p-1.5 text-right text-postRed-700">₹${modAmtSum.toFixed(2)}</td>
+          <td class="p-1.5 text-right text-postRed-700">₹${modActiveAmtSum.toFixed(2)}</td>
         </tr>
       `;
 
@@ -2969,7 +2974,7 @@
       if (session && !currentUser) initApp();
     });
 
-    // EXCEL EXPORT (INCLUDES DETAILED CONSOLIDATION SHEET IF ALL REPORT)
+    // EXCEL EXPORT (EXACT FILTERED LIST + OPTIONAL CONSOLIDATION SHEET)
     async function exportMISExcel() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const todayStr = new Date().toISOString().split('T')[0];
@@ -3002,19 +3007,22 @@
       const wsClaims = XLSX.utils.json_to_sheet(formattedData);
       XLSX.utils.book_append_sheet(wb, wsClaims, "Claims Details");
 
-      // IF ALL REPORT, ADD CONSOLIDATION SHEET
+      // IF ALL REPORT, ADD CONSOLIDATION SHEET (PENDING + IN PROGRESS VALUE)
       if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
         const modSummary = [];
         ['Booking', 'Delivery', 'DSS', 'Others'].forEach(m => {
           const list = rawMISMasterList.filter(c => c.module === m);
-          const amt = list.reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
+          const activePendingAmt = list
+            .filter(c => c.claim_status === 'Pending' || c.claim_status === 'In Progress')
+            .reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
+            
           modSummary.push({
             "Module": m,
             "Total Claims": list.length,
             "Pending": list.filter(c => c.claim_status === 'Pending').length,
             "In Progress": list.filter(c => c.claim_status === 'In Progress').length,
             "Settled": list.filter(c => c.claim_status === 'Settled').length,
-            "Total Amount (INR)": amt
+            "Pending + In Progress Amt (INR)": activePendingAmt
           });
         });
         const wsSummary = XLSX.utils.json_to_sheet(modSummary);
@@ -3024,7 +3032,7 @@
       XLSX.writeFile(wb, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
-    // PDF EXPORT (WITH CONSOLIDATION TABLES FOR "ALL" REPORTS)
+    // PDF EXPORT (STRICT FILTER INTEGRITY + CONSOLIDATION IF "ALL")
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
@@ -3040,7 +3048,7 @@
         }
       }
 
-      // CENTERED HEADINGS
+      // CENTERED HEADINGS (MATCHES FILTER CRITERIA STRICTLY)
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
       doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 13, { align: "center" });
@@ -3053,20 +3061,23 @@
 
       // CONSOLIDATION TABLES IF REPORT IS "ALL"
       if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
-        doc.setFontSize(9);
+        doc.setFontSize(8.5);
         doc.setTextColor(138, 12, 33);
-        doc.text("CONSOLIDATED SUMMARY (MODULE-WISE & STATUS-WISE)", 14, startYPos);
+        doc.text("CONSOLIDATED SUMMARY (MODULE-WISE ACTIVE PENDENCY VALUE)", 14, startYPos);
 
         const modRows = ['Booking', 'Delivery', 'DSS', 'Others'].map(m => {
           const list = rawMISMasterList.filter(c => c.module === m);
-          const amt = list.reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
-          return [m, list.length, list.filter(c => c.claim_status === 'Pending').length, list.filter(c => c.claim_status === 'In Progress').length, list.filter(c => c.claim_status === 'Settled').length, `Rs. ${amt.toFixed(2)}`];
+          const activePendingAmt = list
+            .filter(c => c.claim_status === 'Pending' || c.claim_status === 'In Progress')
+            .reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
+            
+          return [m, list.length, list.filter(c => c.claim_status === 'Pending').length, list.filter(c => c.claim_status === 'In Progress').length, list.filter(c => c.claim_status === 'Settled').length, `Rs. ${activePendingAmt.toFixed(2)}`];
         });
 
         doc.autoTable({
-          head: [["Module", "Total Claims", "Pending", "In Progress", "Settled", "Total Value (Rs)"]],
+          head: [["Module", "Total Claims", "Pending", "In Progress", "Settled", "Pending + In Prog Amt (Rs)"]],
           body: modRows,
-          startY: startYPos + 3,
+          startY: startYPos + 2.5,
           theme: 'grid',
           headStyles: { fillColor: [138, 12, 33], textColor: [255, 255, 255], fontSize: 7.5 },
           styles: { fontSize: 7, cellPadding: 1.5 },
@@ -3076,6 +3087,7 @@
         startYPos = doc.lastAutoTable.finalY + 6;
       }
 
+      // FILTERED CLAIMS ROWS (ONLY EXPORTS CURRENT SELECTION)
       const headers = [["Sl. No.", "Ref No", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => {
         const isSettled = c.claim_status === 'Settled';
@@ -3084,6 +3096,9 @@
           const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
           tatDays = d !== null ? `${d} d (TAT)` : "-";
         } else if (c.claim_status === 'In Progress') {
+          const d = calculateDaysDifference(c.txn_date, todayStr);
+          tatDays = d !== null ? `${d} d (Age)` : "-";
+        } else if (c.claim_status === 'Pending') {
           const d = calculateDaysDifference(c.txn_date, todayStr);
           tatDays = d !== null ? `${d} d (Age)` : "-";
         }
