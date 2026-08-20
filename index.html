@@ -38,7 +38,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-amber-50/40 text-slate-900 font-sans min-h-screen text-xs flex flex-col justify-between">
+<body class="bg-amber-50/40 text-slate-900 font-sans min-h-screen text-xs flex flex-col justify-between" onclick="closeChannelDropdownIfClickedOutside(event)">
 
   <div>
     <!-- NAVBAR -->
@@ -540,7 +540,7 @@
           </div>
         </div>
 
-        <!-- TAB 5: ADMIN-ONLY BOOKING PERFORMANCE & DIGITAL ADOPTION DASHBOARD -->
+        <!-- TAB 5: ADMIN-ONLY BOOKING PERFORMANCE & DIGITAL ADOPTION DASHBOARD WITH CHANNEL CHECKLIST -->
         <div id="bookingDashView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -558,7 +558,7 @@
             </div>
           </div>
 
-          <!-- TIME PERIOD & FILTER BAR -->
+          <!-- TIME PERIOD & MULTI-CHANNEL COMPARISON CHECKLIST FILTER BAR -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end text-xs">
             <div>
               <label class="block font-bold text-slate-700 mb-0.5">Quick Period</label>
@@ -584,7 +584,80 @@
                 <option value="">-- All Offices --</option>
               </select>
             </div>
-            <div class="flex gap-1.5 md:col-span-2">
+
+            <!-- MULTI-SELECT CHECKED LISTBOX FOR CHANNELS -->
+            <div class="relative" id="channelDropdownWrapper">
+              <label class="block font-bold text-postRed-900 mb-0.5">⚡ Compare Channels (<span id="channelSelectedCount">12 Selected</span>)</label>
+              <button type="button" onclick="toggleChannelDropdown(event)" class="w-full bg-white border-2 border-postGold-400 p-1.5 rounded text-xs font-semibold text-left flex justify-between items-center shadow-2xs">
+                <span class="truncate" id="channelDropdownLabel">All Digital Channels</span>
+                <span>▼</span>
+              </button>
+
+              <!-- DROPDOWN CHECKLIST POPOVER -->
+              <div id="channelChecklistPopover" class="hidden absolute top-full left-0 mt-1 w-64 bg-white border-2 border-amber-400 shadow-xl rounded-xl p-2.5 z-50 space-y-2 text-xs">
+                <div class="flex justify-between items-center border-b pb-1.5 text-[11px] font-bold">
+                  <span class="text-postRed-800">Select Digital Channels:</span>
+                  <div class="flex gap-1.5">
+                    <button type="button" onclick="setAllChannelCheckboxes(true)" class="text-emerald-700 hover:underline">All</button>
+                    <span>|</span>
+                    <button type="button" onclick="setAllChannelCheckboxes(false)" class="text-rose-700 hover:underline">None</button>
+                  </div>
+                </div>
+
+                <div class="max-h-48 overflow-y-auto space-y-1.5 pr-1 font-medium text-slate-700">
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="dqr" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>DQR Scan</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="sbipos_card" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>SBIPOS-CARD</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="sbipos_bqr" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>SBIPOS BharatQR</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_bqr" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>SBIEPAY BharatQR</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_upi" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>SBIEPAY UPI</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_cc" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>SBIEPAY Credit Card</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_dc" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>SBIEPAY Debit Card</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_neft" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>SBIEPAY NEFT</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="rtgs" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>RTGS</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="wallet" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>Wallet / Franchise Wallet</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="posb" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>POSB</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
+                    <input type="checkbox" name="bookingChannelChk" value="ippb" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+                    <span>IPPB</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-1.5">
               <button type="button" onclick="loadBookingDashboardData()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white p-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">Filter Analysis</button>
               <button type="button" onclick="resetBookingFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Reset</button>
             </div>
@@ -593,7 +666,7 @@
           <!-- SUMMARY SCORECARDS -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-xs">
-              <p class="text-[10px] text-slate-500 font-bold uppercase">Total Bookings (Count &amp; Value)</p>
+              <p class="text-[10px] text-slate-500 font-bold uppercase">Total Bookings (Cash + Selected Digital)</p>
               <p id="dashTotalBookings" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
               <p id="dashTotalValue" class="text-[11px] font-bold text-slate-600">₹0.00</p>
             </div>
@@ -603,7 +676,7 @@
               <p id="dashCashValue" class="text-[11px] font-bold text-amber-700">₹0.00</p>
             </div>
             <div class="bg-white border-2 border-blue-600 p-3 rounded-xl shadow-xs">
-              <p class="text-[10px] text-blue-700 font-bold uppercase">Digital Transactions (DQR, POS, etc.)</p>
+              <p class="text-[10px] text-blue-700 font-bold uppercase">Selected Digital Transactions</p>
               <p id="dashDigitalCount" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
               <p id="dashDigitalValue" class="text-[11px] font-bold text-blue-700">₹0.00</p>
             </div>
@@ -842,7 +915,6 @@
         return val.toISOString().split('T')[0];
       }
 
-      // Handle Excel serial date numbers
       if (typeof val === 'number' || (!isNaN(val) && !String(val).includes('-') && !String(val).includes('/'))) {
         const num = parseFloat(val);
         if (num > 20000 && num < 70000) {
@@ -858,7 +930,6 @@
         return null;
       }
 
-      // Match DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
       const dmyMatch = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
       if (dmyMatch) {
         const day = String(dmyMatch[1]).padStart(2, '0');
@@ -867,7 +938,6 @@
         return `${year}-${month}-${day}`;
       }
 
-      // Match YYYY/MM/DD or YYYY-MM-DD
       const ymdMatch = str.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
       if (ymdMatch) {
         const year = ymdMatch[1];
@@ -876,7 +946,6 @@
         return `${year}-${month}-${day}`;
       }
 
-      // Match DD-Mon-YYYY (e.g. 15-Aug-2024 or 15-AUG-24)
       const months = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
       const monMatch = str.match(/^(\d{1,2})[\s\-\/]([a-zA-Z]{3})[\s\-\/](\d{2,4})/);
       if (monMatch) {
@@ -894,6 +963,42 @@
       }
 
       return null;
+    }
+
+    // CHECKLIST MULTI-SELECT HANDLERS
+    function toggleChannelDropdown(e) {
+      if (e) e.stopPropagation();
+      const popover = $('channelChecklistPopover');
+      if (popover) popover.classList.toggle('hidden');
+    }
+
+    function closeChannelDropdownIfClickedOutside(e) {
+      const popover = $('channelChecklistPopover');
+      const wrapper = $('channelDropdownWrapper');
+      if (popover && !popover.classList.contains('hidden')) {
+        if (wrapper && !wrapper.contains(e.target)) {
+          popover.classList.add('hidden');
+        }
+      }
+    }
+
+    function setAllChannelCheckboxes(checked) {
+      document.querySelectorAll('input[name="bookingChannelChk"]').forEach(chk => chk.checked = checked);
+      onChannelCheckboxChanged();
+    }
+
+    function onChannelCheckboxChanged() {
+      const checkedBoxes = Array.from(document.querySelectorAll('input[name="bookingChannelChk"]:checked'));
+      const count = checkedBoxes.length;
+      $('channelSelectedCount').innerText = `${count} Selected`;
+      $('channelDropdownLabel').innerText = count === 0 ? 'No Channels (0%)' : (count === 12 ? 'All Digital Channels' : `${count} Channels Selected`);
+      loadBookingDashboardData();
+    }
+
+    function getSelectedChannelSet() {
+      const set = new Set();
+      document.querySelectorAll('input[name="bookingChannelChk"]:checked').forEach(chk => set.add(chk.value));
+      return set;
     }
 
     // RRN AUTO-FILL SYNC
@@ -1436,20 +1541,17 @@
             const rawOfficeName = String(row['Office Name'] || '').trim();
             const rawBookingDate = row['Booking Date'];
 
-            // 1. Skip rows where Office Name is empty or a separator
             if (!rawOfficeName || rawOfficeName === '-' || rawOfficeName === '--' || rawOfficeName === '---') {
               skippedRows++;
               continue;
             }
 
-            // 2. Parse booking date strictly
             const parsedDate = parsePostalBookingDate(rawBookingDate);
             if (!parsedDate) {
               skippedRows++;
               continue;
             }
 
-            // 3. Extract transaction counts & amounts safely
             const dqr_c = parseFloat(row['DQR Scan (Cnt)']) || 0;
             const dqr_a = parseFloat(row['DQR Scan (Amt)']) || 0;
             const sbipos_card_c = parseFloat(row['SBIPOS-CARD (Cnt)']) || 0;
@@ -1487,6 +1589,28 @@
               cash_amt: parseFloat(row['Cash (Amt)']) || 0,
               dqr_cnt: dqr_c,
               dqr_amt: dqr_a,
+              sbipos_card_cnt: sbipos_card_c,
+              sbipos_card_amt: sbipos_card_a,
+              sbipos_bharatqr_cnt: sbipos_bqr_c,
+              sbipos_bharatqr_amt: sbipos_bqr_a,
+              sbiepay_bharatqr_cnt: sbiepay_bqr_c,
+              sbiepay_bharatqr_amt: sbiepay_bqr_a,
+              sbiepay_upi_cnt: sbiepay_upi_c,
+              sbiepay_upi_amt: sbiepay_upi_a,
+              sbiepay_cc_cnt: sbiepay_cc_c,
+              sbiepay_cc_amt: sbiepay_cc_a,
+              sbiepay_dc_cnt: sbiepay_dc_c,
+              sbiepay_dc_amt: sbiepay_dc_a,
+              sbiepay_neft_cnt: sbiepay_neft_c,
+              sbiepay_neft_amt: sbiepay_neft_a,
+              rtgs_cnt: rtgs_c,
+              rtgs_amt: rtgs_a,
+              wallet_cnt: wallet_c,
+              wallet_amt: wallet_a,
+              posb_cnt: posb_c,
+              posb_amt: posb_a,
+              ippb_cnt: ippb_c,
+              ippb_amt: ippb_a,
               total_digital_cnt,
               total_digital_amt,
               imported_by: currentUser?.id
@@ -1497,14 +1621,11 @@
             return alert(`No valid data rows found to import! (${skippedRows} empty/dash rows skipped)`);
           }
 
-          // Chunked database insertion (100 rows per batch) to prevent network payload limits
           const batchSize = 100;
           for (let i = 0; i < recordsToInsert.length; i += batchSize) {
             const batch = recordsToInsert.slice(i, i + batchSize);
             const { error } = await supabaseClient.from('booking_performance').insert(batch);
-            if (error) {
-              throw error;
-            }
+            if (error) throw error;
           }
 
           alert(`Successfully imported ${recordsToInsert.length} valid booking records! (${skippedRows} blank/separator rows skipped)`);
@@ -1543,6 +1664,7 @@
       loadBookingDashboardData();
     }
 
+    // CALCULATES DIGITAL SUM DYNAMICALLY BASED ON CHECKED CHANNELS
     async function loadBookingDashboardData() {
       let query = supabaseClient.from('booking_performance').select('*');
 
@@ -1558,6 +1680,7 @@
       if (error || !data) return;
 
       bookingImportedRecords = data;
+      const selectedChannels = getSelectedChannelSet();
 
       let totalCashCnt = 0, totalCashAmt = 0;
       let totalDigCnt = 0, totalDigAmt = 0;
@@ -1567,8 +1690,23 @@
         const off = r.office_name || 'Unassigned';
         const c_cnt = parseFloat(r.cash_cnt) || 0;
         const c_amt = parseFloat(r.cash_amt) || 0;
-        const d_cnt = parseFloat(r.total_digital_cnt) || 0;
-        const d_amt = parseFloat(r.total_digital_amt) || 0;
+
+        // Sum only checked channels
+        let d_cnt = 0;
+        let d_amt = 0;
+
+        if (selectedChannels.has('dqr')) { d_cnt += parseFloat(r.dqr_cnt) || 0; d_amt += parseFloat(r.dqr_amt) || 0; }
+        if (selectedChannels.has('sbipos_card')) { d_cnt += parseFloat(r.sbipos_card_cnt) || 0; d_amt += parseFloat(r.sbipos_card_amt) || 0; }
+        if (selectedChannels.has('sbipos_bqr')) { d_cnt += parseFloat(r.sbipos_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbipos_bharatqr_amt) || 0; }
+        if (selectedChannels.has('sbiepay_bqr')) { d_cnt += parseFloat(r.sbiepay_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbiepay_bharatqr_amt) || 0; }
+        if (selectedChannels.has('sbiepay_upi')) { d_cnt += parseFloat(r.sbiepay_upi_cnt) || 0; d_amt += parseFloat(r.sbiepay_upi_amt) || 0; }
+        if (selectedChannels.has('sbiepay_cc')) { d_cnt += parseFloat(r.sbiepay_cc_cnt) || 0; d_amt += parseFloat(r.sbiepay_cc_amt) || 0; }
+        if (selectedChannels.has('sbiepay_dc')) { d_cnt += parseFloat(r.sbiepay_dc_cnt) || 0; d_amt += parseFloat(r.sbiepay_dc_amt) || 0; }
+        if (selectedChannels.has('sbiepay_neft')) { d_cnt += parseFloat(r.sbiepay_neft_cnt) || 0; d_amt += parseFloat(r.sbiepay_neft_amt) || 0; }
+        if (selectedChannels.has('rtgs')) { d_cnt += parseFloat(r.rtgs_cnt) || 0; d_amt += parseFloat(r.rtgs_amt) || 0; }
+        if (selectedChannels.has('wallet')) { d_cnt += parseFloat(r.wallet_cnt) || 0; d_amt += parseFloat(r.wallet_amt) || 0; }
+        if (selectedChannels.has('posb')) { d_cnt += parseFloat(r.posb_cnt) || 0; d_amt += parseFloat(r.posb_amt) || 0; }
+        if (selectedChannels.has('ippb')) { d_cnt += parseFloat(r.ippb_cnt) || 0; d_amt += parseFloat(r.ippb_amt) || 0; }
 
         totalCashCnt += c_cnt;
         totalCashAmt += c_amt;
@@ -1645,6 +1783,7 @@
       $('bookingFromDate').value = '';
       $('bookingToDate').value = '';
       $('bookingFilterOffice').value = '';
+      setAllChannelCheckboxes(true);
       loadBookingDashboardData();
     }
 
@@ -1672,7 +1811,7 @@
       doc.setTextColor(51, 65, 85);
       doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 148.5, 22, { align: "center" });
 
-      // Gather table data
+      const selectedChannels = getSelectedChannelSet();
       const officeMap = {};
       let totalCashCnt = 0, totalCashAmt = 0, totalDigCnt = 0, totalDigAmt = 0;
 
@@ -1680,8 +1819,20 @@
         const off = r.office_name || 'Unassigned';
         const c_cnt = parseFloat(r.cash_cnt) || 0;
         const c_amt = parseFloat(r.cash_amt) || 0;
-        const d_cnt = parseFloat(r.total_digital_cnt) || 0;
-        const d_amt = parseFloat(r.total_digital_amt) || 0;
+
+        let d_cnt = 0, d_amt = 0;
+        if (selectedChannels.has('dqr')) { d_cnt += parseFloat(r.dqr_cnt) || 0; d_amt += parseFloat(r.dqr_amt) || 0; }
+        if (selectedChannels.has('sbipos_card')) { d_cnt += parseFloat(r.sbipos_card_cnt) || 0; d_amt += parseFloat(r.sbipos_card_amt) || 0; }
+        if (selectedChannels.has('sbipos_bqr')) { d_cnt += parseFloat(r.sbipos_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbipos_bharatqr_amt) || 0; }
+        if (selectedChannels.has('sbiepay_bqr')) { d_cnt += parseFloat(r.sbiepay_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbiepay_bharatqr_amt) || 0; }
+        if (selectedChannels.has('sbiepay_upi')) { d_cnt += parseFloat(r.sbiepay_upi_cnt) || 0; d_amt += parseFloat(r.sbiepay_upi_amt) || 0; }
+        if (selectedChannels.has('sbiepay_cc')) { d_cnt += parseFloat(r.sbiepay_cc_cnt) || 0; d_amt += parseFloat(r.sbiepay_cc_amt) || 0; }
+        if (selectedChannels.has('sbiepay_dc')) { d_cnt += parseFloat(r.sbiepay_dc_cnt) || 0; d_amt += parseFloat(r.sbiepay_dc_amt) || 0; }
+        if (selectedChannels.has('sbiepay_neft')) { d_cnt += parseFloat(r.sbiepay_neft_cnt) || 0; d_amt += parseFloat(r.sbiepay_neft_amt) || 0; }
+        if (selectedChannels.has('rtgs')) { d_cnt += parseFloat(r.rtgs_cnt) || 0; d_amt += parseFloat(r.rtgs_amt) || 0; }
+        if (selectedChannels.has('wallet')) { d_cnt += parseFloat(r.wallet_cnt) || 0; d_amt += parseFloat(r.wallet_amt) || 0; }
+        if (selectedChannels.has('posb')) { d_cnt += parseFloat(r.posb_cnt) || 0; d_amt += parseFloat(r.posb_amt) || 0; }
+        if (selectedChannels.has('ippb')) { d_cnt += parseFloat(r.ippb_cnt) || 0; d_amt += parseFloat(r.ippb_amt) || 0; }
 
         totalCashCnt += c_cnt;
         totalCashAmt += c_amt;
@@ -1707,7 +1858,6 @@
         idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), `Rs. ${o.cash_amt.toFixed(2)}`, o.dig_cnt.toLocaleString('en-IN'), `Rs. ${o.dig_amt.toFixed(2)}`, `${o.pct.toFixed(2)}%`
       ]);
 
-      // Add summary total row in PDF export table without amounts in summary
       rows.push([
         'Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), '-', totalDigCnt.toLocaleString('en-IN'), '-', `${totalDigShare}%`
       ]);
