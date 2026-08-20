@@ -272,7 +272,7 @@
                   </select>
                 </div>
                 
-                <!-- CONDITIONAL RRN -->
+                <!-- CONDITIONAL RRN (ONLY SBI POS) -->
                 <div id="rrnFieldContainer" class="hidden">
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
                   <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
@@ -402,13 +402,13 @@
             <div class="flex items-center gap-3">
               <img id="adminLogoPreview" src="" alt="Division Logo" class="h-10 w-15 object-contain bg-white p-1 rounded border border-postGold-500 shadow-xs">
               <div>
-                <h4 class="font-bold text-xs text-postRed-900 uppercase">Database Logo Configuration (configurationmaster)</h4>
-                <p class="text-[11px] text-slate-600">Superadmin can update the official division logo stored directly in Supabase configurationmaster table.</p>
+                <h4 class="font-bold text-xs text-postRed-900 uppercase">Division Logo Branding &amp; PDF Header Seal</h4>
+                <p class="text-[11px] text-slate-600">Superadmin can upload custom logo (1.5:1 ratio) to update the Navbar, Login screen, and Top-Right corner of exported PDFs.</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
               <input type="file" id="customLogoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-              <button type="button" onclick="$('customLogoFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📤 Upload to Database</button>
+              <button type="button" onclick="$('customLogoFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📤 Upload Custom Logo</button>
               <button type="button" onclick="resetDefaultLogo()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">↺ Default Logo</button>
             </div>
           </div>
@@ -435,7 +435,7 @@
           </div>
         </div>
 
-        <!-- TAB 5: MIS REPORTS -->
+        <!-- TAB 5: MIS REPORTS (SORTABLE ON ALL FIELDS + CONSOLIDATED SUMMARIES + OFFICE-WISE MATRIX WITH PRINTOUT OPTION) -->
         <div id="reportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -562,7 +562,7 @@
             </div>
           </div>
 
-          <!-- CONSOLIDATED SUMMARY MATRICES -->
+          <!-- CONSOLIDATED SUMMARY MATRICES: MODULE-WISE, STATUS-WISE & OFFICE-WISE WITH DIRECT PRINTOUT -->
           <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
             <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
               <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
@@ -572,7 +572,7 @@
               <!-- 1. Module-wise Breakdown -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
-                  1. Module-wise Breakdown (Active Pendency Value: Pending + In Progress)
+                  1. Module-wise Breakdown (Pending + In-Progress Financial Value)
                 </div>
                 <table class="w-full text-left text-[11px] border-collapse">
                   <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
@@ -607,13 +607,14 @@
                 </table>
               </div>
 
-              <!-- 3. Office-wise Pendency & Status Matrix WITH DEDICATED PRINTOUT -->
+              <!-- 3. Office-wise Pendency & Status Matrix (WITH DIRECT PRINTOUT OPTION) -->
               <div class="lg:col-span-2 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
                   <div class="flex items-center gap-1.5">
                     <span class="text-sm">🏢</span>
                     <span>3. Office-wise Pendency &amp; Status Breakdown</span>
                   </div>
+                  <!-- DIRECT PRINTOUT OPTION -->
                   <button type="button" onclick="printOfficeWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
                     🖨️ Print Office Report
                   </button>
@@ -923,7 +924,7 @@
 
     const OFFICIAL_INDIA_POST_LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
 
-    let currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
+    let currentAppLogo = localStorage.getItem('app_custom_logo') || OFFICIAL_INDIA_POST_LOGO_URL;
     let cachedPdfLogoBase64 = null;
 
     let currentUser = null;
@@ -1037,61 +1038,38 @@
       return cachedPdfLogoBase64;
     }
 
-    async function loadLogoFromDatabase() {
-      try {
-        const { data: config } = await supabaseClient
-          .from('configurationmaster')
-          .select('config_value')
-          .eq('config_key', 'APP_LOGO_BASE64')
-          .maybeSingle();
-
-        if (config && config.config_value) {
-          currentAppLogo = config.config_value;
-          if (config.config_value.startsWith('data:image/png') || config.config_value.startsWith('http')) {
-            cachedPdfLogoBase64 = config.config_value;
-          }
-        }
-      } catch (err) {
-        console.warn("Using default logo:", err);
-      }
-
+    function initLogos() {
       if ($('navLogoImg')) $('navLogoImg').src = currentAppLogo;
       if ($('loginLogoImg')) $('loginLogoImg').src = currentAppLogo;
       if ($('adminLogoPreview')) $('adminLogoPreview').src = currentAppLogo;
       getSynchronousBase64Logo();
     }
+    initLogos();
 
-    async function handleLogoUpload(e) {
+    function handleLogoUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
       const r = new FileReader();
-      r.onload = async ev => {
-        const newLogoBase64 = ev.target.result;
-        await supabaseClient.from('configurationmaster').upsert([{
-          id: 'app_logo', config_key: 'APP_LOGO_BASE64', config_value: newLogoBase64
-        }], { onConflict: 'config_key' });
-
-        currentAppLogo = newLogoBase64;
-        cachedPdfLogoBase64 = newLogoBase64;
-        loadLogoFromDatabase();
-        alert("Custom logo uploaded to configurationmaster table successfully!");
+      r.onload = ev => {
+        currentAppLogo = ev.target.result;
+        cachedPdfLogoBase64 = ev.target.result;
+        localStorage.setItem('app_custom_logo', currentAppLogo);
+        initLogos();
+        alert("Custom logo updated successfully!");
       };
       r.readAsDataURL(file);
     }
 
-    async function resetDefaultLogo() {
+    function resetDefaultLogo() {
       if (!confirm("Reset to official default India Post logo?")) return;
-      await supabaseClient.from('configurationmaster').upsert([{
-        id: 'app_logo', config_key: 'APP_LOGO_BASE64', config_value: OFFICIAL_INDIA_POST_LOGO_URL
-      }], { onConflict: 'config_key' });
-
       currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
+      localStorage.removeItem('app_custom_logo');
       cachedPdfLogoBase64 = null;
-      loadLogoFromDatabase();
-      alert("Logo reset to official default.");
+      initLogos();
+      alert("Logo reset to official India Post emblem.");
     }
 
-    window.showAuthView = function(view) {
+    function showAuthView(view) {
       if (view === 'register') {
         $('loginFormContainer').classList.add('hidden');
         $('registerFormContainer').classList.remove('hidden');
@@ -1099,11 +1077,575 @@
         $('registerFormContainer').classList.add('hidden');
         $('loginFormContainer').classList.remove('hidden');
       }
-    };
+    }
 
-    window.showTab = function(tabId) {
+    function switchAuthTab(view) { showAuthView(view); }
+
+    async function copyToClipboard(text, btnElement) {
+      try {
+        await navigator.clipboard.writeText(text);
+        const originalHtml = btnElement.innerHTML;
+        btnElement.innerHTML = "✓ Copied";
+        btnElement.classList.add("bg-emerald-100", "text-emerald-800", "border-emerald-300");
+        setTimeout(() => {
+          btnElement.innerHTML = originalHtml;
+          btnElement.classList.remove("bg-emerald-100", "text-emerald-800", "border-emerald-300");
+        }, 1500);
+      } catch (err) {
+        prompt("Copy Reference ID:", text);
+      }
+    }
+
+    function calculateDaysDifference(startDateStr, endDateStr) {
+      if (!startDateStr || !endDateStr) return null;
+      const start = new Date(startDateStr);
+      const end = new Date(endDateStr);
+      const diffTime = end.getTime() - start.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+      return diffDays >= 0 ? diffDays : 0;
+    }
+
+    function toggleSettlementDateField() {
+      const status = $('modalStatus').value;
+      const container = $('modalSettlementDateContainer');
+      if (status === 'Settled') {
+        container.classList.remove('hidden');
+        if (!$('modalSettlementDate').value) {
+          $('modalSettlementDate').value = new Date().toISOString().split('T')[0];
+        }
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    // LIVE PREVIEW ON FILE SELECTION
+    async function handleFileSelectPreview(e) {
+      const file = e.target.files[0];
+      if (!file) {
+        clearUserPastedImage();
+        return;
+      }
+      userPastedImageBlob = null;
+      const previewContainer = $('userPastedPreviewContainer');
+      const imgPreview = $('userPastedImagePreview');
+      const pdfPreview = $('pdfFilePreviewBlock');
+      const pdfFileName = $('pdfPreviewFileName');
+      const sizeText = $('userPastedImageSize');
+
+      previewContainer.classList.remove('hidden');
+
+      if (file.type.startsWith('image/')) {
+        let displayBlob = file;
+        if ($('autoConvertDark')?.checked) {
+          const res = await convertBlobDarkToLight(file);
+          displayBlob = res.blob;
+        }
+        imgPreview.src = URL.createObjectURL(displayBlob);
+        imgPreview.classList.remove('hidden');
+        pdfPreview.classList.add('hidden');
+        sizeText.innerText = `Image: ${(file.size / 1024).toFixed(1)} KB`;
+      } else if (file.type === 'application/pdf') {
+        imgPreview.classList.add('hidden');
+        pdfPreview.classList.remove('hidden');
+        pdfFileName.innerText = file.name;
+        sizeText.innerText = `PDF Document: ${(file.size / 1024).toFixed(1)} KB`;
+      }
+    }
+
+    // THEME CONVERTER
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) { h = s = 0; }
+      else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return [h, s, l];
+    }
+
+    function hslToRgb(h, s, l) {
+      let r, g, b;
+      if (s === 0) { r = g = b = l; }
+      else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+
+    function checkIsDarkTheme(data) {
+      let darkPixels = 0;
+      let totalSampled = 0;
+      for (let i = 0; i < data.length; i += 16) {
+        const a = data[i + 3];
+        if (a < 128) continue;
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        if (luminance < 115) darkPixels++;
+        totalSampled++;
+      }
+      return totalSampled > 0 && (darkPixels / totalSampled) > 0.45;
+    }
+
+    function processDarkToLightCanvas(sourceImg, maxBgLightness = 0.96, minTextDarkness = 0.12, preserveColor = true) {
+      const c = document.createElement('canvas');
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      c.width = sourceImg.naturalWidth || sourceImg.width;
+      c.height = sourceImg.naturalHeight || sourceImg.height;
+      ctx.drawImage(sourceImg, 0, 0);
+
+      const imgData = ctx.getImageData(0, 0, c.width, c.height);
+      const data = imgData.data;
+
+      const isDark = checkIsDarkTheme(data);
+      if (!isDark) return { canvas: c, isDarkTheme: false };
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+        if (a === 0) continue;
+
+        const [h, s, l] = rgbToHsl(r, g, b);
+        const isColored = s > 0.25 && l > 0.15 && l < 0.85;
+
+        if (preserveColor && isColored) {
+          const newL = l < 0.5 ? 0.35 + l * 0.4 : l;
+          const [nr, ng, nb] = hslToRgb(h, Math.min(1, s * 1.15), newL);
+          data[i] = nr; data[i + 1] = ng; data[i + 2] = nb;
+        } else {
+          let newL = 1 - l;
+          newL = minTextDarkness + newL * (maxBgLightness - minTextDarkness);
+          const [nr, ng, nb] = hslToRgb(h, s * 0.08, newL);
+          data[i] = nr; data[i + 1] = ng; data[i + 2] = nb;
+        }
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+      return { canvas: c, isDarkTheme: true };
+    }
+
+    async function convertBlobDarkToLight(blob) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const { canvas, isDarkTheme } = processDarkToLightCanvas(img, 0.96, 0.12, true);
+          if (!isDarkTheme) {
+            resolve({ blob, isDarkTheme: false });
+          } else {
+            canvas.toBlob((convertedBlob) => resolve({ blob: convertedBlob, isDarkTheme: true }), 'image/png');
+          }
+        };
+        img.src = URL.createObjectURL(blob);
+      });
+    }
+
+    function handleConverterFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      loadStandaloneImage(file);
+    }
+
+    function loadStandaloneImage(file) {
+      const r = new FileReader();
+      r.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          standaloneImageSource = img;
+          $('converterOriginalImg').src = e.target.result;
+          $('converterOriginalImg').classList.remove('hidden');
+          $('converterDropNotice').classList.add('hidden');
+          runThemeConverter();
+        };
+        img.src = e.target.result;
+      };
+      r.readAsDataURL(file);
+    }
+
+    function runThemeConverter() {
+      if (!standaloneImageSource) return;
+      const bgLight = parseFloat($('sliderLightness').value) / 100;
+      const textDark = parseFloat($('sliderDarkness').value) / 100;
+      const preserveColor = $('chkPreserveColor').checked;
+
+      $('valLightness').innerText = $('sliderLightness').value + '%';
+      $('valDarkness').innerText = $('sliderDarkness').value + '%';
+
+      const { canvas, isDarkTheme } = processDarkToLightCanvas(standaloneImageSource, bgLight, textDark, preserveColor);
+      
+      const badge = $('converterResultBadge');
+      const statusText = $('detectionStatusText');
+      if (isDarkTheme) {
+        badge.className = "absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold";
+        badge.innerText = "✓ Dark Theme Inverted to Light";
+        statusText.innerHTML = `Status: <span class="text-emerald-700 font-bold">Dark Theme Inverted</span>`;
+      } else {
+        badge.className = "absolute top-2 left-2 bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold";
+        badge.innerText = "ℹ️ Light Theme Kept Untouched";
+        statusText.innerHTML = `Status: <span class="text-blue-700 font-bold">Protected Untouched</span>`;
+      }
+
+      canvas.toBlob(blob => {
+        standaloneConvertedBlob = blob;
+        $('converterResultImg').src = URL.createObjectURL(blob);
+        $('converterResultImg').classList.remove('hidden');
+        $('converterEmptyNotice').classList.add('hidden');
+      }, 'image/png');
+    }
+
+    function downloadConvertedImage() {
+      if (!standaloneConvertedBlob) return alert("Please select or paste an image to convert first!");
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(standaloneConvertedBlob);
+      a.download = `converted_light_screenshot_${Date.now()}.png`;
+      a.click();
+    }
+
+    // CLIPBOARD PASTE PREVIEW
+    window.addEventListener('paste', async (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      let blob = null;
+      for (let index in items) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.includes('image/')) {
+          blob = item.getAsFile();
+          break;
+        }
+      }
+      if (!blob) return;
+
+      const replyModal = $('replyModal');
+      const registerClaimView = $('registerClaimView');
+      const converterTabView = $('converterTabView');
+
+      if (replyModal && !replyModal.classList.contains('hidden')) {
+        adminPastedImageBlob = blob;
+        $('adminPastedImagePreview').src = URL.createObjectURL(blob);
+        $('adminPastedPreviewContainer').classList.remove('hidden');
+        $('modalAdminFile').value = '';
+        e.preventDefault();
+      } else if (converterTabView && !converterTabView.classList.contains('hidden')) {
+        loadStandaloneImage(blob);
+        e.preventDefault();
+      } else if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
+        let isDark = false;
+        let displayBlob = blob;
+        if ($('autoConvertDark')?.checked) {
+          const res = await convertBlobDarkToLight(blob);
+          displayBlob = res.blob;
+          isDark = res.isDarkTheme;
+        }
+        userPastedImageBlob = displayBlob;
+        
+        $('userPastedImagePreview').src = URL.createObjectURL(displayBlob);
+        $('userPastedImagePreview').classList.remove('hidden');
+        $('pdfFilePreviewBlock').classList.add('hidden');
+        $('userPastedPreviewContainer').classList.remove('hidden');
+        $('userPastedImageSize').innerText = isDark 
+          ? `Clipboard: ${(displayBlob.size / 1024).toFixed(1)} KB (Inverted Light PNG)` 
+          : `Clipboard: ${(displayBlob.size / 1024).toFixed(1)} KB (Light Image)`;
+        $('claimFile').value = '';
+        e.preventDefault();
+      }
+    });
+
+    function clearAdminPastedImage() {
+      adminPastedImageBlob = null;
+      $('adminPastedPreviewContainer').classList.add('hidden');
+      $('adminPastedImagePreview').src = '';
+    }
+
+    function clearUserPastedImage() {
+      userPastedImageBlob = null;
+      $('userPastedPreviewContainer').classList.add('hidden');
+      $('userPastedImagePreview').src = '';
+      $('claimFile').value = '';
+    }
+
+    function formatDateTimeCompact(isoStr) {
+      if (!isoStr) return '<span class="text-slate-400">N/A</span>';
+      const d = new Date(isoStr);
+      const datePart = d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' });
+      const timePart = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      return `<div class="font-bold text-slate-800 leading-tight">${datePart}</div><div class="text-[10px] text-slate-600 leading-tight">${timePart}</div>`;
+    }
+
+    function formatDateTime(isoStr) {
+      if (!isoStr) return 'N/A';
+      const d = new Date(isoStr);
+      return d.toLocaleString('en-IN', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    }
+
+    function getFormattedTimestamp() {
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+    }
+
+    async function loadFilterDropdowns() {
+      const { data: offices } = await supabaseClient
+        .from('offices')
+        .select('office_name')
+        .order('office_name', { ascending: true });
+
+      const regSelect = $('regOfficeName');
+      const claimSelect = $('claimOffice');
+      const editClaimSelect = $('editClaimOffice');
+      const editUserOfficeSelect = $('editUserOffice');
+      const filterOfficeSelect = $('filterOfficeName');
+      const overviewFilterOfficeSelect = $('overviewFilterOffice');
+
+      if (offices) {
+        let optionsHtml = '<option value="">-- Select Office Name --</option>';
+        let filterOptionsHtml = '<option value="">-- All Offices --</option>';
+        offices.forEach(o => {
+          optionsHtml += `<option value="${o.office_name}">${o.office_name}</option>`;
+          filterOptionsHtml += `<option value="${o.office_name}">${o.office_name}</option>`;
+        });
+
+        if (regSelect) regSelect.innerHTML = optionsHtml;
+        if (claimSelect) claimSelect.innerHTML = optionsHtml;
+        if (editClaimSelect) editClaimSelect.innerHTML = optionsHtml;
+        if (editUserOfficeSelect) editUserOfficeSelect.innerHTML = optionsHtml;
+        if (filterOfficeSelect) filterOfficeSelect.innerHTML = filterOptionsHtml;
+        if (overviewFilterOfficeSelect) overviewFilterOfficeSelect.innerHTML = filterOptionsHtml;
+      }
+
+      const { data: users } = await supabaseClient
+        .from('profiles')
+        .select('id, emp_id, emp_name')
+        .order('emp_name', { ascending: true });
+
+      const filterUserSelect = $('filterEmpUser');
+      const overviewFilterEmpUser = $('overviewFilterEmpUser');
+
+      if (users) {
+        let userOptsHtml = '<option value="">-- All Users --</option>';
+        users.forEach(u => {
+          userOptsHtml += `<option value="${u.id}">${u.emp_name} (${u.emp_id})</option>`;
+        });
+        if (filterUserSelect) filterUserSelect.innerHTML = userOptsHtml;
+        if (overviewFilterEmpUser) overviewFilterEmpUser.innerHTML = userOptsHtml;
+      }
+    }
+
+    function empIdToEmail(empId) {
+      return `${empId.trim().toLowerCase()}@internal.app`;
+    }
+
+    async function handleEmpIdLogin(e) {
+      e.preventDefault();
+      const empId = $('loginEmpId').value.trim().toUpperCase();
+      const password = $('loginPassword').value;
+      const shadowEmail = empIdToEmail(empId);
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ 
+        email: shadowEmail, 
+        password 
+      });
+
+      if (error) return alert("Login failed: Invalid Employee ID or Password");
+
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('is_active')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      if (profile && profile.is_active === false) {
+        await supabaseClient.auth.signOut();
+        return alert("ACCESS DENIED: Your account has been locked/disabled by an Admin.");
+      }
+
+      initApp();
+    }
+
+    async function handleEmpIdRegister(e) {
+      e.preventDefault();
+      const emp_id = $('regEmpId').value.trim().toUpperCase();
+      const emp_name = $('regEmpName').value.trim();
+      const mobile_number = $('regMobile').value.trim();
+      const office_name = $('regOfficeName').value;
+      const password = $('regPassword').value;
+      const confirmPassword = $('regConfirmPassword').value;
+
+      if (!mobile_number || mobile_number.length !== 10) {
+        return alert("Please enter a valid 10-digit mobile number!");
+      }
+
+      if (password !== confirmPassword) {
+        return alert("Password and Confirm Password do not match!");
+      }
+
+      const shadowEmail = empIdToEmail(emp_id);
+      const { data, error } = await supabaseClient.auth.signUp({ 
+        email: shadowEmail, 
+        password: password,
+        options: {
+          data: { emp_id, emp_name, mobile_number, office_name, role: 'user' }
+        }
+      });
+
+      if (error) {
+        return alert("Registration failed: " + error.message);
+      }
+
+      if (data?.user?.id) {
+        await supabaseClient.from('profiles').upsert([{
+          id: data.user.id,
+          emp_id: emp_id,
+          emp_name: emp_name,
+          mobile_number: mobile_number,
+          office_name: office_name,
+          role: 'user',
+          is_active: true
+        }], { onConflict: 'id' });
+      }
+
+      alert(`Account created successfully for Employee ID '${emp_id}'! Please log in.`);
+      showAuthView('login');
+      $('loginEmpId').value = emp_id;
+    }
+
+    async function handleLogout() {
+      sessionStorage.removeItem('activePortalTab');
+      await supabaseClient.auth.signOut();
+      window.location.reload();
+    }
+
+    async function initApp() {
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+      if (authError || !user) return;
+      currentUser = user;
+
+      let { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      const metaMobile = user.user_metadata?.mobile_number || user.user_metadata?.mobile_no || "";
+
+      if (!profile) {
+        const fallbackEmpId = user.user_metadata?.emp_id || `EMP-${user.id.substring(0, 5)}`.toUpperCase();
+        const fallbackName = user.user_metadata?.emp_name || "Employee";
+        const fallbackOffice = user.user_metadata?.office_name || "Chennai GPO";
+
+        const { data: newProfile } = await supabaseClient
+          .from('profiles')
+          .insert([{
+            id: user.id,
+            emp_id: fallbackEmpId,
+            emp_name: fallbackName,
+            mobile_number: metaMobile,
+            office_name: fallbackOffice,
+            role: 'user',
+            is_active: true
+          }])
+          .select()
+          .single();
+
+        profile = newProfile;
+      } else if ((!profile.mobile_number || profile.mobile_number.trim() === '') && metaMobile) {
+        const { data: updatedProfile } = await supabaseClient
+          .from('profiles')
+          .update({ mobile_number: metaMobile })
+          .eq('id', user.id)
+          .select()
+          .single();
+        if (updatedProfile) profile = updatedProfile;
+      }
+
+      if (profile?.is_active === false) {
+        await supabaseClient.auth.signOut();
+        return alert("ACCESS DENIED: Your account has been locked/disabled by an Admin.");
+      }
+
+      userProfile = profile;
+
+      $('authSection').classList.add('hidden');
+      $('navbar').classList.remove('hidden');
+      $('mainDashboard').classList.remove('hidden');
+      $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${(profile.role || 'user').toUpperCase()})`;
+
+      const role = profile.role || 'user';
+      const isAdmin = role === 'admin' || role === 'superadmin';
+      const isSuperadmin = role === 'superadmin';
+      const isViewer = role === 'viewer';
+
+      // BOTH ADMIN & SUPERADMIN ACCESS USER MANAGEMENT
+      if (isAdmin) {
+        $('adminTabBtn').classList.remove('hidden');
+        $('tabBtnTrack').classList.remove('hidden');
+        $('tabBtnRegister').classList.remove('hidden');
+        $('tabBtnConverter').classList.remove('hidden');
+        $('tabBtnReports').classList.remove('hidden');
+        if (isSuperadmin) $('superadminLogoPanel').classList.remove('hidden');
+      } else if (isViewer) {
+        $('adminTabBtn').classList.add('hidden');
+        $('tabBtnTrack').classList.add('hidden');
+        $('tabBtnRegister').classList.add('hidden');
+        $('tabBtnConverter').classList.add('hidden');
+        $('tabBtnReports').classList.remove('hidden');
+        currentActiveTab = 'reports';
+      } else {
+        $('adminTabBtn').classList.add('hidden');
+        $('tabBtnTrack').classList.remove('hidden');
+        $('tabBtnRegister').classList.remove('hidden');
+        $('tabBtnConverter').classList.remove('hidden');
+        $('tabBtnReports').classList.remove('hidden');
+      }
+
+      const mobileInput = $('claimUserMobile');
+      if (mobileInput) mobileInput.value = profile.mobile_number || "";
+
+      showTab(currentActiveTab);
+
+      if (!isAppInitialized) {
+        if (!isViewer) loadClaimsSummary();
+        generateMISReport();
+        subscribeRealtimeClaims();
+        isAppInitialized = true;
+      }
+    }
+
+    function showTab(tabId) {
+      const role = userProfile?.role || 'user';
+      const isAdmin = role === 'admin' || role === 'superadmin';
+      const isViewer = role === 'viewer';
+
+      if (tabId === 'adminRoleMgmt' && !isAdmin) {
+        alert("Access Denied: Only Admins and Superadmins can access User Management.");
+        tabId = isViewer ? 'reports' : 'track';
+      }
+
+      if (isViewer && tabId !== 'reports') {
+        tabId = 'reports';
+      }
+
       currentActiveTab = tabId;
       sessionStorage.setItem('activePortalTab', tabId);
+
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(el => {
         el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer";
@@ -1121,7 +1663,7 @@
         $(map[tabId][0]).classList.remove('hidden');
         $(map[tabId][1]).className = "tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer";
       }
-    };
+    }
 
     async function submitClaim(e) {
       e.preventDefault();
@@ -1327,7 +1869,6 @@
     function renderClaimsSummaryTable() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
-      if (!tbody) return;
       tbody.innerHTML = '';
 
       ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'txn_date', 'created_at', 'txn_amount', 'claim_status'].forEach(c => {
@@ -1450,32 +1991,17 @@
     }
 
     async function loadClaimsSummary() {
-      try {
-        const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-        let query = supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)').order('created_at', { ascending: false });
 
-        if (!isAdmin) {
-          query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
-        }
-
-        const { data: claims, error } = await query;
-        if (error) throw error;
-
-        const { data: profiles } = await supabaseClient.from('profiles').select('id, emp_id, emp_name');
-        const profileMap = {};
-        (profiles || []).forEach(p => { profileMap[p.id] = p; });
-
-        rawClaimsList = (claims || []).map(c => ({
-          ...c,
-          profiles: profileMap[c.created_by] || { emp_id: 'N/A', emp_name: 'Staff' }
-        }));
-
-        currentClaimsList = [...rawClaimsList];
-        renderClaimsSummaryTable();
-        generateMISReport();
-      } catch (e) {
-        console.warn("Could not load claims summary:", e);
+      if (!isAdmin) {
+        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
       }
+
+      const { data: claims, error } = await query;
+      rawClaimsList = claims || [];
+      currentClaimsList = [...rawClaimsList];
+      applyOverviewFilters();
     }
 
     function openDetailsModal(claimId) {
@@ -2044,7 +2570,7 @@
     }
 
     function filterUserAccounts() {
-      const query = $('userInstantSearch')?.value.trim().toLowerCase() || '';
+      const query = ($('userInstantSearch')?.value || '').trim().toLowerCase();
       if (!query) return renderUserAccounts(allLoadedUsers);
       renderUserAccounts(allLoadedUsers.filter(u => 
         (u.emp_id || '').toLowerCase().includes(query) ||
@@ -2061,7 +2587,6 @@
 
     function renderUserAccounts(users) {
       const tbody = $('usersTableBody');
-      if (!tbody) return;
       tbody.innerHTML = '';
       if (!users || users.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No user accounts found.</td></tr>`;
@@ -2226,15 +2751,75 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "portrait" });
 
-      const logoData = getSynchronousBase64Logo();
-      if (logoData) {
-        try {
-          doc.addImage(logoData, 'PNG', 169, 8, 27, 18);
-        } catch (err) {
-          console.warn("Logo embed error:", err);
-        }
-      }
+     const logoData = await getPdfLogoBase64();
+if (logoData) {
+  try {
+    doc.addImage(logoData, 'PNG', 260, 6, 24, 16); // Exact 1.5 : 1 Ratio (24mm x 16mm)
+  } catch (err) {
+    console.warn("Logo add error:", err);
+  }
+}
+// Synchronous 1.5:1 Logo Rasterizer & Database Fetcher for PDF
+async function getPdfLogoBase64() {
+  try {
+    const { data: config } = await supabaseClient
+      .from('configurationmaster')
+      .select('config_value')
+      .eq('config_key', 'APP_LOGO_BASE64')
+      .maybeSingle();
 
+    if (config && config.config_value) {
+      return config.config_value;
+    }
+  } catch (err) {
+    console.warn("Using fallback canvas logo");
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 240;
+  canvas.height = 160;
+  const ctx = canvas.getContext("2d");
+  
+  ctx.fillStyle = "#C4122F";
+  ctx.fillRect(0, 0, 240, 160);
+  ctx.strokeStyle = "#F8B133";
+  ctx.lineWidth = 5;
+  ctx.strokeRect(3, 3, 234, 154);
+  
+  ctx.fillStyle = "#F8B133";
+  ctx.beginPath();
+  ctx.moveTo(60, 40); ctx.lineTo(180, 40); ctx.lineTo(120, 92); ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.beginPath();
+  ctx.moveTo(60, 47); ctx.lineTo(120, 100); ctx.lineTo(60, 126); ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#FEF9C3";
+  ctx.beginPath();
+  ctx.moveTo(180, 47); ctx.lineTo(120, 100); ctx.lineTo(180, 126); ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#FACC15";
+  ctx.beginPath();
+  ctx.moveTo(62, 126); ctx.lineTo(120, 96); ctx.lineTo(178, 126); ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#8A0C21";
+  ctx.fillRect(40, 130, 160, 22);
+  ctx.strokeStyle = "#F8B133";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(40, 130, 160, 22);
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "bold 10px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("INDIA POST", 120, 145);
+
+  return canvas.toDataURL("image/png");
+}
+      // CENTERED HEADERS
       doc.setFontSize(14);
       doc.setTextColor(168, 15, 40);
       doc.text("User Accounts & Roles Roster", 105, 16, { align: "center" });
@@ -2289,6 +2874,9 @@
       generateMISReport('All');
     }
 
+    // ==============================================================
+    // MIS & SETTLEMENT TAT ANALYTICS GENERATOR + CONSOLIDATION
+    // ==============================================================
     async function generateMISReport(filterType = 'All') {
       currentMISReportFilter = filterType;
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
@@ -2317,6 +2905,7 @@
       rawMISMasterList = claims;
       const todayStr = new Date().toISOString().split('T')[0];
 
+      // Status Metrics
       const totalCount = claims.length;
       const pendingClaims = claims.filter(c => c.claim_status === 'Pending');
       const inProgressClaims = claims.filter(c => c.claim_status === 'In Progress');
@@ -2329,6 +2918,7 @@
       $('misSettled').innerText = settledClaims.length;
       $('misRejected').innerText = rejectedClaims.length;
 
+      // Settled TAT Slabs: <=3, 4-15, >15 Days
       let totalTatSum = 0;
       let settledCountWithDate = 0;
       let settledLe3Count = 0;
@@ -2353,6 +2943,7 @@
       $('misSettled4to15').innerText = settled4to15Count;
       $('misSettledGt15').innerText = settledGt15Count;
 
+      // In-Progress Aging Buckets
       let inProgressLe10Count = 0;
       let inProgress11to20Count = 0;
       let inProgress21to30Count = 0;
@@ -2373,6 +2964,7 @@
       $('misInProgress21to30').innerText = inProgress21to30Count;
       $('misInProgressGt30').innerText = inProgressGt30Count;
 
+      // Filter Current MIS Data
       if (filterType === 'All') {
         currentMISClaimsList = claims;
         $('misReportTableTitle').innerText = `Report Summary View: All Registered Claims (${claims.length})`;
@@ -2441,6 +3033,7 @@
       renderMISTableRows();
     }
 
+    // CONSOLIDATED BREAKDOWNS MATRIX (SHOWS PENDING + IN-PROGRESS PENDENCY AMOUNT)
     function renderConsolidatedSummaries(claims) {
       const moduleStats = {
         'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
@@ -2493,6 +3086,7 @@
         }
       });
 
+      // 1. Module Table Render (Pending + In Progress Value)
       const modTbody = $('moduleSummaryTableBody');
       modTbody.innerHTML = '';
       let modTotalSum = 0, modPendSum = 0, modInpSum = 0, modSetSum = 0, modActiveAmtSum = 0;
@@ -2528,6 +3122,7 @@
         </tr>
       `;
 
+      // 2. Status Table Render
       const statTbody = $('statusSummaryTableBody');
       statTbody.innerHTML = '';
       let statCountSum = 0, statAmtSum = 0;
@@ -2557,6 +3152,7 @@
         </tr>
       `;
 
+      // 3. Office-wise Matrix Render
       const offTbody = $('officeSummaryTableBody');
       offTbody.innerHTML = '';
       const sortedOffices = Object.keys(officeStats).sort();
@@ -2577,6 +3173,7 @@
       });
     }
 
+    // MIS SORTING ON ALL COLUMNS
     function sortMISReport(col) {
       if (currentMISSortCol === col) {
         currentMISSortDir = currentMISSortDir === 'asc' ? 'desc' : 'asc';
@@ -2590,7 +3187,6 @@
     function renderMISTableRows() {
       const todayStr = new Date().toISOString().split('T')[0];
       const tbody = $('misReportTableBody');
-      if (!tbody) return;
       tbody.innerHTML = '';
 
       ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'txn_date', 'settlement_date', 'tat_aging', 'txn_amount', 'claim_status'].forEach(c => {
@@ -2673,6 +3269,21 @@
         .subscribe();
     }
 
+    function getStatusColor(status) {
+      if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
+      if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
+      if (status === 'Settled') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+      if (status === 'Rejected') return 'bg-rose-100 text-rose-800 border border-rose-200';
+      return 'bg-slate-100 text-slate-800';
+    }
+
+    loadFilterDropdowns();
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (session && !currentUser) initApp();
+    });
+
+    // EXCEL EXPORT
     async function exportMISExcel() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const todayStr = new Date().toISOString().split('T')[0];
@@ -2704,9 +3315,59 @@
       const wb = XLSX.utils.book_new();
       const wsClaims = XLSX.utils.json_to_sheet(formattedData);
       XLSX.utils.book_append_sheet(wb, wsClaims, "Claims Details");
+
+      // IF ALL REPORT, ADD CONSOLIDATION SHEET WITH MODULE-WISE & OFFICE-WISE
+      if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
+        const modSummary = [];
+        ['Booking', 'Delivery', 'DSS', 'Others'].forEach(m => {
+          const list = rawMISMasterList.filter(c => c.module === m);
+          const activePendingAmt = list
+            .filter(c => c.claim_status === 'Pending' || c.claim_status === 'In Progress')
+            .reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
+            
+          modSummary.push({
+            "Module": m,
+            "Total Claims": list.length,
+            "Pending": list.filter(c => c.claim_status === 'Pending').length,
+            "In Progress": list.filter(c => c.claim_status === 'In Progress').length,
+            "Settled": list.filter(c => c.claim_status === 'Settled').length,
+            "Pending + In Progress Amt (INR)": activePendingAmt
+          });
+        });
+        const wsSummary = XLSX.utils.json_to_sheet(modSummary);
+        XLSX.utils.book_append_sheet(wb, wsSummary, "Module Summary");
+
+        const officeStats = {};
+        rawMISMasterList.forEach(c => {
+          const off = c.raised_for_office || 'Unassigned';
+          const amt = parseFloat(c.txn_amount) || 0;
+          if (!officeStats[off]) {
+            officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+          }
+          officeStats[off].registered++;
+          if (c.claim_status === 'Pending') { officeStats[off].pending++; officeStats[off].activePendingAmount += amt; }
+          else if (c.claim_status === 'In Progress') { officeStats[off].inprogress++; officeStats[off].activePendingAmount += amt; }
+          else if (c.claim_status === 'Settled') { officeStats[off].settled++; }
+          else if (c.claim_status === 'Rejected') { officeStats[off].rejected++; }
+        });
+
+        const offRows = Object.keys(officeStats).sort().map(off => ({
+          "Office Name": off,
+          "Registered": officeStats[off].registered,
+          "Pending": officeStats[off].pending,
+          "In Progress": officeStats[off].inprogress,
+          "Settled": officeStats[off].settled,
+          "Rejected": officeStats[off].rejected,
+          "Pending + In Progress Amt (INR)": officeStats[off].activePendingAmount
+        }));
+        const wsOffice = XLSX.utils.json_to_sheet(offRows);
+        XLSX.utils.book_append_sheet(wb, wsOffice, "Office-wise Pendency");
+      }
+
       XLSX.writeFile(wb, `Report_${currentMISReportFilter}_${getFormattedTimestamp()}.xlsx`);
     }
 
+    // PDF EXPORT (1.5 : 1 RATIO LOGO TOP-RIGHT, DATES IN HEADING & PROPER PAGE COUNTING)
     async function exportMISPDF() {
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) return alert("No claim data to export!");
       const { jsPDF } = window.jspdf;
@@ -2716,6 +3377,7 @@
       const fromDateVal = $('filterFromDate').value || 'Inception';
       const toDateVal = $('filterToDate').value || 'Current Date';
 
+      // 1. EMBED LOGO IN TOP RIGHT CORNER (1.5:1 RATIO -> 24mm x 16mm)
       const logoData = getSynchronousBase64Logo();
       if (logoData) {
         try {
@@ -2725,6 +3387,7 @@
         }
       }
 
+      // 2. CENTERED HEADINGS WITH EXTRACTION PERIOD DATES
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
       doc.text(`Refund Claims & Settlement TAT Report (${currentMISReportFilter})`, 148.5, 12, { align: "center" });
@@ -2737,6 +3400,37 @@
       doc.setTextColor(30, 41, 59);
       doc.text(`Period: ${fromDateVal} to ${toDateVal} | Filter: ${currentMISReportFilter} | Visible Records: ${currentMISClaimsList.length}`, 148.5, 22, { align: "center" });
 
+      let startYPos = 26;
+
+      // 3. CONSOLIDATION TABLES IF REPORT IS "ALL"
+      if (currentMISReportFilter === 'All' && rawMISMasterList.length) {
+        doc.setFontSize(8.5);
+        doc.setTextColor(138, 12, 33);
+        doc.text("1. CONSOLIDATED MODULE BREAKDOWN (ACTIVE PENDENCY VALUE)", 14, startYPos);
+
+        const modRows = ['Booking', 'Delivery', 'DSS', 'Others'].map(m => {
+          const list = rawMISMasterList.filter(c => c.module === m);
+          const activePendingAmt = list
+            .filter(c => c.claim_status === 'Pending' || c.claim_status === 'In Progress')
+            .reduce((acc, curr) => acc + (parseFloat(curr.txn_amount) || 0), 0);
+            
+          return [m, list.length, list.filter(c => c.claim_status === 'Pending').length, list.filter(c => c.claim_status === 'In Progress').length, list.filter(c => c.claim_status === 'Settled').length, `Rs. ${activePendingAmt.toFixed(2)}`];
+        });
+
+        doc.autoTable({
+          head: [["Module", "Total Claims", "Pending", "In Progress", "Settled", "Pending + In Prog Amt (Rs)"]],
+          body: modRows,
+          startY: startYPos + 2,
+          theme: 'grid',
+          headStyles: { fillColor: [138, 12, 33], textColor: [255, 255, 255], fontSize: 7.5 },
+          styles: { fontSize: 7, cellPadding: 1.5, textColor: [15, 23, 42] },
+          margin: { left: 14, right: 14 }
+        });
+
+        startYPos = doc.lastAutoTable.finalY + 6;
+      }
+
+      // 4. MAIN CLAIMS TABLE
       const headers = [["Sl. No.", "Txn ID (Ref)", "Module", "Office", "Txn Date", "Settlement Date", "TAT / Age", "Amount (Rs)", "Status", "Admin Remarks"]];
       const rows = currentMISClaimsList.map((c, index) => {
         const isSettled = c.claim_status === 'Settled';
@@ -2769,12 +3463,13 @@
       doc.autoTable({
         head: headers,
         body: rows,
-        startY: 26,
+        startY: startYPos,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
         styles: { fontSize: 8, cellPadding: 2, textColor: [15, 23, 42] }
       });
 
+      // 5. TOTAL PAGE NUMBERING & FOOTER
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -2783,6 +3478,7 @@
         doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Page ${i} of ${totalPages}`, 148.5, 202, { align: "center" });
       }
 
+      // 6. STATEMENT END LINE
       const finalY = doc.lastAutoTable.finalY + 7;
       doc.setPage(totalPages);
       doc.setFontSize(8.5);
@@ -2791,21 +3487,6 @@
 
       doc.save(`Report_${currentMISReportFilter}_${getFormattedTimestamp()}.pdf`);
     }
-
-    // DOM BOOTSTRAP
-    document.addEventListener('DOMContentLoaded', () => {
-      initLogos();
-
-      if (supabaseClient) {
-        supabaseClient.auth.getSession().then(({ data: { session } }) => {
-          if (session?.user) {
-            initApp();
-          }
-        }).catch(err => {
-          console.warn("Session check error:", err);
-        });
-      }
-    });
   </script>
 </body>
 </html>
