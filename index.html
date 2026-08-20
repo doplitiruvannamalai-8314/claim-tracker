@@ -656,7 +656,7 @@
             </div>
           </div>
 
-          <!-- LOGO CHANGER (SUPERADMIN) -->
+          <!-- LOGO CHANGER IN CONFIGURATION MASTER (SUPERADMIN ONLY) -->
           <div id="superadminLogoPanel" class="hidden bg-amber-50/70 border border-amber-300 rounded-xl p-3.5 flex items-center justify-between flex-wrap gap-3">
             <div class="flex items-center gap-3">
               <img id="adminLogoPreview" src="" alt="Division Logo" class="h-10 w-15 object-contain bg-white p-1 rounded border border-postGold-500 shadow-xs">
@@ -806,9 +806,7 @@
 
     const $ = id => document.getElementById(id);
 
-    const OFFICIAL_INDIA_POST_LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
-
-    let currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
+    let currentAppLogo = "";
     let cachedPdfLogoBase64 = null;
 
     let currentUser = null;
@@ -836,20 +834,19 @@
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
 
-    // ROBUST POSTAL EXCEL/CSV DATE PARSER (Fixes "Invalid time value")
+    // ROBUST POSTAL EXCEL/CSV DATE PARSER (Returns null on invalid or dashes)
     function parsePostalBookingDate(val) {
-      if (!val) return new Date().toISOString().split('T')[0];
+      if (val === null || val === undefined) return null;
 
-      // 1. If it's already a Date object
       if (val instanceof Date && !isNaN(val.getTime())) {
         return val.toISOString().split('T')[0];
       }
 
-      // 2. If it's an Excel numeric serial date (e.g. 45231)
+      // Handle Excel serial date numbers
       if (typeof val === 'number' || (!isNaN(val) && !String(val).includes('-') && !String(val).includes('/'))) {
         const num = parseFloat(val);
-        if (num > 20000 && num < 70000) { // Valid Excel date serial range
-          const jsDate = new Date((num - (25567 + 2)) * 86400 * 1000);
+        if (num > 20000 && num < 70000) {
+          const jsDate = new Date(Math.round((num - 25569) * 86400 * 1000));
           if (!isNaN(jsDate.getTime())) {
             return jsDate.toISOString().split('T')[0];
           }
@@ -857,8 +854,11 @@
       }
 
       const str = String(val).trim();
+      if (!str || str === '-' || str === '--' || str === '---' || str.toLowerCase() === 'null' || str.toLowerCase() === 'undefined') {
+        return null;
+      }
 
-      // 3. Match DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+      // Match DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
       const dmyMatch = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
       if (dmyMatch) {
         const day = String(dmyMatch[1]).padStart(2, '0');
@@ -867,7 +867,7 @@
         return `${year}-${month}-${day}`;
       }
 
-      // 4. Match YYYY/MM/DD or YYYY-MM-DD
+      // Match YYYY/MM/DD or YYYY-MM-DD
       const ymdMatch = str.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
       if (ymdMatch) {
         const year = ymdMatch[1];
@@ -876,7 +876,7 @@
         return `${year}-${month}-${day}`;
       }
 
-      // 5. Match DD-Mon-YYYY (e.g., 15-Aug-2024 or 15-AUG-24)
+      // Match DD-Mon-YYYY (e.g. 15-Aug-2024 or 15-AUG-24)
       const months = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
       const monMatch = str.match(/^(\d{1,2})[\s\-\/]([a-zA-Z]{3})[\s\-\/](\d{2,4})/);
       if (monMatch) {
@@ -888,14 +888,12 @@
         return `${year}-${month}-${day}`;
       }
 
-      // 6. Native JS Date fallback
       const parsed = new Date(str);
       if (!isNaN(parsed.getTime())) {
         return parsed.toISOString().split('T')[0];
       }
 
-      // Default to today if unparseable
-      return new Date().toISOString().split('T')[0];
+      return null;
     }
 
     // RRN AUTO-FILL SYNC
@@ -1411,7 +1409,7 @@
       }
     }
 
-    // BOOKING PERFORMANCE IMPORT WITH ROBUST DATE PARSING
+    // ROBUST EXCEL / CSV IMPORT (SKIPS EMPTY ROWS, DASHES & SEPARATORS)
     async function handleBookingExcelUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1420,7 +1418,6 @@
       reader.onload = async (ev) => {
         try {
           const data = new Uint8Array(ev.target.result);
-          // cellDates: false ensures XLSX gives raw values so parsePostalBookingDate can handle them cleanly
           const workbook = XLSX.read(data, { type: 'array', cellDates: false, raw: true });
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
@@ -1430,7 +1427,29 @@
             return alert("Uploaded sheet is empty!");
           }
 
-          const recordsToInsert = jsonData.map(row => {
+          const recordsToInsert = [];
+          let skippedRows = 0;
+
+          for (let i = 0; i < jsonData.length; i++) {
+            const row = jsonData[i];
+
+            const rawOfficeName = String(row['Office Name'] || '').trim();
+            const rawBookingDate = row['Booking Date'];
+
+            // 1. Skip rows where Office Name is empty or a separator
+            if (!rawOfficeName || rawOfficeName === '-' || rawOfficeName === '--' || rawOfficeName === '---') {
+              skippedRows++;
+              continue;
+            }
+
+            // 2. Parse booking date strictly
+            const parsedDate = parsePostalBookingDate(rawBookingDate);
+            if (!parsedDate) {
+              skippedRows++;
+              continue;
+            }
+
+            // 3. Extract transaction counts & amounts safely
             const dqr_c = parseFloat(row['DQR Scan (Cnt)']) || 0;
             const dqr_a = parseFloat(row['DQR Scan (Amt)']) || 0;
             const sbipos_card_c = parseFloat(row['SBIPOS-CARD (Cnt)']) || 0;
@@ -1459,11 +1478,11 @@
             const total_digital_cnt = dqr_c + sbipos_card_c + sbipos_bqr_c + sbiepay_bqr_c + sbiepay_upi_c + sbiepay_cc_c + sbiepay_dc_c + sbiepay_neft_c + rtgs_c + wallet_c + posb_c + ippb_c;
             const total_digital_amt = dqr_a + sbipos_card_a + sbipos_bqr_a + sbiepay_bqr_a + sbiepay_upi_a + sbiepay_cc_a + sbiepay_dc_a + sbiepay_neft_a + rtgs_a + wallet_a + posb_a + ippb_a;
 
-            return {
-              office_id: String(row['Office ID'] || ''),
-              office_name: String(row['Office Name'] || 'Unassigned'),
-              booking_date: parsePostalBookingDate(row['Booking Date']),
-              product: String(row['Product'] || 'Postal Booking'),
+            recordsToInsert.push({
+              office_id: String(row['Office ID'] || '').trim(),
+              office_name: rawOfficeName,
+              booking_date: parsedDate,
+              product: String(row['Product'] || 'Postal Booking').trim(),
               cash_cnt: parseFloat(row['Cash (Cnt)']) || 0,
               cash_amt: parseFloat(row['Cash (Amt)']) || 0,
               dqr_cnt: dqr_c,
@@ -1471,17 +1490,30 @@
               total_digital_cnt,
               total_digital_amt,
               imported_by: currentUser?.id
-            };
-          });
-
-          const { error } = await supabaseClient.from('booking_performance').insert(recordsToInsert);
-          if (error) alert("Database Import Error: " + error.message);
-          else {
-            alert(`Successfully imported ${recordsToInsert.length} booking records!`);
-            loadBookingDashboardData();
+            });
           }
+
+          if (!recordsToInsert.length) {
+            return alert(`No valid data rows found to import! (${skippedRows} empty/dash rows skipped)`);
+          }
+
+          // Chunked database insertion (100 rows per batch) to prevent network payload limits
+          const batchSize = 100;
+          for (let i = 0; i < recordsToInsert.length; i += batchSize) {
+            const batch = recordsToInsert.slice(i, i + batchSize);
+            const { error } = await supabaseClient.from('booking_performance').insert(batch);
+            if (error) {
+              throw error;
+            }
+          }
+
+          alert(`Successfully imported ${recordsToInsert.length} valid booking records! (${skippedRows} blank/separator rows skipped)`);
+          $('bookingExcelFileInput').value = '';
+          loadBookingDashboardData();
+
         } catch (err) {
-          alert("Error parsing Excel file: " + err.message);
+          console.error("Import failure:", err);
+          alert("Import failed: " + (err.message || "Invalid file format"));
         }
       };
       reader.readAsArrayBuffer(file);
@@ -1565,7 +1597,6 @@
       $('dashDigitalSharePct').innerText = `${digPct}%`;
       $('dashDigitalProgressBar').style.width = `${digPct}%`;
 
-      // Render Leaderboard
       const tbody = $('bookingPerfTableBody');
       tbody.innerHTML = '';
 
@@ -1706,7 +1737,7 @@
     }
 
     function printOfficeWiseReport() {
-      alert("Office-wise report printout ready.");
+      alert("Office-wise pendency printout ready.");
     }
 
     function getStatusColor(status) {
