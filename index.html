@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Refund Claim Management & Tracking Portal</title>
   
+  <!-- Supabase JS v2 CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -35,6 +37,7 @@
     }
   </script>
 
+  <!-- Excel & PDF Export Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -42,6 +45,7 @@
 <body class="bg-amber-50/40 text-slate-900 font-sans min-h-screen text-xs flex flex-col justify-between">
 
   <div>
+    <!-- TOP NAVBAR -->
     <nav id="navbar" class="hidden bg-postRed-700 text-white px-4 py-2.5 flex justify-between items-center shadow-lg border-b-4 border-postGold-500">
       <div class="flex items-center gap-3">
         <img id="navLogoImg" src="" alt="India Post Logo" class="h-8 w-12 object-contain bg-white p-0.5 rounded shadow-xs">
@@ -58,10 +62,12 @@
       </div>
     </nav>
 
+    <!-- MAIN CONTAINER -->
     <div class="max-w-7xl mx-auto p-3 md:p-4 w-full">
 
+      <!-- AUTHENTICATION CONTAINER (LOGIN & REGISTRATION) -->
       <div id="authSection" class="max-w-md mx-auto mt-6 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-postRed-600 border-x border-b border-amber-200">
-        <div class="text-center mb-5">
+        <div class="text-center mb-4">
           <div class="flex justify-center mb-2">
             <img id="loginLogoImg" src="" alt="India Post Logo" class="h-16 w-24 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
           </div>
@@ -70,6 +76,10 @@
           <div class="h-1 w-16 bg-postGold-500 mx-auto mt-1.5 rounded"></div>
         </div>
 
+        <!-- AUTH ERROR / NOTIFICATION BANNER -->
+        <div id="authAlertBanner" class="hidden mb-3 p-2.5 rounded text-xs font-semibold"></div>
+
+        <!-- 1. LOGIN FORM -->
         <div id="loginFormContainer">
           <form id="loginForm" onsubmit="handleEmpIdLogin(event)" class="space-y-3.5">
             <div>
@@ -93,6 +103,7 @@
           </div>
         </div>
 
+        <!-- 2. REGISTRATION FORM -->
         <div id="registerFormContainer" class="hidden">
           <div class="mb-3 pb-2 border-b border-amber-200 flex justify-between items-center">
             <h2 class="text-xs font-bold text-postRed-700 uppercase">New Staff Registration</h2>
@@ -138,8 +149,10 @@
         </div>
       </div>
 
+      <!-- MAIN DASHBOARD -->
       <div id="mainDashboard" class="hidden space-y-4">
 
+        <!-- TABS -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
           <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer">Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
@@ -148,37 +161,83 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
         </div>
 
+        <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW -->
         <div id="trackView" class="tab-content bg-white p-4 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex gap-2 max-w-md w-full">
               <input type="text" id="searchRefNo" placeholder="Enter 12-Digit Reference No (Txn ID)" class="border border-slate-300 p-1.5 rounded-lg w-full text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
               <button type="button" onclick="trackClaim()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer whitespace-nowrap">Track</button>
             </div>
-            <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live View</span>
+            <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live View Active</span>
           </div>
           <div id="trackResult" class="hidden border border-postGold-400 p-3 rounded-lg bg-amber-50/40 space-y-1 text-xs"></div>
 
+          <!-- FILTERS -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
+            <div class="col-span-2">
+              <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Instant Search</label>
+              <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type Ref No, Article, Name..." class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Module</label>
+              <select id="overviewFilterModule" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Modules --</option>
+                <option value="Booking">Booking</option>
+                <option value="Delivery">Delivery</option>
+                <option value="DSS">DSS</option>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Office</label>
+              <select id="overviewFilterOffice" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Offices --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Entry By</label>
+              <select id="overviewFilterEmpUser" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Users --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Status</label>
+              <select id="overviewFilterStatus" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Statuses --</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Settled">Settled</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+            <div>
+              <button type="button" onclick="resetOverviewFilters()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 p-1.5 rounded font-bold text-xs cursor-pointer transition">Reset</button>
+            </div>
+          </div>
+
+          <!-- TABLE -->
           <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
             <table class="w-full text-left text-xs border-collapse">
               <thead class="sticky top-0 z-10 shadow-xs">
                 <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 cursor-pointer select-none font-bold whitespace-nowrap">
-                  <th class="p-2 bg-postRed-50">Ref No / Module</th>
-                  <th class="p-2 bg-postRed-50">Raised By / Office</th>
-                  <th class="p-2 bg-postRed-50">Txn Date</th>
-                  <th class="p-2 bg-postRed-50 max-w-[85px]">Entry Date</th>
-                  <th class="p-2 bg-postRed-50">Amount</th>
-                  <th class="p-2 bg-postRed-50">Status</th>
-                  <th class="p-2 bg-postRed-50 min-w-[150px]">Remarks</th> 
-                  <th class="p-2 bg-postRed-50 text-center min-w-[170px]">Actions</th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_id_ref')">Ref No / Module <span id="sort_txn_id_ref">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('emp_name')">Raised By / Office <span id="sort_emp_name">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_date')">Txn Date <span id="sort_txn_date">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition max-w-[85px]" onclick="sortTable('created_at')">Entry Date <span id="sort_created_at">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status / Settle Date <span id="sort_claim_status">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 cursor-default min-w-[150px]">Remarks</th> 
+                  <th class="p-2 bg-postRed-50 cursor-default text-center min-w-[170px]">Actions &amp; Documents</th>
                 </tr>
               </thead>
               <tbody id="claimsTableBody" class="divide-y divide-slate-200">
-                <tr><td colspan="8" class="p-3 text-center text-slate-400">No claims submitted yet.</td></tr>
+                <tr><td colspan="8" class="p-3 text-center text-slate-400">Loading claims...</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
+        <!-- TAB 2: CLAIM REGISTRATION FORM -->
         <div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
           <div class="border-b pb-2 mb-3 border-amber-200">
             <h3 class="text-sm font-bold text-postRed-700 uppercase">New Claim Registration Form</h3>
@@ -189,14 +248,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">Raised for Office Name *</label>
-                  <select id="claimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
-                    <option value="Chennai GPO">Chennai GPO</option>
-                    <option value="Anna Road HPO">Anna Road HPO</option>
-                    <option value="T Nagar HPO">T Nagar HPO</option>
-                    <option value="Mylapore HPO">Mylapore HPO</option>
-                    <option value="Park Town HPO">Park Town HPO</option>
-                    <option value="St. Thomas Mount HPO">St. Thomas Mount HPO</option>
-                  </select>
+                  <select id="claimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none"></select>
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">Module *</label>
@@ -231,10 +283,12 @@
                     <option value="SBI ePay">SBI ePay</option>
                   </select>
                 </div>
+                
                 <div id="rrnFieldContainer" class="hidden">
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
                   <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
                 </div>
+
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-0.5">User Mobile Number (10 Digits) *</label>
                   <input type="tel" id="claimUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required placeholder="10-digit mobile" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-amber-50/30 font-mono outline-none">
@@ -243,14 +297,43 @@
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-0.5">Remarks by User *</label>
-                <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-xs h-24 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/10" placeholder="Enter description for claim..."></textarea>
+                <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-xs h-24 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/10" placeholder="Enter reason and description for claim..."></textarea>
               </div>
             </div>
 
             <div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Document Attachment *</label>
-                <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
+                  <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
+                    <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
+                    <span>☀️ Auto Light Theme</span>
+                  </label>
+                </div>
+
+                <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileSelectPreview(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+                
+                <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
+                  <span class="text-xl">📋</span>
+                  <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
+                </div>
+              </div>
+
+              <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
+                <div id="previewMediaWrapper" class="flex flex-col items-center justify-center w-full">
+                  <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
+                  <div id="pdfFilePreviewBlock" class="hidden flex items-center gap-2 bg-white px-3 py-2 rounded border border-emerald-300 shadow-xs">
+                    <span class="text-xl">📄</span>
+                    <div>
+                      <p id="pdfPreviewFileName" class="font-bold text-slate-800 text-xs">document.pdf</p>
+                      <p class="text-[10px] text-emerald-700 font-semibold">PDF Document Ready</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between w-full mt-2 text-[11px] pt-1 border-t border-emerald-200">
+                  <span id="userPastedImageSize" class="font-bold text-emerald-800 text-[10px]">✓ File Attached</span>
+                  <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove Attachment</button>
+                </div>
               </div>
 
               <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-md cursor-pointer transition uppercase tracking-wide">
@@ -260,47 +343,462 @@
           </form>
         </div>
 
+        <!-- TAB 3: THEME CONVERTER -->
         <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
-          <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
-            <h3 class="text-sm font-bold text-postRed-700 uppercase">☀️ Screenshot Dark-to-Light Converter</h3>
-            <input type="file" id="converterFileInput" accept="image/*" class="text-xs" onchange="handleConverterFileSelect(event)">
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="border p-2 bg-slate-900 text-white text-center min-h-[200px] flex items-center justify-center">
-              <img id="converterOriginalImg" class="max-h-[200px] max-w-full hidden" alt="Original">
-              <span id="converterDropNotice" class="text-slate-400">Select an image to preview</span>
+          <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">☀️ Dark → Light Screenshot Theme Converter</h3>
+              <p class="text-[11px] text-slate-500">Auto-converts dark backgrounds to ink-saving white while preserving light screenshots untouched</p>
             </div>
-            <div class="border p-2 bg-slate-50 text-center min-h-[200px] flex items-center justify-center">
-              <img id="converterResultImg" class="max-h-[200px] max-w-full hidden" alt="Converted">
-              <span id="converterEmptyNotice" class="text-slate-400">Converted result will appear here</span>
+            <div class="flex gap-2">
+              <button type="button" onclick="$('converterFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📂 Select Image</button>
+              <button type="button" onclick="downloadConvertedImage()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">💾 Download PNG</button>
+              <input type="file" id="converterFileInput" accept="image/*" class="hidden" onchange="handleConverterFileSelect(event)">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[260px] relative">
+              <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original Source</span>
+              <img id="converterOriginalImg" class="max-h-[260px] max-w-full object-contain hidden" alt="Original">
+              <div id="converterDropNotice" class="text-center text-slate-400 text-xs">
+                <p class="text-xl mb-1">🖼️</p>
+                <p>Drag &amp; drop dark image here or paste with <kbd class="bg-slate-700 px-1 py-0.5 rounded font-mono">Ctrl + V</kbd></p>
+              </div>
+            </div>
+
+            <div class="border border-slate-300 rounded-lg p-3 bg-slate-50 flex flex-col items-center justify-center min-h-[260px] relative">
+              <span id="converterResultBadge" class="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Processed Result</span>
+              <img id="converterResultImg" class="max-h-[260px] max-w-full object-contain hidden" alt="Converted Light">
+              <p id="converterEmptyNotice" class="text-slate-400 text-xs">Converted light image will appear here</p>
             </div>
           </div>
         </div>
 
+        <!-- TAB 4: USER MANAGEMENT -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
-          <div class="flex justify-between items-center border-b pb-2">
-            <h3 class="text-sm font-bold text-postRed-700 uppercase">User Accounts</h3>
-            <button type="button" onclick="loadAllUsers()" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔄 Refresh</button>
+          <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
+            <div>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">User Account &amp; Role Management</h3>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="exportUsersExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📊 Export Excel</button>
+              <button type="button" onclick="exportUsersPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📄 Export PDF</button>
+              <button type="button" onclick="loadAllUsers()" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">🔄 Refresh</button>
+            </div>
           </div>
+
           <div class="overflow-x-auto border border-slate-200 rounded-lg">
             <table class="w-full text-left text-xs border-collapse">
               <thead>
-                <tr class="bg-postRed-50 border-b text-postRed-900 font-bold whitespace-nowrap">
+                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
                   <th class="p-2">Emp ID</th>
-                  <th class="p-2">Name</th>
-                  <th class="p-2">Role</th>
-                  <th class="p-2">Mobile</th>
-                  <th class="p-2">Office</th>
+                  <th class="p-2">Emp Name / Role</th>
+                  <th class="p-2">Registered On</th>
+                  <th class="p-2">Mobile No</th>
+                  <th class="p-2">Office Name</th>
                   <th class="p-2">Status</th>
+                  <th class="p-2 text-center">Admin Actions</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody" class="divide-y divide-slate-200">
-                <tr><td colspan="6" class="p-3 text-center text-slate-400">Loading users...</td></tr>
+                <tr><td colspan="7" class="p-3 text-center text-slate-400">Loading users...</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
+        <!-- TAB 5: MIS REPORTS -->
         <div id="reportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
-          <div class="flex justify-between items-center border-b pb-2">
-            <h3 class="text-sm font-bold text-postRed-700 uppercase">MIS Summary
+          <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
+            <div>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">MIS &amp; Settlement Turnaround Time (TAT) Reports</h3>
+            </div>
+            <div class="flex gap-2">
+              <button type="button" onclick="exportMISExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
+                📊 Export Excel (.xlsx)
+              </button>
+              <button type="button" onclick="exportMISPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
+                📄 Export PDF
+              </button>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
+            <div onclick="generateMISReport('All')" class="bg-white border p-2.5 rounded cursor-pointer hover:bg-amber-50/50"><p class="text-slate-600 font-bold">Total Claims</p><p id="misTotal" class="text-base font-extrabold text-slate-900">0</p></div>
+            <div onclick="generateMISReport('Pending')" class="bg-white border p-2.5 rounded cursor-pointer hover:bg-amber-50/50"><p class="text-amber-700 font-bold">Pending</p><p id="misPending" class="text-base font-extrabold text-amber-700">0</p></div>
+            <div onclick="generateMISReport('In Progress')" class="bg-white border p-2.5 rounded cursor-pointer hover:bg-amber-50/50"><p class="text-blue-700 font-bold">In Progress</p><p id="misInProgress" class="text-base font-extrabold text-blue-900">0</p></div>
+            <div onclick="generateMISReport('Settled')" class="bg-white border p-2.5 rounded cursor-pointer hover:bg-amber-50/50"><p class="text-emerald-700 font-bold">Settled</p><p id="misSettled" class="text-base font-extrabold text-emerald-900">0</p></div>
+            <div onclick="generateMISReport('Rejected')" class="bg-white border p-2.5 rounded cursor-pointer hover:bg-amber-50/50"><p class="text-rose-700 font-bold">Rejected</p><p id="misRejected" class="text-base font-extrabold text-rose-900">0</p></div>
+          </div>
+
+          <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
+                  <th class="p-2">Ref No</th>
+                  <th class="p-2">Raised By</th>
+                  <th class="p-2">Module</th>
+                  <th class="p-2">Office</th>
+                  <th class="p-2">Txn Date</th>
+                  <th class="p-2">Settlement Date</th>
+                  <th class="p-2">TAT / Aging</th>
+                  <th class="p-2">Amount</th>
+                  <th class="p-2">Status</th>
+                  <th class="p-2">Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="misReportTableBody" class="divide-y divide-slate-200">
+                <tr><td colspan="10" class="p-3 text-center text-slate-400">Loading Report...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+    // ==========================================
+    // 1. GLOBAL UI ROUTERS (GUARANTEED TO RUN)
+    // ==========================================
+    const $ = id => document.getElementById(id);
+
+    window.showAuthView = function(view) {
+      const loginContainer = $('loginFormContainer');
+      const regContainer = $('registerFormContainer');
+      const banner = $('authAlertBanner');
+      if (banner) banner.classList.add('hidden');
+
+      if (view === 'register') {
+        if (loginContainer) loginContainer.classList.add('hidden');
+        if (regContainer) regContainer.classList.remove('hidden');
+      } else {
+        if (regContainer) regContainer.classList.add('hidden');
+        if (loginContainer) loginContainer.classList.remove('hidden');
+      }
+    };
+
+    window.showTab = function(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer";
+      });
+
+      const map = {
+        'track': 'trackView',
+        'registerClaim': 'registerClaimView',
+        'converterTab': 'converterTabView',
+        'adminRoleMgmt': 'adminRoleMgmtView',
+        'reports': 'reportsView'
+      };
+
+      if ($(map[tabId])) {
+        $(map[tabId]).classList.remove('hidden');
+      }
+    };
+
+    function cleanPhoneInput(el) {
+      el.value = el.value.replace(/\D/g, '').slice(0, 10);
+    }
+
+    function empIdToEmail(empId) {
+      return `${empId.trim().toLowerCase()}@postalclaims.internal`;
+    }
+
+    function showAuthAlert(msg, isSuccess = false) {
+      const b = $('authAlertBanner');
+      if (!b) return;
+      b.className = isSuccess 
+        ? "mb-3 p-2.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300"
+        : "mb-3 p-2.5 rounded text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-300";
+      b.innerText = msg;
+      b.classList.remove('hidden');
+    }
+
+    // ==========================================
+    // 2. SUPABASE INITIALIZATION
+    // ==========================================
+    const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
+    
+    let supabaseClient = null;
+    try {
+      if (window.supabase && window.supabase.createClient) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+    } catch (e) {
+      console.warn("Supabase init error:", e);
+    }
+
+    // Default Logo Base64
+    const DEFAULT_INDIA_POST_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 160'><rect width='240' height='160' fill='%23C4122F' rx='8'/><path d='M60 40 L180 40 L120 92 Z' fill='%23F8B133'/><polygon points='60,47 120,100 60,126' fill='%23FFFDF5'/><polygon points='180,47 120,100 180,126' fill='%23FEF9C3'/><polygon points='62,126 120,96 178,126' fill='%23FACC15'/><rect x='40' y='130' width='160' height='22' rx='3' fill='%238A0C21'/><text x='120' y='145' font-family='Arial,sans-serif' font-size='10' font-weight='bold' fill='%23FFFDF5' text-anchor='middle'>INDIA POST</text></svg>";
+
+    let currentUser = null;
+    let userProfile = null;
+    let rawClaimsList = [];
+    let currentClaimsList = [];
+
+    // ==========================================
+    // 3. AUTHENTICATION LOGIC
+    // ==========================================
+    async function handleEmpIdLogin(e) {
+      e.preventDefault();
+      const btn = $('loginSubmitBtn');
+      btn.disabled = true;
+      btn.innerText = "Logging in...";
+
+      try {
+        const empId = $('loginEmpId').value.trim().toUpperCase();
+        const password = $('loginPassword').value;
+        const shadowEmail = empIdToEmail(empId);
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ 
+          email: shadowEmail, 
+          password: password 
+        });
+
+        if (error) {
+          showAuthAlert("Login Failed: " + error.message);
+          return;
+        }
+
+        await initApp();
+      } catch (err) {
+        showAuthAlert("Login error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Log In";
+      }
+    }
+
+    async function handleEmpIdRegister(e) {
+      e.preventDefault();
+      const btn = $('regSubmitBtn');
+      btn.disabled = true;
+      btn.innerText = "Registering...";
+
+      try {
+        const emp_id = $('regEmpId').value.trim().toUpperCase();
+        const emp_name = $('regEmpName').value.trim();
+        const mobile_number = $('regMobile').value.trim();
+        const office_name = $('regOfficeName').value;
+        const password = $('regPassword').value;
+        const confirmPassword = $('regConfirmPassword').value;
+
+        if (password !== confirmPassword) {
+          showAuthAlert("Password and Confirm Password do not match!");
+          return;
+        }
+
+        const shadowEmail = empIdToEmail(emp_id);
+        const { data, error } = await supabaseClient.auth.signUp({ 
+          email: shadowEmail, 
+          password: password,
+          options: {
+            data: { emp_id, emp_name, mobile_number, office_name, role: 'user' }
+          }
+        });
+
+        if (error) {
+          showAuthAlert("Registration failed: " + error.message);
+          return;
+        }
+
+        if (data?.user?.id) {
+          await supabaseClient.from('profiles').upsert([{
+            id: data.user.id,
+            emp_id: emp_id,
+            emp_name: emp_name,
+            mobile_number: mobile_number,
+            office_name: office_name,
+            role: 'user',
+            is_active: true
+          }], { onConflict: 'id' });
+        }
+
+        showAuthAlert(`Account created for ${emp_id}! You can now log in.`, true);
+        showAuthView('login');
+        $('loginEmpId').value = emp_id;
+        $('loginPassword').value = '';
+      } catch (err) {
+        showAuthAlert("Registration error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Create Account";
+      }
+    }
+
+    async function handleLogout() {
+      if (supabaseClient) await supabaseClient.auth.signOut();
+      window.location.reload();
+    }
+
+    // ==========================================
+    // 4. APP INITIALIZATION & DATA LOADING
+    // ==========================================
+    async function initApp() {
+      try {
+        const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+        if (authError || !user) return;
+        currentUser = user;
+
+        let { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (!profile) {
+          profile = {
+            id: user.id,
+            emp_id: user.user_metadata?.emp_id || "EMP",
+            emp_name: user.user_metadata?.emp_name || "Staff",
+            role: user.user_metadata?.role || "user",
+            office_name: user.user_metadata?.office_name || "Chennai GPO",
+            mobile_number: user.user_metadata?.mobile_number || ""
+          };
+        }
+
+        userProfile = profile;
+
+        $('authSection').classList.add('hidden');
+        $('navbar').classList.remove('hidden');
+        $('mainDashboard').classList.remove('hidden');
+        $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${(profile.role || 'user').toUpperCase()})`;
+
+        const isAdmin = profile.role === 'admin' || profile.role === 'superadmin';
+        if (isAdmin) {
+          $('adminTabBtn').classList.remove('hidden');
+        }
+
+        showTab('track');
+        loadClaimsSummary();
+      } catch (err) {
+        console.error("Init Error:", err);
+      }
+    }
+
+    async function loadClaimsSummary() {
+      try {
+        const { data: claims } = await supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+        const { data: profiles } = await supabaseClient.from('profiles').select('id, emp_id, emp_name');
+        
+        const profileMap = {};
+        (profiles || []).forEach(p => { profileMap[p.id] = p; });
+
+        rawClaimsList = (claims || []).map(c => ({
+          ...c,
+          profiles: profileMap[c.created_by] || { emp_id: 'N/A', emp_name: 'Staff' }
+        }));
+
+        currentClaimsList = [...rawClaimsList];
+        renderClaimsTable();
+        generateMISReport();
+      } catch (e) {
+        console.warn("Could not load claims:", e);
+      }
+    }
+
+    function renderClaimsTable() {
+      const tbody = $('claimsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!currentClaimsList.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-400">No claims found.</td></tr>`;
+        return;
+      }
+
+      currentClaimsList.forEach(c => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40">
+            <td class="p-2 font-mono font-bold text-postRed-700">${c.txn_id_ref}</td>
+            <td class="p-2 font-semibold text-slate-800">${c.profiles?.emp_name} (${c.raised_for_office})</td>
+            <td class="p-2">${c.txn_date}</td>
+            <td class="p-2 text-slate-500">${c.created_at ? c.created_at.split('T')[0] : '-'}</td>
+            <td class="p-2 font-bold">₹${c.txn_amount}</td>
+            <td class="p-2 font-bold">${c.claim_status || 'Pending'}</td>
+            <td class="p-2 text-slate-600">${c.remarks_by_user || '-'}</td>
+            <td class="p-2 text-center">
+              <a href="${c.file_url}" target="_blank" class="bg-emerald-700 text-white px-2 py-1 rounded text-[10px] font-bold">📄 Doc</a>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function generateMISReport() {
+      const claims = rawClaimsList || [];
+      $('misTotal').innerText = claims.length;
+      $('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
+      $('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
+      $('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
+      $('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
+
+      const tbody = $('misReportTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      claims.forEach(c => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40">
+            <td class="p-2 font-mono font-bold text-postRed-700">${c.txn_id_ref}</td>
+            <td class="p-2">${c.profiles?.emp_name}</td>
+            <td class="p-2">${c.module}</td>
+            <td class="p-2">${c.raised_for_office}</td>
+            <td class="p-2">${c.txn_date}</td>
+            <td class="p-2">${c.settlement_date || '-'}</td>
+            <td class="p-2">-</td>
+            <td class="p-2 font-bold">₹${c.txn_amount}</td>
+            <td class="p-2 font-bold">${c.claim_status}</td>
+            <td class="p-2">${c.reply_remarks_admin || '-'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function loadAllUsers() {
+      const { data: users } = await supabaseClient.from('profiles').select('*');
+      const tbody = $('usersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      (users || []).forEach(u => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40">
+            <td class="p-2 font-mono font-bold">${u.emp_id}</td>
+            <td class="p-2">${u.emp_name}</td>
+            <td class="p-2 uppercase font-bold text-postRed-700">${u.role || 'user'}</td>
+            <td class="p-2">${u.created_at ? u.created_at.split('T')[0] : '-'}</td>
+            <td class="p-2">${u.mobile_number || '-'}</td>
+            <td class="p-2">${u.office_name || '-'}</td>
+            <td class="p-2 font-bold ${u.is_active !== false ? 'text-emerald-700' : 'text-rose-700'}">${u.is_active !== false ? 'Active' : 'Locked'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // ==========================================
+    // 5. DOM READY BOOTSTRAP
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      $('navLogoImg').src = DEFAULT_INDIA_POST_LOGO;
+      $('loginLogoImg').src = DEFAULT_INDIA_POST_LOGO;
+
+      if (supabaseClient) {
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user) {
+            initApp();
+          }
+        }).catch(err => {
+          console.warn("Session check error:", err);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
