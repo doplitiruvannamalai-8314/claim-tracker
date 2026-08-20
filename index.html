@@ -668,35 +668,122 @@
     </div>
   </div>
 
-  <!-- APPLICATION LOGIC SCRIPT -->
+  <!-- APPLICATION SCRIPT WITH PROVEN IN-MEMORY MAPPING & DIRECT ERROR PROMPTS -->
   <script>
-    // SAFE IN-MEMORY FETCH FOR MIS & OVERVIEWS
-    async function generateMISReport(filterType = 'All') {
-      currentMISReportFilter = filterType;
+    // 1. CLEAR AUTHENTICATION HANDLERS
+    async function handleEmpIdLogin(e) {
+      e.preventDefault();
+      const empId = $('loginEmpId').value.trim().toUpperCase();
+      const password = $('loginPassword').value;
+
+      if (!empId || !password) {
+        return alert("Please enter Employee ID and Password.");
+      }
+
+      const shadowEmail = empIdToEmail(empId);
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ 
+        email: shadowEmail, 
+        password: password 
+      });
+
+      if (error) {
+        console.error("Login Error:", error);
+        if (error.message.toLowerCase().includes("email not confirmed")) {
+          return alert("Login Failed: Email confirmation is enabled in your Supabase Auth settings. Please go to Authentication -> Providers -> Email in your Supabase dashboard and turn OFF 'Confirm email'.");
+        }
+        return alert("Login Failed: " + error.message);
+      }
+
+      if (!data?.user) {
+        return alert("Login failed: User session not returned.");
+      }
+
+      // Check active state
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('is_active')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      if (profile && profile.is_active === false) {
+        await supabaseClient.auth.signOut();
+        return alert("ACCESS DENIED: Your account is locked/disabled by an Admin.");
+      }
+
+      await initApp();
+    }
+
+    async function handleEmpIdRegister(e) {
+      e.preventDefault();
+      const emp_id = $('regEmpId').value.trim().toUpperCase();
+      const emp_name = $('regEmpName').value.trim();
+      const mobile_number = $('regMobile').value.trim();
+      const office_name = $('regOfficeName').value;
+      const password = $('regPassword').value;
+      const confirmPassword = $('regConfirmPassword').value;
+
+      if (!mobile_number || mobile_number.length !== 10) {
+        return alert("Please enter a valid 10-digit mobile number!");
+      }
+
+      if (password !== confirmPassword) {
+        return alert("Password and Confirm Password do not match!");
+      }
+
+      const shadowEmail = empIdToEmail(emp_id);
+      
+      const { data, error } = await supabaseClient.auth.signUp({ 
+        email: shadowEmail, 
+        password: password,
+        options: {
+          data: { 
+            emp_id, 
+            emp_name, 
+            mobile_number, 
+            office_name, 
+            role: 'user' 
+          }
+        }
+      });
+
+      if (error) {
+        console.error("Registration Error:", error);
+        return alert("Registration failed: " + error.message);
+      }
+
+      if (data?.user?.id) {
+        await supabaseClient.from('profiles').upsert([{
+          id: data.user.id,
+          emp_id: emp_id,
+          emp_name: emp_name,
+          mobile_number: mobile_number,
+          office_name: office_name,
+          role: 'user',
+          is_active: true
+        }], { onConflict: 'id' });
+      }
+
+      alert(`Account created successfully for Employee ID '${emp_id}'! You can now log in.`);
+      showAuthView('login');
+      $('loginEmpId').value = emp_id;
+      $('loginPassword').value = '';
+    }
+
+    // 2. RELIABLE DATA RETRIEVAL MERGING IN MEMORY
+    async function loadClaimsSummary() {
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-      const isViewer = userProfile?.role === 'viewer';
 
       // 1. Fetch claims independently without join syntax
-      let query = supabaseClient.from('claims').select('*');
-      if (!isAdmin && !isViewer) {
+      let query = supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+
+      if (!isAdmin) {
         query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
       }
 
-      const from = $('filterFromDate').value;
-      const to = $('filterToDate').value;
-      const selectedModule = $('filterModule').value;
-      const selectedOffice = $('filterOfficeName').value;
-      const selectedUser = $('filterEmpUser').value;
-
-      if (from) query = query.gte('txn_date', from);
-      if (to) query = query.lte('txn_date', to);
-      if (selectedModule) query = query.eq('module', selectedModule);
-      if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
-      if (selectedUser) query = query.eq('created_by', selectedUser);
-
       const { data: claims, error: claimsErr } = await query;
       if (claimsErr) {
-        console.error("MIS Claims fetch error:", claimsErr);
+        console.error("Claims fetch error:", claimsErr);
         return;
       }
 
@@ -706,143 +793,16 @@
       (profiles || []).forEach(p => { profileMap[p.id] = p; });
 
       // 3. Attach profile data safely
-      const hydratedClaims = (claims || []).map(c => ({
+      rawClaimsList = (claims || []).map(c => ({
         ...c,
         profiles: profileMap[c.created_by] || { emp_id: 'N/A', emp_name: 'Staff' }
       }));
 
-      rawMISMasterList = hydratedClaims;
-      const todayStr = new Date().toISOString().split('T')[0];
-
-      // Status Metrics
-      const totalCount = hydratedClaims.length;
-      const pendingClaims = hydratedClaims.filter(c => c.claim_status === 'Pending');
-      const inProgressClaims = hydratedClaims.filter(c => c.claim_status === 'In Progress');
-      const settledClaims = hydratedClaims.filter(c => c.claim_status === 'Settled');
-      const rejectedClaims = hydratedClaims.filter(c => c.claim_status === 'Rejected');
-
-      $('misTotal').innerText = totalCount;
-      $('misPending').innerText = pendingClaims.length;
-      $('misInProgress').innerText = inProgressClaims.length;
-      $('misSettled').innerText = settledClaims.length;
-      $('misRejected').innerText = rejectedClaims.length;
-
-      // Settled TAT Slabs: <=3, 4-15, >15 Days
-      let totalTatSum = 0;
-      let settledCountWithDate = 0;
-      let settledLe3Count = 0;
-      let settled4to15Count = 0;
-      let settledGt15Count = 0;
-
-      settledClaims.forEach(c => {
-        const settleDate = c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null);
-        const days = calculateDaysDifference(c.txn_date, settleDate);
-        if (days !== null) {
-          totalTatSum += days;
-          settledCountWithDate++;
-          if (days <= 3) settledLe3Count++;
-          else if (days <= 15) settled4to15Count++;
-          else settledGt15Count++;
-        }
-      });
-
-      const avgTatDays = settledCountWithDate > 0 ? (totalTatSum / settledCountWithDate).toFixed(1) : "0";
-      $('misAvgTat').innerText = `${avgTatDays} Days`;
-      $('misSettledLe3').innerText = settledLe3Count;
-      $('misSettled4to15').innerText = settled4to15Count;
-      $('misSettledGt15').innerText = settledGt15Count;
-
-      // In-Progress Aging Buckets
-      let inProgressLe10Count = 0;
-      let inProgress11to20Count = 0;
-      let inProgress21to30Count = 0;
-      let inProgressGt30Count = 0;
-
-      inProgressClaims.forEach(c => {
-        const days = calculateDaysDifference(c.txn_date, todayStr);
-        if (days !== null) {
-          if (days <= 10) inProgressLe10Count++;
-          else if (days <= 20) inProgress11to20Count++;
-          else if (days <= 30) inProgress21to30Count++;
-          else inProgressGt30Count++;
-        }
-      });
-
-      $('misInProgressLe10').innerText = inProgressLe10Count;
-      $('misInProgress11to20').innerText = inProgress11to20Count;
-      $('misInProgress21to30').innerText = inProgress21to30Count;
-      $('misInProgressGt30').innerText = inProgressGt30Count;
-
-      // Filter Current MIS Data
-      if (filterType === 'All') {
-        currentMISClaimsList = hydratedClaims;
-        $('misReportTableTitle').innerText = `Report Summary View: All Registered Claims (${hydratedClaims.length})`;
-        $('allReportConsolidationContainer').classList.remove('hidden');
-        renderConsolidatedSummaries(hydratedClaims);
-      } else {
-        $('allReportConsolidationContainer').classList.add('hidden');
-
-        if (filterType === 'Pending') {
-          currentMISClaimsList = pendingClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: Pending Claims (${pendingClaims.length})`;
-        } else if (filterType === 'In Progress') {
-          currentMISClaimsList = inProgressClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: In Progress Claims (${inProgressClaims.length})`;
-        } else if (filterType === 'Settled') {
-          currentMISClaimsList = settledClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: All Settled Claims (${settledClaims.length})`;
-        } else if (filterType === 'Rejected') {
-          currentMISClaimsList = rejectedClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
-        } else if (filterType === 'Settled_le3') {
-          currentMISClaimsList = settledClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d <= 3;
-          });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled within 3 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'Settled_4to15') {
-          currentMISClaimsList = settledClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d >= 4 && d <= 15;
-          });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled in 4 to 15 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'Settled_gt15') {
-          currentMISClaimsList = settledClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d > 15;
-          });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled in > 15 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_le10') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d <= 10;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: <= 10 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_11to20') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d >= 11 && d <= 20;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: 11 to 20 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_21to30') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d >= 21 && d <= 30;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: 21 to 30 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_gt30') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d > 30;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: > 30 Days (${currentMISClaimsList.length})`;
-        }
-      }
-
-      renderMISTableRows();
+      currentClaimsList = [...rawClaimsList];
+      applyOverviewFilters();
     }
 
-    // INITIALIZE ON DOM READY & SESSION RESTORATION
+    // 3. INITIALIZE AFTER DOM IS READY
     document.addEventListener('DOMContentLoaded', async () => {
       initLogos();
       loadFilterDropdowns();
