@@ -442,56 +442,7 @@
             </div>
           </div>
 
-          <!-- SETTLED TAT & IN-PROGRESS AGING -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
-            <div class="bg-emerald-50/60 border border-emerald-300 rounded-xl p-3 space-y-2">
-              <div class="flex justify-between items-center border-b border-emerald-200 pb-1">
-                <span class="font-bold text-[11px] text-emerald-900 uppercase">⏱️ Settled Claims TAT Breakdown</span>
-                <span class="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Avg: <strong id="misAvgTat">0 Days</strong></span>
-              </div>
-              <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                <div onclick="generateMISReport('Settled_le3')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">&le; 3 Days</span>
-                  <span id="misSettledLe3" class="text-sm font-extrabold text-emerald-800">0</span>
-                </div>
-                <div onclick="generateMISReport('Settled_4to15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">4 - 15 Days</span>
-                  <span id="misSettled4to15" class="text-sm font-extrabold text-amber-700">0</span>
-                </div>
-                <div onclick="generateMISReport('Settled_gt15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">&gt; 15 Days</span>
-                  <span id="misSettledGt15" class="text-sm font-extrabold text-rose-700">0</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-blue-50/60 border border-blue-300 rounded-xl p-3 space-y-2">
-              <div class="flex justify-between items-center border-b border-blue-200 pb-1">
-                <span class="font-bold text-[11px] text-blue-900 uppercase">⏳ In-Progress Claims Aging Buckets</span>
-                <span class="text-[10px] text-slate-500">From Txn Date</span>
-              </div>
-              <div class="grid grid-cols-4 gap-1 text-center text-xs">
-                <div onclick="generateMISReport('InProgress_le10')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">&le; 10 Days</span>
-                  <span id="misInProgressLe10" class="text-sm font-extrabold text-slate-800">0</span>
-                </div>
-                <div onclick="generateMISReport('InProgress_11to20')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">11-20 Days</span>
-                  <span id="misInProgress11to20" class="text-sm font-extrabold text-amber-700">0</span>
-                </div>
-                <div onclick="generateMISReport('InProgress_21to30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">21-30 Days</span>
-                  <span id="misInProgress21to30" class="text-sm font-extrabold text-orange-700">0</span>
-                </div>
-                <div onclick="generateMISReport('InProgress_gt30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">&gt; 30 Days</span>
-                  <span id="misInProgressGt30" class="text-sm font-extrabold text-rose-700">0</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CONSOLIDATED SUMMARY MATRICES WITH DEDICATED PRINTOUT -->
+          <!-- CONSOLIDATED SUMMARY MATRICES -->
           <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
             <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
               <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
@@ -705,7 +656,7 @@
             </div>
           </div>
 
-          <!-- LOGO CHANGER IN CONFIGURATION MASTER (SUPERADMIN ONLY) -->
+          <!-- LOGO CHANGER (SUPERADMIN) -->
           <div id="superadminLogoPanel" class="hidden bg-amber-50/70 border border-amber-300 rounded-xl p-3.5 flex items-center justify-between flex-wrap gap-3">
             <div class="flex items-center gap-3">
               <img id="adminLogoPreview" src="" alt="Division Logo" class="h-10 w-15 object-contain bg-white p-1 rounded border border-postGold-500 shadow-xs">
@@ -745,7 +696,7 @@
 
       </div>
 
-      <!-- RE-UPLOAD MODAL FOR APPLICANT (CALLED WHEN ADMIN FLAGS NOT LEGIBLE) -->
+      <!-- RE-UPLOAD MODAL FOR APPLICANT -->
       <div id="reuploadModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postGold-500">
           <div class="flex justify-between items-center border-b pb-2">
@@ -768,7 +719,7 @@
         </div>
       </div>
 
-      <!-- ADMIN EDIT/REPLY MODAL (INCLUDES REPLACE/FLAG OPTION) -->
+      <!-- ADMIN EDIT/REPLY MODAL -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
@@ -807,7 +758,7 @@
             <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
           </div>
 
-          <!-- ADMIN OPTION TO DIRECTLY REPLACE USER DOCUMENT -->
+          <!-- ADMIN DIRECT REPLACE -->
           <div class="p-2.5 bg-amber-50 rounded border border-amber-200 space-y-1 text-xs">
             <label class="block font-bold text-postRed-900">Admin Direct Document Replacement (Optional)</label>
             <input type="file" id="modalAdminDirectReplaceFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border p-1 rounded text-xs bg-white">
@@ -855,8 +806,9 @@
 
     const $ = id => document.getElementById(id);
 
-    // Initial state: Logo will be dynamically loaded from configurationmaster table in Supabase
-    let currentAppLogo = "";
+    const OFFICIAL_INDIA_POST_LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
+
+    let currentAppLogo = OFFICIAL_INDIA_POST_LOGO_URL;
     let cachedPdfLogoBase64 = null;
 
     let currentUser = null;
@@ -883,6 +835,68 @@
 
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
+
+    // ROBUST POSTAL EXCEL/CSV DATE PARSER (Fixes "Invalid time value")
+    function parsePostalBookingDate(val) {
+      if (!val) return new Date().toISOString().split('T')[0];
+
+      // 1. If it's already a Date object
+      if (val instanceof Date && !isNaN(val.getTime())) {
+        return val.toISOString().split('T')[0];
+      }
+
+      // 2. If it's an Excel numeric serial date (e.g. 45231)
+      if (typeof val === 'number' || (!isNaN(val) && !String(val).includes('-') && !String(val).includes('/'))) {
+        const num = parseFloat(val);
+        if (num > 20000 && num < 70000) { // Valid Excel date serial range
+          const jsDate = new Date((num - (25567 + 2)) * 86400 * 1000);
+          if (!isNaN(jsDate.getTime())) {
+            return jsDate.toISOString().split('T')[0];
+          }
+        }
+      }
+
+      const str = String(val).trim();
+
+      // 3. Match DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+      const dmyMatch = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
+      if (dmyMatch) {
+        const day = String(dmyMatch[1]).padStart(2, '0');
+        const month = String(dmyMatch[2]).padStart(2, '0');
+        const year = dmyMatch[3];
+        return `${year}-${month}-${day}`;
+      }
+
+      // 4. Match YYYY/MM/DD or YYYY-MM-DD
+      const ymdMatch = str.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+      if (ymdMatch) {
+        const year = ymdMatch[1];
+        const month = String(ymdMatch[2]).padStart(2, '0');
+        const day = String(ymdMatch[3]).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+
+      // 5. Match DD-Mon-YYYY (e.g., 15-Aug-2024 or 15-AUG-24)
+      const months = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
+      const monMatch = str.match(/^(\d{1,2})[\s\-\/]([a-zA-Z]{3})[\s\-\/](\d{2,4})/);
+      if (monMatch) {
+        const day = String(monMatch[1]).padStart(2, '0');
+        const mStr = monMatch[2].toLowerCase();
+        const month = months[mStr] ? String(months[mStr]).padStart(2, '0') : '01';
+        let year = monMatch[3];
+        if (year.length === 2) year = '20' + year;
+        return `${year}-${month}-${day}`;
+      }
+
+      // 6. Native JS Date fallback
+      const parsed = new Date(str);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().split('T')[0];
+      }
+
+      // Default to today if unparseable
+      return new Date().toISOString().split('T')[0];
+    }
 
     // RRN AUTO-FILL SYNC
     const txnInput = $('claimTxnId');
@@ -1296,7 +1310,7 @@
       });
     }
 
-    // 1. ADMIN ACTION: OPEN REPLY & DOCUMENT REVISION MODAL
+    // ADMIN ACTION: OPEN REPLY & DOCUMENT REVISION MODAL
     function openReplyModal(claimId) {
       const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
       if (!claim) return alert("Claim record not found.");
@@ -1360,7 +1374,7 @@
       }
     }
 
-    // 2. USER ACTION: RE-UPLOAD DOCUMENT WHEN FLAGGED
+    // USER ACTION: RE-UPLOAD DOCUMENT
     function openReuploadModal(claimId, reason) {
       $('reuploadClaimId').value = claimId;
       $('reuploadAdminReason').innerText = reason;
@@ -1397,7 +1411,7 @@
       }
     }
 
-    // 3. BOOKING PERFORMANCE IMPORT & DIGITAL VS CASH DASHBOARD
+    // BOOKING PERFORMANCE IMPORT WITH ROBUST DATE PARSING
     async function handleBookingExcelUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1406,17 +1420,17 @@
       reader.onload = async (ev) => {
         try {
           const data = new Uint8Array(ev.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
+          // cellDates: false ensures XLSX gives raw values so parsePostalBookingDate can handle them cleanly
+          const workbook = XLSX.read(data, { type: 'array', cellDates: false, raw: true });
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
           if (!jsonData || !jsonData.length) {
             return alert("Uploaded sheet is empty!");
           }
 
           const recordsToInsert = jsonData.map(row => {
-            // Calculate total digital transactions across all digital channels
             const dqr_c = parseFloat(row['DQR Scan (Cnt)']) || 0;
             const dqr_a = parseFloat(row['DQR Scan (Amt)']) || 0;
             const sbipos_card_c = parseFloat(row['SBIPOS-CARD (Cnt)']) || 0;
@@ -1448,7 +1462,7 @@
             return {
               office_id: String(row['Office ID'] || ''),
               office_name: String(row['Office Name'] || 'Unassigned'),
-              booking_date: row['Booking Date'] ? new Date(row['Booking Date']).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+              booking_date: parsePostalBookingDate(row['Booking Date']),
               product: String(row['Product'] || 'Postal Booking'),
               cash_cnt: parseFloat(row['Cash (Cnt)']) || 0,
               cash_amt: parseFloat(row['Cash (Amt)']) || 0,
@@ -1590,7 +1604,6 @@
       loadBookingDashboardData();
     }
 
-    // PDF EXPORT FOR BOOKING PERFORMANCE DASHBOARD
     async function exportBookingReportPDF() {
       if (!bookingImportedRecords.length) return alert("No performance data to export!");
       const { jsPDF } = window.jspdf;
@@ -1609,7 +1622,6 @@
       doc.setTextColor(180, 83, 9);
       doc.text("Chennai City Central Division &bull; Booking Performance Monitoring", 148.5, 17, { align: "center" });
 
-      // Gather table data
       const officeMap = {};
       bookingImportedRecords.forEach(r => {
         const off = r.office_name || 'Unassigned';
@@ -1641,47 +1653,60 @@
       doc.save(`Booking_Performance_Report_${Date.now()}.pdf`);
     }
 
-    // 4. MIS ANALYTICS & LOGISTICS
-    function generateMISReport(filterType = 'All') {
-      currentMISReportFilter = filterType;
-      const claims = rawClaimsList || [];
-      $('misTotal').innerText = claims.length;
-      $('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
-      $('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
-      $('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
-      $('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
+    function printClaimDetails(claimId) {
+      const claim = rawClaimsList.find(c => c.id === claimId);
+      if (!claim) return alert("Claim details not found!");
 
-      let filtered = claims;
-      if (filterType === 'Pending') filtered = claims.filter(c => c.claim_status === 'Pending');
-      else if (filterType === 'In Progress') filtered = claims.filter(c => c.claim_status === 'In Progress');
-      else if (filterType === 'Settled') filtered = claims.filter(c => c.claim_status === 'Settled');
-      else if (filterType === 'Rejected') filtered = claims.filter(c => c.claim_status === 'Rejected');
+      const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
+      const printWindow = window.open('', '_blank', 'width=950,height=850');
+      if (!printWindow) return alert("Popup blocked! Please allow popups.");
 
-      currentMISClaimsList = filtered;
-      const tbody = $('misReportTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      filtered.forEach(c => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-amber-50/40">
-            <td class="p-2 font-mono font-bold text-postRed-700">${c.txn_id_ref}</td>
-            <td class="p-2">${c.profiles?.emp_name || 'Staff'}</td>
-            <td class="p-2">${c.module}</td>
-            <td class="p-2">${c.raised_for_office}</td>
-            <td class="p-2">${c.txn_date}</td>
-            <td class="p-2">${c.settlement_date || '-'}</td>
-            <td class="p-2">-</td>
-            <td class="p-2 font-bold">₹${c.txn_amount}</td>
-            <td class="p-2 font-bold">${c.claim_status}</td>
-            <td class="p-2">${c.reply_remarks_admin || '-'}</td>
-          </tr>
-        `;
-      });
+      const printHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
+          <style>
+            @page { size: A4 portrait; margin: 10mm 12mm; }
+            body { font-family: sans-serif; color: #1e293b; padding: 14px; font-size: 11px; }
+            .header-banner { border-bottom: 2px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+            td { padding: 4px 8px; border: 1px solid #cbd5e1; }
+            td.label { background: #f8fafc; font-weight: bold; width: 25%; }
+            .preview { max-width: 100%; max-height: 260px; object-fit: contain; }
+          </style>
+        </head>
+        <body>
+          <div class="header-banner">
+            <div>
+              <h1 style="color:#A80F28; margin:0; font-size:16px;">Refund Claims Portal</h1>
+              <h2 style="color:#D97706; margin:2px 0 0 0; font-size:11px;">Chennai City Central Division</h2>
+            </div>
+            <div><strong>Txn ID: ${claim.txn_id_ref}</strong></div>
+          </div>
+          <table>
+            <tr><td class="label">Employee:</td><td>${claim.profiles?.emp_name} (${claim.profiles?.emp_id})</td><td class="label">Office:</td><td>${claim.raised_for_office}</td></tr>
+            <tr><td class="label">Module:</td><td>${claim.module}</td><td class="label">Article:</td><td>${claim.article_number}</td></tr>
+            <tr><td class="label">Txn Date:</td><td>${claim.txn_date}</td><td class="label">Amount:</td><td>Rs. ${claim.txn_amount}</td></tr>
+            <tr><td class="label">Status:</td><td>${claim.claim_status}</td><td class="label">Doc Status:</td><td>${claim.doc_status || 'Approved'}</td></tr>
+          </table>
+          <p><strong>Remarks by User:</strong> ${claim.remarks_by_user || '-'}</p>
+          <p><strong>Admin Remarks:</strong> ${claim.reply_remarks_admin || '-'}</p>
+          <div>
+            <strong>Attached Document:</strong><br>
+            ${isUserImage ? `<img src="${claim.file_url}" class="preview">` : `<a href="${claim.file_url}" target="_blank">View File</a>`}
+          </div>
+        </body>
+        </html>
+      `;
+      printWindow.document.open();
+      printWindow.document.write(printHtml);
+      printWindow.document.close();
+      printWindow.print();
     }
 
     function printOfficeWiseReport() {
-      alert("Office-wise pendency printout ready.");
+      alert("Office-wise report printout ready.");
     }
 
     function getStatusColor(status) {
@@ -1739,7 +1764,66 @@
       doc.save(`MIS_Report_${Date.now()}.pdf`);
     }
 
-    // 5. DOM BOOTSTRAP
+    function generateMISReport(filterType = 'All') {
+      currentMISReportFilter = filterType;
+      const claims = rawClaimsList || [];
+      $('misTotal').innerText = claims.length;
+      $('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
+      $('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
+      $('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
+      $('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
+
+      let filtered = claims;
+      if (filterType === 'Pending') filtered = claims.filter(c => c.claim_status === 'Pending');
+      else if (filterType === 'In Progress') filtered = claims.filter(c => c.claim_status === 'In Progress');
+      else if (filterType === 'Settled') filtered = claims.filter(c => c.claim_status === 'Settled');
+      else if (filterType === 'Rejected') filtered = claims.filter(c => c.claim_status === 'Rejected');
+
+      currentMISClaimsList = filtered;
+      const tbody = $('misReportTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      filtered.forEach(c => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40">
+            <td class="p-2 font-mono font-bold text-postRed-700">${c.txn_id_ref}</td>
+            <td class="p-2">${c.profiles?.emp_name || 'Staff'}</td>
+            <td class="p-2">${c.module}</td>
+            <td class="p-2">${c.raised_for_office}</td>
+            <td class="p-2">${c.txn_date}</td>
+            <td class="p-2">${c.settlement_date || '-'}</td>
+            <td class="p-2">-</td>
+            <td class="p-2 font-bold">₹${c.txn_amount}</td>
+            <td class="p-2 font-bold">${c.claim_status}</td>
+            <td class="p-2">${c.reply_remarks_admin || '-'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function loadAllUsers() {
+      const { data: users } = await supabaseClient.from('profiles').select('*');
+      const tbody = $('usersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      (users || []).forEach(u => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40">
+            <td class="p-2 font-mono font-bold">${u.emp_id}</td>
+            <td class="p-2">${u.emp_name}</td>
+            <td class="p-2 uppercase font-bold text-postRed-700">${u.role || 'user'}</td>
+            <td class="p-2">${u.created_at ? u.created_at.split('T')[0] : '-'}</td>
+            <td class="p-2">${u.mobile_number || '-'}</td>
+            <td class="p-2">${u.office_name || '-'}</td>
+            <td class="p-2 font-bold ${u.is_active !== false ? 'text-emerald-700' : 'text-rose-700'}">${u.is_active !== false ? 'Active' : 'Locked'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // DOM BOOTSTRAP
     document.addEventListener('DOMContentLoaded', () => {
       loadLogoFromDatabase();
       supabaseClient.auth.getSession().then(({ data: { session } }) => {
