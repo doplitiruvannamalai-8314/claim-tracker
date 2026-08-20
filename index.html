@@ -656,7 +656,7 @@
             </div>
           </div>
 
-          <!-- LOGO CHANGER IN CONFIGURATION MASTER (SUPERADMIN ONLY) -->
+          <!-- LOGO CHANGER (SUPERADMIN) -->
           <div id="superadminLogoPanel" class="hidden bg-amber-50/70 border border-amber-300 rounded-xl p-3.5 flex items-center justify-between flex-wrap gap-3">
             <div class="flex items-center gap-3">
               <img id="adminLogoPreview" src="" alt="Division Logo" class="h-10 w-15 object-contain bg-white p-1 rounded border border-postGold-500 shadow-xs">
@@ -1625,6 +1625,19 @@
           </tr>
         `;
       });
+
+      // SUMMARY TOTAL ROW AT THE END OF THE TABLE
+      tbody.innerHTML += `
+        <tr class="bg-amber-100/70 border-t-2 border-slate-300 font-extrabold text-slate-900">
+          <td class="p-2 text-center font-mono">Σ</td>
+          <td class="p-2 font-bold uppercase text-postRed-900">Total (${sortedOffices.length} Offices)</td>
+          <td class="p-2 text-center">${totalCashCnt.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right">₹${totalCashAmt.toFixed(2)}</td>
+          <td class="p-2 text-center text-blue-900">${totalDigCnt.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right text-blue-900">₹${totalDigAmt.toFixed(2)}</td>
+          <td class="p-2 text-center font-extrabold text-emerald-800 bg-emerald-100">${digPct}%</td>
+        </tr>
+      `;
     }
 
     function resetBookingFilters() {
@@ -1651,17 +1664,39 @@
       doc.text("Digital vs Cash Transaction Performance Report", 148.5, 12, { align: "center" });
       doc.setFontSize(9.5);
       doc.setTextColor(180, 83, 9);
-      doc.text("Chennai City Central Division &bull; Booking Performance Monitoring", 148.5, 17, { align: "center" });
+      doc.text("Chennai City Central Division • Booking Performance Monitoring", 148.5, 17, { align: "center" });
 
+      const fromVal = $('bookingFromDate')?.value || 'Inception';
+      const toVal = $('bookingToDate')?.value || 'Current Date';
+      doc.setFontSize(8);
+      doc.setTextColor(51, 65, 85);
+      doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 148.5, 22, { align: "center" });
+
+      // Gather table data
       const officeMap = {};
+      let totalCashCnt = 0, totalCashAmt = 0, totalDigCnt = 0, totalDigAmt = 0;
+
       bookingImportedRecords.forEach(r => {
         const off = r.office_name || 'Unassigned';
+        const c_cnt = parseFloat(r.cash_cnt) || 0;
+        const c_amt = parseFloat(r.cash_amt) || 0;
+        const d_cnt = parseFloat(r.total_digital_cnt) || 0;
+        const d_amt = parseFloat(r.total_digital_amt) || 0;
+
+        totalCashCnt += c_cnt;
+        totalCashAmt += c_amt;
+        totalDigCnt += d_cnt;
+        totalDigAmt += d_amt;
+
         if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, cash_amt: 0, dig_cnt: 0, dig_amt: 0 };
-        officeMap[off].cash_cnt += parseFloat(r.cash_cnt) || 0;
-        officeMap[off].cash_amt += parseFloat(r.cash_amt) || 0;
-        officeMap[off].dig_cnt += parseFloat(r.total_digital_cnt) || 0;
-        officeMap[off].dig_amt += parseFloat(r.total_digital_amt) || 0;
+        officeMap[off].cash_cnt += c_cnt;
+        officeMap[off].cash_amt += c_amt;
+        officeMap[off].dig_cnt += d_cnt;
+        officeMap[off].dig_amt += d_amt;
       });
+
+      const totalBookings = totalCashCnt + totalDigCnt;
+      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(1) : "0.0";
 
       const rows = Object.keys(officeMap).map(name => {
         const o = officeMap[name];
@@ -1669,7 +1704,12 @@
         const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
         return { name, ...o, pct };
       }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
-        idx + 1, o.name, o.cash_cnt, `Rs. ${o.cash_amt.toFixed(2)}`, o.dig_cnt, `Rs. ${o.dig_amt.toFixed(2)}`, `${o.pct.toFixed(1)}%`
+        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), `Rs. ${o.cash_amt.toFixed(2)}`, o.dig_cnt.toLocaleString('en-IN'), `Rs. ${o.dig_amt.toFixed(2)}`, `${o.pct.toFixed(1)}%`
+      ]);
+
+      // Add summary total row in PDF export table
+      rows.push([
+        'Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), `Rs. ${totalCashAmt.toFixed(2)}`, totalDigCnt.toLocaleString('en-IN'), `Rs. ${totalDigAmt.toFixed(2)}`, `${totalDigShare}%`
       ]);
 
       doc.autoTable({
@@ -1737,7 +1777,7 @@
     }
 
     function printOfficeWiseReport() {
-      alert("Office-wise pendency printout ready.");
+      alert("Office-wise report printout ready.");
     }
 
     function getStatusColor(status) {
