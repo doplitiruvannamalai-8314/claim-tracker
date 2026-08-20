@@ -585,74 +585,29 @@
               </select>
             </div>
 
-            <!-- MULTI-SELECT CHECKED LISTBOX FOR CHANNELS -->
+            <!-- MULTI-SELECT CHECKED LISTBOX FOR CHANNELS (WITH LIVE HEADING COUNT OF TXNS) -->
             <div class="relative" id="channelDropdownWrapper">
-              <label class="block font-bold text-postRed-900 mb-0.5">⚡ Compare Channels (<span id="channelSelectedCount">12 Selected</span>)</label>
+              <label class="block font-bold text-postRed-900 mb-0.5">
+                ⚡ Compare Channels (<span id="channelHeadingTxnCount" class="font-extrabold text-postRed-700">0 Txns</span>)
+              </label>
               <button type="button" onclick="toggleChannelDropdown(event)" class="w-full bg-white border-2 border-postGold-400 p-1.5 rounded text-xs font-semibold text-left flex justify-between items-center shadow-2xs">
-                <span class="truncate" id="channelDropdownLabel">All Digital Channels</span>
+                <span class="truncate" id="channelDropdownLabel">Select Channels</span>
                 <span>▼</span>
               </button>
 
-              <!-- DROPDOWN CHECKLIST POPOVER -->
-              <div id="channelChecklistPopover" class="hidden absolute top-full left-0 mt-1 w-64 bg-white border-2 border-amber-400 shadow-xl rounded-xl p-2.5 z-50 space-y-2 text-xs">
+              <!-- DROPDOWN CHECKLIST POPOVER (DYNAMICALLY RENDERS ONLY NON-ZERO CHANNELS WITH COUNTS) -->
+              <div id="channelChecklistPopover" class="hidden absolute top-full left-0 mt-1 w-72 bg-white border-2 border-amber-400 shadow-xl rounded-xl p-2.5 z-50 space-y-2 text-xs">
                 <div class="flex justify-between items-center border-b pb-1.5 text-[11px] font-bold">
-                  <span class="text-postRed-800">Select Digital Channels:</span>
+                  <span class="text-postRed-800">Available Digital Channels:</span>
                   <div class="flex gap-1.5">
-                    <button type="button" onclick="setAllChannelCheckboxes(true)" class="text-emerald-700 hover:underline">All</button>
+                    <button type="button" onclick="setAllChannelCheckboxes(true)" class="text-emerald-700 hover:underline cursor-pointer">All</button>
                     <span>|</span>
-                    <button type="button" onclick="setAllChannelCheckboxes(false)" class="text-rose-700 hover:underline">None</button>
+                    <button type="button" onclick="setAllChannelCheckboxes(false)" class="text-rose-700 hover:underline cursor-pointer">None</button>
                   </div>
                 </div>
 
-                <div class="max-h-48 overflow-y-auto space-y-1.5 pr-1 font-medium text-slate-700">
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="dqr" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>DQR Scan</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="sbipos_card" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>SBIPOS-CARD</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="sbipos_bqr" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>SBIPOS BharatQR</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_bqr" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>SBIEPAY BharatQR</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_upi" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>SBIEPAY UPI</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_cc" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>SBIEPAY Credit Card</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_dc" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>SBIEPAY Debit Card</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="sbiepay_neft" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>SBIEPAY NEFT</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="rtgs" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>RTGS</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="wallet" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>Wallet / Franchise Wallet</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="posb" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>POSB</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer hover:bg-amber-50 p-1 rounded">
-                    <input type="checkbox" name="bookingChannelChk" value="ippb" checked onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
-                    <span>IPPB</span>
-                  </label>
+                <div id="dynamicChannelListContainer" class="max-h-52 overflow-y-auto space-y-1.5 pr-1 font-medium text-slate-700">
+                  <div class="text-center text-slate-400 py-2">No transactions in selected period</div>
                 </div>
               </div>
             </div>
@@ -895,6 +850,25 @@
 
     let bookingImportedRecords = [];
 
+    // Master list of known digital channel keys and their human-readable labels
+    const DIGITAL_CHANNEL_CONFIG = [
+      { key: 'dqr', cntField: 'dqr_cnt', amtField: 'dqr_amt', label: 'DQR Scan' },
+      { key: 'sbipos_card', cntField: 'sbipos_card_cnt', amtField: 'sbipos_card_amt', label: 'SBIPOS-CARD' },
+      { key: 'sbipos_bqr', cntField: 'sbipos_bharatqr_cnt', amtField: 'sbipos_bharatqr_amt', label: 'SBIPOS BharatQR' },
+      { key: 'sbiepay_bqr', cntField: 'sbiepay_bharatqr_cnt', amtField: 'sbiepay_bharatqr_amt', label: 'SBIEPAY BharatQR' },
+      { key: 'sbiepay_upi', cntField: 'sbiepay_upi_cnt', amtField: 'sbiepay_upi_amt', label: 'SBIEPAY UPI' },
+      { key: 'sbiepay_cc', cntField: 'sbiepay_cc_cnt', amtField: 'sbiepay_cc_amt', label: 'SBIEPAY Credit Card' },
+      { key: 'sbiepay_dc', cntField: 'sbiepay_dc_cnt', amtField: 'sbiepay_dc_amt', label: 'SBIEPAY Debit Card' },
+      { key: 'sbiepay_neft', cntField: 'sbiepay_neft_cnt', amtField: 'sbiepay_neft_amt', label: 'SBIEPAY NEFT' },
+      { key: 'rtgs', cntField: 'rtgs_cnt', amtField: 'rtgs_amt', label: 'RTGS' },
+      { key: 'wallet', cntField: 'wallet_cnt', amtField: 'wallet_amt', label: 'Wallet / Franchise Wallet' },
+      { key: 'posb', cntField: 'posb_cnt', amtField: 'posb_amt', label: 'POSB' },
+      { key: 'ippb', cntField: 'ippb_cnt', amtField: 'ippb_amt', label: 'IPPB' }
+    ];
+
+    // Maintain currently selected channels in memory across date filters
+    let activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
+
     let currentActiveTab = sessionStorage.getItem('activePortalTab') || 'track';
 
     let userPastedImageBlob = null;
@@ -907,7 +881,7 @@
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
 
-    // ROBUST POSTAL EXCEL/CSV DATE PARSER (Returns null on invalid or dashes)
+    // ROBUST POSTAL EXCEL/CSV DATE PARSER
     function parsePostalBookingDate(val) {
       if (val === null || val === undefined) return null;
 
@@ -983,22 +957,56 @@
     }
 
     function setAllChannelCheckboxes(checked) {
-      document.querySelectorAll('input[name="bookingChannelChk"]').forEach(chk => chk.checked = checked);
+      document.querySelectorAll('input[name="bookingChannelChk"]').forEach(chk => {
+        chk.checked = checked;
+        if (checked) activeSelectedChannelKeys.add(chk.value);
+        else activeSelectedChannelKeys.delete(chk.value);
+      });
       onChannelCheckboxChanged();
     }
 
     function onChannelCheckboxChanged() {
       const checkedBoxes = Array.from(document.querySelectorAll('input[name="bookingChannelChk"]:checked'));
-      const count = checkedBoxes.length;
-      $('channelSelectedCount').innerText = `${count} Selected`;
-      $('channelDropdownLabel').innerText = count === 0 ? 'No Channels (0%)' : (count === 12 ? 'All Digital Channels' : `${count} Channels Selected`);
+      activeSelectedChannelKeys.clear();
+      checkedBoxes.forEach(cb => activeSelectedChannelKeys.add(cb.value));
       loadBookingDashboardData();
     }
 
-    function getSelectedChannelSet() {
-      const set = new Set();
-      document.querySelectorAll('input[name="bookingChannelChk"]:checked').forEach(chk => set.add(chk.value));
-      return set;
+    // DYNAMICALLY REFRESHES CHECKLIST POPOVER TO SHOW ONLY NON-ZERO CHANNELS WITH TXN COUNTS
+    function renderDynamicChannelChecklist(channelSummaryMap) {
+      const container = $('dynamicChannelListContainer');
+      if (!container) return;
+
+      const nonZeroChannels = DIGITAL_CHANNEL_CONFIG.filter(cfg => (channelSummaryMap[cfg.key]?.count || 0) > 0);
+
+      if (!nonZeroChannels.length) {
+        container.innerHTML = `<div class="text-center text-slate-400 py-3">No digital transactions recorded in this period</div>`;
+        $('channelDropdownLabel').innerText = 'No Digital Txns (0)';
+        return;
+      }
+
+      let html = '';
+      nonZeroChannels.forEach(cfg => {
+        const isChecked = activeSelectedChannelKeys.has(cfg.key);
+        const count = (channelSummaryMap[cfg.key]?.count || 0).toLocaleString('en-IN');
+
+        html += `
+          <label class="flex items-center justify-between gap-1.5 cursor-pointer hover:bg-amber-50 p-1.5 rounded transition">
+            <div class="flex items-center gap-1.5">
+              <input type="checkbox" name="bookingChannelChk" value="${cfg.key}" ${isChecked ? 'checked' : ''} onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
+              <span class="font-medium">${cfg.label}</span>
+            </div>
+            <span class="font-mono font-bold text-[10.5px] bg-slate-100 text-postRed-800 px-1.5 py-0.2 rounded border">${count}</span>
+          </label>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      const checkedCount = nonZeroChannels.filter(cfg => activeSelectedChannelKeys.has(cfg.key)).length;
+      $('channelDropdownLabel').innerText = checkedCount === 0 
+        ? 'No Channels Selected (0)' 
+        : (checkedCount === nonZeroChannels.length ? `All Active Channels (${checkedCount})` : `${checkedCount} of ${nonZeroChannels.length} Channels`);
     }
 
     // RRN AUTO-FILL SYNC
@@ -1664,7 +1672,7 @@
       loadBookingDashboardData();
     }
 
-    // CALCULATES DIGITAL SUM DYNAMICALLY BASED ON CHECKED CHANNELS
+    // CALCULATES DIGITAL SUM DYNAMICALLY BASED ON CHECKED CHANNELS & UPDATES DYNAMIC NON-ZERO CHANNEL POPOVER
     async function loadBookingDashboardData() {
       let query = supabaseClient.from('booking_performance').select('*');
 
@@ -1680,8 +1688,24 @@
       if (error || !data) return;
 
       bookingImportedRecords = data;
-      const selectedChannels = getSelectedChannelSet();
 
+      // 1. First pass: Aggregate overall counts per channel in this filtered date range
+      const channelSummaryMap = {};
+      DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+        channelSummaryMap[cfg.key] = { count: 0, amount: 0 };
+      });
+
+      data.forEach(r => {
+        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+          channelSummaryMap[cfg.key].count += parseFloat(r[cfg.cntField]) || 0;
+          channelSummaryMap[cfg.key].amount += parseFloat(r[cfg.amtField]) || 0;
+        });
+      });
+
+      // 2. Render dynamic channel checklist in popover showing only non-zero channels with live counts
+      renderDynamicChannelChecklist(channelSummaryMap);
+
+      // 3. Second pass: Calculate totals per office using only currently selected digital channels
       let totalCashCnt = 0, totalCashAmt = 0;
       let totalDigCnt = 0, totalDigAmt = 0;
       const officeMap = {};
@@ -1691,22 +1715,15 @@
         const c_cnt = parseFloat(r.cash_cnt) || 0;
         const c_amt = parseFloat(r.cash_amt) || 0;
 
-        // Sum only checked channels
         let d_cnt = 0;
         let d_amt = 0;
 
-        if (selectedChannels.has('dqr')) { d_cnt += parseFloat(r.dqr_cnt) || 0; d_amt += parseFloat(r.dqr_amt) || 0; }
-        if (selectedChannels.has('sbipos_card')) { d_cnt += parseFloat(r.sbipos_card_cnt) || 0; d_amt += parseFloat(r.sbipos_card_amt) || 0; }
-        if (selectedChannels.has('sbipos_bqr')) { d_cnt += parseFloat(r.sbipos_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbipos_bharatqr_amt) || 0; }
-        if (selectedChannels.has('sbiepay_bqr')) { d_cnt += parseFloat(r.sbiepay_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbiepay_bharatqr_amt) || 0; }
-        if (selectedChannels.has('sbiepay_upi')) { d_cnt += parseFloat(r.sbiepay_upi_cnt) || 0; d_amt += parseFloat(r.sbiepay_upi_amt) || 0; }
-        if (selectedChannels.has('sbiepay_cc')) { d_cnt += parseFloat(r.sbiepay_cc_cnt) || 0; d_amt += parseFloat(r.sbiepay_cc_amt) || 0; }
-        if (selectedChannels.has('sbiepay_dc')) { d_cnt += parseFloat(r.sbiepay_dc_cnt) || 0; d_amt += parseFloat(r.sbiepay_dc_amt) || 0; }
-        if (selectedChannels.has('sbiepay_neft')) { d_cnt += parseFloat(r.sbiepay_neft_cnt) || 0; d_amt += parseFloat(r.sbiepay_neft_amt) || 0; }
-        if (selectedChannels.has('rtgs')) { d_cnt += parseFloat(r.rtgs_cnt) || 0; d_amt += parseFloat(r.rtgs_amt) || 0; }
-        if (selectedChannels.has('wallet')) { d_cnt += parseFloat(r.wallet_cnt) || 0; d_amt += parseFloat(r.wallet_amt) || 0; }
-        if (selectedChannels.has('posb')) { d_cnt += parseFloat(r.posb_cnt) || 0; d_amt += parseFloat(r.posb_amt) || 0; }
-        if (selectedChannels.has('ippb')) { d_cnt += parseFloat(r.ippb_cnt) || 0; d_amt += parseFloat(r.ippb_amt) || 0; }
+        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+          if (activeSelectedChannelKeys.has(cfg.key)) {
+            d_cnt += parseFloat(r[cfg.cntField]) || 0;
+            d_amt += parseFloat(r[cfg.amtField]) || 0;
+          }
+        });
 
         totalCashCnt += c_cnt;
         totalCashAmt += c_amt;
@@ -1721,6 +1738,9 @@
         officeMap[off].dig_cnt += d_cnt;
         officeMap[off].dig_amt += d_amt;
       });
+
+      // Update Heading transaction count next to Compare Channels filter
+      $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
 
       const totalBookings = totalCashCnt + totalDigCnt;
       const totalVal = totalCashAmt + totalDigAmt;
@@ -1764,7 +1784,7 @@
         `;
       });
 
-      // SUMMARY TOTAL ROW WITH RED HEADER BACKGROUND AND NO AMOUNT COLUMNS
+      // SUMMARY TOTAL ROW WITH POSTRED-700 HEADER BACKGROUND & 2-DECIMAL SHARE
       tbody.innerHTML += `
         <tr class="bg-postRed-700 text-white font-extrabold border-t-2 border-postRed-900">
           <td class="p-2 text-center font-mono">Σ</td>
@@ -1783,7 +1803,7 @@
       $('bookingFromDate').value = '';
       $('bookingToDate').value = '';
       $('bookingFilterOffice').value = '';
-      setAllChannelCheckboxes(true);
+      activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
       loadBookingDashboardData();
     }
 
@@ -1809,9 +1829,8 @@
       const toVal = $('bookingToDate')?.value || 'Current Date';
       doc.setFontSize(8);
       doc.setTextColor(51, 65, 85);
-      doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 148.5, 22, { align: "center" });
+      doc.text(`Period: ${fromVal} to ${toVal} | Selected Channels Count: ${activeSelectedChannelKeys.size} | Generated on: ${new Date().toLocaleString('en-IN')}`, 148.5, 22, { align: "center" });
 
-      const selectedChannels = getSelectedChannelSet();
       const officeMap = {};
       let totalCashCnt = 0, totalCashAmt = 0, totalDigCnt = 0, totalDigAmt = 0;
 
@@ -1821,18 +1840,12 @@
         const c_amt = parseFloat(r.cash_amt) || 0;
 
         let d_cnt = 0, d_amt = 0;
-        if (selectedChannels.has('dqr')) { d_cnt += parseFloat(r.dqr_cnt) || 0; d_amt += parseFloat(r.dqr_amt) || 0; }
-        if (selectedChannels.has('sbipos_card')) { d_cnt += parseFloat(r.sbipos_card_cnt) || 0; d_amt += parseFloat(r.sbipos_card_amt) || 0; }
-        if (selectedChannels.has('sbipos_bqr')) { d_cnt += parseFloat(r.sbipos_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbipos_bharatqr_amt) || 0; }
-        if (selectedChannels.has('sbiepay_bqr')) { d_cnt += parseFloat(r.sbiepay_bharatqr_cnt) || 0; d_amt += parseFloat(r.sbiepay_bharatqr_amt) || 0; }
-        if (selectedChannels.has('sbiepay_upi')) { d_cnt += parseFloat(r.sbiepay_upi_cnt) || 0; d_amt += parseFloat(r.sbiepay_upi_amt) || 0; }
-        if (selectedChannels.has('sbiepay_cc')) { d_cnt += parseFloat(r.sbiepay_cc_cnt) || 0; d_amt += parseFloat(r.sbiepay_cc_amt) || 0; }
-        if (selectedChannels.has('sbiepay_dc')) { d_cnt += parseFloat(r.sbiepay_dc_cnt) || 0; d_amt += parseFloat(r.sbiepay_dc_amt) || 0; }
-        if (selectedChannels.has('sbiepay_neft')) { d_cnt += parseFloat(r.sbiepay_neft_cnt) || 0; d_amt += parseFloat(r.sbiepay_neft_amt) || 0; }
-        if (selectedChannels.has('rtgs')) { d_cnt += parseFloat(r.rtgs_cnt) || 0; d_amt += parseFloat(r.rtgs_amt) || 0; }
-        if (selectedChannels.has('wallet')) { d_cnt += parseFloat(r.wallet_cnt) || 0; d_amt += parseFloat(r.wallet_amt) || 0; }
-        if (selectedChannels.has('posb')) { d_cnt += parseFloat(r.posb_cnt) || 0; d_amt += parseFloat(r.posb_amt) || 0; }
-        if (selectedChannels.has('ippb')) { d_cnt += parseFloat(r.ippb_cnt) || 0; d_amt += parseFloat(r.ippb_amt) || 0; }
+        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+          if (activeSelectedChannelKeys.has(cfg.key)) {
+            d_cnt += parseFloat(r[cfg.cntField]) || 0;
+            d_amt += parseFloat(r[cfg.amtField]) || 0;
+          }
+        });
 
         totalCashCnt += c_cnt;
         totalCashAmt += c_amt;
