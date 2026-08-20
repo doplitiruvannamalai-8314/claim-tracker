@@ -609,7 +609,7 @@
             </div>
             <div class="bg-white border-2 border-emerald-600 p-3 rounded-xl shadow-xs">
               <p class="text-[10px] text-emerald-700 font-bold uppercase">Digital Adoption Share</p>
-              <p id="dashDigitalSharePct" class="text-base font-extrabold text-emerald-800 mt-0.5">0.0%</p>
+              <p id="dashDigitalSharePct" class="text-base font-extrabold text-emerald-800 mt-0.5">0.00%</p>
               <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-1">
                 <div id="dashDigitalProgressBar" class="bg-emerald-600 h-full w-0 transition-all duration-500"></div>
               </div>
@@ -624,15 +624,15 @@
             </div>
             <div class="max-h-[420px] overflow-y-auto">
               <table class="w-full text-left text-xs border-collapse">
-                <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-700 sticky top-0">
+                <thead class="bg-postRed-700 text-white font-bold sticky top-0">
                   <tr>
                     <th class="p-2 text-center">Rank</th>
                     <th class="p-2">Office Name</th>
                     <th class="p-2 text-center">Cash Txn (Cnt)</th>
                     <th class="p-2 text-right">Cash Amount (₹)</th>
-                    <th class="p-2 text-center text-blue-800">Digital Txn (Cnt)</th>
-                    <th class="p-2 text-right text-blue-800">Digital Amount (₹)</th>
-                    <th class="p-2 text-center font-bold text-emerald-800">Digital % Share</th>
+                    <th class="p-2 text-center">Digital Txn (Cnt)</th>
+                    <th class="p-2 text-right">Digital Amount (₹)</th>
+                    <th class="p-2 text-center font-bold">Digital % Share</th>
                   </tr>
                 </thead>
                 <tbody id="bookingPerfTableBody" class="divide-y divide-slate-100">
@@ -1586,7 +1586,7 @@
 
       const totalBookings = totalCashCnt + totalDigCnt;
       const totalVal = totalCashAmt + totalDigAmt;
-      const digPct = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(1) : "0.0";
+      const digPct = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
 
       $('dashTotalBookings').innerText = totalBookings.toLocaleString('en-IN');
       $('dashTotalValue').innerText = `₹${totalVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
@@ -1621,21 +1621,21 @@
             <td class="p-2 text-right">₹${o.cash_amt.toFixed(2)}</td>
             <td class="p-2 text-center font-bold text-blue-800">${o.dig_cnt.toLocaleString('en-IN')}</td>
             <td class="p-2 text-right font-bold text-blue-800">₹${o.dig_amt.toFixed(2)}</td>
-            <td class="p-2 text-center font-extrabold text-emerald-700 bg-emerald-50/50">${o.pct.toFixed(1)}%</td>
+            <td class="p-2 text-center font-extrabold text-emerald-700 bg-emerald-50/50">${o.pct.toFixed(2)}%</td>
           </tr>
         `;
       });
 
-      // SUMMARY TOTAL ROW AT THE END OF THE TABLE
+      // SUMMARY TOTAL ROW WITH RED HEADER BACKGROUND AND NO AMOUNT COLUMNS
       tbody.innerHTML += `
-        <tr class="bg-amber-100/70 border-t-2 border-slate-300 font-extrabold text-slate-900">
+        <tr class="bg-postRed-700 text-white font-extrabold border-t-2 border-postRed-900">
           <td class="p-2 text-center font-mono">Σ</td>
-          <td class="p-2 font-bold uppercase text-postRed-900">Total (${sortedOffices.length} Offices)</td>
+          <td class="p-2 font-bold uppercase tracking-wider">Total (${sortedOffices.length} Offices)</td>
           <td class="p-2 text-center">${totalCashCnt.toLocaleString('en-IN')}</td>
-          <td class="p-2 text-right">₹${totalCashAmt.toFixed(2)}</td>
-          <td class="p-2 text-center text-blue-900">${totalDigCnt.toLocaleString('en-IN')}</td>
-          <td class="p-2 text-right text-blue-900">₹${totalDigAmt.toFixed(2)}</td>
-          <td class="p-2 text-center font-extrabold text-emerald-800 bg-emerald-100">${digPct}%</td>
+          <td class="p-2 text-right text-postRed-200">-</td>
+          <td class="p-2 text-center">${totalDigCnt.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right text-postRed-200">-</td>
+          <td class="p-2 text-center font-extrabold text-postGold-400">${digPct}%</td>
         </tr>
       `;
     }
@@ -1696,7 +1696,7 @@
       });
 
       const totalBookings = totalCashCnt + totalDigCnt;
-      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(1) : "0.0";
+      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
 
       const rows = Object.keys(officeMap).map(name => {
         const o = officeMap[name];
@@ -1704,12 +1704,12 @@
         const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
         return { name, ...o, pct };
       }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
-        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), `Rs. ${o.cash_amt.toFixed(2)}`, o.dig_cnt.toLocaleString('en-IN'), `Rs. ${o.dig_amt.toFixed(2)}`, `${o.pct.toFixed(1)}%`
+        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), `Rs. ${o.cash_amt.toFixed(2)}`, o.dig_cnt.toLocaleString('en-IN'), `Rs. ${o.dig_amt.toFixed(2)}`, `${o.pct.toFixed(2)}%`
       ]);
 
-      // Add summary total row in PDF export table
+      // Add summary total row in PDF export table without amounts in summary
       rows.push([
-        'Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), `Rs. ${totalCashAmt.toFixed(2)}`, totalDigCnt.toLocaleString('en-IN'), `Rs. ${totalDigAmt.toFixed(2)}`, `${totalDigShare}%`
+        'Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), '-', totalDigCnt.toLocaleString('en-IN'), '-', `${totalDigShare}%`
       ]);
 
       doc.autoTable({
@@ -1717,8 +1717,15 @@
         body: rows,
         startY: 26,
         theme: 'grid',
-        headStyles: { fillColor: [168, 15, 40] },
-        styles: { fontSize: 8 }
+        headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
+        styles: { fontSize: 8 },
+        didParseCell: function(data) {
+          if (data.row.index === rows.length - 1) {
+            data.cell.styles.fillColor = [168, 15, 40];
+            data.cell.styles.textColor = [255, 255, 255];
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
       });
 
       doc.save(`Booking_Performance_Report_${Date.now()}.pdf`);
@@ -1777,7 +1784,7 @@
     }
 
     function printOfficeWiseReport() {
-      alert("Office-wise report printout ready.");
+      alert("Office-wise pendency printout ready.");
     }
 
     function getStatusColor(status) {
