@@ -595,7 +595,7 @@
                 <span>▼</span>
               </button>
 
-              <!-- DROPDOWN CHECKLIST POPOVER (DYNAMICALLY RENDERS ONLY NON-ZERO CHANNELS WITH COUNTS) -->
+              <!-- DROPDOWN CHECKLIST POPOVER -->
               <div id="channelChecklistPopover" class="hidden absolute top-full left-0 mt-1 w-72 bg-white border-2 border-amber-400 shadow-xl rounded-xl p-2.5 z-50 space-y-2 text-xs">
                 <div class="flex justify-between items-center border-b pb-1.5 text-[11px] font-bold">
                   <span class="text-postRed-800">Available Digital Channels:</span>
@@ -850,7 +850,7 @@
 
     let bookingImportedRecords = [];
 
-    // Master list of known digital channel keys and their human-readable labels
+    // Master list of known digital channel keys and their field mappings
     const DIGITAL_CHANNEL_CONFIG = [
       { key: 'dqr', cntField: 'dqr_cnt', amtField: 'dqr_amt', label: 'DQR Scan' },
       { key: 'sbipos_card', cntField: 'sbipos_card_cnt', amtField: 'sbipos_card_amt', label: 'SBIPOS-CARD' },
@@ -866,7 +866,6 @@
       { key: 'ippb', cntField: 'ippb_cnt', amtField: 'ippb_amt', label: 'IPPB' }
     ];
 
-    // Maintain currently selected channels in memory across date filters
     let activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
 
     let currentActiveTab = sessionStorage.getItem('activePortalTab') || 'track';
@@ -1522,7 +1521,7 @@
       }
     }
 
-    // ROBUST EXCEL / CSV IMPORT (SKIPS EMPTY ROWS, DASHES & SEPARATORS)
+    // ROBUST EXCEL / CSV IMPORT (UPSERT: UPDATES EXISTING DATES INSTEAD OF DUPLICATING)
     async function handleBookingExcelUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1629,14 +1628,17 @@
             return alert(`No valid data rows found to import! (${skippedRows} empty/dash rows skipped)`);
           }
 
+          // Use upsert matching on unique constraint (office_name, booking_date, product)
           const batchSize = 100;
           for (let i = 0; i < recordsToInsert.length; i += batchSize) {
             const batch = recordsToInsert.slice(i, i + batchSize);
-            const { error } = await supabaseClient.from('booking_performance').insert(batch);
+            const { error } = await supabaseClient
+              .from('booking_performance')
+              .upsert(batch, { onConflict: 'office_name,booking_date,product' });
             if (error) throw error;
           }
 
-          alert(`Successfully imported ${recordsToInsert.length} valid booking records! (${skippedRows} blank/separator rows skipped)`);
+          alert(`Successfully imported/updated ${recordsToInsert.length} booking records! (${skippedRows} blank/separator rows skipped)`);
           $('bookingExcelFileInput').value = '';
           loadBookingDashboardData();
 
@@ -1672,7 +1674,7 @@
       loadBookingDashboardData();
     }
 
-    // CALCULATES DIGITAL SUM DYNAMICALLY BASED ON CHECKED CHANNELS & UPDATES DYNAMIC NON-ZERO CHANNEL POPOVER
+    // CALCULATES DIGITAL SUM DYNAMICALLY & UPDATES NON-ZERO CHANNELS AND SUMMARY
     async function loadBookingDashboardData() {
       let query = supabaseClient.from('booking_performance').select('*');
 
@@ -1689,7 +1691,7 @@
 
       bookingImportedRecords = data;
 
-      // 1. First pass: Aggregate overall counts per channel in this filtered date range
+      // Aggregate overall non-zero counts
       const channelSummaryMap = {};
       DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
         channelSummaryMap[cfg.key] = { count: 0, amount: 0 };
@@ -1702,10 +1704,8 @@
         });
       });
 
-      // 2. Render dynamic channel checklist in popover showing only non-zero channels with live counts
       renderDynamicChannelChecklist(channelSummaryMap);
 
-      // 3. Second pass: Calculate totals per office using only currently selected digital channels
       let totalCashCnt = 0, totalCashAmt = 0;
       let totalDigCnt = 0, totalDigAmt = 0;
       const officeMap = {};
@@ -1739,7 +1739,7 @@
         officeMap[off].dig_amt += d_amt;
       });
 
-      // Update Heading transaction count next to Compare Channels filter
+      // Update heading count
       $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
 
       const totalBookings = totalCashCnt + totalDigCnt;
@@ -1784,7 +1784,7 @@
         `;
       });
 
-      // SUMMARY TOTAL ROW WITH POSTRED-700 HEADER BACKGROUND & 2-DECIMAL SHARE
+      // SUMMARY TOTAL ROW WITH RED HEADER BACKGROUND & 2-DECIMAL SHARE
       tbody.innerHTML += `
         <tr class="bg-postRed-700 text-white font-extrabold border-t-2 border-postRed-900">
           <td class="p-2 text-center font-mono">Σ</td>
@@ -1829,7 +1829,7 @@
       const toVal = $('bookingToDate')?.value || 'Current Date';
       doc.setFontSize(8);
       doc.setTextColor(51, 65, 85);
-      doc.text(`Period: ${fromVal} to ${toVal} | Selected Channels Count: ${activeSelectedChannelKeys.size} | Generated on: ${new Date().toLocaleString('en-IN')}`, 148.5, 22, { align: "center" });
+      doc.text(`Period: ${fromVal} to ${toVal} | Selected Channels: ${activeSelectedChannelKeys.size} | Generated on: ${new Date().toLocaleString('en-IN')}`, 148.5, 22, { align: "center" });
 
       const officeMap = {};
       let totalCashCnt = 0, totalCashAmt = 0, totalDigCnt = 0, totalDigAmt = 0;
