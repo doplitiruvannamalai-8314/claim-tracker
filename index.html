@@ -833,7 +833,32 @@
         </div>
 
       </div>
+<!-- USER EDIT REMARKS MODAL (FOR CLAIM CREATORS) -->
+<div id="userEditRemarksModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-amber-500">
+    <div class="flex justify-between items-center border-b pb-2 border-amber-200">
+      <h3 class="font-bold text-sm text-postRed-700 uppercase">✏️ Edit My Claim Remarks</h3>
+      <button type="button" onclick="closeUserEditRemarksModal()" class="text-xl font-bold cursor-pointer text-slate-400 hover:text-slate-700">&times;</button>
+    </div>
+    
+    <input type="hidden" id="userEditClaimId">
+    
+    <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-xs space-y-1">
+      <div><strong class="text-slate-500">Txn / Ref No:</strong> <span id="userEditTxnRef" class="font-mono font-bold text-postRed-700"></span></div>
+      <div><strong class="text-slate-500">Office / Module:</strong> <span id="userEditOfficeModule" class="font-semibold text-slate-800"></span></div>
+    </div>
 
+    <div>
+      <label class="block text-xs font-bold text-slate-700 mb-1">User Remarks / Reason for Claim *</label>
+      <textarea id="userEditRemarksInput" required class="w-full border border-slate-300 p-2 rounded text-xs h-28 outline-none focus:ring-2 focus:ring-postRed-600 bg-white" placeholder="Update your remarks or explanation here..."></textarea>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
+      <button type="button" onclick="closeUserEditRemarksModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+      <button type="button" id="btnSaveUserRemarks" onclick="submitUserRemarksEdit()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Update Remarks</button>
+    </div>
+  </div>
+</div>
       <!-- RE-UPLOAD MODAL FOR APPLICANT -->
       <div id="reuploadModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postGold-500">
@@ -857,8 +882,8 @@
         </div>
       </div>
 
-      <!-- ADMIN EDIT/REPLY MODAL -->
-      <!-- ADMIN EDIT/REPLY MODAL -->
+   
+     <!-- ADMIN EDIT/REPLY MODAL -->
 <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
   <div class="bg-white rounded-2xl p-5 max-w-xl w-full space-y-3 shadow-2xl border-t-8 border-postRed-600 max-h-[90vh] overflow-y-auto">
     <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
@@ -868,7 +893,7 @@
     
     <input type="hidden" id="modalClaimId">
 
-    <!-- 3-Column Top Grid with Module Selector -->
+    <!-- 3-Column Header: Module, Status & Quality -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
       <div>
         <label class="block font-bold text-slate-700 mb-0.5">Change Module</label>
@@ -3950,6 +3975,247 @@ async function submitDocumentReupload() {
       printWindow.document.write(allDocketsHtml);
       printWindow.document.close();
     }
+    // =========================================================================
+// USER EDIT REMARKS MODAL ROUTINES (SEPARATE FROM ADMIN PANEL)
+// =========================================================================
+
+function openUserEditRemarksModal(claimId) {
+  const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
+             || (rawMISMasterList && rawMISMasterList.find(c => String(c.id) === String(claimId)))
+             || (currentClaimsList && currentClaimsList.find(c => String(c.id) === String(claimId)));
+
+  if (!claim) return alert("Claim details not found.");
+
+  if ($('userEditClaimId')) $('userEditClaimId').value = claim.id;
+  if ($('userEditTxnRef')) $('userEditTxnRef').innerText = claim.txn_id_ref || '-';
+  if ($('userEditOfficeModule')) $('userEditOfficeModule').innerText = `${claim.raised_for_office || '-'} / ${claim.module || '-'}`;
+  if ($('userEditRemarksInput')) $('userEditRemarksInput').value = claim.remarks_by_user || '';
+
+  if ($('userEditRemarksModal')) $('userEditRemarksModal').classList.remove('hidden');
+}
+
+function closeUserEditRemarksModal() {
+  if ($('userEditRemarksModal')) $('userEditRemarksModal').classList.add('hidden');
+}
+
+async function submitUserRemarksEdit() {
+  const id = $('userEditClaimId')?.value;
+  const newRemarks = $('userEditRemarksInput')?.value.trim();
+
+  if (!id) return alert("Missing claim identifier.");
+  if (!newRemarks) return alert("Please enter your updated remarks.");
+
+  const btn = $('btnSaveUserRemarks');
+  if (btn) { btn.disabled = true; btn.innerText = "Saving..."; }
+
+  try {
+    const { error } = await supabaseClient
+      .from('claims')
+      .update({ remarks_by_user: newRemarks })
+      .eq('id', id);
+
+    if (error) {
+      alert("Error updating remarks: " + error.message);
+    } else {
+      alert("Your remarks have been updated successfully!");
+      closeUserEditRemarksModal();
+      await loadClaimsSummary();
+    }
+  } catch (err) {
+    alert("Unexpected error: " + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerText = "Update Remarks"; }
+  }
+}
+
+// =========================================================================
+// ADMIN MODAL OPEN & SUBMIT (INCLUDES CHANGE OF MODULE)
+// =========================================================================
+
+function openReplyModal(claimId) {
+  const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
+             || (rawMISMasterList && rawMISMasterList.find(c => String(c.id) === String(claimId)))
+             || (currentClaimsList && currentClaimsList.find(c => String(c.id) === String(claimId)));
+
+  if (!claim) return alert("Claim record details not found.");
+
+  if ($('modalClaimId')) $('modalClaimId').value = claim.id;
+  if ($('modalModule')) $('modalModule').value = claim.module || 'Booking';
+  if ($('modalStatus')) $('modalStatus').value = claim.claim_status || 'Pending';
+  if ($('modalDocStatus')) $('modalDocStatus').value = claim.doc_status || 'Approved';
+  if ($('modalAdminRemarks')) $('modalAdminRemarks').value = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
+  
+  if ($('modalSettlementDate')) {
+    $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
+  }
+
+  clearModalUserPastedImage();
+  clearModalAdminPastedImage();
+  onModalStatusChanged();
+
+  if ($('replyModal')) $('replyModal').classList.remove('hidden');
+}
+
+async function submitAdminReply() {
+  const id = $('modalClaimId')?.value;
+  if (!id) return alert("Missing Claim ID.");
+
+  const newModule = $('modalModule')?.value || 'Booking';
+  const status = $('modalStatus')?.value || 'Pending';
+  const docStatus = $('modalDocStatus')?.value || 'Approved';
+  const remarks = $('modalAdminRemarks')?.value.trim() || '';
+  const settlementDate = (status === 'Settled') ? ($('modalSettlementDate')?.value || null) : null;
+
+  const saveBtn = $('btnAdminSave');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = "Saving..."; }
+
+  try {
+    let updatedUserFileUrl = null;
+    let updatedAdminFileUrl = null;
+
+    if (modalUserPastedBlob) {
+      const fileExt = modalUserPastedBlob.name ? modalUserPastedBlob.name.split('.').pop() : 'png';
+      const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${fileExt}`;
+      const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalUserPastedBlob, { upsert: true });
+      if (!err1) updatedUserFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    }
+
+    if (modalAdminPastedBlob) {
+      const fileExt = modalAdminPastedBlob.name ? modalAdminPastedBlob.name.split('.').pop() : 'png';
+      const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${fileExt}`;
+      const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalAdminPastedBlob, { upsert: true });
+      if (!err2) updatedAdminFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    }
+
+    const updateData = {
+      module: newModule,
+      claim_status: status,
+      doc_status: docStatus,
+      reply_remarks_admin: remarks,
+      settlement_date: settlementDate
+    };
+
+    if (docStatus === 'Needs Revision') {
+      updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
+    } else {
+      updateData.doc_revision_remarks = null;
+    }
+
+    if (updatedUserFileUrl) {
+      updateData.file_url = updatedUserFileUrl;
+      updateData.doc_status = 'Approved';
+      updateData.doc_revision_remarks = null;
+    }
+
+    if (updatedAdminFileUrl) {
+      updateData.admin_file_url = updatedAdminFileUrl;
+    }
+
+    const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
+    if (error) {
+      alert("Error saving admin update: " + error.message);
+    } else {
+      alert("Admin action, module, and remarks updated successfully!");
+      closeModal();
+      if (typeof loadClaimsSummary === 'function') await loadClaimsSummary();
+      if (typeof generateMISReport === 'function') await generateMISReport(currentMISReportFilter || 'All');
+    }
+  } catch (err) {
+    alert("Unexpected Error: " + err.message);
+  } finally {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "Save Changes"; }
+  }
+}
+
+// =========================================================================
+// CLAIMS TABLE (ROUTES ADMIN TO ACTION MODAL & USER TO EDIT REMARKS MODAL)
+// =========================================================================
+
+function renderClaimsSummaryTable() {
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+  const tbody = $('claimsTableBody');
+  if (!tbody) return;
+
+  if (!currentClaimsList.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500">No requests found.</td></tr>`;
+    return;
+  }
+
+  let htmlArr = [];
+  currentClaimsList.forEach(c => {
+    const empNameOnly = c.profiles?.emp_name || 'N/A';
+    const empIdOnly = c.profiles?.emp_id ? `[${c.profiles.emp_id}]` : '';
+    const isOwner = c.created_by === currentUser?.id;
+    const isSettled = c.claim_status === 'Settled';
+    const isPending = c.claim_status === 'Pending';
+    const needsRevision = c.doc_status === 'Needs Revision';
+
+    let remarksDisplay = c.reply_remarks_admin 
+      ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
+      : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user || '-'}</div>`;
+
+    let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
+
+    if (needsRevision && isOwner) {
+      userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
+    } else if (needsRevision) {
+      userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
+    }
+
+    let adminDocHtml = '';
+    if (c.admin_file_url) {
+      adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
+    } else {
+      adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
+    }
+
+    // Explicit Action Routing:
+    // - Admin => openReplyModal() (Has Module, Status, Doc Quality, Admin Remarks)
+    // - User (Creator of pending claim) => openUserEditRemarksModal() (Only edits User Remarks)
+    // - Others => openDetailsModal() (Read-only docket)
+    let actionBtnHtml = '';
+    if (isAdmin) {
+      actionBtnHtml = `<button type="button" onclick="openReplyModal('${c.id}')" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Action</button>`;
+    } else if (isOwner && isPending) {
+      actionBtnHtml = `<button type="button" onclick="openUserEditRemarksModal('${c.id}')" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Edit</button>`;
+    } else {
+      actionBtnHtml = `<button type="button" onclick="openDetailsModal('${c.id}')" class="w-full bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 px-2 py-1 rounded text-[10px] font-bold cursor-pointer">👁️ View</button>`;
+    }
+
+    htmlArr.push(`
+      <tr class="hover:bg-amber-50/40 transition align-middle">
+        <td class="p-2 whitespace-nowrap">
+          <span class="text-postRed-700 font-bold font-mono text-xs block cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+            <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer">📋 Copy</button>
+          </div>
+        </td>
+        <td class="p-2 whitespace-nowrap">
+          <div class="font-bold text-slate-800">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono">${empIdOnly}</span></div>
+          <div class="text-[10.5px] text-slate-600">${c.raised_for_office}</div>
+        </td>
+        <td class="p-2 font-bold text-slate-800">${c.txn_date}</td>
+        <td class="p-1.5 max-w-[85px]">${c.created_at ? c.created_at.split('T')[0] : '-'}</td>
+        <td class="p-2 font-bold text-slate-900">₹${c.txn_amount}</td>
+        <td class="p-2 whitespace-nowrap">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${getStatusColor(c.claim_status)}">${c.claim_status}</span>
+          ${isSettled && c.settlement_date ? `<div class="text-[10px] text-emerald-800 font-bold mt-0.5">📅 ${c.settlement_date}</div>` : ''}
+        </td>
+        <td class="p-2">${remarksDisplay}</td>
+        <td class="p-2 text-center min-w-[190px]">
+          <div class="grid grid-cols-2 gap-1 w-[185px] mx-auto">
+            ${actionBtnHtml}
+            <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
+            ${userDocHtml}
+            ${adminDocHtml}
+          </div>
+        </td>
+      </tr>
+    `);
+  });
+  tbody.innerHTML = htmlArr.join('');
+}
 
     // 13. GLOBAL CLIPBOARD (CTRL + V) SCREENSHOT ENGINE
     window.addEventListener('paste', async (e) => {
