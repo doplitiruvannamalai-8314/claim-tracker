@@ -34,7 +34,7 @@
         <img id="navLogoImg" src="" alt="India Post Logo" class="h-8 w-12 object-contain bg-white p-0.5 rounded shadow-xs">
         <div>
           <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">Refund Claims Management Portal</div>
-          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; Dak Sewa - Jan Sewa</div>
+          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; TN Circle</div>
         </div>
       </div>
       <div class="flex items-center gap-3 text-xs">
@@ -120,7 +120,7 @@
       <!-- MAIN DASHBOARD -->
       <div id="mainDashboard" class="hidden space-y-4">
 
-        <!-- TABS -->
+        <!-- TABS NAVIGATION -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
           <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer">Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
@@ -130,16 +130,56 @@
           <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">User Management</button>
         </div>
 
-        <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW -->
+        <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW & TRACKING -->
         <div id="trackView" class="tab-content bg-white p-4 rounded-xl shadow-md border border-amber-200 space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="flex gap-2 max-w-md w-full">
-              <input type="text" id="searchRefNo" placeholder="Enter Reference No, Article No, or RRN" class="border border-slate-300 p-1.5 rounded-lg w-full text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
-              <button type="button" onclick="trackClaim()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer whitespace-nowrap">Track</button>
+          <div class="bg-gradient-to-r from-postRed-50 to-amber-50/80 border-2 border-postGold-400 rounded-xl p-3.5 shadow-xs space-y-3">
+            <div class="flex items-center justify-between border-b border-postGold-300 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🔍</span>
+                <h3 class="font-extrabold text-xs text-postRed-800 uppercase tracking-wide">Search / Track a Claim</h3>
+              </div>
+              <span class="text-[10px] font-bold text-postRed-700 bg-white border border-postGold-400 px-2 py-0.5 rounded-full">
+                Live Search &amp; Database Sync
+              </span>
             </div>
-            <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live Filter Active</span>
+
+            <div class="flex items-center gap-2 max-w-xl">
+              <div class="relative w-full">
+                <input 
+                  type="text" 
+                  id="searchRefNo" 
+                  oninput="handleTrackInput(event)"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault(); executeTrackSearch();}"
+                  placeholder="Enter 12-digit Ref No, Article No, or RRN..." 
+                  class="w-full border-2 border-slate-300 focus:border-postRed-600 bg-white p-2 pr-7 rounded-lg text-xs font-mono outline-none shadow-inner"
+                >
+                <button 
+                  type="button" 
+                  id="btnClearTrackText" 
+                  onclick="clearTrackSearch()" 
+                  class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-700 font-bold text-sm cursor-pointer"
+                  title="Clear"
+                >&times;</button>
+              </div>
+              <button 
+                type="button" 
+                onclick="executeTrackSearch()" 
+                class="bg-postRed-600 hover:bg-postRed-700 text-white font-bold px-4 py-2 rounded-lg text-xs shadow-md hover:shadow-lg transition cursor-pointer whitespace-nowrap"
+              >
+                Track
+              </button>
+              <button 
+                type="button" 
+                onclick="clearTrackSearch()" 
+                class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-lg text-xs transition cursor-pointer whitespace-nowrap"
+              >
+                Reset
+              </button>
+            </div>
+
+            <!-- TRACK RESULT CARD -->
+            <div id="trackResult" class="hidden border border-postGold-400 p-3 rounded-lg bg-white shadow-xs"></div>
           </div>
-          <div id="trackResult" class="hidden border border-postGold-400 p-3 rounded-lg bg-amber-50/40 space-y-1 text-xs"></div>
 
           <!-- FILTERS -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
@@ -319,29 +359,38 @@
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
               <h3 class="text-sm font-bold text-postRed-700 uppercase">☀️ Dark → Light Screenshot Theme Converter</h3>
-              <p class="text-[11px] text-slate-500">Auto-converts dark backgrounds to ink-saving white while preserving light screenshots untouched</p>
+              <p class="text-[11px] text-slate-500">Auto-converts dark backgrounds to ink-saving white while preserving text and elements</p>
             </div>
             <div class="flex gap-2">
-              <button type="button" onclick="$('converterFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">📂 Select Image</button>
-              <button type="button" onclick="downloadConvertedImage()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">💾 Download PNG</button>
+              <button type="button" onclick="resetConverter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded text-xs font-bold cursor-pointer transition">↺ Reset</button>
+              <button type="button" onclick="$('converterFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition">📂 Select Image</button>
+              <button type="button" onclick="downloadConvertedImage()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition">💾 Download PNG</button>
               <input type="file" id="converterFileInput" accept="image/*" class="hidden" onchange="handleConverterFileSelect(event)">
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="border border-slate-200 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[260px] relative">
+            <div 
+              id="converterDropZone"
+              ondragover="handleConverterDragOver(event)" 
+              ondragleave="handleConverterDragLeave(event)" 
+              ondrop="handleConverterDrop(event)"
+              tabindex="0"
+              class="border-2 border-dashed border-slate-600 rounded-lg p-3 bg-slate-900 text-white flex flex-col items-center justify-center min-h-[280px] relative cursor-pointer outline-none transition"
+            >
               <span class="absolute top-2 left-2 bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-mono">Original Source</span>
               <img id="converterOriginalImg" class="max-h-[260px] max-w-full object-contain hidden" alt="Original">
-              <div id="converterDropNotice" class="text-center text-slate-400 text-xs">
-                <p class="text-xl mb-1">🖼️</p>
-                <p>Drag &amp; drop dark image here or paste with <kbd class="bg-slate-700 px-1 py-0.5 rounded font-mono">Ctrl + V</kbd></p>
+              <div id="converterDropNotice" class="text-center text-slate-400 text-xs pointer-events-none">
+                <p class="text-2xl mb-1">🖼️</p>
+                <p class="font-semibold text-slate-200">Drag &amp; drop dark image here</p>
+                <p class="text-[11px] mt-0.5">or click &amp; press <kbd class="bg-slate-700 text-white px-1.5 py-0.5 rounded font-mono">Ctrl + V</kbd> to paste</p>
               </div>
             </div>
 
-            <div class="border border-slate-300 rounded-lg p-3 bg-slate-50 flex flex-col items-center justify-center min-h-[260px] relative">
+            <div class="border border-slate-300 rounded-lg p-3 bg-slate-50 flex flex-col items-center justify-center min-h-[280px] relative">
               <span id="converterResultBadge" class="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Processed Result</span>
-              <img id="converterResultImg" class="max-h-[260px] max-w-full object-contain hidden" alt="Converted Light">
-              <p id="converterEmptyNotice" class="text-slate-400 text-xs">Converted light image will appear here</p>
+              <canvas id="converterCanvas" class="max-h-[260px] max-w-full object-contain hidden rounded border border-slate-300 bg-white shadow-xs"></canvas>
+              <p id="converterEmptyNotice" class="text-slate-400 text-xs text-center">Converted light image will appear here</p>
             </div>
           </div>
         </div>
@@ -981,15 +1030,15 @@
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Department of Posts &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
+      <div class="text-slate-500 font-medium">Maintained by : &bull; <span class="font-semibold text-slate-700">Krishnan K</span></div>
     </div>
   </footer>
 
   <!-- ========================================================================= -->
-  <!-- SINGLE UNBROKEN SCRIPT TAG CONTAINING EVERY FUNCTION IN PROPER ORDER      -->
+  <!-- SINGLE FULL UNBROKEN JAVASCRIPT ENGINE                                    -->
   <!-- ========================================================================= -->
   <script>
-    // 1. TOP-LEVEL CONSTANTS & DOM SELECTOR
+    // 1. TOP-LEVEL CONSTANTS & DOM HELPER
     const $ = id => document.getElementById(id);
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
@@ -1010,7 +1059,6 @@
       { key: 'ippb', cntField: 'ippb_cnt', amtField: 'ippb_amt', label: 'IPPB' }
     ];
 
-    // Global State
     let currentAppLogo = "";
     let cachedPdfLogoBase64 = null;
     let currentUser = null;
@@ -1034,7 +1082,6 @@
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
 
-    // 2. HELPER UTILITIES
     function getStatusColor(status) {
       if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
       if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
@@ -1170,7 +1217,7 @@
         : (checkedCount === nonZeroChannels.length ? `All Active Channels (${checkedCount})` : `${checkedCount} of ${nonZeroChannels.length} Channels`);
     }
 
-    // 3. LOGO MANAGEMENT
+    // 2. LOGO MANAGEMENT
     async function loadLogoFromDatabase() {
       try {
         const { data: config } = await supabaseClient
@@ -1223,7 +1270,7 @@
       alert("Logo restored.");
     }
 
-    // 4. AUTH & TAB NAVIGATION
+    // 3. AUTH LOGIC
     async function handleEmpIdLogin(e) {
       e.preventDefault();
       const empId = $('loginEmpId').value.trim().toUpperCase();
@@ -1342,29 +1389,52 @@
       }
     }
 
+    // 4. CLEAN TAB SWITCHER
     function showTab(tabId) {
-      currentActiveTab = tabId;
-      sessionStorage.setItem('activePortalTab', tabId);
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(el => {
-        el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer";
-      });
-
-      const map = {
-        'track': ['trackView', 'tabBtnTrack'],
-        'registerClaim': ['registerClaimView', 'tabBtnRegister'],
-        'converterTab': ['converterTabView', 'tabBtnConverter'],
-        'reports': ['reportsView', 'tabBtnReports'],
-        'bookingDash': ['bookingDashView', 'adminBookingDashTabBtn'],
-        'adminRoleMgmt': ['adminRoleMgmtView', 'adminTabBtn']
+      const tabsConfig = {
+        'track': { view: 'trackView', btn: 'tabBtnTrack' },
+        'registerClaim': { view: 'registerClaimView', btn: 'tabBtnRegister' },
+        'converterTab': { view: 'converterTabView', btn: 'tabBtnConverter' },
+        'reports': { view: 'reportsView', btn: 'tabBtnReports' },
+        'bookingDash': { view: 'bookingDashView', btn: 'adminBookingDashTabBtn' },
+        'adminRoleMgmt': { view: 'adminRoleMgmtView', btn: 'adminTabBtn' }
       };
 
-      if (map[tabId]) {
-        $(map[tabId][0]).classList.remove('hidden');
-        $(map[tabId][1]).className = "tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer";
+      if (!tabsConfig[tabId]) tabId = 'track';
+
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      if (!isAdmin && ['converterTab', 'bookingDash', 'adminRoleMgmt'].includes(tabId)) {
+        tabId = 'track';
       }
 
-      if (tabId === 'bookingDash') {
+      currentActiveTab = tabId;
+      sessionStorage.setItem('activePortalTab', tabId);
+
+      // Hide all known tab containers explicitly
+      ['trackView', 'registerClaimView', 'converterTabView', 'reportsView', 'bookingDashView', 'adminRoleMgmtView'].forEach(id => {
+        const el = $(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.tab-content').forEach(viewEl => {
+        if (viewEl) viewEl.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.tab-btn').forEach(btnEl => {
+        if (btnEl) {
+          btnEl.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer transition";
+        }
+      });
+
+      const activeView = $(tabsConfig[tabId].view);
+      const activeBtn = $(tabsConfig[tabId].btn);
+
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.className = "tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer transition";
+      }
+
+      if (tabId === 'bookingDash' && typeof applyBookingQuickPeriod === 'function') {
         applyBookingQuickPeriod();
       }
     }
@@ -1405,12 +1475,176 @@
       }
     }
 
-    // 5. CLAIM CREATION & TRACKING
+    // 5. SEARCH & TRACK CLAIM HANDLERS
+    function handleTrackInput(e) {
+      const val = (e.target.value || '').trim();
+      const clearBtn = $('btnClearTrackText');
+      const resCard = $('trackResult');
+
+      if (clearBtn) {
+        if (val.length > 0) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+
+      if (val.length === 0 && resCard) {
+        resCard.classList.add('hidden');
+        resCard.innerHTML = '';
+      }
+    }
+
+    function clearTrackSearch() {
+      const input = $('searchRefNo');
+      const clearBtn = $('btnClearTrackText');
+      const resCard = $('trackResult');
+
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      if (clearBtn) clearBtn.classList.add('hidden');
+      if (resCard) {
+        resCard.classList.add('hidden');
+        resCard.innerHTML = '';
+      }
+    }
+
+    async function executeTrackSearch() {
+      const input = $('searchRefNo');
+      const searchVal = (input?.value || '').trim();
+      const resCard = $('trackResult');
+
+      if (!resCard) return;
+      if (!searchVal) {
+        alert("Please enter a Reference Number, Article Number, or RRN to search!");
+        if (input) input.focus();
+        return;
+      }
+
+      const q = searchVal.toLowerCase();
+
+      const masterPool = [
+        ...(Array.isArray(rawClaimsList) ? rawClaimsList : []),
+        ...(Array.isArray(rawMISMasterList) ? rawMISMasterList : []),
+        ...(Array.isArray(currentClaimsList) ? currentClaimsList : [])
+      ];
+
+      let found = masterPool.find(c => {
+        const txn = String(c.txn_id_ref || '').trim().toLowerCase();
+        const art = String(c.article_number || '').trim().toLowerCase();
+        const rrn = String(c.rrn_number || '').trim().toLowerCase();
+        return txn === q || art === q || rrn === q || txn.includes(q) || art.includes(q) || rrn.includes(q);
+      });
+
+      if (!found) {
+        resCard.classList.remove('hidden');
+        resCard.innerHTML = `<div class="p-2 text-center text-slate-500 italic">Searching database for "${searchVal}"...</div>`;
+
+        try {
+          const { data, error } = await supabaseClient
+            .from('claims')
+            .select('*')
+            .or(`txn_id_ref.eq.${searchVal},article_number.eq.${searchVal},rrn_number.eq.${searchVal}`)
+            .limit(1);
+
+          if (!error && data && data.length > 0) {
+            found = data[0];
+            if (found.created_by) {
+              const { data: prof } = await supabaseClient
+                .from('profiles')
+                .select('emp_id, emp_name')
+                .eq('id', found.created_by)
+                .maybeSingle();
+              found.profiles = prof || { emp_id: 'N/A', emp_name: 'Staff' };
+            }
+          }
+        } catch (err) {
+          console.warn("DB tracking query error:", err);
+        }
+      }
+
+      resCard.classList.remove('hidden');
+
+      if (found) {
+        const isSettled = found.claim_status === 'Settled';
+        const tat = (isSettled && found.settlement_date)
+          ? calculateDaysDifference(found.txn_date, found.settlement_date)
+          : calculateDaysDifference(found.txn_date, new Date().toISOString().split('T')[0]);
+
+        const creatorName = found.profiles?.emp_name || 'Staff';
+        const creatorId = found.profiles?.emp_id ? `[${found.profiles.emp_id}]` : '';
+
+        resCard.innerHTML = `
+          <div class="flex justify-between items-start border-b border-postGold-400 pb-2 mb-2">
+            <div>
+              <span class="text-xs text-slate-500 font-bold">Ref No:</span>
+              <span class="text-sm font-extrabold text-postRed-700 font-mono ml-1">${found.txn_id_ref || '-'}</span>
+              <button type="button" onclick="copyTextToClipboard('${found.txn_id_ref}', this)" class="ml-2 bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">📋 Copy</button>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(found.claim_status)}">${found.claim_status || 'Pending'}</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div><strong class="text-slate-600 block text-[10px]">Raised By:</strong> <span class="font-bold text-slate-800">${creatorName} ${creatorId}</span></div>
+            <div><strong class="text-slate-600 block text-[10px]">Office:</strong> <span class="font-semibold text-slate-800">${found.raised_for_office || '-'}</span></div>
+            <div><strong class="text-slate-600 block text-[10px]">Module / Article:</strong> <span class="font-bold text-postRed-800">${found.module || '-'}</span> / <span class="font-mono">${found.article_number || '-'}</span></div>
+            <div><strong class="text-slate-600 block text-[10px]">Txn Amount:</strong> <span class="font-extrabold text-emerald-800 text-sm">₹${found.txn_amount || '0'}</span></div>
+            <div><strong class="text-slate-600 block text-[10px]">Txn Date:</strong> <span>${found.txn_date || '-'}</span></div>
+            <div><strong class="text-slate-600 block text-[10px]">Settlement Date:</strong> <span>${found.settlement_date || 'Pending'}</span></div>
+            <div><strong class="text-slate-600 block text-[10px]">${isSettled ? 'TAT:' : 'Aging:'}</strong> <span class="font-bold text-postRed-700">${tat !== null ? tat + ' Days' : '-'}</span></div>
+            <div><strong class="text-slate-600 block text-[10px]">Doc Status:</strong> <span class="font-bold ${found.doc_status === 'Needs Revision' ? 'text-rose-700' : 'text-emerald-700'}">${found.doc_status || 'Approved'}</span></div>
+          </div>
+          <div class="mt-2.5 pt-2 border-t border-postGold-300 text-xs grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="bg-amber-50/40 p-2 rounded border border-amber-200">
+              <strong class="text-slate-600 block text-[10px]">User Remarks:</strong>
+              <p class="mt-0.5 text-slate-800 whitespace-pre-wrap">${found.remarks_by_user || 'No remarks provided.'}</p>
+            </div>
+            <div class="bg-postRed-50/50 p-2 rounded border border-postRed-200">
+              <strong class="text-postRed-800 block text-[10px]">Admin Remarks:</strong>
+              <p class="mt-0.5 text-postRed-900 font-medium whitespace-pre-wrap">${found.reply_remarks_admin || 'Pending admin review.'}</p>
+            </div>
+          </div>
+          <div class="flex gap-2 pt-2.5 flex-wrap items-center">
+            ${found.file_url ? `<a href="${found.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs">📄 User Doc</a>` : ''}
+            ${found.admin_file_url ? `<a href="${found.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs">📎 Admin Doc</a>` : ''}
+            <button type="button" onclick="printClaimDetails('${found.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">🖨️ Print Docket</button>
+          </div>
+        `;
+      } else {
+        resCard.innerHTML = `
+          <div class="text-rose-700 font-bold py-2 text-center bg-rose-50 border border-rose-200 rounded-lg">
+            ⚠️ No claim record found matching "${searchVal}". Check the Reference ID, Article Number, or RRN.
+          </div>
+        `;
+      }
+    }
+
+    // 6. CLAIM CREATION & OVERVIEW TABLE
+    function handlePaymentChannelChange() {
+      const channel = $('claimChannel')?.value;
+      const rrnContainer = $('rrnFieldContainer');
+      const rrnInputField = $('claimRrn');
+
+      if (channel === 'SBI POS') {
+        if (rrnContainer) rrnContainer.classList.remove('hidden');
+        if (rrnInputField) {
+          rrnInputField.required = true;
+          if (!rrnInputField.value && $('claimTxnId')?.value) {
+            rrnInputField.value = $('claimTxnId').value;
+          }
+        }
+      } else {
+        if (rrnContainer) rrnContainer.classList.add('hidden');
+        if (rrnInputField) {
+          rrnInputField.required = false;
+          rrnInputField.value = '';
+        }
+      }
+    }
+
     function clearUserPastedImage() {
       userPastedImageBlob = null;
-      $('claimFile').value = '';
-      if($('userPastedImagePreview')) $('userPastedImagePreview').src = '';
-      if($('userPastedPreviewContainer')) $('userPastedPreviewContainer').classList.add('hidden');
+      if ($('claimFile')) $('claimFile').value = '';
+      if ($('userPastedImagePreview')) $('userPastedImagePreview').src = '';
+      if ($('userPastedPreviewContainer')) $('userPastedPreviewContainer').classList.add('hidden');
     }
 
     function handleFileSelectPreview(e) {
@@ -1469,12 +1703,13 @@
       }]).select();
 
       if (error) {
-        alert("Error submitting: " + error.message);
+        alert("Error submitting claim: " + error.message);
       } else {
         alert("Claim registered successfully!");
         e.target.reset();
         clearUserPastedImage();
-        $('rrnFieldContainer').classList.add('hidden');
+        if ($('rrnFieldContainer')) $('rrnFieldContainer').classList.add('hidden');
+        if ($('userPastedPreviewContainer')) $('userPastedPreviewContainer').classList.add('hidden');
         showTab('track');
         await loadClaimsSummary();
       }
@@ -1642,64 +1877,7 @@
       tbody.innerHTML = htmlArr.join('');
     }
 
-    async function trackClaim() {
-      const searchVal = ($('searchRefNo')?.value || '').trim();
-      const resCard = $('trackResult');
-      if (!searchVal) return alert("Please enter Reference Number, Article Number, or RRN to track!");
-
-      const searchLower = searchVal.toLowerCase();
-      const found = rawClaimsList.find(c => 
-        (c.txn_id_ref && c.txn_id_ref.toLowerCase() === searchLower) ||
-        (c.article_number && c.article_number.toLowerCase() === searchLower) ||
-        (c.rrn_number && c.rrn_number.toLowerCase() === searchLower) ||
-        (c.txn_id_ref && c.txn_id_ref.toLowerCase().includes(searchLower)) ||
-        (c.article_number && c.article_number.toLowerCase().includes(searchLower))
-      );
-
-      if (!resCard) return;
-      resCard.classList.remove('hidden');
-
-      if (found) {
-        const isSettled = found.claim_status === 'Settled';
-        const tat = (isSettled && found.settlement_date) 
-          ? calculateDaysDifference(found.txn_date, found.settlement_date) 
-          : calculateDaysDifference(found.txn_date, new Date().toISOString().split('T')[0]);
-
-        resCard.innerHTML = `
-          <div class="flex justify-between items-start border-b border-postGold-400 pb-1.5 mb-1.5">
-            <div>
-              <span class="text-xs text-slate-500 font-bold">Ref No:</span>
-              <span class="text-sm font-extrabold text-postRed-700 font-mono ml-1">${found.txn_id_ref}</span>
-              <button type="button" onclick="copyTextToClipboard('${found.txn_id_ref}', this)" class="ml-2 bg-amber-100 hover:bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer">📋 Copy</button>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor(found.claim_status)}">${found.claim_status}</span>
-          </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <div><strong>Raised By:</strong> ${found.profiles?.emp_name || 'Staff'} (${found.profiles?.emp_id || 'N/A'})</div>
-            <div><strong>Office:</strong> ${found.raised_for_office}</div>
-            <div><strong>Module/Article:</strong> ${found.module} / ${found.article_number}</div>
-            <div><strong>Amount:</strong> <span class="font-bold text-emerald-800">₹${found.txn_amount}</span></div>
-            <div><strong>Txn Date:</strong> ${found.txn_date}</div>
-            <div><strong>Settlement Date:</strong> ${found.settlement_date || 'Pending'}</div>
-            <div><strong>${isSettled ? 'TAT' : 'Aging'}:</strong> ${tat !== null ? tat + ' Days' : '-'}</div>
-            <div><strong>Document Quality:</strong> <span class="font-bold text-postRed-700">${found.doc_status || 'Approved'}</span></div>
-          </div>
-          <div class="mt-2 pt-1 border-t border-postGold-300 text-xs">
-            <p><strong>User Remarks:</strong> ${found.remarks_by_user || '-'}</p>
-            <p><strong>Admin Remarks:</strong> ${found.reply_remarks_admin || 'Pending Response'}</p>
-          </div>
-          <div class="flex gap-2 pt-2 flex-wrap">
-            <a href="${found.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Primary User Doc</a>
-            ${found.admin_file_url ? `<a href="${found.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Admin Resolution Doc</a>` : ''}
-            <button type="button" onclick="printClaimDetails('${found.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">🖨️ Print Full Docket</button>
-          </div>
-        `;
-      } else {
-        resCard.innerHTML = `<p class="text-postRed-700 font-bold">No claim record found matching "${searchVal}" under your permissions.</p>`;
-      }
-    }
-
-    // 6. MIS ANALYTICS & TURNAROUND
+    // 7. MIS REPORTS & CONSOLIDATED BREAKDOWNS
     function renderConsolidatedSummaries(claims) {
       const moduleStats = {
         'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
@@ -1718,9 +1896,10 @@
       const officeStats = {};
 
       claims.forEach(c => {
-        const mod = moduleStats[c.module] ? c.module : 'Others';
+        const off = (c.raised_for_office || 'Unassigned').trim();
         const amt = parseFloat(c.txn_amount) || 0;
-        const off = c.raised_for_office || 'Unassigned';
+        const statusNormalized = (c.claim_status || '').trim();
+        const mod = moduleStats[c.module] ? c.module : 'Others';
 
         if (!officeStats[off]) {
           officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
@@ -1729,27 +1908,27 @@
         officeStats[off].registered++;
         moduleStats[mod].total++;
 
-        if (c.claim_status === 'Pending') {
+        if (statusNormalized === 'Pending') {
           moduleStats[mod].pending++;
           moduleStats[mod].activePendingAmount += amt;
           officeStats[off].pending++;
           officeStats[off].activePendingAmount += amt;
-        } else if (c.claim_status === 'In Progress') {
+        } else if (statusNormalized === 'In Progress') {
           moduleStats[mod].inprogress++;
           moduleStats[mod].activePendingAmount += amt;
           officeStats[off].inprogress++;
           officeStats[off].activePendingAmount += amt;
-        } else if (c.claim_status === 'Settled') {
+        } else if (statusNormalized === 'Settled') {
           moduleStats[mod].settled++;
           officeStats[off].settled++;
-        } else if (c.claim_status === 'Rejected') {
+        } else if (statusNormalized === 'Rejected') {
           moduleStats[mod].rejected++;
           officeStats[off].rejected++;
         }
 
-        if (statusStats[c.claim_status]) {
-          statusStats[c.claim_status].count++;
-          statusStats[c.claim_status].amount += amt;
+        if (statusStats[statusNormalized]) {
+          statusStats[statusNormalized].count++;
+          statusStats[statusNormalized].amount += amt;
         }
       });
 
@@ -2122,51 +2301,87 @@
       generateMISReport('All');
     }
 
-    // 7. BOOKING PERFORMANCE DASHBOARD
+    // 8. BOOKING PERFORMANCE & DIGITAL ADOPTION
     async function applyBookingQuickPeriod() {
-      const mode = $('bookingQuickPeriod')?.value || 'yesterday';
-      const today = new Date();
-      const toStr = today.toISOString().split('T')[0];
+      const mode = $('bookingQuickPeriod')?.value || 'recent';
 
-      if (mode === 'today') {
-        $('bookingFromDate').value = toStr;
-        $('bookingToDate').value = toStr;
-      } else if (mode === 'yesterday') {
+      const getLocalDateStr = (d = new Date()) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      const todayStr = getLocalDateStr(new Date());
+
+      if (mode === 'all') {
+        if ($('bookingFromDate')) $('bookingFromDate').value = '';
+        if ($('bookingToDate')) $('bookingToDate').value = '';
+      } 
+      else if (mode === 'today') {
+        if ($('bookingFromDate')) $('bookingFromDate').value = todayStr;
+        if ($('bookingToDate')) $('bookingToDate').value = todayStr;
+      } 
+      else if (mode === 'yesterday') {
         const yest = new Date();
         yest.setDate(yest.getDate() - 1);
-        const yestStr = yest.toISOString().split('T')[0];
-        $('bookingFromDate').value = yestStr;
-        $('bookingToDate').value = yestStr;
-      } else if (mode === 'recent') {
-        const { data: latestRow } = await supabaseClient
-          .from('booking_performance')
-          .select('booking_date')
-          .order('booking_date', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        const yestStr = getLocalDateStr(yest);
+        if ($('bookingFromDate')) $('bookingFromDate').value = yestStr;
+        if ($('bookingToDate')) $('bookingToDate').value = yestStr;
+      } 
+      else if (mode === 'recent') {
+        try {
+          const { data: latestRows, error } = await supabaseClient
+            .from('booking_performance')
+            .select('booking_date')
+            .not('booking_date', 'is', null)
+            .neq('booking_date', '-')
+            .order('booking_date', { ascending: false })
+            .limit(1);
 
-        if (latestRow && latestRow.booking_date) {
-          $('bookingFromDate').value = latestRow.booking_date;
-          $('bookingToDate').value = latestRow.booking_date;
-        } else {
-          $('bookingFromDate').value = toStr;
-          $('bookingToDate').value = toStr;
+          let targetRecentDate = null;
+
+          if (!error && latestRows && latestRows.length > 0) {
+            targetRecentDate = latestRows[0].booking_date;
+          }
+
+          if (!targetRecentDate && Array.isArray(bookingImportedRecords) && bookingImportedRecords.length > 0) {
+            const memoryDates = bookingImportedRecords
+              .map(r => r.booking_date)
+              .filter(d => d && d !== '-' && !isNaN(new Date(d).getTime()))
+              .sort();
+            if (memoryDates.length > 0) {
+              targetRecentDate = memoryDates[memoryDates.length - 1];
+            }
+          }
+
+          if (!targetRecentDate) {
+            targetRecentDate = todayStr;
+          }
+
+          if ($('bookingFromDate')) $('bookingFromDate').value = targetRecentDate;
+          if ($('bookingToDate')) $('bookingToDate').value = targetRecentDate;
+        } catch (err) {
+          console.warn("Error resolving recent booking date:", err);
+          if ($('bookingFromDate')) $('bookingFromDate').value = todayStr;
+          if ($('bookingToDate')) $('bookingToDate').value = todayStr;
         }
-      } else if (mode === 'fortnight') {
+      } 
+      else if (mode === 'fortnight') {
         const d = new Date();
         d.setDate(d.getDate() - 15);
-        $('bookingFromDate').value = d.toISOString().split('T')[0];
-        $('bookingToDate').value = toStr;
-      } else if (mode === 'month') {
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        $('bookingFromDate').value = `${year}-${month}-01`;
-        $('bookingToDate').value = toStr;
-      } else if (mode === 'all') {
-        $('bookingFromDate').value = '';
-        $('bookingToDate').value = '';
+        if ($('bookingFromDate')) $('bookingFromDate').value = getLocalDateStr(d);
+        if ($('bookingToDate')) $('bookingToDate').value = todayStr;
+      } 
+      else if (mode === 'month') {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        if ($('bookingFromDate')) $('bookingFromDate').value = `${year}-${month}-01`;
+        if ($('bookingToDate')) $('bookingToDate').value = todayStr;
       }
-      loadBookingDashboardData();
+
+      await loadBookingDashboardData();
     }
 
     async function loadBookingDashboardData() {
@@ -2181,16 +2396,23 @@
       if (office) query = query.eq('office_name', office);
 
       const { data, error } = await query;
-      if (error || !data) return;
+      if (error) {
+        console.error("Booking data fetch error:", error);
+        return;
+      }
 
-      bookingImportedRecords = data;
+      bookingImportedRecords = data || [];
+
+      if (!activeSelectedChannelKeys || activeSelectedChannelKeys.size === 0) {
+        activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
+      }
 
       const channelSummaryMap = {};
       DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
         channelSummaryMap[cfg.key] = { count: 0, amount: 0 };
       });
 
-      data.forEach(r => {
+      bookingImportedRecords.forEach(r => {
         DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
           channelSummaryMap[cfg.key].count += parseFloat(r[cfg.cntField]) || 0;
           channelSummaryMap[cfg.key].amount += parseFloat(r[cfg.amtField]) || 0;
@@ -2203,8 +2425,8 @@
       let totalDigCnt = 0;
       const officeMap = {};
 
-      data.forEach(r => {
-        const off = r.office_name || 'Unassigned';
+      bookingImportedRecords.forEach(r => {
+        const off = (r.office_name || 'Unassigned').trim();
         const c_cnt = parseFloat(r.cash_cnt) || 0;
 
         let d_cnt = 0;
@@ -2222,11 +2444,10 @@
         officeMap[off].dig_cnt += d_cnt;
       });
 
-      if ($('channelHeadingTxnCount')) $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
-
       const totalBookings = totalCashCnt + totalDigCnt;
       const digPct = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
 
+      if ($('channelHeadingTxnCount')) $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
       if ($('dashTotalBookings')) $('dashTotalBookings').innerText = totalBookings.toLocaleString('en-IN');
       if ($('dashCashCount')) $('dashCashCount').innerText = totalCashCnt.toLocaleString('en-IN');
       if ($('dashDigitalCount')) $('dashDigitalCount').innerText = totalDigCnt.toLocaleString('en-IN');
@@ -2244,7 +2465,7 @@
       }).sort((a, b) => b.pct - a.pct);
 
       if (!sortedOffices.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No booking records found for selected dates.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No booking records found for the selected date range.</td></tr>`;
         return;
       }
 
@@ -2282,7 +2503,323 @@
       loadBookingDashboardData();
     }
 
-    // 8. USER MANAGEMENT
+    async function handleBookingExcelUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: 0, raw: false });
+
+          if (!jsonRows.length) return alert("The selected sheet contains no data rows!");
+
+          const parseDateSafe = (val) => {
+            if (!val) return null;
+            const str = String(val).trim();
+            if (['-', '--', 'NA', 'N/A', '0', 'null', 'undefined', ''].includes(str)) return null;
+
+            if (!isNaN(str) && Number(str) > 1000) {
+              const d = new Date(Math.round((Number(str) - 25569) * 86400 * 1000));
+              return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+            }
+
+            if (str.includes('/') || str.includes('-')) {
+              const delim = str.includes('/') ? '/' : '-';
+              const parts = str.split(delim);
+              if (parts.length === 3) {
+                if (parts[2].length === 4) {
+                  const yyyy = parts[2];
+                  const mm = parts[1].padStart(2, '0');
+                  const dd = parts[0].padStart(2, '0');
+                  const d = new Date(`${yyyy}-${mm}-${dd}`);
+                  return isNaN(d.getTime()) ? null : `${yyyy}-${mm}-${dd}`;
+                }
+                if (parts[0].length === 4) {
+                  const d = new Date(str);
+                  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+                }
+              }
+            }
+
+            const d = new Date(str);
+            return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+          };
+
+          const validRecordsToInsert = [];
+          const currentUserId = currentUser?.id || null;
+
+          jsonRows.forEach(row => {
+            const rawDate = row['Booking Date'] || row['booking_date'] || row['DATE'] || row['Date'] || row['__EMPTY_2'];
+            const validatedDate = parseDateSafe(rawDate);
+            if (!validatedDate) return;
+
+            const office = String(row['Office Name'] || row['office_name'] || row['OFFICE'] || row['Office'] || row['__EMPTY_1'] || '').trim();
+            if (!office || office.toLowerCase().includes('total') || office === '-' || office === '--') return;
+
+            const office_id = String(row['Office ID'] || row['office_id'] || row['OFFICE ID'] || row['__EMPTY'] || '').trim() || null;
+            const productVal = String(row['Product'] || row['product'] || row['PRODUCT'] || row['__EMPTY_3'] || 'ALL').trim();
+
+            const normMap = {};
+            Object.keys(row).forEach(k => {
+              const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+              normMap[cleanK] = row[k];
+            });
+
+            const num = (...matchKeys) => {
+              for (let mk of matchKeys) {
+                if (row[mk] !== undefined && row[mk] !== null) {
+                  const cleaned = String(row[mk]).replace(/[₹, ]/g, '').trim();
+                  if (cleaned !== '' && cleaned !== '-') {
+                    const val = parseFloat(cleaned);
+                    if (!isNaN(val)) return val;
+                  }
+                }
+                const cleanTarget = mk.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (normMap[cleanTarget] !== undefined && normMap[cleanTarget] !== null) {
+                  const cleaned = String(normMap[cleanTarget]).replace(/[₹, ]/g, '').trim();
+                  if (cleaned !== '' && cleaned !== '-') {
+                    const val = parseFloat(cleaned);
+                    if (!isNaN(val)) return val;
+                  }
+                }
+              }
+              return 0;
+            };
+
+            const cash_cnt = num('Cash (Cnt)', 'Cash Count', 'cash_cnt');
+            const cash_amt = num('Cash (Amt)', 'Cash Amount', 'cash_amt');
+            const ops_cnt = num('On Postal Service (Cnt)', 'OPS (Cnt)', 'ops_cnt');
+            const ops_amt = num('On Postal Service (Amt)', 'OPS (Amt)', 'ops_amt');
+            const postage_stamp_cnt = num('Postage Stamp (Cnt)', 'Postage Stamp Count', 'postage_stamp_cnt');
+            const postage_stamp_amt = num('Postage Stamp (Amt)', 'Postage Stamp Amount', 'postage_stamp_amt');
+            const service_stamp_cnt = num('Service Stamp (Cnt)', 'Service Stamp Count', 'service_stamp_cnt');
+            const service_stamp_amt = num('Service Stamp (Amt)', 'Service Stamp Amount', 'service_stamp_amt');
+            const franking_cnt = num('Franking Machine (Cnt)', 'Franking (Cnt)', 'franking_cnt');
+            const franking_amt = num('Franking Machine (Amt)', 'Franking (Amt)', 'franking_amt');
+            const contract_cnt = num('Contract (Cnt)', 'Contract Count', 'contract_cnt');
+            const contract_amt = num('Contract (Amt)', 'Contract Amount', 'contract_amt');
+            const dqr_cnt = num('DQR Scan (Cnt)', 'DQR (Cnt)', 'dqr_cnt');
+            const dqr_amt = num('DQR Scan (Amt)', 'DQR (Amt)', 'dqr_amt');
+            const franchise_wallet_cnt = num('Franchise Wallet (Cnt)', 'franchise_wallet_cnt');
+            const franchise_wallet_amt = num('Franchise Wallet (Amt)', 'franchise_wallet_amt');
+            const sbipos_card_cnt = num('SBIPOS-CARD (Cnt)', 'SBIPOS CARD (Cnt)', 'sbipos_card_cnt');
+            const sbipos_card_amt = num('SBIPOS-CARD (Amt)', 'SBIPOS CARD (Amt)', 'sbipos_card_amt');
+            const sbipos_bharatqr_cnt = num('SBIPOS BHARATQR (Cnt)', 'SBIPOS BharatQR (Cnt)', 'sbipos_bharatqr_cnt');
+            const sbipos_bharatqr_amt = num('SBIPOS BHARATQR (Amt)', 'SBIPOS BharatQR (Amt)', 'sbipos_bharatqr_amt');
+            const sbiepay_bharatqr_cnt = num('SBIEPAY BHARATQR (Cnt)', 'SBIEPAY BharatQR (Cnt)', 'sbiepay_bharatqr_cnt');
+            const sbiepay_bharatqr_amt = num('SBIEPAY BHARATQR (Amt)', 'SBIEPAY BharatQR (Amt)', 'sbiepay_bharatqr_amt');
+            const sbiepay_upi_cnt = num('SBIEPAY UPI (Cnt)', 'sbiepay_upi_cnt');
+            const sbiepay_upi_amt = num('SBIEPAY UPI (Amt)', 'sbiepay_upi_amt');
+            const sbiepay_cc_cnt = num('SBIEPAY Credit Card (Cnt)', 'SBIEPAY CC (Cnt)', 'sbiepay_cc_cnt');
+            const sbiepay_cc_amt = num('SBIEPAY Credit Card (Amt)', 'SBIEPAY CC (Amt)', 'sbiepay_cc_amt');
+            const sbiepay_dc_cnt = num('SBIEPAY Debit Card (Cnt)', 'SBIEPAY DC (Cnt)', 'sbiepay_dc_cnt');
+            const sbiepay_dc_amt = num('SBIEPAY Debit Card (Amt)', 'SBIEPAY DC (Amt)', 'sbiepay_dc_amt');
+            const sbiepay_neft_cnt = num('SBIEPAY NEFT (Cnt)', 'sbiepay_neft_cnt');
+            const sbiepay_neft_amt = num('SBIEPAY NEFT (Amt)', 'sbiepay_neft_amt');
+            const rtgs_cnt = num('RTGS (Cnt)', 'rtgs_cnt');
+            const rtgs_amt = num('RTGS (Amt)', 'rtgs_amt');
+            const wallet_cnt = num('Wallet (Cnt)', 'wallet_cnt');
+            const wallet_amt = num('Wallet (Amt)', 'wallet_amt');
+            const posb_cnt = num('POSB (Cnt)', 'posb_cnt');
+            const posb_amt = num('POSB (Amt)', 'posb_amt');
+            const ippb_cnt = num('IPPB (Cnt)', 'ippb_cnt');
+            const ippb_amt = num('IPPB (Amt)', 'ippb_amt');
+            const other_cnt = num('Other (Cnt)', 'other_cnt');
+            const other_amt = num('Other (Amt)', 'other_amt');
+
+            const total_digital_cnt = dqr_cnt + franchise_wallet_cnt + sbipos_card_cnt + sbipos_bharatqr_cnt + 
+                                      sbiepay_bharatqr_cnt + sbiepay_upi_cnt + sbiepay_cc_cnt + sbiepay_dc_cnt + 
+                                      sbiepay_neft_cnt + rtgs_cnt + wallet_cnt + posb_cnt + ippb_cnt + other_cnt;
+
+            const total_digital_amt = dqr_amt + franchise_wallet_amt + sbipos_card_amt + sbipos_bharatqr_amt + 
+                                      sbiepay_bharatqr_amt + sbiepay_upi_amt + sbiepay_cc_amt + sbiepay_dc_amt + 
+                                      sbiepay_neft_amt + rtgs_amt + wallet_amt + posb_amt + ippb_amt + other_amt;
+
+            validRecordsToInsert.push({
+              office_id,
+              office_name: office,
+              booking_date: validatedDate,
+              product: productVal,
+              cash_cnt, cash_amt,
+              ops_cnt, ops_amt,
+              postage_stamp_cnt, postage_stamp_amt,
+              service_stamp_cnt, service_stamp_amt,
+              franking_cnt, franking_amt,
+              contract_cnt, contract_amt,
+              dqr_cnt, dqr_amt,
+              franchise_wallet_cnt, franchise_wallet_amt,
+              sbipos_card_cnt, sbipos_card_amt,
+              sbipos_bharatqr_cnt, sbipos_bharatqr_amt,
+              sbiepay_bharatqr_cnt, sbiepay_bharatqr_amt,
+              sbiepay_upi_cnt, sbiepay_upi_amt,
+              sbiepay_cc_cnt, sbiepay_cc_amt,
+              sbiepay_dc_cnt, sbiepay_dc_amt,
+              sbiepay_neft_cnt, sbiepay_neft_amt,
+              rtgs_cnt, rtgs_amt,
+              wallet_cnt, wallet_amt,
+              posb_cnt, posb_amt,
+              ippb_cnt, ippb_amt,
+              other_cnt, other_amt,
+              total_digital_cnt, total_digital_amt,
+              imported_by: currentUserId
+            });
+          });
+
+          if (!validRecordsToInsert.length) {
+            return alert("No valid date and office rows found in the sheet.");
+          }
+
+          const { error } = await supabaseClient
+            .from('booking_performance')
+            .upsert(validRecordsToInsert, { onConflict: 'office_name,booking_date,product' });
+
+          if (error) throw error;
+
+          alert(`Successfully imported ${validRecordsToInsert.length} booking records!`);
+          $('bookingExcelFileInput').value = '';
+
+          const importedDates = [...new Set(validRecordsToInsert.map(r => r.booking_date))].sort();
+          if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'custom';
+          if ($('bookingFromDate')) $('bookingFromDate').value = importedDates[0];
+          if ($('bookingToDate')) $('bookingToDate').value = importedDates[importedDates.length - 1];
+
+          await loadBookingDashboardData();
+        } catch (err) {
+          alert("Excel import failed: " + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // 9. THEME CONVERTER ENGINE
+    function resetConverter() {
+      const origImg = $('converterOriginalImg');
+      const dropNotice = $('converterDropNotice');
+      const canvas = $('converterCanvas');
+      const emptyNotice = $('converterEmptyNotice');
+      const fileInput = $('converterFileInput');
+
+      if (fileInput) fileInput.value = '';
+
+      if (origImg) {
+        origImg.src = '';
+        origImg.classList.add('hidden');
+      }
+      if (dropNotice) {
+        dropNotice.classList.remove('hidden');
+      }
+
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 0;
+        canvas.height = 0;
+        canvas.classList.add('hidden');
+      }
+      if (emptyNotice) {
+        emptyNotice.classList.remove('hidden');
+      }
+    }
+
+    function processImageForConverter(fileOrBlob) {
+      if (!fileOrBlob || !fileOrBlob.type.startsWith('image/')) {
+        return alert("Please select or paste a valid image file!");
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const originalSrc = e.target.result;
+        
+        const origImg = $('converterOriginalImg');
+        const dropNotice = $('converterDropNotice');
+        
+        if (origImg) {
+          origImg.src = originalSrc;
+          origImg.classList.remove('hidden');
+        }
+        if (dropNotice) {
+          dropNotice.classList.add('hidden');
+        }
+
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = function() {
+          const canvas = $('converterCanvas');
+          const emptyNotice = $('converterEmptyNotice');
+          if (!canvas) return;
+
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext('2d');
+
+          ctx.drawImage(img, 0, 0);
+
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imgData.data;
+
+          for (let i = 0; i < data.length; i += 4) {
+            data[i] = 255 - data[i];         // Red
+            data[i + 1] = 255 - data[i + 1]; // Green
+            data[i + 2] = 255 - data[i + 2]; // Blue
+          }
+
+          ctx.putImageData(imgData, 0, 0);
+
+          canvas.classList.remove('hidden');
+          if (emptyNotice) emptyNotice.classList.add('hidden');
+        };
+        img.src = originalSrc;
+      };
+      reader.readAsDataURL(fileOrBlob);
+    }
+
+    function handleConverterFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) processImageForConverter(file);
+    }
+
+    function handleConverterDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const zone = $('converterDropZone');
+      if (zone) zone.classList.add('border-postGold-400', 'bg-slate-800');
+    }
+
+    function handleConverterDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const zone = $('converterDropZone');
+      if (zone) zone.classList.remove('border-postGold-400', 'bg-slate-800');
+    }
+
+    function handleConverterDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const zone = $('converterDropZone');
+      if (zone) zone.classList.remove('border-postGold-400', 'bg-slate-800');
+
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        processImageForConverter(dt.files[0]);
+      }
+    }
+
+    function downloadConvertedImage() {
+      const canvas = $('converterCanvas');
+      if (!canvas || canvas.classList.contains('hidden') || canvas.width === 0) {
+        return alert("Please upload or paste an image first to convert!");
+      }
+      const link = document.createElement('a');
+      link.download = `Converted_Light_Theme_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // 10. USER MANAGEMENT & PROFILES
     async function loadAllUsers() {
       const { data: users } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
       allLoadedUsers = users || [];
@@ -2432,555 +2969,670 @@
       doc.save(`User_Directory_${Date.now()}.pdf`);
     }
 
-    // 9. EXPORTS, MODALS & BATCH PRINT
-    async function exportMISExcel() {
-      if (!currentMISClaimsList.length) return alert("No records to export!");
-      const ws = XLSX.utils.json_to_sheet(currentMISClaimsList);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "MIS");
-      XLSX.writeFile(wb, `MIS_Export_${Date.now()}.xlsx`);
-    }
+    // 11. ADMIN ACTION & REPLY MODAL
+    function openReplyModal(claimId) {
+      const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
+                 || (rawMISMasterList && rawMISMasterList.find(c => String(c.id) === String(claimId)));
+                 
+      if (!claim) return alert("Claim record details not found.");
 
-    async function exportMISPDF() {
-      if (!currentMISClaimsList.length) return alert("No records to export!");
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape" });
-
-      if (cachedPdfLogoBase64) {
-        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 260, 6, 24, 16); } catch (e) {}
+      if ($('modalClaimId')) $('modalClaimId').value = claim.id;
+      if ($('modalStatus')) $('modalStatus').value = claim.claim_status || 'Pending';
+      if ($('modalDocStatus')) $('modalDocStatus').value = claim.doc_status || 'Approved';
+      if ($('modalAdminRemarks')) $('modalAdminRemarks').value = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
+      
+      if ($('modalSettlementDate')) {
+        $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
       }
 
-      doc.setFontSize(13);
-      doc.setTextColor(168, 15, 40);
-      doc.text("Refund Claims & Settlement TAT Report", 148.5, 12, { align: "center" });
+      clearModalUserPastedImage();
+      clearModalAdminPastedImage();
+      onModalStatusChanged();
 
-      const headers = [["Sl. No.", "Txn ID (Ref)", "Module", "Office", "Txn Date", "Settlement Date", "Amount (Rs)", "Status", "Admin Remarks"]];
-      const rows = currentMISClaimsList.map((c, idx) => [
-        idx + 1, c.txn_id_ref, c.module, c.raised_for_office, c.txn_date, c.settlement_date || "-", `Rs. ${c.txn_amount}`, c.claim_status, c.reply_remarks_admin || "-"
-      ]);
-
-      doc.autoTable({ head: headers, body: rows, startY: 26, theme: 'grid', headStyles: { fillColor: [168, 15, 40] }, styles: { fontSize: 8 } });
-      doc.save(`MIS_Report_${Date.now()}.pdf`);
+      if ($('replyModal')) $('replyModal').classList.remove('hidden');
     }
 
-    function printOfficeWiseReport() {
-      if (!rawMISMasterList.length) return alert("No claim records found in the current filtered period!");
-      const fromDateVal = $('filterFromDate')?.value || 'Inception';
-      const toDateVal = $('filterToDate')?.value || 'Current Date';
+    function closeModal() {
+      if ($('replyModal')) $('replyModal').classList.add('hidden');
+      clearModalUserPastedImage();
+      clearModalAdminPastedImage();
+    }
 
-      const officeStats = {};
-      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+    function onModalStatusChanged() {
+      const status = $('modalStatus') ? $('modalStatus').value : 'Pending';
+      const settlementContainer = $('modalSettlementDateContainer');
+      const pendingUserDocSection = $('modalPendingUserDocSection');
+      const settledAdminDocSection = $('modalSettledAdminDocSection');
 
-      rawMISMasterList.forEach(c => {
-        const off = c.raised_for_office || 'Unassigned';
-        const amt = parseFloat(c.txn_amount) || 0;
-        if (!officeStats[off]) {
-          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+      if (status === 'Settled' || status === 'Rejected') {
+        if (status === 'Settled') {
+          if (settlementContainer) settlementContainer.classList.remove('hidden');
+          if ($('modalSettlementDate') && !$('modalSettlementDate').value) {
+            $('modalSettlementDate').value = new Date().toISOString().split('T')[0];
+          }
+        } else {
+          if (settlementContainer) settlementContainer.classList.add('hidden');
         }
-        officeStats[off].registered++;
-        grandReg++;
+        if (pendingUserDocSection) pendingUserDocSection.classList.add('hidden');
+        if (settledAdminDocSection) settledAdminDocSection.classList.remove('hidden');
+      } else {
+        if (settlementContainer) settlementContainer.classList.add('hidden');
+        if (pendingUserDocSection) pendingUserDocSection.classList.remove('hidden');
+        if (settledAdminDocSection) settledAdminDocSection.classList.add('hidden');
+      }
+    }
 
-        if (c.claim_status === 'Pending') {
-          officeStats[off].pending++;
-          officeStats[off].activePendingAmount += amt;
-          grandPend++;
-          grandActiveAmt += amt;
-        } else if (c.claim_status === 'In Progress') {
-          officeStats[off].inprogress++;
-          officeStats[off].activePendingAmount += amt;
-          grandInp++;
-          grandActiveAmt += amt;
-        } else if (c.claim_status === 'Settled') {
-          officeStats[off].settled++;
-          grandSet++;
-        } else if (c.claim_status === 'Rejected') {
-          officeStats[off].rejected++;
-          grandRej++;
+    function clearModalUserPastedImage() {
+      modalUserPastedBlob = null;
+      if ($('modalUserReplaceFileInput')) $('modalUserReplaceFileInput').value = '';
+      if ($('modalUserPastedImagePreview')) $('modalUserPastedImagePreview').src = '';
+      if ($('modalUserPastedPreviewContainer')) $('modalUserPastedPreviewContainer').classList.add('hidden');
+    }
+
+    function clearModalAdminPastedImage() {
+      modalAdminPastedBlob = null;
+      if ($('modalAdminFileInput')) $('modalAdminFileInput').value = '';
+      if ($('modalAdminPastedImagePreview')) $('modalAdminPastedImagePreview').src = '';
+      if ($('modalAdminPastedPreviewContainer')) $('modalAdminPastedPreviewContainer').classList.add('hidden');
+    }
+
+    function handleModalUserFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      modalUserPastedBlob = file;
+      if (file.type.startsWith('image/')) {
+        if ($('modalUserPastedImagePreview')) {
+          $('modalUserPastedImagePreview').src = URL.createObjectURL(file);
+          $('modalUserPastedImagePreview').classList.remove('hidden');
         }
-      });
+      } else {
+        if ($('modalUserPastedImagePreview')) $('modalUserPastedImagePreview').classList.add('hidden');
+      }
+      if ($('modalUserPastedPreviewContainer')) $('modalUserPastedPreviewContainer').classList.remove('hidden');
+    }
+
+    function handleModalAdminFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      modalAdminPastedBlob = file;
+      if (file.type.startsWith('image/')) {
+        if ($('modalAdminPastedImagePreview')) {
+          $('modalAdminPastedImagePreview').src = URL.createObjectURL(file);
+          $('modalAdminPastedImagePreview').classList.remove('hidden');
+        }
+      } else {
+        if ($('modalAdminPastedImagePreview')) $('modalAdminPastedImagePreview').classList.add('hidden');
+      }
+      if ($('modalAdminPastedPreviewContainer')) $('modalAdminPastedPreviewContainer').classList.remove('hidden');
+    }
+
+    async function submitAdminReply() {
+      const id = $('modalClaimId') ? $('modalClaimId').value : null;
+      if (!id) return alert("Missing Claim ID.");
+
+      const status = $('modalStatus') ? $('modalStatus').value : 'Pending';
+      const docStatus = $('modalDocStatus') ? $('modalDocStatus').value : 'Approved';
+      const remarks = $('modalAdminRemarks') ? $('modalAdminRemarks').value.trim() : '';
+      const settlementDate = (status === 'Settled') ? ($('modalSettlementDate') ? $('modalSettlementDate').value : null) : null;
+
+      const saveBtn = $('btnAdminSave');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = "Saving..."; }
+
+      try {
+        let updatedUserFileUrl = null;
+        let updatedAdminFileUrl = null;
+
+        if (modalUserPastedBlob) {
+          const fileExt = modalUserPastedBlob.name ? modalUserPastedBlob.name.split('.').pop() : 'png';
+          const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${fileExt}`;
+          const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalUserPastedBlob, { upsert: true });
+          if (!err1) updatedUserFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+        }
+
+        if (modalAdminPastedBlob) {
+          const fileExt = modalAdminPastedBlob.name ? modalAdminPastedBlob.name.split('.').pop() : 'png';
+          const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${fileExt}`;
+          const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalAdminPastedBlob, { upsert: true });
+          if (!err2) updatedAdminFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+        }
+
+        const updateData = {
+          claim_status: status,
+          doc_status: docStatus,
+          reply_remarks_admin: remarks,
+          settlement_date: settlementDate
+        };
+
+        if (docStatus === 'Needs Revision') {
+          updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
+        } else {
+          updateData.doc_revision_remarks = null;
+        }
+
+        if (updatedUserFileUrl) {
+          updateData.file_url = updatedUserFileUrl;
+          updateData.doc_status = 'Approved';
+          updateData.doc_revision_remarks = null;
+        }
+
+        if (updatedAdminFileUrl) {
+          updateData.admin_file_url = updatedAdminFileUrl;
+        }
+
+        const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
+        if (error) {
+          alert("Error saving admin update: " + error.message);
+        } else {
+          alert("Admin action and remarks updated successfully!");
+          closeModal();
+          if (typeof loadClaimsSummary === 'function') await loadClaimsSummary();
+          if (typeof generateMISReport === 'function') await generateMISReport(currentMISReportFilter || 'All');
+        }
+      } catch (err) {
+        alert("Unexpected Error: " + err.message);
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "Save Changes"; }
+      }
+    }
+
+    // 12. DOCKET PRINTING ENGINE
+    function printClaimDetails(claimId) {
+      const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
+                 || (rawMISMasterList && rawMISMasterList.find(c => String(c.id) === String(claimId)))
+                 || (currentClaimsList && currentClaimsList.find(c => String(c.id) === String(claimId)));
+
+      if (!claim) return alert("Claim details not found for docket printing!");
+
+      const creatorEmpId = claim.profiles?.emp_id || 'N/A';
+      const creatorEmpName = claim.profiles?.emp_name || 'Staff';
+      const entryDateTime = formatDateTime(claim.created_at);
+
+      const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
+      const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('claims/'));
 
       const printWindow = window.open('', '_blank', 'width=950,height=850');
-      if (!printWindow) return alert("Popup blocked! Please allow popups to print office report.");
+      if (!printWindow) return alert("Popup blocked! Please allow popups for this site to print.");
 
-      const sortedOffices = Object.keys(officeStats).sort();
-      let tableRowsHtml = '';
-      sortedOffices.forEach((off, idx) => {
-        const s = officeStats[off];
-        tableRowsHtml += `
-          <tr>
-            <td style="text-align:center;">${idx + 1}</td>
-            <td style="font-weight:bold; color:#0f172a;">${off}</td>
-            <td style="text-align:center; font-weight:bold;">${s.registered}</td>
-            <td style="text-align:center; color:#b45309; font-weight:bold;">${s.pending}</td>
-            <td style="text-align:center; color:#1d4ed8; font-weight:bold;">${s.inprogress}</td>
-            <td style="text-align:center; color:#15803d; font-weight:bold;">${s.settled}</td>
-            <td style="text-align:center; color:#b91c1c; font-weight:bold;">${s.rejected}</td>
-            <td style="text-align:right; font-weight:bold; color:#991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
-          </tr>
-        `;
-      });
-
-      printWindow.document.open();
-      printWindow.document.write(`
+      const printHtml = `
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Office-wise Pendency & Status Report</title>
+          <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
           <style>
             @page { size: A4 portrait; margin: 10mm 12mm; }
-            body { font-family: sans-serif; color: #1e293b; padding: 14px; font-size: 11px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-            th { background: #A80F28; color: #fff; padding: 5px 6px; border: 1px solid #8A0C21; }
-            td { padding: 4.5px 6px; border: 1px solid #cbd5e1; }
-            .total-row { background: #fee2e2 !important; font-weight: bold; color: #881337; }
+            * { box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 14px; font-size: 11px; line-height: 1.3; background: #fff; }
+            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 10.5px; font-weight: bold; }
+            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 12.5px; font-weight: bold; text-align: right; }
+            .section-title { background: #FEF9C3; color: #8A0C21; padding: 3px 8px; font-weight: bold; font-size: 10.5px; margin: 8px 0 5px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
+            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            table.details-grid td { padding: 4px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: top; }
+            table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
+            table.details-grid td.value { width: 28%; color: #0f172a; }
+            .status-pill { display: inline-block; padding: 1.5px 8px; border-radius: 9999px; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
+            .status-Pending { background: #FEF9C3; color: #B45309; border: 1px solid #FACC15; }
+            .status-InProgress { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
+            .status-Settled { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+            .status-Rejected { background: #FFE4E6; color: #BE123C; border: 1px solid #FDA4AF; }
+            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; background: #fafaf9; margin-bottom: 6px; font-size: 11px; min-height: 26px; white-space: pre-wrap; word-break: break-word; }
+            .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
+            .attachments-grid { display: flex; gap: 10px; margin-top: 6px; justify-content: space-between; align-items: flex-start; }
+            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
+            .attachment-col strong { font-size: 10.5px; display: block; margin-bottom: 4px; text-align: left; }
+            .attachment-preview { max-width: 100%; max-height: 260px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
+            .attachment-link { font-size: 10.5px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
+            .end-of-doc { margin-top: 20px; padding-top: 10px; border-top: 1.5px dashed #94a3b8; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; letter-spacing: 2px; text-transform: uppercase; }
+            @media print { body { padding: 0; } .no-print { display: none; } .attachment-preview { max-height: 260px; } }
           </style>
         </head>
         <body>
-          <h2 style="color:#A80F28; margin:0;">Office-wise Pendency & Status Report</h2>
-          <p>Period: ${fromDateVal} to ${toDateVal}</p>
-          <table>
-            <thead>
-              <tr><th>#</th><th>Office Name</th><th>Registered</th><th>Pending</th><th>In Progress</th><th>Settled</th><th>Rejected</th><th>Pending + In Prog (Rs)</th></tr>
-            </thead>
-            <tbody>
-              ${tableRowsHtml}
-              <tr class="total-row"><td colspan="2" style="text-align:center;">GRAND TOTAL</td><td style="text-align:center;">${grandReg}</td><td style="text-align:center;">${grandPend}</td><td style="text-align:center;">${grandInp}</td><td style="text-align:center;">${grandSet}</td><td style="text-align:center;">${grandRej}</td><td style="text-align:right;">Rs. ${grandActiveAmt.toFixed(2)}</td></tr>
-            </tbody>
+          <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
+            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:7px 16px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🖨️ Print Now</button>
+            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:12px;">Close</button>
+          </div>
+
+          <div class="header-banner">
+            <div class="title-area">
+              <h1>Refund Claims Management Portal</h1>
+              <h2>Chennai City Central Division &bull; Complete Claim Registration Docket</h2>
+            </div>
+            <div class="ref-badge">TRANSACTION ID: ${claim.txn_id_ref}</div>
+          </div>
+
+          <div class="section-title">1. REGISTRATION &amp; APPLICANT DETAILS</div>
+          <table class="details-grid">
+            <tr>
+              <td class="label">Created By Employee:</td>
+              <td class="value"><strong>${creatorEmpName}</strong></td>
+              <td class="label">Employee ID:</td>
+              <td class="value"><strong>${creatorEmpId}</strong></td>
+            </tr>
+            <tr>
+              <td class="label">Raised For Office:</td>
+              <td class="value">${claim.raised_for_office}</td>
+              <td class="label">User Contact Mobile:</td>
+              <td class="value font-mono">${claim.user_mobile || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td class="label">Date &amp; Time of Entry:</td>
+              <td class="value">${entryDateTime}</td>
+              <td class="label">Current Status:</td>
+              <td class="value">
+                <span class="status-pill status-${(claim.claim_status || 'Pending').replace(/\s+/g, '')}">
+                  ${claim.claim_status}
+                </span>
+              </td>
+            </tr>
           </table>
-          <script>window.onload = function() { window.print(); };<\/script>
+
+          <div class="section-title">2. TRANSACTION &amp; POSTAL CLAIM DATA</div>
+          <table class="details-grid">
+            <tr>
+              <td class="label">Module:</td>
+              <td class="value"><strong>${claim.module}</strong></td>
+              <td class="label">Article Number:</td>
+              <td class="value"><strong>${claim.article_number}</strong></td>
+            </tr>
+            <tr>
+              <td class="label">Transaction ID / Ref:</td>
+              <td class="value" style="font-family: monospace; font-weight:bold;">${claim.txn_id_ref}</td>
+              <td class="label">RRN Number:</td>
+              <td class="value" style="font-family: monospace;">${claim.rrn_number || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td class="label">Transaction Date:</td>
+              <td class="value">${claim.txn_date}</td>
+              <td class="label">Transaction Amount:</td>
+              <td class="value" style="font-size: 11.5px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
+            </tr>
+            <tr>
+              <td class="label">Payment Channel:</td>
+              <td class="value">${claim.payment_channel}</td>
+              <td class="label">Settlement Date:</td>
+              <td class="value"><strong>${claim.settlement_date || 'Pending'}</strong></td>
+            </tr>
+          </table>
+
+          <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
+          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#475569;">Remarks by User:</div>
+          <div class="remarks-box">${claim.remarks_by_user || 'No remarks entered.'}</div>
+
+          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
+          <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Response from Admin.'}</div>
+
+          <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
+          <div class="attachments-grid">
+            <div class="attachment-col">
+              <strong>Primary User Document:</strong>
+              ${isUserImage 
+                ? `<img src="${claim.file_url}" class="attachment-preview" alt="User Document">`
+                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View Primary File</a>` : '<em>No file attached.</em>')
+              }
+            </div>
+
+            ${claim.admin_file_url ? `
+              <div class="attachment-col">
+                <strong style="color: #991b1b;">Admin Resolution Document:</strong>
+                ${isAdminImage 
+                  ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
+                  : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`
+                }
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="end-of-doc">
+            *** END OF DOCUMENT ***
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 500);
+            };
+          <\/script>
         </body>
         </html>
-      `);
+      `;
+
+      printWindow.document.open();
+      printWindow.document.write(printHtml);
       printWindow.document.close();
     }
 
-    async function exportBookingReportImage() {
-      if (!bookingImportedRecords.length) return alert("No booking data available to export as image!");
-      const fromVal = $('bookingFromDate')?.value || 'Inception';
-      const toVal = $('bookingToDate')?.value || 'CurrentDate';
-      const fileName = `Office-wise Digital Adoption-${fromVal}-${toVal}.png`;
+    function batchPrintDockets() {
+      const printList = (currentMISClaimsList && currentMISClaimsList.length > 0)
+        ? currentMISClaimsList
+        : ((currentClaimsList && currentClaimsList.length > 0) ? currentClaimsList : rawClaimsList);
 
-      const selectedChannels = activeSelectedChannelKeys;
-      const officeMap = {};
-      let totalCashCnt = 0, totalDigCnt = 0;
+      if (!printList || printList.length === 0) {
+        return alert("No claim records available in the current filter to print.");
+      }
 
-      bookingImportedRecords.forEach(r => {
-        const off = r.office_name || 'Unassigned';
-        const c_cnt = parseFloat(r.cash_cnt) || 0;
-        let d_cnt = 0;
-        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          if (selectedChannels.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
-        });
+      if (printList.length > 50) {
+        if (!confirm(`You are about to print ${printList.length} claim dockets at once. Proceed?`)) {
+          return;
+        }
+      }
 
-        totalCashCnt += c_cnt;
-        totalDigCnt += d_cnt;
-        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
-        officeMap[off].cash_cnt += c_cnt;
-        officeMap[off].dig_cnt += d_cnt;
-      });
+      const printWindow = window.open('', '_blank', 'width=950,height=850');
+      if (!printWindow) return alert("Popup blocked! Please allow popups to batch print.");
 
-      const totalBookings = totalCashCnt + totalDigCnt;
-      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+      let allDocketsHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Batch Refund Claim Dockets (${printList.length} Records)</title>
+          <style>
+            @page { size: A4 portrait; margin: 10mm 12mm; }
+            * { box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 0; font-size: 11px; line-height: 1.3; background: #fff; }
+            .docket-page { padding: 14px; page-break-after: always; min-height: 98vh; position: relative; }
+            .docket-page:last-child { page-break-after: auto; }
+            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 10.5px; font-weight: bold; }
+            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 12.5px; font-weight: bold; text-align: right; }
+            .section-title { background: #FEF9C3; color: #8A0C21; padding: 3px 8px; font-weight: bold; font-size: 10.5px; margin: 8px 0 5px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
+            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            table.details-grid td { padding: 4px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: top; }
+            table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
+            table.details-grid td.value { width: 28%; color: #0f172a; }
+            .status-pill { display: inline-block; padding: 1.5px 8px; border-radius: 9999px; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
+            .status-Pending { background: #FEF9C3; color: #B45309; border: 1px solid #FACC15; }
+            .status-InProgress { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
+            .status-Settled { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+            .status-Rejected { background: #FFE4E6; color: #BE123C; border: 1px solid #FDA4AF; }
+            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; background: #fafaf9; margin-bottom: 6px; font-size: 11px; min-height: 26px; white-space: pre-wrap; word-break: break-word; }
+            .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
+            .attachments-grid { display: flex; gap: 10px; margin-top: 6px; justify-content: space-between; align-items: flex-start; }
+            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
+            .attachment-col strong { font-size: 10.5px; display: block; margin-bottom: 4px; text-align: left; }
+            .attachment-preview { max-width: 100%; max-height: 260px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
+            .attachment-link { font-size: 10.5px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
+            .end-of-doc { margin-top: 20px; padding-top: 10px; border-top: 1.5px dashed #94a3b8; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; letter-spacing: 2px; text-transform: uppercase; }
+            @media print { .no-print { display: none !important; } .docket-page { padding: 0 0 10px 0; } .attachment-preview { max-height: 260px; } }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px; position: sticky; top: 0; z-index: 1000;">
+            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:7px 16px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🖨️ Print ${printList.length} Dockets</button>
+            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:12px;">Close</button>
+          </div>
+      `;
 
-      const sortedOffices = Object.keys(officeMap).map(name => {
-        const o = officeMap[name];
-        const tot = o.cash_cnt + o.dig_cnt;
-        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
-        return { name, ...o, tot, pct };
-      }).sort((a, b) => b.pct - a.pct);
+      printList.forEach((claim, idx) => {
+        const creatorEmpId = claim.profiles?.emp_id || 'N/A';
+        const creatorEmpName = claim.profiles?.emp_name || 'Staff';
+        const entryDateTime = formatDateTime(claim.created_at);
 
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.top = '-9999px';
-      container.style.left = '-9999px';
-      container.style.width = '800px';
-      container.style.backgroundColor = '#FFFFFF';
-      container.style.padding = '20px';
-      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
+        const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('claims/'));
 
-      let rowsHtml = '';
-      sortedOffices.forEach((o, i) => {
-        rowsHtml += `
-          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
-            <td style="padding: 7px; text-align: center; font-weight: bold; font-family: monospace;">#${i + 1}</td>
-            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${o.name}</td>
-            <td style="padding: 7px; text-align: center; font-weight: 600;">${o.cash_cnt.toLocaleString('en-IN')}</td>
-            <td style="padding: 7px; text-align: center; font-weight: bold; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
-            <td style="padding: 7px; text-align: center; font-weight: 800; color: #15803d; background: #f0fdf4;">${o.pct.toFixed(2)}%</td>
-          </tr>
+        allDocketsHtml += `
+          <div class="docket-page">
+            <div class="header-banner">
+              <div class="title-area">
+                <h1>Refund Claims Management Portal</h1>
+                <h2>Chennai City Central Division &bull; Claim Docket [${idx + 1} of ${printList.length}]</h2>
+              </div>
+              <div class="ref-badge">TRANSACTION ID: ${claim.txn_id_ref || '-'}</div>
+            </div>
+
+            <div class="section-title">1. REGISTRATION &amp; APPLICANT DETAILS</div>
+            <table class="details-grid">
+              <tr>
+                <td class="label">Created By Employee:</td>
+                <td class="value"><strong>${creatorEmpName}</strong></td>
+                <td class="label">Employee ID:</td>
+                <td class="value"><strong>${creatorEmpId}</strong></td>
+              </tr>
+              <tr>
+                <td class="label">Raised For Office:</td>
+                <td class="value">${claim.raised_for_office || '-'}</td>
+                <td class="label">User Contact Mobile:</td>
+                <td class="value font-mono">${claim.user_mobile || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td class="label">Date &amp; Time of Entry:</td>
+                <td class="value">${entryDateTime}</td>
+                <td class="label">Current Status:</td>
+                <td class="value">
+                  <span class="status-pill status-${(claim.claim_status || 'Pending').replace(/\s+/g, '')}">
+                    ${claim.claim_status || 'Pending'}
+                  </span>
+                </td>
+              </tr>
+            </table>
+
+            <div class="section-title">2. TRANSACTION &amp; POSTAL CLAIM DATA</div>
+            <table class="details-grid">
+              <tr>
+                <td class="label">Module:</td>
+                <td class="value"><strong>${claim.module || '-'}</strong></td>
+                <td class="label">Article Number:</td>
+                <td class="value"><strong>${claim.article_number || '-'}</strong></td>
+              </tr>
+              <tr>
+                <td class="label">Transaction ID / Ref:</td>
+                <td class="value" style="font-family: monospace; font-weight:bold;">${claim.txn_id_ref || '-'}</td>
+                <td class="label">RRN Number:</td>
+                <td class="value" style="font-family: monospace;">${claim.rrn_number || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td class="label">Transaction Date:</td>
+                <td class="value">${claim.txn_date || '-'}</td>
+                <td class="label">Transaction Amount:</td>
+                <td class="value" style="font-size: 11.5px; font-weight:bold; color: #166534;">₹${claim.txn_amount || '0'}</td>
+              </tr>
+              <tr>
+                <td class="label">Payment Channel:</td>
+                <td class="value">${claim.payment_channel || '-'}</td>
+                <td class="label">Settlement Date:</td>
+                <td class="value"><strong>${claim.settlement_date || 'Pending'}</strong></td>
+              </tr>
+            </table>
+
+            <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
+            <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#475569;">Remarks by User:</div>
+            <div class="remarks-box">${claim.remarks_by_user || 'No remarks entered.'}</div>
+
+            <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
+            <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Response from Admin.'}</div>
+
+            <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
+            <div class="attachments-grid">
+              <div class="attachment-col">
+                <strong>Primary User Document:</strong>
+                ${isUserImage 
+                  ? `<img src="${claim.file_url}" class="attachment-preview" alt="User Document">`
+                  : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View Primary File</a>` : '<em>No file attached.</em>')
+                }
+              </div>
+
+              ${claim.admin_file_url ? `
+                <div class="attachment-col">
+                  <strong style="color: #991b1b;">Admin Resolution Document:</strong>
+                  ${isAdminImage 
+                    ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
+                    : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`
+                  }
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="end-of-doc">
+              *** END OF DOCKET [${claim.txn_id_ref || ''}] ***
+            </div>
+          </div>
         `;
       });
 
-      container.innerHTML = `
-        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
-          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Digital vs Cash Transaction Performance Report</h2>
-              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Leaderboard</p>
-              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
-          </div>
-
-          <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
-                <th style="padding: 8px; text-align: center; width: 10%;">Rank</th>
-                <th style="padding: 8px; width: 45%;">Office Name</th>
-                <th style="padding: 8px; text-align: center; width: 15%;">Cash Txn (Cnt)</th>
-                <th style="padding: 8px; text-align: center; width: 15%;">Digital Txn (Cnt)</th>
-                <th style="padding: 8px; text-align: center; width: 15%;">Digital % Share</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
-                <td style="padding: 8px; text-align: center; font-family: monospace;">Σ</td>
-                <td style="padding: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
-                <td style="padding: 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
-                <td style="padding: 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
-                <td style="padding: 8px; text-align: center; color: #FACC15; font-size: 12px;">${totalDigShare}%</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      allDocketsHtml += `
+          <script>
+            window.onload = function() {
+              setTimeout(function() { window.print(); }, 800);
+            };
+          <\/script>
+        </body>
+        </html>
       `;
 
-      document.body.appendChild(container);
-      try {
-        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      } catch (err) {
-        alert("Image export failed: " + err.message);
-      } finally {
-        document.body.removeChild(container);
-      }
+      printWindow.document.open();
+      printWindow.document.write(allDocketsHtml);
+      printWindow.document.close();
     }
 
-    async function exportBookingReportPDF() {
-      if (!bookingImportedRecords.length) return alert("No performance data to export!");
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "portrait" });
+    // 13. GLOBAL CLIPBOARD (CTRL + V) SCREENSHOT ENGINE
+    window.addEventListener('paste', async (e) => {
+      const activeEl = document.activeElement;
+      const activeTag = activeEl ? activeEl.tagName.toLowerCase() : '';
+      const isTextInput = activeTag === 'textarea' || (activeTag === 'input' && ['text', 'password', 'tel', 'number', 'search'].includes(activeEl.type));
 
-      if (cachedPdfLogoBase64) {
-        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 169, 8, 27, 18); } catch (e) {}
+      const items = (e.clipboardData || (e.originalEvent && e.originalEvent.clipboardData))?.items;
+      if (!items) return;
+
+      let imageBlob = null;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          imageBlob = item.getAsFile();
+          break;
+        }
       }
 
-      doc.setFontSize(13);
-      doc.setTextColor(168, 15, 40);
-      doc.text("Digital vs Cash Transaction Performance Report", 105, 14, { align: "center" });
-      doc.setFontSize(9.5);
-      doc.setTextColor(180, 83, 9);
-      doc.text("Chennai City Central Division • Booking Performance Monitoring", 105, 19, { align: "center" });
+      if (!imageBlob) return;
+      e.preventDefault();
 
-      const fromVal = $('bookingFromDate')?.value || 'Inception';
-      const toVal = $('bookingToDate')?.value || 'Current Date';
-      doc.setFontSize(8);
-      doc.setTextColor(51, 65, 85);
-      doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 105, 24, { align: "center" });
+      const replyModal = $('replyModal');
+      const registerClaimView = $('registerClaimView');
+      const converterView = $('converterTabView');
+      const reuploadModal = $('reuploadModal');
 
-      const officeMap = {};
-      let totalCashCnt = 0, totalDigCnt = 0;
+      if (replyModal && !replyModal.classList.contains('hidden')) {
+        const currentStatus = $('modalStatus')?.value || 'Pending';
 
-      bookingImportedRecords.forEach(r => {
-        const off = r.office_name || 'Unassigned';
-        const c_cnt = parseFloat(r.cash_cnt) || 0;
-        let d_cnt = 0;
-        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          if (activeSelectedChannelKeys.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
-        });
-
-        totalCashCnt += c_cnt;
-        totalDigCnt += d_cnt;
-        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
-        officeMap[off].cash_cnt += c_cnt;
-        officeMap[off].dig_cnt += d_cnt;
-      });
-
-      const totalBookings = totalCashCnt + totalDigCnt;
-      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
-
-      const rows = Object.keys(officeMap).map(name => {
-        const o = officeMap[name];
-        const tot = o.cash_cnt + o.dig_cnt;
-        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
-        return { name, ...o, tot, pct };
-      }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
-        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), o.dig_cnt.toLocaleString('en-IN'), `${o.pct.toFixed(2)}%`
-      ]);
-
-      rows.push(['Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
-
-      doc.autoTable({
-        head: [["Rank", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
-        body: rows,
-        startY: 30,
-        theme: 'grid',
-        headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
-        styles: { fontSize: 8 },
-        didParseCell: function(data) {
-          if (data.row.index === rows.length - 1) {
-            data.cell.styles.fillColor = [168, 15, 40];
-            data.cell.styles.textColor = [255, 255, 255];
-            data.cell.styles.fontStyle = 'bold';
+        if (currentStatus === 'Settled' || currentStatus === 'Rejected') {
+          modalAdminPastedBlob = imageBlob;
+          if ($('modalAdminFileInput')) $('modalAdminFileInput').value = '';
+          
+          const preview = $('modalAdminPastedImagePreview');
+          if (preview) {
+            preview.src = URL.createObjectURL(imageBlob);
+            preview.classList.remove('hidden');
           }
+          const container = $('modalAdminPastedPreviewContainer');
+          if (container) container.classList.remove('hidden');
+        } else {
+          modalUserPastedBlob = imageBlob;
+          if ($('modalUserReplaceFileInput')) $('modalUserReplaceFileInput').value = '';
+
+          const preview = $('modalUserPastedImagePreview');
+          if (preview) {
+            preview.src = URL.createObjectURL(imageBlob);
+            preview.classList.remove('hidden');
+          }
+          const container = $('modalUserPastedPreviewContainer');
+          if (container) container.classList.remove('hidden');
         }
-      });
-
-      doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
-    }
-
-    async function exportMISReportImage() {
-      if (!currentMISClaimsList.length) return alert("No MIS report data available to export as image!");
-      const fromVal = $('filterFromDate')?.value || 'Inception';
-      const toVal = $('filterToDate')?.value || 'CurrentDate';
-      const fileName = `MIS_Report_${currentMISReportFilter}_${fromVal}_to_${toVal}.png`;
-
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.top = '-9999px';
-      container.style.left = '-9999px';
-      container.style.width = '1050px';
-      container.style.backgroundColor = '#FFFFFF';
-      container.style.padding = '20px';
-      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-
-      let rowsHtml = '';
-      currentMISClaimsList.forEach((c, idx) => {
-        const isSettled = c.claim_status === 'Settled';
-        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
-        rowsHtml += `
-          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 10px;">
-            <td style="padding: 6px; text-align: center;">${idx + 1}</td>
-            <td style="padding: 6px; font-weight: bold; font-family: monospace; color: #a80f28;">${c.txn_id_ref}</td>
-            <td style="padding: 6px;">${c.profiles?.emp_name || 'Staff'}</td>
-            <td style="padding: 6px;">${c.module}</td>
-            <td style="padding: 6px;">${c.raised_for_office}</td>
-            <td style="padding: 6px;">${c.txn_date}</td>
-            <td style="padding: 6px;">${settleDate}</td>
-            <td style="padding: 6px; text-align: right; font-weight: bold;">₹${c.txn_amount}</td>
-            <td style="padding: 6px; font-weight: bold;">${c.claim_status}</td>
-            <td style="padding: 6px; font-size: 9.5px;">${c.reply_remarks_admin || '-'}</td>
-          </tr>
-        `;
-      });
-
-      container.innerHTML = `
-        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
-          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Refund Claims & Settlement TAT Report (${currentMISReportFilter})</h2>
-              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Claims & Turnaround Statement</p>
-              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Records: <strong>${currentMISClaimsList.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
-          </div>
-
-          <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-              <tr style="background: #8A0C21; color: #ffffff; font-size: 10.5px; font-weight: bold;">
-                <th style="padding: 7px; text-align: center; width: 4%;">#</th>
-                <th style="padding: 7px; width: 14%;">Ref No</th>
-                <th style="padding: 7px; width: 13%;">Raised By</th>
-                <th style="padding: 7px; width: 8%;">Module</th>
-                <th style="padding: 7px; width: 14%;">Office Name</th>
-                <th style="padding: 7px; width: 9%;">Txn Date</th>
-                <th style="padding: 7px; width: 9%;">Settle Date</th>
-                <th style="padding: 7px; text-align: right; width: 9%;">Amount</th>
-                <th style="padding: 7px; width: 8%;">Status</th>
-                <th style="padding: 7px; width: 12%;">Admin Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      document.body.appendChild(container);
-      try {
-        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      } catch (err) {
-        alert("Image export failed: " + err.message);
-      } finally {
-        document.body.removeChild(container);
+        return;
       }
-    }
 
-    async function exportOfficeWiseImage() {
-      if (!rawMISMasterList.length) return alert("No office pendency data available to export as image!");
-
-      const fromVal = $('filterFromDate')?.value || 'Inception';
-      const toVal = $('filterToDate')?.value || 'CurrentDate';
-      const fileName = `Office_Wise_Pendency_${fromVal}_to_${toVal}.png`;
-
-      const officeStats = {};
-      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
-
-      rawMISMasterList.forEach(c => {
-        const off = c.raised_for_office || 'Unassigned';
-        const amt = parseFloat(c.txn_amount) || 0;
-        if (!officeStats[off]) {
-          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
-        }
-        officeStats[off].registered++;
-        grandReg++;
-
-        if (c.claim_status === 'Pending') {
-          officeStats[off].pending++;
-          officeStats[off].activePendingAmount += amt;
-          grandPend++;
-          grandActiveAmt += amt;
-        } else if (c.claim_status === 'In Progress') {
-          officeStats[off].inprogress++;
-          officeStats[off].activePendingAmount += amt;
-          grandInp++;
-          grandActiveAmt += amt;
-        } else if (c.claim_status === 'Settled') {
-          officeStats[off].settled++;
-          grandSet++;
-        } else if (c.claim_status === 'Rejected') {
-          officeStats[off].rejected++;
-          grandRej++;
-        }
-      });
-
-      const sortedOffices = Object.keys(officeStats).sort();
-
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.top = '-9999px';
-      container.style.left = '-9999px';
-      container.style.width = '900px';
-      container.style.backgroundColor = '#FFFFFF';
-      container.style.padding = '20px';
-      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-
-      let rowsHtml = '';
-      sortedOffices.forEach((off, idx) => {
-        const s = officeStats[off];
-        rowsHtml += `
-          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
-            <td style="padding: 7px; text-align: center;">${idx + 1}</td>
-            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${off}</td>
-            <td style="padding: 7px; text-align: center; font-weight: bold;">${s.registered}</td>
-            <td style="padding: 7px; text-align: center; color: #b45309; font-weight: bold;">${s.pending}</td>
-            <td style="padding: 7px; text-align: center; color: #1d4ed8; font-weight: bold;">${s.inprogress}</td>
-            <td style="padding: 7px; text-align: center; color: #15803d; font-weight: bold;">${s.settled}</td>
-            <td style="padding: 7px; text-align: center; color: #b91c1c; font-weight: bold;">${s.rejected}</td>
-            <td style="padding: 7px; text-align: right; font-weight: bold; color: #991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
-          </tr>
-        `;
-      });
-
-      container.innerHTML = `
-        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
-          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Office-wise Pendency & Status Breakdown</h2>
-              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Matrix</p>
-              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
-          </div>
-
-          <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
-                <th style="padding: 8px; text-align: center; width: 5%;">#</th>
-                <th style="padding: 8px; width: 33%;">Office Name</th>
-                <th style="padding: 8px; text-align: center; width: 10%;">Registered</th>
-                <th style="padding: 8px; text-align: center; width: 10%;">Pending</th>
-                <th style="padding: 8px; text-align: center; width: 11%;">In Progress</th>
-                <th style="padding: 8px; text-align: center; width: 9%;">Settled</th>
-                <th style="padding: 8px; text-align: center; width: 9%;">Rejected</th>
-                <th style="padding: 8px; text-align: right; width: 13%;">Pending + In Prog (Rs)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
-                <td colspan="2" style="padding: 8px; text-align: center; letter-spacing: 0.5px;">GRAND TOTAL (${sortedOffices.length} Offices)</td>
-                <td style="padding: 8px; text-align: center;">${grandReg}</td>
-                <td style="padding: 8px; text-align: center;">${grandPend}</td>
-                <td style="padding: 8px; text-align: center;">${grandInp}</td>
-                <td style="padding: 8px; text-align: center;">${grandSet}</td>
-                <td style="padding: 8px; text-align: center;">${grandRej}</td>
-                <td style="padding: 8px; text-align: right; color: #FACC15;">Rs. ${grandActiveAmt.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      document.body.appendChild(container);
-      try {
-        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      } catch (err) {
-        alert("Image export failed: " + err.message);
-      } finally {
-        document.body.removeChild(container);
+      if (reuploadModal && !reuploadModal.classList.contains('hidden')) {
+        userPastedImageBlob = imageBlob;
+        if ($('reuploadFileInput')) $('reuploadFileInput').value = '';
+        alert(`Screenshot captured from clipboard (${(imageBlob.size / 1024).toFixed(1)} KB) and attached!`);
+        return;
       }
-    }
 
-    function handleConverterFileSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        $('converterOriginalImg').src = ev.target.result;
-        $('converterOriginalImg').classList.remove('hidden');
-        $('converterDropNotice').classList.add('hidden');
-        
-        $('converterResultImg').src = ev.target.result;
-        $('converterResultImg').classList.remove('hidden');
-        $('converterEmptyNotice').classList.add('hidden');
-        $('converterResultImg').style.filter = 'invert(1) hue-rotate(180deg) contrast(1.2)';
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function downloadConvertedImage() {
-      alert("Note: True bit-level dark-to-light conversion requires backend processing. Displaying CSS filter mockup.");
-    }
-
-    function handleBookingExcelUpload(e) {
-      const file = e.target.files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = async function(evt) {
-        try {
-          const data = new Uint8Array(evt.target.result);
-          const workbook = XLSX.read(data, {type: 'array'});
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(sheet);
-          alert(`Successfully simulated import of ${json.length} booking records.`);
-          $('bookingExcelFileInput').value = '';
-        } catch(error) {
-          alert("Error parsing excel file.");
+      if (converterView && !converterView.classList.contains('hidden')) {
+        if (typeof processImageForConverter === 'function') {
+          processImageForConverter(imageBlob);
         }
-      };
-      reader.readAsArrayBuffer(file);
-    }
+        return;
+      }
 
-    // 10. INITIALIZATION LISTENER
+      if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
+        userPastedImageBlob = imageBlob;
+
+        if ($('claimFile')) $('claimFile').value = '';
+        if ($('pdfFilePreviewBlock')) $('pdfFilePreviewBlock').classList.add('hidden');
+
+        const preview = $('userPastedImagePreview');
+        if (preview) {
+          preview.src = URL.createObjectURL(imageBlob);
+          preview.classList.remove('hidden');
+        }
+        const container = $('userPastedPreviewContainer');
+        if (container) container.classList.remove('hidden');
+
+        const sizeEl = $('userPastedImageSize');
+        if (sizeEl) sizeEl.innerText = `Clipboard Screenshot: ${(imageBlob.size / 1024).toFixed(1)} KB`;
+        return;
+      }
+
+      userPastedImageBlob = imageBlob;
+      const preview = $('userPastedImagePreview');
+      if (preview) {
+        preview.src = URL.createObjectURL(imageBlob);
+        preview.classList.remove('hidden');
+      }
+      const container = $('userPastedPreviewContainer');
+      if (container) container.classList.remove('hidden');
+    });
+
+    // 14. INITIALIZATION LISTENER
     document.addEventListener('DOMContentLoaded', () => {
-      loadLogoFromDatabase();
+      if (typeof loadLogoFromDatabase === 'function') {
+        loadLogoFromDatabase();
+      }
+
       supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) initApp();
+        if (session?.user && typeof initApp === 'function') {
+          initApp();
+        }
+      }).catch(err => {
+        console.warn("Session retrieval failed:", err);
       });
+
+      const userDropZone = $('userPasteDropZone');
+      if (userDropZone) {
+        userDropZone.addEventListener('click', () => userDropZone.focus());
+      }
+
+      const converterDropZone = $('converterDropZone');
+      if (converterDropZone) {
+        converterDropZone.addEventListener('click', () => converterDropZone.focus());
+      }
+
+      const modalUserDropZone = $('modalUserPasteDropZone');
+      if (modalUserDropZone) {
+        modalUserDropZone.addEventListener('click', () => modalUserDropZone.focus());
+      }
+
+      const modalAdminDropZone = $('modalAdminPasteDropZone');
+      if (modalAdminDropZone) {
+        modalAdminDropZone.addEventListener('click', () => modalAdminDropZone.focus());
+      }
+
+      const txnInput = $('claimTxnId');
+      const rrnInput = $('claimRrn');
+      const channelSelect = $('claimChannel');
+
+      if (txnInput && rrnInput) {
+        txnInput.addEventListener('input', (e) => {
+          if (!isRrnManuallyEdited && channelSelect?.value === 'SBI POS') {
+            rrnInput.value = e.target.value.trim();
+          }
+        });
+
+        rrnInput.addEventListener('input', (e) => {
+          isRrnManuallyEdited = (rrnInput.value.trim() !== txnInput.value.trim());
+        });
+      }
     });
   </script>
 </body>
