@@ -164,7 +164,7 @@
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
             <div class="col-span-2">
               <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Search (Ref / Article / Name / Office)</label>
-              <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type to search..." class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type to filter..." class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Module</label>
@@ -492,13 +492,14 @@
             </div>
           </div>
 
-          <!-- CONSOLIDATED SUMMARY MATRICES -->
+          <!-- CONSOLIDATED SUMMARY MATRICES (ALL 3 TABLES FULLY RESTORED) -->
           <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
             <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
               <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
             </h4>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
+              <!-- 1. Module Table -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
                   1. Module-wise Breakdown (Pending + In Progress Value)
@@ -518,6 +519,7 @@
                 </table>
               </div>
 
+              <!-- 2. Status Table -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
                   2. Status-wise Financial Summary
@@ -535,6 +537,7 @@
                 </table>
               </div>
 
+              <!-- 3. Office-wise Matrix with Printout -->
               <div class="lg:col-span-2 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
                   <div class="flex items-center gap-1.5">
@@ -696,8 +699,8 @@
             </div>
           </div>
 
-          <!-- OFFICE PERFORMANCE COMPARISON TABLE -->
-          <div id="bookingTableCaptureArea" class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white p-2">
+          <!-- OFFICE PERFORMANCE COMPARISON TABLE (SCROLLABLE UI) -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white p-2">
             <div class="bg-slate-100 p-2 font-bold text-slate-700 text-xs flex justify-between items-center rounded-t-lg">
               <span>🏆 Office-wise Digital Adoption &amp; Cash Comparison Leaderboard</span>
               <span class="text-[11px] text-slate-500 font-normal">Ranked by Digital Adoption %</span>
@@ -797,9 +800,9 @@
         </div>
       </div>
 
-      <!-- ADMIN EDIT/REPLY MODAL -->
+      <!-- ADMIN EDIT/REPLY MODAL (TWO ATTACHMENT TYPES WITH FILE & CLIPBOARD PASTE SUPPORT) -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
+        <div class="bg-white rounded-2xl p-5 max-w-xl w-full space-y-3 shadow-2xl border-t-8 border-postRed-600 max-h-[90vh] overflow-y-auto">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
             <h3 class="font-bold text-sm text-postRed-700">Admin Action &amp; Document Quality Review</h3>
             <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer leading-none">&times;</button>
@@ -832,15 +835,50 @@
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-0.5">Admin Remarks / Reason for Document Revision</label>
+            <label class="block text-xs font-bold text-slate-700 mb-0.5">Admin Remarks / Instructions</label>
             <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
           </div>
 
-          <!-- ADMIN DIRECT REPLACE -->
-          <div class="p-2.5 bg-amber-50 rounded border border-amber-200 space-y-1 text-xs">
-            <label class="block font-bold text-postRed-900">Admin Direct Document Replacement (Optional)</label>
-            <input type="file" id="modalAdminDirectReplaceFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border p-1 rounded text-xs bg-white">
-            <span class="text-[10px] text-slate-500 italic block">Upload here if you want to replace the user document directly yourself.</span>
+          <!-- ATTACHMENT SECTION 1: USER REPLACEMENT DOCUMENT (FOR ILLEGIBLE CASES) -->
+          <div class="p-2.5 bg-rose-50/70 rounded-xl border border-rose-200 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center">
+              <label class="font-bold text-rose-900">1. Replace User Uploaded Document (If Illegible/Wrong)</label>
+              <span class="text-[10px] text-rose-700 font-semibold">Overrides User Doc</span>
+            </div>
+            <input type="file" id="modalUserReplaceFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalUserFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+            
+            <div id="modalUserPasteDropZone" tabindex="0" class="border border-dashed border-rose-300 hover:border-rose-600 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+              <p class="text-[11px] font-bold text-rose-800">📋 Click &amp; press <kbd class="bg-rose-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Replacement Image</p>
+            </div>
+
+            <div id="modalUserPastedPreviewContainer" class="hidden relative border border-rose-300 rounded p-1.5 bg-rose-50 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img id="modalUserPastedImagePreview" src="" alt="Replacement User Preview" class="h-10 w-15 object-cover rounded border border-rose-200">
+                <span class="text-rose-800 font-bold text-xs">✓ User Replacement File Attached</span>
+              </div>
+              <button type="button" onclick="clearModalUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold underline cursor-pointer">Remove</button>
+            </div>
+          </div>
+
+          <!-- ATTACHMENT SECTION 2: ADMIN RESOLUTION DOCUMENT (FOR SETTLED/REMARKS CASES) -->
+          <div class="p-2.5 bg-amber-50/70 rounded-xl border border-amber-200 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center">
+              <label class="font-bold text-amber-900">2. Attach Admin Resolution Document (For Settled/Closure Proof)</label>
+              <span class="text-[10px] text-amber-700 font-semibold">Admin Resolution Doc</span>
+            </div>
+            <input type="file" id="modalAdminFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalAdminFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+            
+            <div id="modalAdminPasteDropZone" tabindex="0" class="border border-dashed border-amber-400 hover:border-amber-700 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+              <p class="text-[11px] font-bold text-amber-900">📋 Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Admin Resolution Image</p>
+            </div>
+
+            <div id="modalAdminPastedPreviewContainer" class="hidden relative border border-amber-300 rounded p-1.5 bg-amber-50 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img id="modalAdminPastedImagePreview" src="" alt="Admin Resolution Preview" class="h-10 w-15 object-cover rounded border border-amber-200">
+                <span class="text-emerald-800 font-bold text-xs">✓ Admin Resolution File Attached</span>
+              </div>
+              <button type="button" onclick="clearModalAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold underline cursor-pointer">Remove</button>
+            </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
@@ -899,6 +937,10 @@
     let isAppInitialized = false;
 
     let bookingImportedRecords = [];
+
+    // Modal attachment blobs
+    let modalUserPastedBlob = null;
+    let modalAdminPastedBlob = null;
 
     // Master list of known digital channel keys and their field mappings
     const DIGITAL_CHANNEL_CONFIG = [
@@ -1563,6 +1605,92 @@
       });
     }
 
+    // ADMIN MODAL FILE ATTACHMENT HANDLERS (SECTIONS 1 & 2)
+    function handleModalUserFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      modalUserPastedBlob = file;
+      if (file.type.startsWith('image/')) {
+        $('modalUserPastedImagePreview').src = URL.createObjectURL(file);
+        $('modalUserPastedImagePreview').classList.remove('hidden');
+      } else {
+        $('modalUserPastedImagePreview').classList.add('hidden');
+      }
+      $('modalUserPastedPreviewContainer').classList.remove('hidden');
+    }
+
+    function clearModalUserPastedImage() {
+      modalUserPastedBlob = null;
+      $('modalUserReplaceFileInput').value = '';
+      $('modalUserPastedPreviewContainer').classList.add('hidden');
+    }
+
+    function handleModalAdminFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      modalAdminPastedBlob = file;
+      if (file.type.startsWith('image/')) {
+        $('modalAdminPastedImagePreview').src = URL.createObjectURL(file);
+        $('modalAdminPastedImagePreview').classList.remove('hidden');
+      } else {
+        $('modalAdminPastedImagePreview').classList.add('hidden');
+      }
+      $('modalAdminPastedPreviewContainer').classList.remove('hidden');
+    }
+
+    function clearModalAdminPastedImage() {
+      modalAdminPastedBlob = null;
+      $('modalAdminFileInput').value = '';
+      $('modalAdminPastedPreviewContainer').classList.add('hidden');
+    }
+
+    // GLOBAL CLIPBOARD PASTE LISTENER FOR ALL MODALS & FORMS
+    window.addEventListener('paste', async (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      let blob = null;
+      for (let index in items) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.includes('image/')) {
+          blob = item.getAsFile();
+          break;
+        }
+      }
+      if (!blob) return;
+
+      const replyModal = $('replyModal');
+      const registerClaimView = $('registerClaimView');
+
+      if (replyModal && !replyModal.classList.contains('hidden')) {
+        const activeElem = document.activeElement;
+        // If user is focused on the user-doc paste area
+        if (activeElem && activeElem.id === 'modalUserPasteDropZone') {
+          modalUserPastedBlob = blob;
+          $('modalUserPastedImagePreview').src = URL.createObjectURL(blob);
+          $('modalUserPastedImagePreview').classList.remove('hidden');
+          $('modalUserPastedPreviewContainer').classList.remove('hidden');
+          $('modalUserReplaceFileInput').value = '';
+          e.preventDefault();
+        } else {
+          // Default paste inside reply modal assigns to Admin Resolution Document
+          modalAdminPastedBlob = blob;
+          $('modalAdminPastedImagePreview').src = URL.createObjectURL(blob);
+          $('modalAdminPastedImagePreview').classList.remove('hidden');
+          $('modalAdminPastedPreviewContainer').classList.remove('hidden');
+          $('modalAdminFileInput').value = '';
+          e.preventDefault();
+        }
+      } else if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
+        userPastedImageBlob = blob;
+        $('userPastedImagePreview').src = URL.createObjectURL(blob);
+        $('userPastedImagePreview').classList.remove('hidden');
+        $('pdfFilePreviewBlock').classList.add('hidden');
+        $('userPastedPreviewContainer').classList.remove('hidden');
+        $('userPastedImageSize').innerText = `Clipboard: ${(blob.size / 1024).toFixed(1)} KB`;
+        $('claimFile').value = '';
+        e.preventDefault();
+      }
+    });
+
     // ADMIN ACTION: OPEN REPLY & DOCUMENT REVISION MODAL
     function openReplyModal(claimId) {
       const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
@@ -1573,13 +1701,19 @@
       $('modalDocStatus').value = claim.doc_status || 'Approved';
       $('modalAdminRemarks').value = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
       $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
-      $('modalAdminDirectReplaceFile').value = '';
+      
+      clearModalUserPastedImage();
+      clearModalAdminPastedImage();
 
       toggleSettlementDateField();
       $('replyModal').classList.remove('hidden');
     }
 
-    function closeModal() { $('replyModal').classList.add('hidden'); }
+    function closeModal() { 
+      $('replyModal').classList.add('hidden'); 
+      clearModalUserPastedImage();
+      clearModalAdminPastedImage();
+    }
 
     async function submitAdminReply() {
       const id = $('modalClaimId').value;
@@ -1587,43 +1721,64 @@
       const docStatus = $('modalDocStatus').value;
       const remarks = $('modalAdminRemarks').value.trim();
       const settlementDate = (status === 'Settled') ? $('modalSettlementDate').value : null;
-      const directReplaceFile = $('modalAdminDirectReplaceFile').files[0];
 
-      let newFileUrl = null;
-      if (directReplaceFile) {
-        const fileExt = directReplaceFile.name.split('.').pop();
-        const filePath = `claims/admin-replaced-${id}-${Date.now()}.${fileExt}`;
-        const { error: uploadErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, directReplaceFile, { upsert: true });
-        if (!uploadErr) {
-          newFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+      const saveBtn = $('btnAdminSave');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = "Saving..."; }
+
+      try {
+        let updatedUserFileUrl = null;
+        let updatedAdminFileUrl = null;
+
+        // 1. Upload User Replacement File if provided
+        if (modalUserPastedBlob) {
+          const fileExt = (modalUserPastedBlob.name) ? modalUserPastedBlob.name.split('.').pop() : 'png';
+          const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${fileExt}`;
+          const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalUserPastedBlob, { upsert: true });
+          if (!err1) updatedUserFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
         }
-      }
 
-      const updateData = {
-        claim_status: status,
-        doc_status: docStatus,
-        reply_remarks_admin: remarks,
-        settlement_date: settlementDate
-      };
+        // 2. Upload Admin Resolution File if provided
+        if (modalAdminPastedBlob) {
+          const fileExt = (modalAdminPastedBlob.name) ? modalAdminPastedBlob.name.split('.').pop() : 'png';
+          const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${fileExt}`;
+          const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalAdminPastedBlob, { upsert: true });
+          if (!err2) updatedAdminFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+        }
 
-      if (docStatus === 'Needs Revision') {
-        updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
-      } else {
-        updateData.doc_revision_remarks = null;
-      }
+        const updateData = {
+          claim_status: status,
+          doc_status: docStatus,
+          reply_remarks_admin: remarks,
+          settlement_date: settlementDate
+        };
 
-      if (newFileUrl) {
-        updateData.file_url = newFileUrl;
-        updateData.doc_status = 'Approved';
-        updateData.doc_revision_remarks = null;
-      }
+        if (docStatus === 'Needs Revision') {
+          updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
+        } else {
+          updateData.doc_revision_remarks = null;
+        }
 
-      const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
-      if (error) alert("Error: " + error.message);
-      else {
-        alert("Action & Document status updated successfully!");
-        closeModal();
-        loadClaimsSummary();
+        if (updatedUserFileUrl) {
+          updateData.file_url = updatedUserFileUrl;
+          updateData.doc_status = 'Approved';
+          updateData.doc_revision_remarks = null;
+        }
+
+        if (updatedAdminFileUrl) {
+          updateData.admin_file_url = updatedAdminFileUrl;
+        }
+
+        const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
+        if (error) alert("Error: " + error.message);
+        else {
+          alert("Admin Action & Documents updated successfully!");
+          closeModal();
+          loadClaimsSummary();
+        }
+      } catch (err) {
+        alert("Unexpected Error: " + err.message);
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "Save Changes"; }
       }
     }
 
@@ -1956,10 +2111,9 @@
       loadBookingDashboardData();
     }
 
-    // EXPORT AS IMAGE WITH NAME: Office-wise Digital Adoption-from-todate.png
+    // EXPORT AS IMAGE WITH NAME: Office-wise Digital Adoption-from-todate.png (FULL COMPLETE TABLE CAPTURE)
     async function exportBookingReportImage() {
-      const captureElem = $('bookingTableCaptureArea');
-      if (!captureElem || !bookingImportedRecords.length) {
+      if (!bookingImportedRecords.length) {
         return alert("No booking data available to export as image!");
       }
 
@@ -1967,8 +2121,101 @@
       const toVal = $('bookingToDate')?.value || 'CurrentDate';
       const fileName = `Office-wise Digital Adoption-${fromVal}-${toVal}.png`;
 
+      const selectedChannels = getSelectedChannelSet();
+      const officeMap = {};
+      let totalCashCnt = 0, totalDigCnt = 0;
+
+      bookingImportedRecords.forEach(r => {
+        const off = r.office_name || 'Unassigned';
+        const c_cnt = parseFloat(r.cash_cnt) || 0;
+
+        let d_cnt = 0;
+        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+          if (selectedChannels.has(cfg.key)) {
+            d_cnt += parseFloat(r[cfg.cntField]) || 0;
+          }
+        });
+
+        totalCashCnt += c_cnt;
+        totalDigCnt += d_cnt;
+
+        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
+        officeMap[off].cash_cnt += c_cnt;
+        officeMap[off].dig_cnt += d_cnt;
+      });
+
+      const totalBookings = totalCashCnt + totalDigCnt;
+      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+
+      const sortedOffices = Object.keys(officeMap).map(name => {
+        const o = officeMap[name];
+        const tot = o.cash_cnt + o.dig_cnt;
+        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
+        return { name, ...o, tot, pct };
+      }).sort((a, b) => b.pct - a.pct);
+
+      // Build standalone offscreen table to capture all rows without UI scrollbar cutoffs
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '900px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      sortedOffices.forEach((o, i) => {
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
+            <td style="padding: 7px; text-align: center; font-weight: bold; font-family: monospace;">#${i + 1}</td>
+            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${o.name}</td>
+            <td style="padding: 7px; text-align: center; font-weight: 600;">${o.cash_cnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 7px; text-align: center; font-weight: bold; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 7px; text-align: center; font-weight: 800; color: #15803d; background: #f0fdf4;">${o.pct.toFixed(2)}%</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Digital vs Cash Transaction Performance Report</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Leaderboard</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
+                <th style="padding: 8px; text-align: center; width: 8%;">Rank</th>
+                <th style="padding: 8px; width: 44%;">Office Name</th>
+                <th style="padding: 8px; text-align: center; width: 16%;">Cash Txn (Cnt)</th>
+                <th style="padding: 8px; text-align: center; width: 16%;">Digital Txn (Cnt)</th>
+                <th style="padding: 8px; text-align: center; width: 16%;">Digital % Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
+                <td style="padding: 8px; text-align: center; font-family: monospace;">Σ</td>
+                <td style="padding: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
+                <td style="padding: 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
+                <td style="padding: 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
+                <td style="padding: 8px; text-align: center; color: #FACC15; font-size: 12px;">${totalDigShare}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+
       try {
-        const canvas = await html2canvas(captureElem, {
+        const canvas = await html2canvas(container, {
           scale: 2,
           backgroundColor: '#FFFFFF',
           useCORS: true
@@ -1981,6 +2228,8 @@
         link.click();
       } catch (err) {
         alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
       }
     }
 
@@ -2008,6 +2257,7 @@
       doc.setTextColor(51, 65, 85);
       doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 105, 24, { align: "center" });
 
+      const selectedChannels = getSelectedChannelSet();
       const officeMap = {};
       let totalCashCnt = 0, totalDigCnt = 0;
 
@@ -2017,7 +2267,7 @@
 
         let d_cnt = 0;
         DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          if (activeSelectedChannelKeys.has(cfg.key)) {
+          if (selectedChannels.has(cfg.key)) {
             d_cnt += parseFloat(r[cfg.cntField]) || 0;
           }
         });
@@ -2063,701 +2313,6 @@
       });
 
       doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
-    }
-
-    // CONSOLIDATED SUMMARY MATRICES & OFFICE-WISE MATRIX IN MIS REPORTS
-    function renderConsolidatedSummaries(claims) {
-      const moduleStats = {
-        'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
-        'Delivery': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
-        'DSS': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
-        'Others': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 }
-      };
-
-      const statusStats = {
-        'Pending': { count: 0, amount: 0 },
-        'In Progress': { count: 0, amount: 0 },
-        'Settled': { count: 0, amount: 0 },
-        'Rejected': { count: 0, amount: 0 }
-      };
-
-      const officeStats = {};
-
-      claims.forEach(c => {
-        const mod = moduleStats[c.module] ? c.module : 'Others';
-        const amt = parseFloat(c.txn_amount) || 0;
-        const off = c.raised_for_office || 'Unassigned';
-
-        if (!officeStats[off]) {
-          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
-        }
-
-        officeStats[off].registered++;
-        moduleStats[mod].total++;
-
-        if (c.claim_status === 'Pending') {
-          moduleStats[mod].pending++;
-          moduleStats[mod].activePendingAmount += amt;
-          officeStats[off].pending++;
-          officeStats[off].activePendingAmount += amt;
-        } else if (c.claim_status === 'In Progress') {
-          moduleStats[mod].inprogress++;
-          moduleStats[mod].activePendingAmount += amt;
-          officeStats[off].inprogress++;
-          officeStats[off].activePendingAmount += amt;
-        } else if (c.claim_status === 'Settled') {
-          moduleStats[mod].settled++;
-          officeStats[off].settled++;
-        } else if (c.claim_status === 'Rejected') {
-          moduleStats[mod].rejected++;
-          officeStats[off].rejected++;
-        }
-
-        if (statusStats[c.claim_status]) {
-          statusStats[c.claim_status].count++;
-          statusStats[c.claim_status].amount += amt;
-        }
-      });
-
-      // 1. Module Table
-      const modTbody = $('moduleSummaryTableBody');
-      if (modTbody) {
-        modTbody.innerHTML = '';
-        let modTotalSum = 0, modPendSum = 0, modInpSum = 0, modSetSum = 0, modActiveAmtSum = 0;
-
-        Object.keys(moduleStats).forEach(m => {
-          const s = moduleStats[m];
-          modTotalSum += s.total;
-          modPendSum += s.pending;
-          modInpSum += s.inprogress;
-          modSetSum += s.settled;
-          modActiveAmtSum += s.activePendingAmount;
-
-          modTbody.innerHTML += `
-            <tr class="hover:bg-slate-50">
-              <td class="p-1.5 font-bold text-slate-800">${m}</td>
-              <td class="p-1.5 text-center font-bold">${s.total}</td>
-              <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
-              <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
-              <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
-              <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
-            </tr>
-          `;
-        });
-
-        modTbody.innerHTML += `
-          <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
-            <td class="p-1.5">Total</td>
-            <td class="p-1.5 text-center">${modTotalSum}</td>
-            <td class="p-1.5 text-center text-amber-800">${modPendSum}</td>
-            <td class="p-1.5 text-center text-blue-800">${modInpSum}</td>
-            <td class="p-1.5 text-center text-emerald-800">${modSetSum}</td>
-            <td class="p-1.5 text-right text-postRed-700">₹${modActiveAmtSum.toFixed(2)}</td>
-          </tr>
-        `;
-      }
-
-      // 2. Status Table
-      const statTbody = $('statusSummaryTableBody');
-      if (statTbody) {
-        statTbody.innerHTML = '';
-        let statCountSum = 0, statAmtSum = 0;
-
-        Object.keys(statusStats).forEach(st => {
-          const s = statusStats[st];
-          statCountSum += s.count;
-          statAmtSum += s.amount;
-          const sharePct = claims.length > 0 ? ((s.count / claims.length) * 100).toFixed(1) : "0.0";
-
-          statTbody.innerHTML += `
-            <tr class="hover:bg-slate-50">
-              <td class="p-1.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusColor(st)}">${st}</span></td>
-              <td class="p-1.5 text-center font-bold">${s.count}</td>
-              <td class="p-1.5 text-center font-semibold text-slate-600">${sharePct}%</td>
-              <td class="p-1.5 text-right font-bold text-slate-800">₹${s.amount.toFixed(2)}</td>
-            </tr>
-          `;
-        });
-
-        statTbody.innerHTML += `
-          <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
-            <td class="p-1.5">Total</td>
-            <td class="p-1.5 text-center">${statCountSum}</td>
-            <td class="p-1.5 text-center">100%</td>
-            <td class="p-1.5 text-right text-postRed-700">₹${statAmtSum.toFixed(2)}</td>
-          </tr>
-        `;
-      }
-
-      // 3. Office-wise Matrix
-      const offTbody = $('officeSummaryTableBody');
-      if (offTbody) {
-        offTbody.innerHTML = '';
-        const sortedOffices = Object.keys(officeStats).sort();
-
-        sortedOffices.forEach(off => {
-          const s = officeStats[off];
-          offTbody.innerHTML += `
-            <tr class="hover:bg-slate-50">
-              <td class="p-1.5 font-bold text-slate-800">${off}</td>
-              <td class="p-1.5 text-center font-bold">${s.registered}</td>
-              <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
-              <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
-              <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
-              <td class="p-1.5 text-center text-rose-700 font-semibold">${s.rejected}</td>
-              <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
-            </tr>
-          `;
-        });
-      }
-    }
-
-    async function generateMISReport(filterType = 'All') {
-      currentMISReportFilter = filterType;
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-      const isViewer = userProfile?.role === 'viewer';
-
-      let query = supabaseClient.from('claims').select('*, profiles:created_by(emp_id, emp_name)');
-      if (!isAdmin && !isViewer) {
-        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
-      }
-
-      const from = $('filterFromDate')?.value;
-      const to = $('filterToDate')?.value;
-      const selectedModule = $('filterModule')?.value;
-      const selectedOffice = $('filterOfficeName')?.value;
-      const selectedUser = $('filterEmpUser')?.value;
-
-      if (from) query = query.gte('txn_date', from);
-      if (to) query = query.lte('txn_date', to);
-      if (selectedModule) query = query.eq('module', selectedModule);
-      if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
-      if (selectedUser) query = query.eq('created_by', selectedUser);
-
-      const { data: claims } = await query;
-      if (!claims) return;
-
-      rawMISMasterList = claims;
-      const todayStr = new Date().toISOString().split('T')[0];
-
-      const totalCount = claims.length;
-      const pendingClaims = claims.filter(c => c.claim_status === 'Pending');
-      const inProgressClaims = claims.filter(c => c.claim_status === 'In Progress');
-      const settledClaims = claims.filter(c => c.claim_status === 'Settled');
-      const rejectedClaims = claims.filter(c => c.claim_status === 'Rejected');
-
-      $('misTotal').innerText = totalCount;
-      $('misPending').innerText = pendingClaims.length;
-      $('misInProgress').innerText = inProgressClaims.length;
-      $('misSettled').innerText = settledClaims.length;
-      $('misRejected').innerText = rejectedClaims.length;
-
-      let totalTatSum = 0;
-      let settledCountWithDate = 0;
-      let settledLe3Count = 0;
-      let settled4to15Count = 0;
-      let settledGt15Count = 0;
-
-      settledClaims.forEach(c => {
-        const settleDate = c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null);
-        const days = calculateDaysDifference(c.txn_date, settleDate);
-        if (days !== null) {
-          totalTatSum += days;
-          settledCountWithDate++;
-          if (days <= 3) settledLe3Count++;
-          else if (days <= 15) settled4to15Count++;
-          else settledGt15Count++;
-        }
-      });
-
-      const avgTatDays = settledCountWithDate > 0 ? (totalTatSum / settledCountWithDate).toFixed(1) : "0";
-      $('misAvgTat').innerText = `${avgTatDays} Days`;
-      $('misSettledLe3').innerText = settledLe3Count;
-      $('misSettled4to15').innerText = settled4to15Count;
-      $('misSettledGt15').innerText = settledGt15Count;
-
-      let inProgressLe10Count = 0;
-      let inProgress11to20Count = 0;
-      let inProgress21to30Count = 0;
-      let inProgressGt30Count = 0;
-
-      inProgressClaims.forEach(c => {
-        const days = calculateDaysDifference(c.txn_date, todayStr);
-        if (days !== null) {
-          if (days <= 10) inProgressLe10Count++;
-          else if (days <= 20) inProgress11to20Count++;
-          else if (days <= 30) inProgress21to30Count++;
-          else inProgressGt30Count++;
-        }
-      });
-
-      $('misInProgressLe10').innerText = inProgressLe10Count;
-      $('misInProgress11to20').innerText = inProgress11to20Count;
-      $('misInProgress21to30').innerText = inProgress21to30Count;
-      $('misInProgressGt30').innerText = inProgressGt30Count;
-
-      if (filterType === 'All') {
-        currentMISClaimsList = claims;
-        $('misReportTableTitle').innerText = `Report Summary View: All Registered Claims (${claims.length})`;
-        $('allReportConsolidationContainer').classList.remove('hidden');
-        renderConsolidatedSummaries(claims);
-      } else {
-        $('allReportConsolidationContainer').classList.add('hidden');
-
-        if (filterType === 'Pending') {
-          currentMISClaimsList = pendingClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: Pending Claims (${pendingClaims.length})`;
-        } else if (filterType === 'In Progress') {
-          currentMISClaimsList = inProgressClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: In Progress Claims (${inProgressClaims.length})`;
-        } else if (filterType === 'Settled') {
-          currentMISClaimsList = settledClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: All Settled Claims (${settledClaims.length})`;
-        } else if (filterType === 'Rejected') {
-          currentMISClaimsList = rejectedClaims;
-          $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
-        } else if (filterType === 'Settled_le3') {
-          currentMISClaimsList = settledClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d <= 3;
-          });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled within 3 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'Settled_4to15') {
-          currentMISClaimsList = settledClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d >= 4 && d <= 15;
-          });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled in 4 to 15 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'Settled_gt15') {
-          currentMISClaimsList = settledClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d > 15;
-          });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled in > 15 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_le10') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d <= 10;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: <= 10 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_11to20') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d >= 11 && d <= 20;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: 11 to 20 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_21to30') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d >= 21 && d <= 30;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: 21 to 30 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'InProgress_gt30') {
-          currentMISClaimsList = inProgressClaims.filter(c => {
-            const d = calculateDaysDifference(c.txn_date, todayStr);
-            return d !== null && d > 30;
-          });
-          $('misReportTableTitle').innerText = `In-Progress Aging: > 30 Days (${currentMISClaimsList.length})`;
-        }
-      }
-
-      renderMISTableRows();
-    }
-
-    function sortMISReport(col) {
-      if (currentMISSortCol === col) {
-        currentMISSortDir = currentMISSortDir === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentMISSortCol = col;
-        currentMISSortDir = 'asc';
-      }
-      renderMISTableRows();
-    }
-
-    function renderMISTableRows() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const tbody = $('misReportTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      ['txn_id_ref', 'emp_name', 'module', 'raised_for_office', 'txn_date', 'settlement_date', 'tat_aging', 'txn_amount', 'claim_status'].forEach(c => {
-        const iconEl = $('sort_mis_' + c);
-        if (iconEl) iconEl.innerText = '⇅';
-      });
-      const activeIcon = $('sort_mis_' + currentMISSortCol);
-      if (activeIcon) activeIcon.innerText = currentMISSortDir === 'asc' ? '▲' : '▼';
-
-      if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-500">No matching claims found for this filter selection.</td></tr>`;
-        return;
-      }
-
-      currentMISClaimsList.sort((a, b) => {
-        let valA, valB;
-        if (currentMISSortCol === 'emp_name') {
-          valA = (a.profiles?.emp_name || '').toLowerCase();
-          valB = (b.profiles?.emp_name || '').toLowerCase();
-        } else if (currentMISSortCol === 'txn_amount') {
-          valA = parseFloat(a.txn_amount) || 0;
-          valB = parseFloat(b.txn_amount) || 0;
-        } else if (currentMISSortCol === 'tat_aging') {
-          const isSettledA = a.claim_status === 'Settled';
-          const isSettledB = b.claim_status === 'Settled';
-          valA = isSettledA ? calculateDaysDifference(a.txn_date, a.settlement_date || a.created_at?.split('T')[0]) : calculateDaysDifference(a.txn_date, todayStr);
-          valB = isSettledB ? calculateDaysDifference(b.txn_date, b.settlement_date || b.created_at?.split('T')[0]) : calculateDaysDifference(b.txn_date, todayStr);
-          valA = valA !== null ? valA : 0;
-          valB = valB !== null ? valB : 0;
-        } else {
-          valA = (a[currentMISSortCol] || '').toString().toLowerCase();
-          valB = (b[currentMISSortCol] || '').toString().toLowerCase();
-        }
-        if (valA < valB) return currentMISSortDir === 'asc' ? -1 : 1;
-        if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
-        return 0;
-      });
-
-      currentMISClaimsList.forEach(c => {
-        const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
-        const isSettled = c.claim_status === 'Settled';
-        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
-        
-        let tatOrAgingDisplay = '-';
-        if (isSettled) {
-          const days = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-          tatOrAgingDisplay = days !== null ? `<span class="font-bold text-emerald-800">${days} Days (TAT)</span>` : '-';
-        } else if (c.claim_status === 'In Progress') {
-          const days = calculateDaysDifference(c.txn_date, todayStr);
-          const colorClass = days > 30 ? 'text-rose-700 font-extrabold' : (days > 15 ? 'text-amber-700 font-bold' : 'text-slate-800 font-semibold');
-          tatOrAgingDisplay = days !== null ? `<span class="${colorClass}">${days} Days (Age)</span>` : '-';
-        } else if (c.claim_status === 'Pending') {
-          const days = calculateDaysDifference(c.txn_date, todayStr);
-          tatOrAgingDisplay = days !== null ? `<span class="text-slate-700 font-medium">${days} Days (Age)</span>` : '-';
-        }
-
-        tbody.innerHTML += `
-          <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-2.5 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
-            <td class="p-2.5 font-semibold text-slate-800 whitespace-nowrap">${creatorName}</td>
-            <td class="p-2.5 font-medium text-slate-800 whitespace-nowrap">${c.module}</td>
-            <td class="p-2.5 whitespace-nowrap text-slate-800">${c.raised_for_office}</td>
-            <td class="p-2.5 whitespace-nowrap text-slate-800">${c.txn_date}</td>
-            <td class="p-2.5 whitespace-nowrap font-medium text-slate-800">${settleDate}</td>
-            <td class="p-2.5 whitespace-nowrap">${tatOrAgingDisplay}</td>
-            <td class="p-2.5 font-semibold whitespace-nowrap text-slate-900">₹${c.txn_amount}</td>
-            <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
-            <td class="p-2.5 text-xs text-slate-800">${c.reply_remarks_admin || '-'}</td>
-          </tr>
-        `;
-      });
-    }
-
-    function printOfficeWiseReport() {
-      if (!rawMISMasterList.length) return alert("No claim records found in the current filtered period!");
-
-      const fromDateVal = $('filterFromDate')?.value || 'Inception';
-      const toDateVal = $('filterToDate')?.value || 'Current Date';
-
-      const officeStats = {};
-      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
-
-      rawMISMasterList.forEach(c => {
-        const off = c.raised_for_office || 'Unassigned';
-        const amt = parseFloat(c.txn_amount) || 0;
-        if (!officeStats[off]) {
-          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
-        }
-        officeStats[off].registered++;
-        grandReg++;
-
-        if (c.claim_status === 'Pending') {
-          officeStats[off].pending++;
-          officeStats[off].activePendingAmount += amt;
-          grandPend++;
-          grandActiveAmt += amt;
-        } else if (c.claim_status === 'In Progress') {
-          officeStats[off].inprogress++;
-          officeStats[off].activePendingAmount += amt;
-          grandInp++;
-          grandActiveAmt += amt;
-        } else if (c.claim_status === 'Settled') {
-          officeStats[off].settled++;
-          grandSet++;
-        } else if (c.claim_status === 'Rejected') {
-          officeStats[off].rejected++;
-          grandRej++;
-        }
-      });
-
-      const printWindow = window.open('', '_blank', 'width=950,height=850');
-      if (!printWindow) return alert("Popup blocked! Please allow popups to print office report.");
-
-      const sortedOffices = Object.keys(officeStats).sort();
-
-      let tableRowsHtml = '';
-      sortedOffices.forEach((off, idx) => {
-        const s = officeStats[off];
-        tableRowsHtml += `
-          <tr>
-            <td style="text-align:center;">${idx + 1}</td>
-            <td style="font-weight:bold; color:#0f172a;">${off}</td>
-            <td style="text-align:center; font-weight:bold;">${s.registered}</td>
-            <td style="text-align:center; color:#b45309; font-weight:bold;">${s.pending}</td>
-            <td style="text-align:center; color:#1d4ed8; font-weight:bold;">${s.inprogress}</td>
-            <td style="text-align:center; color:#15803d; font-weight:bold;">${s.settled}</td>
-            <td style="text-align:center; color:#b91c1c; font-weight:bold;">${s.rejected}</td>
-            <td style="text-align:right; font-weight:bold; color:#991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
-          </tr>
-        `;
-      });
-
-      const printHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Office-wise Pendency & Status Report</title>
-          <style>
-            @page { size: A4 portrait; margin: 10mm 12mm; }
-            * { box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 14px; font-size: 11px; line-height: 1.3; background: #fff; }
-            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
-            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 11px; font-weight: bold; }
-            .title-area p { margin: 2px 0 0 0; font-size: 9.5px; color: #475569; font-weight: 600; }
-            .logo-box img { height: 42px; width: 63px; object-fit: contain; }
-            table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10.5px; }
-            th { background: #A80F28; color: #fff; padding: 5px 6px; border: 1px solid #8A0C21; font-weight: bold; }
-            td { padding: 4.5px 6px; border: 1px solid #cbd5e1; }
-            tr:nth-child(even) { background: #f8fafc; }
-            .total-row { background: #fee2e2 !important; font-weight: bold; color: #881337; }
-            .end-of-doc { margin-top: 18px; padding-top: 8px; border-top: 1.5px dashed #94a3b8; text-align: center; font-weight: bold; font-size: 10px; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; }
-            @media print { body { padding: 0; } .no-print { display: none; } }
-          </style>
-        </head>
-        <body>
-          <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
-            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🖨️ Print Now</button>
-            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:11px;">Close</button>
-          </div>
-
-          <div class="header-banner">
-            <div class="title-area">
-              <h1>Refund Claims Management Portal</h1>
-              <h2>Chennai City Central Division &bull; Office-wise Pendency &amp; Status Report</h2>
-              <p>Period: <strong>${fromDateVal}</strong> to <strong>${toDateVal}</strong> | Generated on: ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-            <div class="logo-box">
-              <img src="${currentAppLogo}" alt="India Post">
-            </div>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 5%;">Sl</th>
-                <th style="width: 33%; text-align: left;">Office Name</th>
-                <th style="width: 10%; text-align: center;">Registered</th>
-                <th style="width: 10%; text-align: center;">Pending</th>
-                <th style="width: 11%; text-align: center;">In Progress</th>
-                <th style="width: 9%; text-align: center;">Settled</th>
-                <th style="width: 9%; text-align: center;">Rejected</th>
-                <th style="width: 13%; text-align: right;">Pending + In Prog (Rs)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${tableRowsHtml}
-              <tr class="total-row">
-                <td colspan="2" style="text-align: center;">GRAND TOTAL</td>
-                <td style="text-align: center;">${grandReg}</td>
-                <td style="text-align: center;">${grandPend}</td>
-                <td style="text-align: center;">${grandInp}</td>
-                <td style="text-align: center;">${grandSet}</td>
-                <td style="text-align: center;">${grandRej}</td>
-                <td style="text-align: right;">Rs. ${grandActiveAmt.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="end-of-doc">
-            *** END OF OFFICE REPORT &bull; TOTAL OFFICES: ${sortedOffices.length} ***
-          </div>
-
-          <script>
-            window.onload = function() {
-              setTimeout(function() { window.print(); }, 500);
-            };
-          <\/script>
-        </body>
-        </html>
-      `;
-
-      printWindow.document.open();
-      printWindow.document.write(printHtml);
-      printWindow.document.close();
-    }
-
-    // FULL DOCKET PRINTING FUNCTION
-    function printClaimDetails(claimId) {
-      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
-      if (!claim) return alert("Claim details not found for docket printing!");
-
-      const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
-      const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('claims/'));
-
-      const printWindow = window.open('', '_blank', 'width=950,height=850');
-      if (!printWindow) return alert("Popup blocked! Please allow popups for printing.");
-
-      const printHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
-          <style>
-            @page { size: A4 portrait; margin: 10mm 12mm; }
-            * { box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; padding: 14px; font-size: 11px; line-height: 1.3; }
-            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
-            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; }
-            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 10.5px; font-weight: bold; }
-            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 12.5px; font-weight: bold; }
-            .section-title { background: #FEF9C3; color: #8A0C21; padding: 3px 8px; font-weight: bold; font-size: 10.5px; margin: 8px 0 5px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
-            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-            table.details-grid td { padding: 4px 8px; border: 1px solid #cbd5e1; font-size: 11px; }
-            table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
-            table.details-grid td.value { width: 28%; color: #0f172a; }
-            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; background: #fafaf9; margin-bottom: 6px; font-size: 11px; min-height: 26px; white-space: pre-wrap; }
-            .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
-            .attachments-grid { display: flex; gap: 10px; margin-top: 6px; }
-            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
-            .attachment-preview { max-width: 100%; max-height: 260px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
-            @media print { .no-print { display: none; } }
-          </style>
-        </head>
-        <body>
-          <div class="no-print" style="text-align:right; margin-bottom:10px;">
-            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer;">🖨️ Print Now</button>
-            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px;">Close</button>
-          </div>
-
-          <div class="header-banner">
-            <div class="title-area">
-              <h1>Refund Claims Management Portal</h1>
-              <h2>Chennai City Central Division &bull; Complete Claim Registration Docket</h2>
-            </div>
-            <div class="ref-badge">TRANSACTION ID: ${claim.txn_id_ref}</div>
-          </div>
-
-          <div class="section-title">1. REGISTRATION &amp; APPLICANT DETAILS</div>
-          <table class="details-grid">
-            <tr>
-              <td class="label">Created By:</td><td class="value"><strong>${claim.profiles?.emp_name || 'Staff'}</strong> (${claim.profiles?.emp_id || 'N/A'})</td>
-              <td class="label">Raised For Office:</td><td class="value"><strong>${claim.raised_for_office}</strong></td>
-            </tr>
-            <tr>
-              <td class="label">Mobile Number:</td><td class="value font-mono">${claim.user_mobile || 'N/A'}</td>
-              <td class="label">Current Status:</td><td class="value"><strong>${claim.claim_status}</strong> (${claim.doc_status || 'Approved'})</td>
-            </tr>
-          </table>
-
-          <div class="section-title">2. TRANSACTION &amp; CLAIM DETAILS</div>
-          <table class="details-grid">
-            <tr>
-              <td class="label">Module:</td><td class="value"><strong>${claim.module}</strong></td>
-              <td class="label">Article Number:</td><td class="value"><strong>${claim.article_number}</strong></td>
-            </tr>
-            <tr>
-              <td class="label">RRN Number:</td><td class="value font-mono">${claim.rrn_number || 'N/A'}</td>
-              <td class="label">Transaction Date:</td><td class="value">${claim.txn_date}</td>
-            </tr>
-            <tr>
-              <td class="label">Transaction Amount:</td><td class="value" style="color:#15803d; font-weight:bold;">₹${claim.txn_amount}</td>
-              <td class="label">Payment Channel:</td><td class="value">${claim.payment_channel}</td>
-            </tr>
-            <tr>
-              <td class="label">Settlement Date:</td><td class="value"><strong>${claim.settlement_date || 'Pending'}</strong></td>
-              <td class="label">Entry Date/Time:</td><td class="value">${formatDateTime(claim.created_at)}</td>
-            </tr>
-          </table>
-
-          <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
-          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#475569;">Remarks by User:</div>
-          <div class="remarks-box">${claim.remarks_by_user || 'No remarks provided.'}</div>
-
-          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#92400e;">Admin Action Remarks:</div>
-          <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Admin Response.'}</div>
-
-          <div class="section-title">4. ATTACHED DOCUMENTS</div>
-          <div class="attachments-grid">
-            <div class="attachment-col">
-              <strong>Primary User Document:</strong>
-              ${isUserImage ? `<img src="${claim.file_url}" class="attachment-preview">` : `<a href="${claim.file_url}" target="_blank">📄 View User File</a>`}
-            </div>
-            ${claim.admin_file_url ? `
-              <div class="attachment-col">
-                <strong>Admin Resolution Document:</strong>
-                ${isAdminImage ? `<img src="${claim.admin_file_url}" class="attachment-preview">` : `<a href="${claim.admin_file_url}" target="_blank">📄 View Admin File</a>`}
-              </div>
-            ` : ''}
-          </div>
-        </body>
-        </html>
-      `;
-
-      printWindow.document.open();
-      printWindow.document.write(printHtml);
-      printWindow.document.close();
-      setTimeout(() => printWindow.print(), 400);
-    }
-
-    // DETAILS MODAL
-    function openDetailsModal(claimId) {
-      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
-      if (!claim) return alert("Claim details not found!");
-
-      $('detailsModalContent').innerHTML = `
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Txn Reference ID</span><span class="font-bold text-postRed-700 font-mono text-sm">${claim.txn_id_ref}</span></div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Created By</span><span class="font-bold text-slate-800">${claim.profiles?.emp_name} (${claim.profiles?.emp_id})</span></div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Raised For Office</span><span class="font-semibold">${claim.raised_for_office}</span></div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Module / Article</span><span class="font-bold text-postRed-800">${claim.module}</span> / ${claim.article_number}</div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Amount / Date</span><span class="font-bold text-emerald-800">₹${claim.txn_amount}</span> on ${claim.txn_date}</div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Status</span><span class="font-bold px-2 py-0.5 rounded text-xs ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span> (${claim.doc_status || 'Approved'})</div>
-        <div class="col-span-2 p-2 bg-slate-50 rounded border"><span class="text-slate-500 block font-bold">User Remarks:</span><p class="whitespace-pre-wrap">${claim.remarks_by_user || '-'}</p></div>
-        <div class="col-span-2 p-2 bg-amber-50/70 rounded border border-amber-300"><span class="text-postRed-800 block font-bold">Admin Remarks:</span><p class="whitespace-pre-wrap">${claim.reply_remarks_admin || 'Pending Response'}</p></div>
-        <div class="col-span-2 flex gap-2 pt-1 border-t">
-          <a href="${claim.file_url}" target="_blank" class="bg-emerald-700 text-white px-3 py-1.5 rounded font-bold">📄 Primary User Document</a>
-          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="bg-amber-600 text-white px-3 py-1.5 rounded font-bold">📎 Admin Document</a>` : ''}
-        </div>
-      `;
-
-      $('modalPrintBtn').onclick = () => printClaimDetails(claim.id);
-      $('detailsModal').classList.remove('hidden');
-    }
-
-    function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
-
-    function getStatusColor(status) {
-      if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
-      if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
-      if (status === 'Settled') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
-      if (status === 'Rejected') return 'bg-rose-100 text-rose-800 border border-rose-200';
-      return 'bg-slate-100 text-slate-800';
-    }
-
-    function toggleSettlementDateField() {
-      if ($('modalStatus').value === 'Settled') $('modalSettlementDateContainer').classList.remove('hidden');
-      else $('modalSettlementDateContainer').classList.add('hidden');
-    }
-
-    function handleFileSelectPreview(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      $('userPastedPreviewContainer').classList.remove('hidden');
-      $('userPastedImagePreview').src = URL.createObjectURL(file);
-    }
-
-    function clearUserPastedImage() {
-      userPastedImageBlob = null;
-      $('userPastedPreviewContainer').classList.add('hidden');
-      $('claimFile').value = '';
     }
 
     function exportMISExcel() {
