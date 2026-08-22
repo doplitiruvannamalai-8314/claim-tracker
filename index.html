@@ -656,18 +656,22 @@
               <h3 class="text-sm font-bold text-postRed-700 uppercase">📊 Booking Performance &amp; Digital Adoption Monitoring</h3>
               <p class="text-[11px] text-slate-500">Daily / Fortnightly / Monthly comparisons of Cash vs Digital transactions across division offices</p>
             </div>
-            <div class="flex items-center gap-2">
-              <input type="file" id="bookingExcelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleBookingExcelUpload(event)">
-              <button type="button" onclick="$('bookingExcelFileInput').click()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
-                📥 Import Excel / CSV
-              </button>
-              <button type="button" onclick="exportBookingReportImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
-                🖼️ Export as Image (PNG)
-              </button>
-              <button type="button" onclick="exportBookingReportPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">
-                📄 Export PDF
-              </button>
-            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+  <input type="file" id="bookingExcelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleBookingExcelUpload(event)">
+  <button type="button" onclick="$('bookingExcelFileInput').click()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
+    📥 Import Excel / CSV
+  </button>
+  <!-- PURGE DATE DATA BUTTON (ADMINS) -->
+  <button type="button" onclick="openDeleteBookingDataModal()" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
+    🗑️ Delete by Date
+  </button>
+  <button type="button" onclick="exportBookingReportImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
+    🖼️ Export as Image (PNG)
+  </button>
+  <button type="button" onclick="exportBookingReportPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">
+    📄 Export PDF
+  </button>
+</div>
           </div>
 
           <!-- TIME PERIOD & MULTI-CHANNEL COMPARISON CHECKLIST FILTER BAR -->
@@ -974,10 +978,17 @@
       </div>
     </div>
 
-    <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
-      <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
-      <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
-    </div>
+    <div class="flex justify-between items-center pt-2 border-t border-amber-200">
+  <!-- Delete Claim button on the left -->
+  <button type="button" onclick="deleteClaimByAdmin()" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer transition">
+    🗑️ Delete Claim
+  </button>
+  <div class="flex gap-2">
+    <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+    <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
+  </div>
+</div>
+</div>
   </div>
 </div>
       <!-- ADMIN EDIT USER MODAL -->
@@ -1018,10 +1029,53 @@
               <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 px-3 py-1.5 rounded font-bold cursor-pointer">Cancel</button>
               <button type="submit" class="bg-postRed-600 text-white px-4 py-1.5 rounded font-bold cursor-pointer">Save</button>
             </div>
+
+            
           </form>
         </div>
       </div>
+<!-- DELETE BOOKING PERFORMANCE MODAL -->
+<div id="deleteBookingDataModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-rose-700">
+    <div class="flex justify-between items-center border-b pb-2 border-slate-200">
+      <h3 class="font-bold text-sm text-rose-800 uppercase flex items-center gap-1.5">
+        <span>🗑️</span> Purge Booking Performance Data
+      </h3>
+      <button type="button" onclick="closeDeleteBookingDataModal()" class="text-xl font-bold cursor-pointer text-slate-400 hover:text-slate-700">&times;</button>
+    </div>
 
+    <p class="text-xs text-slate-600">
+      Permanently remove imported performance metrics for a single day or a specific date range.
+    </p>
+
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">From Date *</label>
+        <input type="date" id="deleteBookingFromDate" required class="w-full border border-slate-300 p-1.5 rounded bg-white">
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">To Date *</label>
+        <input type="date" id="deleteBookingToDate" required class="w-full border border-slate-300 p-1.5 rounded bg-white">
+      </div>
+    </div>
+
+    <div>
+      <label class="block font-bold text-slate-700 mb-1 text-xs">Optional: Specific Office Only</label>
+      <select id="deleteBookingOfficeSelect" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+        <option value="">-- All Division Offices --</option>
+      </select>
+    </div>
+
+    <div class="bg-rose-50 border border-rose-200 p-2.5 rounded text-[11px] text-rose-800 font-semibold">
+      ⚠️ Warning: This will delete all cash &amp; digital counts for the selected period from the database.
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+      <button type="button" onclick="closeDeleteBookingDataModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+      <button type="button" id="btnConfirmDeleteBooking" onclick="submitDeleteBookingData()" class="bg-rose-700 hover:bg-rose-800 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Permanently Delete</button>
+    </div>
+  </div>
+</div>
       <!-- ADMIN RESET PASSWORD MODAL -->
       <div id="adminResetPwdModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postGold-500">
@@ -4215,6 +4269,111 @@ function renderClaimsSummaryTable() {
     `);
   });
   tbody.innerHTML = htmlArr.join('');
+}
+// =========================================================================
+// 1. DELETE BOOKING PERFORMANCE DATA (BY SINGLE DATE OR DATE RANGE)
+// =========================================================================
+
+function openDeleteBookingDataModal() {
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+  if (!isAdmin) return alert("Only administrators can delete booking performance data.");
+
+  // Pre-fill with current date filter if available
+  const curFrom = $('bookingFromDate')?.value || '';
+  const curTo = $('bookingToDate')?.value || curFrom;
+
+  if ($('deleteBookingFromDate')) $('deleteBookingFromDate').value = curFrom;
+  if ($('deleteBookingToDate')) $('deleteBookingToDate').value = curTo;
+
+  // Clone offices into delete selector
+  const offSelect = $('deleteBookingOfficeSelect');
+  const mainOff = $('bookingFilterOffice');
+  if (offSelect && mainOff) {
+    offSelect.innerHTML = mainOff.innerHTML;
+  }
+
+  if ($('deleteBookingDataModal')) $('deleteBookingDataModal').classList.remove('hidden');
+}
+
+function closeDeleteBookingDataModal() {
+  if ($('deleteBookingDataModal')) $('deleteBookingDataModal').classList.add('hidden');
+}
+
+async function submitDeleteBookingData() {
+  const from = $('deleteBookingFromDate')?.value;
+  const to = $('deleteBookingToDate')?.value;
+  const office = $('deleteBookingOfficeSelect')?.value;
+
+  if (!from || !to) return alert("Please select both From and To dates.");
+  if (from > to) return alert("From Date cannot be later than To Date.");
+
+  const officeLabel = office ? `for "${office}"` : "for ALL offices";
+  const confirmMsg = `Are you sure you want to PERMANENTLY DELETE booking performance data from ${from} to ${to} ${officeLabel}?\n\nThis cannot be undone!`;
+
+  if (!confirm(confirmMsg)) return;
+
+  const btn = $('btnConfirmDeleteBooking');
+  if (btn) { btn.disabled = true; btn.innerText = "Deleting..."; }
+
+  try {
+    let query = supabaseClient
+      .from('booking_performance')
+      .delete()
+      .gte('booking_date', from)
+      .lte('booking_date', to);
+
+    if (office) {
+      query = query.eq('office_name', office);
+    }
+
+    const { error } = await query;
+    if (error) throw error;
+
+    alert(`Booking performance records successfully deleted for ${from} to ${to}!`);
+    closeDeleteBookingDataModal();
+    await loadBookingDashboardData();
+  } catch (err) {
+    alert("Delete failed: " + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerText = "Permanently Delete"; }
+  }
+}
+
+// =========================================================================
+// 2. DELETE INDIVIDUAL CLAIM REQUEST (ADMIN / SUPERADMIN ONLY)
+// =========================================================================
+
+async function deleteClaimByAdmin() {
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+  if (!isAdmin) return alert("Access denied. Only administrators can delete claim dockets.");
+
+  const claimId = $('modalClaimId')?.value;
+  if (!claimId) return alert("Missing claim ID.");
+
+  const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
+             || (rawMISMasterList && rawMISMasterList.find(c => String(c.id) === String(claimId)));
+
+  const refNo = claim ? claim.txn_id_ref : 'this record';
+
+  if (!confirm(`⚠️ DANGER: Are you sure you want to completely delete Claim #${refNo}?\n\nAll associated remarks and document links will be permanently erased.`)) {
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from('claims')
+      .delete()
+      .eq('id', claimId);
+
+    if (error) throw error;
+
+    alert(`Claim #${refNo} has been permanently deleted.`);
+    closeModal();
+    if (typeof loadClaimsSummary === 'function') await loadClaimsSummary();
+    if (typeof generateMISReport === 'function') await generateMISReport(currentMISReportFilter || 'All');
+  } catch (err) {
+    alert("Error deleting claim: " + err.message);
+  }
 }
 
     // 13. GLOBAL CLIPBOARD (CTRL + V) SCREENSHOT ENGINE
