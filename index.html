@@ -33,10 +33,11 @@
       }
     }
   </script>
-  <!-- Excel & PDF Export Libraries -->
+  <!-- Excel, PDF & HTML2Canvas Export Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="bg-amber-50/40 text-slate-900 font-sans min-h-screen text-xs flex flex-col justify-between" onclick="closeChannelDropdownIfClickedOutside(event)">
 
@@ -116,7 +117,7 @@
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-0.5">Office Name *</label>
               <select id="regOfficeName" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                <option value="">-- Loading Offices... --</option>
+                <option value="Chennai GPO">Chennai GPO</option>
               </select>
             </div>
             <div>
@@ -142,7 +143,7 @@
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
           <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer">Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
-          <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
+          <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
           <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📊 Digital vs Cash Performance</button>
           <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">User Management</button>
@@ -152,7 +153,7 @@
         <div id="trackView" class="tab-content bg-white p-4 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex gap-2 max-w-md w-full">
-              <input type="text" id="searchRefNo" placeholder="Enter 12-Digit Reference No (Txn ID)" class="border border-slate-300 p-1.5 rounded-lg w-full text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
+              <input type="text" id="searchRefNo" placeholder="Enter Reference No, Article No, or RRN" class="border border-slate-300 p-1.5 rounded-lg w-full text-xs focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
               <button type="button" onclick="trackClaim()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer whitespace-nowrap">Track</button>
             </div>
             <span class="text-xs font-bold text-postRed-700 bg-postRed-50 border border-postRed-200 px-2.5 py-1 rounded-full">⚡ Live Filter Active</span>
@@ -162,7 +163,7 @@
           <!-- FILTERS -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
             <div class="col-span-2">
-              <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Search (Ref / Article / Name)</label>
+              <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Search (Ref / Article / Name / Office)</label>
               <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type to filter..." class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
             <div>
@@ -214,7 +215,7 @@
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('txn_amount')">Amount <span id="sort_txn_amount">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortTable('claim_status')">Status / Settle Date <span id="sort_claim_status">⇅</span></th>
                   <th class="p-2 bg-postRed-50 cursor-default min-w-[150px]">Remarks</th> 
-                  <th class="p-2 bg-postRed-50 cursor-default text-center min-w-[170px]">Actions &amp; Documents</th>
+                  <th class="p-2 bg-postRed-50 cursor-default text-center min-w-[190px]">Actions &amp; Documents</th>
                 </tr>
               </thead>
               <tbody id="claimsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -332,7 +333,7 @@
           </form>
         </div>
 
-        <!-- TAB 3: THEME CONVERTER -->
+        <!-- TAB 3: THEME CONVERTER (ADMINS ONLY) -->
         <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -374,6 +375,9 @@
               <button type="button" onclick="exportMISExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
                 📊 Export Excel (.xlsx)
               </button>
+              <button type="button" onclick="exportMISReportImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+                🖼️ Export as Image (PNG)
+              </button>
               <button type="button" onclick="exportMISPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
                 📄 Export PDF
               </button>
@@ -381,7 +385,18 @@
           </div>
           
           <!-- FILTERS -->
-          <div class="grid grid-cols-1 md:grid-cols-6 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Quick Period</label>
+              <select id="misQuickPeriod" onchange="applyMISQuickPeriod()" class="w-full border p-1.5 rounded text-xs bg-white font-semibold outline-none">
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="fortnight">Current Fortnight (15 Days)</option>
+                <option value="month">Current Month (01-mm-yyyy)</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">From Date</label>
               <input type="date" id="filterFromDate" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
@@ -442,6 +457,55 @@
             </div>
           </div>
 
+          <!-- SETTLED TAT & IN-PROGRESS AGING -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
+            <div class="bg-emerald-50/60 border border-emerald-300 rounded-xl p-3 space-y-2">
+              <div class="flex justify-between items-center border-b border-emerald-200 pb-1">
+                <span class="font-bold text-[11px] text-emerald-900 uppercase">⏱️ Settled Claims TAT Breakdown</span>
+                <span class="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Avg: <strong id="misAvgTat">0 Days</strong></span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div onclick="generateMISReport('Settled_le3')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&le; 3 Days</span>
+                  <span id="misSettledLe3" class="text-sm font-extrabold text-emerald-800">0</span>
+                </div>
+                <div onclick="generateMISReport('Settled_4to15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">4 - 15 Days</span>
+                  <span id="misSettled4to15" class="text-sm font-extrabold text-amber-700">0</span>
+                </div>
+                <div onclick="generateMISReport('Settled_gt15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&gt; 15 Days</span>
+                  <span id="misSettledGt15" class="text-sm font-extrabold text-rose-700">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-blue-50/60 border border-blue-300 rounded-xl p-3 space-y-2">
+              <div class="flex justify-between items-center border-b border-blue-200 pb-1">
+                <span class="font-bold text-[11px] text-blue-900 uppercase">⏳ In-Progress Claims Aging Buckets</span>
+                <span class="text-[10px] text-slate-500">From Txn Date</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1 text-center text-xs">
+                <div onclick="generateMISReport('InProgress_le10')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&le; 10 Days</span>
+                  <span id="misInProgressLe10" class="text-sm font-extrabold text-slate-800">0</span>
+                </div>
+                <div onclick="generateMISReport('InProgress_11to20')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">11-20 Days</span>
+                  <span id="misInProgress11to20" class="text-sm font-extrabold text-amber-700">0</span>
+                </div>
+                <div onclick="generateMISReport('InProgress_21to30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">21-30 Days</span>
+                  <span id="misInProgress21to30" class="text-sm font-extrabold text-orange-700">0</span>
+                </div>
+                <div onclick="generateMISReport('InProgress_gt30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&gt; 30 Days</span>
+                  <span id="misInProgressGt30" class="text-sm font-extrabold text-rose-700">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- CONSOLIDATED SUMMARY MATRICES -->
           <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
             <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
@@ -449,6 +513,7 @@
             </h4>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
+              <!-- 1. Module Table -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
                   1. Module-wise Breakdown (Pending + In Progress Value)
@@ -468,6 +533,7 @@
                 </table>
               </div>
 
+              <!-- 2. Status Table -->
               <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
                   2. Status-wise Financial Summary
@@ -485,15 +551,21 @@
                 </table>
               </div>
 
-              <div class="lg:col-span-2 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+              <!-- 3. Office-wise Matrix with Printout & Image Export -->
+              <div id="officeWiseMatrixArea" class="lg:col-span-2 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
                 <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
                   <div class="flex items-center gap-1.5">
                     <span class="text-sm">🏢</span>
                     <span>3. Office-wise Pendency &amp; Status Breakdown</span>
                   </div>
-                  <button type="button" onclick="printOfficeWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-                    🖨️ Print Office Report
-                  </button>
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="exportOfficeWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+                      🖼️ Export Image
+                    </button>
+                    <button type="button" onclick="printOfficeWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+                      🖨️ Print Office Report
+                    </button>
+                  </div>
                 </div>
                 <div class="max-h-60 overflow-y-auto">
                   <table class="w-full text-left text-[11px] border-collapse">
@@ -540,7 +612,7 @@
           </div>
         </div>
 
-        <!-- TAB 5: ADMIN-ONLY BOOKING PERFORMANCE & DIGITAL ADOPTION DASHBOARD WITH CHANNEL CHECKLIST -->
+        <!-- TAB 5: BOOKING DASHBOARD -->
         <div id="bookingDashView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
@@ -551,6 +623,9 @@
               <input type="file" id="bookingExcelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleBookingExcelUpload(event)">
               <button type="button" onclick="$('bookingExcelFileInput').click()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
                 📥 Import Excel / CSV
+              </button>
+              <button type="button" onclick="exportBookingReportImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
+                🖼️ Export as Image (PNG)
               </button>
               <button type="button" onclick="exportBookingReportPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">
                 📄 Export PDF
@@ -565,8 +640,10 @@
               <select id="bookingQuickPeriod" onchange="applyBookingQuickPeriod()" class="w-full border p-1.5 rounded text-xs bg-white font-semibold">
                 <option value="custom">Custom Range</option>
                 <option value="today">Today (Daily)</option>
+                <option value="yesterday">Previous Day / Yesterday</option>
+                <option value="recent">Last Recent Uploaded Date</option>
                 <option value="fortnight">Current Fortnight (15 Days)</option>
-                <option value="month">Current Month</option>
+                <option value="month">Current Month (01-mm-yyyy)</option>
                 <option value="all">All Imported Data</option>
               </select>
             </div>
@@ -585,7 +662,7 @@
               </select>
             </div>
 
-            <!-- MULTI-SELECT CHECKED LISTBOX FOR CHANNELS (WITH LIVE HEADING COUNT OF TXNS) -->
+            <!-- MULTI-SELECT CHECKED LISTBOX FOR CHANNELS -->
             <div class="relative" id="channelDropdownWrapper">
               <label class="block font-bold text-postRed-900 mb-0.5">
                 ⚡ Compare Channels (<span id="channelHeadingTxnCount" class="font-extrabold text-postRed-700">0 Txns</span>)
@@ -623,17 +700,14 @@
             <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-xs">
               <p class="text-[10px] text-slate-500 font-bold uppercase">Total Bookings (Cash + Selected Digital)</p>
               <p id="dashTotalBookings" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
-              <p id="dashTotalValue" class="text-[11px] font-bold text-slate-600">₹0.00</p>
             </div>
             <div class="bg-white border-2 border-amber-500 p-3 rounded-xl shadow-xs">
               <p class="text-[10px] text-amber-700 font-bold uppercase">Cash Transactions</p>
               <p id="dashCashCount" class="text-base font-extrabold text-amber-800 mt-0.5">0</p>
-              <p id="dashCashValue" class="text-[11px] font-bold text-amber-700">₹0.00</p>
             </div>
             <div class="bg-white border-2 border-blue-600 p-3 rounded-xl shadow-xs">
               <p class="text-[10px] text-blue-700 font-bold uppercase">Selected Digital Transactions</p>
               <p id="dashDigitalCount" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
-              <p id="dashDigitalValue" class="text-[11px] font-bold text-blue-700">₹0.00</p>
             </div>
             <div class="bg-white border-2 border-emerald-600 p-3 rounded-xl shadow-xs">
               <p class="text-[10px] text-emerald-700 font-bold uppercase">Digital Adoption Share</p>
@@ -645,8 +719,8 @@
           </div>
 
           <!-- OFFICE PERFORMANCE COMPARISON TABLE -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-            <div class="bg-slate-100 p-2 font-bold text-slate-700 text-xs flex justify-between items-center">
+          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white p-2">
+            <div class="bg-slate-100 p-2 font-bold text-slate-700 text-xs flex justify-between items-center rounded-t-lg">
               <span>🏆 Office-wise Digital Adoption &amp; Cash Comparison Leaderboard</span>
               <span class="text-[11px] text-slate-500 font-normal">Ranked by Digital Adoption %</span>
             </div>
@@ -657,14 +731,12 @@
                     <th class="p-2 text-center">Rank</th>
                     <th class="p-2">Office Name</th>
                     <th class="p-2 text-center">Cash Txn (Cnt)</th>
-                    <th class="p-2 text-right">Cash Amount (₹)</th>
                     <th class="p-2 text-center">Digital Txn (Cnt)</th>
-                    <th class="p-2 text-right">Digital Amount (₹)</th>
                     <th class="p-2 text-center font-bold">Digital % Share</th>
                   </tr>
                 </thead>
                 <tbody id="bookingPerfTableBody" class="divide-y divide-slate-100">
-                  <tr><td colspan="7" class="p-4 text-center text-slate-400">Import Excel/CSV to populate booking dashboard.</td></tr>
+                  <tr><td colspan="5" class="p-4 text-center text-slate-400">Import Excel/CSV to populate booking dashboard.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -709,12 +781,13 @@
               <thead>
                 <tr class="bg-postRed-50 border-b border-postRed-100 text-postRed-900 font-bold whitespace-nowrap">
                   <th class="p-2">Emp ID</th>
-                  <th class="p-2">Emp Name / Role</th>
+                  <th class="p-2">Employee Name</th>
+                  <th class="p-2">Access Role</th>
                   <th class="p-2">Registered On</th>
                   <th class="p-2">Mobile No</th>
                   <th class="p-2">Office Name</th>
                   <th class="p-2">Status</th>
-                  <th class="p-2 text-center">Admin Actions</th>
+                  <th class="p-2 text-center min-w-[210px]">Admin Actions</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody" class="divide-y divide-slate-200"></tbody>
@@ -749,7 +822,7 @@
 
       <!-- ADMIN EDIT/REPLY MODAL -->
       <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
+        <div class="bg-white rounded-2xl p-5 max-w-xl w-full space-y-3 shadow-2xl border-t-8 border-postRed-600 max-h-[90vh] overflow-y-auto">
           <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
             <h3 class="font-bold text-sm text-postRed-700">Admin Action &amp; Document Quality Review</h3>
             <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer leading-none">&times;</button>
@@ -760,7 +833,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div>
               <label class="block font-bold text-slate-700 mb-0.5">Claim Status</label>
-              <select id="modalStatus" onchange="toggleSettlementDateField()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold">
+              <select id="modalStatus" onchange="onModalStatusChanged()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold">
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Settled">Settled</option>
@@ -768,7 +841,7 @@
               </select>
             </div>
             <div>
-              <label class="block font-bold text-slate-700 mb-0.5">Document Status Action</label>
+              <label class="block font-bold text-slate-700 mb-0.5">Document Quality Action</label>
               <select id="modalDocStatus" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-700">
                 <option value="Approved">Approved (Legible Document)</option>
                 <option value="Needs Revision">Ask User to Re-upload (Poor / Irrelevant)</option>
@@ -782,21 +855,123 @@
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-0.5">Admin Remarks / Reason for Document Revision</label>
+            <label class="block text-xs font-bold text-slate-700 mb-0.5">Admin Remarks / Instructions</label>
             <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
           </div>
 
-          <!-- ADMIN DIRECT REPLACE -->
-          <div class="p-2.5 bg-amber-50 rounded border border-amber-200 space-y-1 text-xs">
-            <label class="block font-bold text-postRed-900">Admin Direct Document Replacement (Optional)</label>
-            <input type="file" id="modalAdminDirectReplaceFile" accept=".jpg,.jpeg,.png,.pdf" class="w-full border p-1 rounded text-xs bg-white">
-            <span class="text-[10px] text-slate-500 italic block">Upload here if you want to replace the user document directly yourself.</span>
+          <!-- ATTACHMENT SECTION 1: USER REPLACEMENT UPLOAD -->
+          <div id="modalPendingUserDocSection" class="p-2.5 bg-rose-50/70 rounded-xl border border-rose-200 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center">
+              <label class="font-bold text-rose-900">1. Replace User Uploaded Document (If Illegible/Wrong)</label>
+              <span class="text-[10px] text-rose-700 font-semibold">Overrides User Doc</span>
+            </div>
+            <input type="file" id="modalUserReplaceFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalUserFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+            
+            <div id="modalUserPasteDropZone" tabindex="0" class="border border-dashed border-rose-300 hover:border-rose-600 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+              <p class="text-[11px] font-bold text-rose-800">📋 Click &amp; press <kbd class="bg-rose-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Replacement Image</p>
+            </div>
+
+            <div id="modalUserPastedPreviewContainer" class="hidden relative border border-rose-300 rounded p-1.5 bg-rose-50 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img id="modalUserPastedImagePreview" src="" alt="Replacement User Preview" class="h-10 w-15 object-cover rounded border border-rose-200">
+                <span class="text-rose-800 font-bold text-xs">✓ User Replacement File Attached</span>
+              </div>
+              <button type="button" onclick="clearModalUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold underline cursor-pointer">Remove</button>
+            </div>
+          </div>
+
+          <!-- ATTACHMENT SECTION 2: ADMIN RESOLUTION ATTACHMENT -->
+          <div id="modalSettledAdminDocSection" class="hidden p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center">
+              <label class="font-bold text-emerald-900">2. Attach Admin Resolution / Confirmation Proof Document</label>
+              <span class="text-[10px] text-emerald-700 font-semibold">Resolution Proof</span>
+            </div>
+            <input type="file" id="modalAdminFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalAdminFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+            
+            <div id="modalAdminPasteDropZone" tabindex="0" class="border border-dashed border-emerald-400 hover:border-emerald-700 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+              <p class="text-[11px] font-bold text-emerald-900">📋 Click &amp; press <kbd class="bg-emerald-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Admin Resolution Image</p>
+            </div>
+
+            <div id="modalAdminPastedPreviewContainer" class="hidden relative border border-emerald-300 rounded p-1.5 bg-emerald-50 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img id="modalAdminPastedImagePreview" src="" alt="Admin Resolution Preview" class="h-10 w-15 object-cover rounded border border-emerald-200">
+                <span class="text-emerald-800 font-bold text-xs">✓ Admin Resolution File Attached</span>
+              </div>
+              <button type="button" onclick="clearModalAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold underline cursor-pointer">Remove</button>
+            </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
             <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
             <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
           </div>
+        </div>
+      </div>
+
+      <!-- ADMIN EDIT USER MODAL -->
+      <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
+          <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="font-bold text-sm text-postRed-700">Edit User Details &amp; Role</h3>
+            <button type="button" onclick="closeAdminUserEditModal()" class="text-xl font-bold cursor-pointer">&times;</button>
+          </div>
+          <form onsubmit="submitAdminUserEdit(event)" class="space-y-2.5 text-xs">
+            <input type="hidden" id="editUserId">
+            <div>
+              <label class="block font-bold mb-0.5">Employee ID</label>
+              <input type="text" id="editUserEmpId" disabled class="w-full border p-1.5 rounded text-xs bg-slate-100 font-mono">
+            </div>
+            <div>
+              <label class="block font-bold mb-0.5">Name *</label>
+              <input type="text" id="editUserEmpName" required class="w-full border p-1.5 rounded text-xs">
+            </div>
+            <div>
+              <label class="block font-bold mb-0.5">Mobile *</label>
+              <input type="tel" id="editUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required class="w-full border p-1.5 rounded text-xs font-mono">
+            </div>
+            <div>
+              <label class="block font-bold mb-0.5">Office *</label>
+              <select id="editUserOffice" required class="w-full border p-1.5 rounded text-xs bg-white"></select>
+            </div>
+            <div>
+              <label class="block font-bold mb-0.5">Role *</label>
+              <select id="editUserRole" required class="w-full border p-1.5 rounded text-xs bg-white font-bold text-postRed-700">
+                <option value="user">User</option>
+                <option value="viewer">Viewer</option>
+                <option value="admin">Admin</option>
+                <option value="superadmin">Superadmin</option>
+              </select>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t">
+              <button type="button" onclick="closeAdminUserEditModal()" class="bg-slate-200 px-3 py-1.5 rounded font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postRed-600 text-white px-4 py-1.5 rounded font-bold cursor-pointer">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ADMIN RESET PASSWORD MODAL -->
+      <div id="adminResetPwdModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postGold-500">
+          <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="font-bold text-sm text-postRed-700">🔑 Reset User Password</h3>
+            <button type="button" onclick="closeAdminResetPwdModal()" class="text-xl font-bold cursor-pointer">&times;</button>
+          </div>
+          <form onsubmit="submitAdminPasswordReset(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="resetPwdUserId">
+            <div class="bg-amber-50 p-2 rounded">
+              <p><strong>User:</strong> <span id="resetPwdUserName"></span></p>
+              <p><strong>Emp ID:</strong> <span id="resetPwdUserEmpId" class="font-mono font-bold text-postRed-700"></span></p>
+            </div>
+            <div>
+              <label class="block font-bold mb-0.5">New Password *</label>
+              <input type="text" id="resetPwdInput" required minlength="6" placeholder="Enter new password" class="w-full border p-1.5 rounded font-mono">
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t">
+              <button type="button" onclick="closeAdminResetPwdModal()" class="bg-slate-200 px-3 py-1.5 rounded font-bold cursor-pointer">Cancel</button>
+              <button type="submit" class="bg-postGold-500 text-postRed-900 px-4 py-1.5 rounded font-bold cursor-pointer">Update</button>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -826,7 +1001,7 @@
     </div>
   </footer>
 
-  <!-- APPLICATION SCRIPT -->
+  <!-- COMPLETE APPLICATION SCRIPT -->
   <script>
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
@@ -850,7 +1025,9 @@
 
     let bookingImportedRecords = [];
 
-    // Master list of known digital channel keys and their field mappings
+    let modalUserPastedBlob = null;
+    let modalAdminPastedBlob = null;
+
     const DIGITAL_CHANNEL_CONFIG = [
       { key: 'dqr', cntField: 'dqr_cnt', amtField: 'dqr_amt', label: 'DQR Scan' },
       { key: 'sbipos_card', cntField: 'sbipos_card_cnt', amtField: 'sbipos_card_amt', label: 'SBIPOS-CARD' },
@@ -867,7 +1044,6 @@
     ];
 
     let activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
-
     let currentActiveTab = sessionStorage.getItem('activePortalTab') || 'track';
 
     let userPastedImageBlob = null;
@@ -876,25 +1052,38 @@
 
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
-
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
 
-    // ROBUST POSTAL EXCEL/CSV DATE PARSER
+    function calculateDaysDifference(startDateStr, endDateStr) {
+      if (!startDateStr || !endDateStr) return null;
+      const start = new Date(startDateStr);
+      const end = new Date(endDateStr);
+      const diffTime = end.getTime() - start.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+      return diffDays >= 0 ? diffDays : 0;
+    }
+
+    function formatDateTime(isoStr) {
+      if (!isoStr) return 'N/A';
+      return new Date(isoStr).toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    function formatDateTimeCompact(isoStr) {
+      if (!isoStr) return 'N/A';
+      const d = new Date(isoStr);
+      return `<div class="font-bold text-slate-800">${d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' })}</div>`;
+    }
+
     function parsePostalBookingDate(val) {
       if (val === null || val === undefined) return null;
-
-      if (val instanceof Date && !isNaN(val.getTime())) {
-        return val.toISOString().split('T')[0];
-      }
+      if (val instanceof Date && !isNaN(val.getTime())) return val.toISOString().split('T')[0];
 
       if (typeof val === 'number' || (!isNaN(val) && !String(val).includes('-') && !String(val).includes('/'))) {
         const num = parseFloat(val);
         if (num > 20000 && num < 70000) {
           const jsDate = new Date(Math.round((num - 25569) * 86400 * 1000));
-          if (!isNaN(jsDate.getTime())) {
-            return jsDate.toISOString().split('T')[0];
-          }
+          if (!isNaN(jsDate.getTime())) return jsDate.toISOString().split('T')[0];
         }
       }
 
@@ -905,37 +1094,24 @@
 
       const dmyMatch = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
       if (dmyMatch) {
-        const day = String(dmyMatch[1]).padStart(2, '0');
-        const month = String(dmyMatch[2]).padStart(2, '0');
-        const year = dmyMatch[3];
-        return `${year}-${month}-${day}`;
+        return `${dmyMatch[3]}-${String(dmyMatch[2]).padStart(2, '0')}-${String(dmyMatch[1]).padStart(2, '0')}`;
       }
 
       const ymdMatch = str.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
       if (ymdMatch) {
-        const year = ymdMatch[1];
-        const month = String(ymdMatch[2]).padStart(2, '0');
-        const day = String(ymdMatch[3]).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+        return `${ymdMatch[1]}-${String(ymdMatch[2]).padStart(2, '0')}-${String(ymdMatch[3]).padStart(2, '0')}`;
       }
 
       const months = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
       const monMatch = str.match(/^(\d{1,2})[\s\-\/]([a-zA-Z]{3})[\s\-\/](\d{2,4})/);
       if (monMatch) {
-        const day = String(monMatch[1]).padStart(2, '0');
-        const mStr = monMatch[2].toLowerCase();
-        const month = months[mStr] ? String(months[mStr]).padStart(2, '0') : '01';
-        let year = monMatch[3];
-        if (year.length === 2) year = '20' + year;
-        return `${year}-${month}-${day}`;
+        const month = months[monMatch[2].toLowerCase()] ? String(months[monMatch[2].toLowerCase()]).padStart(2, '0') : '01';
+        let year = monMatch[3].length === 2 ? '20' + monMatch[3] : monMatch[3];
+        return `${year}-${month}-${String(monMatch[1]).padStart(2, '0')}`;
       }
 
       const parsed = new Date(str);
-      if (!isNaN(parsed.getTime())) {
-        return parsed.toISOString().split('T')[0];
-      }
-
-      return null;
+      return !isNaN(parsed.getTime()) ? parsed.toISOString().split('T')[0] : null;
     }
 
     // CHECKLIST MULTI-SELECT HANDLERS
@@ -949,9 +1125,7 @@
       const popover = $('channelChecklistPopover');
       const wrapper = $('channelDropdownWrapper');
       if (popover && !popover.classList.contains('hidden')) {
-        if (wrapper && !wrapper.contains(e.target)) {
-          popover.classList.add('hidden');
-        }
+        if (wrapper && !wrapper.contains(e.target)) popover.classList.add('hidden');
       }
     }
 
@@ -971,7 +1145,6 @@
       loadBookingDashboardData();
     }
 
-    // DYNAMICALLY REFRESHES CHECKLIST POPOVER TO SHOW ONLY NON-ZERO CHANNELS WITH TXN COUNTS
     function renderDynamicChannelChecklist(channelSummaryMap) {
       const container = $('dynamicChannelListContainer');
       if (!container) return;
@@ -1001,14 +1174,121 @@
       });
 
       container.innerHTML = html;
-
       const checkedCount = nonZeroChannels.filter(cfg => activeSelectedChannelKeys.has(cfg.key)).length;
       $('channelDropdownLabel').innerText = checkedCount === 0 
         ? 'No Channels Selected (0)' 
         : (checkedCount === nonZeroChannels.length ? `All Active Channels (${checkedCount})` : `${checkedCount} of ${nonZeroChannels.length} Channels`);
     }
 
-    // RRN AUTO-FILL SYNC
+    function onModalStatusChanged() {
+      const status = $('modalStatus').value;
+      const settlementContainer = $('modalSettlementDateContainer');
+      const pendingUserDocSection = $('modalPendingUserDocSection');
+      const settledAdminDocSection = $('modalSettledAdminDocSection');
+
+      if (status === 'Settled' || status === 'Rejected') {
+        if (status === 'Settled') {
+          settlementContainer.classList.remove('hidden');
+          if (!$('modalSettlementDate').value) {
+            $('modalSettlementDate').value = new Date().toISOString().split('T')[0];
+          }
+        } else {
+          settlementContainer.classList.add('hidden');
+        }
+        pendingUserDocSection.classList.add('hidden');
+        settledAdminDocSection.classList.remove('hidden');
+      } else {
+        settlementContainer.classList.add('hidden');
+        pendingUserDocSection.classList.remove('hidden');
+        settledAdminDocSection.classList.add('hidden');
+      }
+    }
+
+    function toggleSettlementDateField() {
+      onModalStatusChanged();
+    }
+
+    function handleModalUserFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      modalUserPastedBlob = file;
+      if (file.type.startsWith('image/')) {
+        $('modalUserPastedImagePreview').src = URL.createObjectURL(file);
+        $('modalUserPastedImagePreview').classList.remove('hidden');
+      } else {
+        $('modalUserPastedImagePreview').classList.add('hidden');
+      }
+      $('modalUserPastedPreviewContainer').classList.remove('hidden');
+    }
+
+    function clearModalUserPastedImage() {
+      modalUserPastedBlob = null;
+      $('modalUserReplaceFileInput').value = '';
+      $('modalUserPastedPreviewContainer').classList.add('hidden');
+    }
+
+    function handleModalAdminFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      modalAdminPastedBlob = file;
+      if (file.type.startsWith('image/')) {
+        $('modalAdminPastedImagePreview').src = URL.createObjectURL(file);
+        $('modalAdminPastedImagePreview').classList.remove('hidden');
+      } else {
+        $('modalAdminPastedImagePreview').classList.add('hidden');
+      }
+      $('modalAdminPastedPreviewContainer').classList.remove('hidden');
+    }
+
+    function clearModalAdminPastedImage() {
+      modalAdminPastedBlob = null;
+      $('modalAdminFileInput').value = '';
+      $('modalAdminPastedPreviewContainer').classList.add('hidden');
+    }
+
+    window.addEventListener('paste', async (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      let blob = null;
+      for (let index in items) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.includes('image/')) {
+          blob = item.getAsFile();
+          break;
+        }
+      }
+      if (!blob) return;
+
+      const replyModal = $('replyModal');
+      const registerClaimView = $('registerClaimView');
+
+      if (replyModal && !replyModal.classList.contains('hidden')) {
+        const status = $('modalStatus').value;
+        if (status === 'Settled' || status === 'Rejected') {
+          modalAdminPastedBlob = blob;
+          $('modalAdminPastedImagePreview').src = URL.createObjectURL(blob);
+          $('modalAdminPastedImagePreview').classList.remove('hidden');
+          $('modalAdminPastedPreviewContainer').classList.remove('hidden');
+          $('modalAdminFileInput').value = '';
+        } else {
+          modalUserPastedBlob = blob;
+          $('modalUserPastedImagePreview').src = URL.createObjectURL(blob);
+          $('modalUserPastedImagePreview').classList.remove('hidden');
+          $('modalUserPastedPreviewContainer').classList.remove('hidden');
+          $('modalUserReplaceFileInput').value = '';
+        }
+        e.preventDefault();
+      } else if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
+        userPastedImageBlob = blob;
+        $('userPastedImagePreview').src = URL.createObjectURL(blob);
+        $('userPastedImagePreview').classList.remove('hidden');
+        $('pdfFilePreviewBlock').classList.add('hidden');
+        $('userPastedPreviewContainer').classList.remove('hidden');
+        $('userPastedImageSize').innerText = `Clipboard: ${(blob.size / 1024).toFixed(1)} KB`;
+        $('claimFile').value = '';
+        e.preventDefault();
+      }
+    });
+
     const txnInput = $('claimTxnId');
     const rrnInput = $('claimRrn');
     if (txnInput && rrnInput) {
@@ -1044,7 +1324,6 @@
       el.value = el.value.replace(/\D/g, '').slice(0, 10);
     }
 
-    // 1.5 : 1 RATIO BASE64 LOGO FROM DATABASE CONFIGURATION MASTER
     async function loadLogoFromDatabase() {
       try {
         const { data: config } = await supabaseClient
@@ -1058,7 +1337,7 @@
           cachedPdfLogoBase64 = config.config_value;
         }
       } catch (err) {
-        console.warn("Logo load error from configurationmaster:", err);
+        console.warn("Logo load error:", err);
       }
 
       if ($('navLogoImg')) $('navLogoImg').src = currentAppLogo;
@@ -1079,13 +1358,13 @@
         currentAppLogo = newLogoBase64;
         cachedPdfLogoBase64 = newLogoBase64;
         loadLogoFromDatabase();
-        alert("Logo uploaded to configurationmaster table successfully!");
+        alert("Logo uploaded successfully!");
       };
       r.readAsDataURL(file);
     }
 
     async function resetDefaultLogo() {
-      if (!confirm("Reset database logo to official India Post emblem?")) return;
+      if (!confirm("Reset database logo to default?")) return;
       const defaultUrl = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
       await supabaseClient.from('configurationmaster').upsert([{
         id: 'app_logo', config_key: 'APP_LOGO_BASE64', config_value: defaultUrl
@@ -1094,7 +1373,7 @@
       currentAppLogo = defaultUrl;
       cachedPdfLogoBase64 = null;
       loadLogoFromDatabase();
-      alert("Logo restored to default in database.");
+      alert("Logo restored.");
     }
 
     function showAuthView(view) {
@@ -1144,22 +1423,13 @@
       const password = $('loginPassword').value;
       const shadowEmail = empIdToEmail(empId);
 
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ 
-        email: shadowEmail, 
-        password 
-      });
-
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email: shadowEmail, password });
       if (error) return alert("Login failed: " + error.message);
 
-      const { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('is_active')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
+      const { data: profile } = await supabaseClient.from('profiles').select('is_active').eq('id', data.user.id).maybeSingle();
       if (profile && profile.is_active === false) {
         await supabaseClient.auth.signOut();
-        return alert("ACCESS DENIED: Your account has been locked/disabled by an Admin.");
+        return alert("ACCESS DENIED: Your account is locked.");
       }
 
       initApp();
@@ -1178,9 +1448,8 @@
       if (password !== confirmPassword) return alert("Passwords do not match!");
 
       const shadowEmail = empIdToEmail(emp_id);
-      const { data, error } = await supabaseClient.auth.signUp({ 
-        email: shadowEmail, 
-        password: password,
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: shadowEmail, password: password,
         options: { data: { emp_id, emp_name, mobile_number, office_name, role: 'user' } }
       });
 
@@ -1188,13 +1457,7 @@
 
       if (data?.user?.id) {
         await supabaseClient.from('profiles').upsert([{
-          id: data.user.id,
-          emp_id: emp_id,
-          emp_name: emp_name,
-          mobile_number: mobile_number,
-          office_name: office_name,
-          role: 'user',
-          is_active: true
+          id: data.user.id, emp_id, emp_name, mobile_number, office_name, role: 'user', is_active: true
         }], { onConflict: 'id' });
       }
 
@@ -1214,12 +1477,7 @@
       if (authError || !user) return;
       currentUser = user;
 
-      let { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
+      let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
       if (!profile) {
         profile = {
           id: user.id,
@@ -1245,7 +1503,12 @@
       if (isAdmin) {
         $('adminTabBtn').classList.remove('hidden');
         $('adminBookingDashTabBtn').classList.remove('hidden');
+        $('tabBtnConverter').classList.remove('hidden');
         if (isSuperadmin) $('superadminLogoPanel').classList.remove('hidden');
+      } else {
+        $('adminTabBtn').classList.add('hidden');
+        $('adminBookingDashTabBtn').classList.add('hidden');
+        $('tabBtnConverter').classList.add('hidden');
       }
 
       const mobileInput = $('claimUserMobile');
@@ -1255,10 +1518,11 @@
       await loadFilterDropdowns();
       showTab(currentActiveTab);
 
-      if (!isAppInitialized) {
-        loadClaimsSummary();
-        generateMISReport();
-        isAppInitialized = true;
+      await loadClaimsSummary();
+      await generateMISReport('All');
+      if (isAdmin) {
+        await loadBookingDashboardData();
+        await loadAllUsers();
       }
     }
 
@@ -1342,7 +1606,9 @@
           query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
         }
 
-        const { data: claims } = await query;
+        const { data: claims, error } = await query;
+        if (error) throw error;
+
         const { data: profiles } = await supabaseClient.from('profiles').select('id, emp_id, emp_name');
         const profileMap = {};
         (profiles || []).forEach(p => { profileMap[p.id] = p; });
@@ -1353,11 +1619,52 @@
         }));
 
         currentClaimsList = [...rawClaimsList];
-        renderClaimsSummaryTable();
-        generateMISReport();
+        applyOverviewFilters();
       } catch (e) {
         console.warn("Claims load error:", e);
       }
+    }
+
+    function applyOverviewFilters() {
+      const q = ($('overviewInstantSearch')?.value || '').trim().toLowerCase();
+      const mod = $('overviewFilterModule')?.value;
+      const off = $('overviewFilterOffice')?.value;
+      const user = $('overviewFilterEmpUser')?.value;
+      const st = $('overviewFilterStatus')?.value;
+
+      currentClaimsList = rawClaimsList.filter(c => {
+        if (q) {
+          const matchTxn = (c.txn_id_ref || '').toLowerCase().includes(q);
+          const matchArticle = (c.article_number || '').toLowerCase().includes(q);
+          const matchEmpName = (c.profiles?.emp_name || '').toLowerCase().includes(q);
+          const matchEmpId = (c.profiles?.emp_id || '').toLowerCase().includes(q);
+          const matchOffice = (c.raised_for_office || '').toLowerCase().includes(q);
+          if (!matchTxn && !matchArticle && !matchEmpName && !matchEmpId && !matchOffice) return false;
+        }
+        if (mod && c.module !== mod) return false;
+        if (off && c.raised_for_office !== off) return false;
+        if (user && c.created_by !== user) return false;
+        if (st && c.claim_status !== st) return false;
+        return true;
+      });
+
+      renderClaimsSummaryTable();
+    }
+
+    function resetOverviewFilters() {
+      if ($('overviewInstantSearch')) $('overviewInstantSearch').value = '';
+      if ($('overviewFilterModule')) $('overviewFilterModule').value = '';
+      if ($('overviewFilterOffice')) $('overviewFilterOffice').value = '';
+      if ($('overviewFilterEmpUser')) $('overviewFilterEmpUser').value = '';
+      if ($('overviewFilterStatus')) $('overviewFilterStatus').value = '';
+      currentClaimsList = [...rawClaimsList];
+      renderClaimsSummaryTable();
+    }
+
+    function sortTable(col) {
+      currentSortDir = (currentSortCol === col && currentSortDir === 'asc') ? 'desc' : 'asc';
+      currentSortCol = col;
+      renderClaimsSummaryTable();
     }
 
     function renderClaimsSummaryTable() {
@@ -1382,19 +1689,29 @@
           ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
           : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user}</div>`;
 
-        let docButtonHtml = `<a href="${c.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold">📄 Doc</a>`;
+        let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
 
         if (needsRevision && isOwner) {
-          docButtonHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
+          userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
         } else if (needsRevision) {
-          docButtonHtml = `<span class="bg-rose-100 text-rose-800 border border-rose-300 px-1.5 py-0.5 rounded text-[9.5px] font-bold">Needs Revision</span>`;
+          userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
+        }
+
+        let adminDocHtml = '';
+        if (c.admin_file_url) {
+          adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
+        } else if (c.claim_status === 'Pending' || c.claim_status === 'In Progress') {
+          adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">No Admin Doc</span>`;
+        } else {
+          adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
         }
 
         tbody.innerHTML += `
           <tr class="hover:bg-amber-50/40 transition align-middle">
             <td class="p-2 whitespace-nowrap">
-              <span class="text-postRed-700 font-bold font-mono text-xs block">${c.txn_id_ref}</span>
-              <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+              <span class="text-postRed-700 font-bold font-mono text-xs block cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
+              <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer mt-0.5 inline-block">📋 Copy</button>
+              <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border ml-1">${c.module}</span>
             </td>
             <td class="p-2 whitespace-nowrap">
               <div class="font-bold text-slate-800">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono">${empIdOnly}</span></div>
@@ -1408,11 +1725,12 @@
               ${isSettled && c.settlement_date ? `<div class="text-[10px] text-emerald-800 font-bold mt-0.5">📅 ${c.settlement_date}</div>` : ''}
             </td>
             <td class="p-2">${remarksDisplay}</td>
-            <td class="p-2 text-center">
-              <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                ${isAdmin ? `<button type="button" onclick="openReplyModal('${c.id}')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10px] font-bold">✏️ Action</button>` : ''}
-                ${docButtonHtml}
-                <button type="button" onclick="printClaimDetails('${c.id}')" class="bg-slate-800 text-white px-2 py-1 rounded text-[10px] font-bold">🖨️</button>
+            <td class="p-2 text-center min-w-[190px]">
+              <div class="grid grid-cols-2 gap-1 w-[185px] mx-auto">
+                ${isAdmin ? `<button type="button" onclick="openReplyModal('${c.id}')" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Action</button>` : `<div class="w-full"></div>`}
+                <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
+                ${userDocHtml}
+                ${adminDocHtml}
               </div>
             </td>
           </tr>
@@ -1420,252 +1738,543 @@
       });
     }
 
-    // ADMIN ACTION: OPEN REPLY & DOCUMENT REVISION MODAL
-    function openReplyModal(claimId) {
-      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
-      if (!claim) return alert("Claim record not found.");
-
-      $('modalClaimId').value = claim.id;
-      $('modalStatus').value = claim.claim_status || 'Pending';
-      $('modalDocStatus').value = claim.doc_status || 'Approved';
-      $('modalAdminRemarks').value = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
-      $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
-      $('modalAdminDirectReplaceFile').value = '';
-
-      toggleSettlementDateField();
-      $('replyModal').classList.remove('hidden');
-    }
-
-    function closeModal() { $('replyModal').classList.add('hidden'); }
-
-    async function submitAdminReply() {
-      const id = $('modalClaimId').value;
-      const status = $('modalStatus').value;
-      const docStatus = $('modalDocStatus').value;
-      const remarks = $('modalAdminRemarks').value.trim();
-      const settlementDate = (status === 'Settled') ? $('modalSettlementDate').value : null;
-      const directReplaceFile = $('modalAdminDirectReplaceFile').files[0];
-
-      let newFileUrl = null;
-      if (directReplaceFile) {
-        const fileExt = directReplaceFile.name.split('.').pop();
-        const filePath = `claims/admin-replaced-${id}-${Date.now()}.${fileExt}`;
-        const { error: uploadErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, directReplaceFile, { upsert: true });
-        if (!uploadErr) {
-          newFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-        }
-      }
-
-      const updateData = {
-        claim_status: status,
-        doc_status: docStatus,
-        reply_remarks_admin: remarks,
-        settlement_date: settlementDate
-      };
-
-      if (docStatus === 'Needs Revision') {
-        updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
+    // ROBUST FALLBACK CLIPBOARD COPY
+    function copyTextToClipboard(text, btnEl) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          updateCopyButtonState(btnEl);
+        }).catch(() => {
+          fallbackCopyText(text, btnEl);
+        });
       } else {
-        updateData.doc_revision_remarks = null;
-      }
-
-      if (newFileUrl) {
-        updateData.file_url = newFileUrl;
-        updateData.doc_status = 'Approved';
-        updateData.doc_revision_remarks = null;
-      }
-
-      const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
-      if (error) alert("Error: " + error.message);
-      else {
-        alert("Action & Document status updated successfully!");
-        closeModal();
-        loadClaimsSummary();
+        fallbackCopyText(text, btnEl);
       }
     }
 
-    // USER ACTION: RE-UPLOAD DOCUMENT
-    function openReuploadModal(claimId, reason) {
-      $('reuploadClaimId').value = claimId;
-      $('reuploadAdminReason').innerText = reason;
-      $('reuploadFileInput').value = '';
-      $('reuploadModal').classList.remove('hidden');
+    function fallbackCopyText(text, btnEl) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        updateCopyButtonState(btnEl);
+      } catch (err) {
+        console.warn('Fallback copy failed', err);
+      }
+      document.body.removeChild(textArea);
     }
 
-    function closeReuploadModal() { $('reuploadModal').classList.add('hidden'); }
+    function updateCopyButtonState(btnEl) {
+      if (!btnEl) return;
+      const originalText = btnEl.innerText;
+      btnEl.innerText = "✓ Copied";
+      btnEl.classList.remove('bg-amber-100', 'text-amber-900');
+      btnEl.classList.add('bg-emerald-600', 'text-white');
+      setTimeout(() => {
+        btnEl.innerText = originalText;
+        btnEl.classList.remove('bg-emerald-600', 'text-white');
+        btnEl.classList.add('bg-amber-100', 'text-amber-900');
+      }, 2000);
+    }
 
-    async function submitDocumentReupload() {
-      const claimId = $('reuploadClaimId').value;
-      const file = $('reuploadFileInput').files[0];
-      if (!file) return alert("Please select replacement document!");
+    // TRACK CLAIM FUNCTION
+    async function trackClaim() {
+      const searchVal = ($('searchRefNo')?.value || '').trim();
+      const resCard = $('trackResult');
+      if (!searchVal) return alert("Please enter Reference Number, Article Number, or RRN to track!");
 
-      const fileExt = file.name.split('.').pop();
-      const filePath = `claims/user-revised-${claimId}-${Date.now()}.${fileExt}`;
-      const { error: uploadErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, file, { upsert: true });
-      if (uploadErr) return alert("Upload failed: " + uploadErr.message);
+      const searchLower = searchVal.toLowerCase();
+      const found = rawClaimsList.find(c => 
+        (c.txn_id_ref && c.txn_id_ref.toLowerCase() === searchLower) ||
+        (c.article_number && c.article_number.toLowerCase() === searchLower) ||
+        (c.rrn_number && c.rrn_number.toLowerCase() === searchLower) ||
+        (c.txn_id_ref && c.txn_id_ref.toLowerCase().includes(searchLower)) ||
+        (c.article_number && c.article_number.toLowerCase().includes(searchLower))
+      );
 
-      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+      if (!resCard) return;
+      resCard.classList.remove('hidden');
 
-      const { error } = await supabaseClient.from('claims').update({
-        file_url: publicUrl,
-        doc_status: 'Approved',
-        doc_revision_remarks: null,
-        claim_status: 'Pending'
-      }).eq('id', claimId);
+      if (found) {
+        const isSettled = found.claim_status === 'Settled';
+        const tat = (isSettled && found.settlement_date) 
+          ? calculateDaysDifference(found.txn_date, found.settlement_date) 
+          : calculateDaysDifference(found.txn_date, new Date().toISOString().split('T')[0]);
 
-      if (error) alert("Update error: " + error.message);
-      else {
-        alert("Revised document re-uploaded! Claim reset to Pending for review.");
-        closeReuploadModal();
-        loadClaimsSummary();
+        resCard.innerHTML = `
+          <div class="flex justify-between items-start border-b border-postGold-400 pb-1.5 mb-1.5">
+            <div>
+              <span class="text-xs text-slate-500 font-bold">Ref No:</span>
+              <span class="text-sm font-extrabold text-postRed-700 font-mono ml-1">${found.txn_id_ref}</span>
+              <button type="button" onclick="copyTextToClipboard('${found.txn_id_ref}', this)" class="ml-2 bg-amber-100 hover:bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer">📋 Copy</button>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor(found.claim_status)}">${found.claim_status}</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div><strong>Raised By:</strong> ${found.profiles?.emp_name || 'Staff'} (${found.profiles?.emp_id || 'N/A'})</div>
+            <div><strong>Office:</strong> ${found.raised_for_office}</div>
+            <div><strong>Module/Article:</strong> ${found.module} / ${found.article_number}</div>
+            <div><strong>Amount:</strong> <span class="font-bold text-emerald-800">₹${found.txn_amount}</span></div>
+            <div><strong>Txn Date:</strong> ${found.txn_date}</div>
+            <div><strong>Settlement Date:</strong> ${found.settlement_date || 'Pending'}</div>
+            <div><strong>${isSettled ? 'TAT' : 'Aging'}:</strong> ${tat !== null ? tat + ' Days' : '-'}</div>
+            <div><strong>Document Quality:</strong> <span class="font-bold text-postRed-700">${found.doc_status || 'Approved'}</span></div>
+          </div>
+          <div class="mt-2 pt-1 border-t border-postGold-300 text-xs">
+            <p><strong>User Remarks:</strong> ${found.remarks_by_user || '-'}</p>
+            <p><strong>Admin Remarks:</strong> ${found.reply_remarks_admin || 'Pending Response'}</p>
+          </div>
+          <div class="flex gap-2 pt-2 flex-wrap">
+            <a href="${found.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📄 Primary User Doc</a>
+            ${found.admin_file_url ? `<a href="${found.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs">📎 Admin Resolution Doc</a>` : ''}
+            <button type="button" onclick="printClaimDetails('${found.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer">🖨️ Print Full Docket</button>
+          </div>
+        `;
+      } else {
+        resCard.innerHTML = `<p class="text-postRed-700 font-bold">No claim record found matching "${searchVal}" under your permissions.</p>`;
       }
     }
 
-    // ROBUST EXCEL / CSV IMPORT (UPSERT: UPDATES EXISTING DATES INSTEAD OF DUPLICATING)
-    async function handleBookingExcelUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    // MIS Analytics & Report Functions
+    function getStatusColor(status) {
+      if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
+      if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
+      if (status === 'Settled') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+      if (status === 'Rejected') return 'bg-rose-100 text-rose-800 border border-rose-200';
+      return 'bg-slate-100 text-slate-800';
+    }
 
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        try {
-          const data = new Uint8Array(ev.target.result);
-          const workbook = XLSX.read(data, { type: 'array', cellDates: false, raw: true });
-          const sheetName = workbook.SheetNames[0];
-          const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-          if (!jsonData || !jsonData.length) {
-            return alert("Uploaded sheet is empty!");
-          }
-
-          const recordsToInsert = [];
-          let skippedRows = 0;
-
-          for (let i = 0; i < jsonData.length; i++) {
-            const row = jsonData[i];
-
-            const rawOfficeName = String(row['Office Name'] || '').trim();
-            const rawBookingDate = row['Booking Date'];
-
-            if (!rawOfficeName || rawOfficeName === '-' || rawOfficeName === '--' || rawOfficeName === '---') {
-              skippedRows++;
-              continue;
-            }
-
-            const parsedDate = parsePostalBookingDate(rawBookingDate);
-            if (!parsedDate) {
-              skippedRows++;
-              continue;
-            }
-
-            const dqr_c = parseFloat(row['DQR Scan (Cnt)']) || 0;
-            const dqr_a = parseFloat(row['DQR Scan (Amt)']) || 0;
-            const sbipos_card_c = parseFloat(row['SBIPOS-CARD (Cnt)']) || 0;
-            const sbipos_card_a = parseFloat(row['SBIPOS-CARD (Amt)']) || 0;
-            const sbipos_bqr_c = parseFloat(row['SBIPOS BHARATQR (Cnt)']) || 0;
-            const sbipos_bqr_a = parseFloat(row['SBIPOS BHARATQR (Amt)']) || 0;
-            const sbiepay_bqr_c = parseFloat(row['SBIEPAY BHARATQR (Cnt)']) || 0;
-            const sbiepay_bqr_a = parseFloat(row['SBIEPAY BHARATQR (Amt)']) || 0;
-            const sbiepay_upi_c = parseFloat(row['SBIEPAY UPI (Cnt)']) || 0;
-            const sbiepay_upi_a = parseFloat(row['SBIEPAY UPI (Amt)']) || 0;
-            const sbiepay_cc_c = parseFloat(row['SBIEPAY Credit Card (Cnt)']) || 0;
-            const sbiepay_cc_a = parseFloat(row['SBIEPAY Credit Card (Amt)']) || 0;
-            const sbiepay_dc_c = parseFloat(row['SBIEPAY Debit Card (Cnt)']) || 0;
-            const sbiepay_dc_a = parseFloat(row['SBIEPAY Debit Card (Amt)']) || 0;
-            const sbiepay_neft_c = parseFloat(row['SBIEPAY NEFT (Cnt)']) || 0;
-            const sbiepay_neft_a = parseFloat(row['SBIEPAY NEFT (Amt)']) || 0;
-            const rtgs_c = parseFloat(row['RTGS (Cnt)']) || 0;
-            const rtgs_a = parseFloat(row['RTGS (Amt)']) || 0;
-            const wallet_c = parseFloat(row['Wallet (Cnt)']) || 0;
-            const wallet_a = parseFloat(row['Wallet (Amt)']) || 0;
-            const posb_c = parseFloat(row['POSB (Cnt)']) || 0;
-            const posb_a = parseFloat(row['POSB (Amt)']) || 0;
-            const ippb_c = parseFloat(row['IPPB (Cnt)']) || 0;
-            const ippb_a = parseFloat(row['IPPB (Amt)']) || 0;
-
-            const total_digital_cnt = dqr_c + sbipos_card_c + sbipos_bqr_c + sbiepay_bqr_c + sbiepay_upi_c + sbiepay_cc_c + sbiepay_dc_c + sbiepay_neft_c + rtgs_c + wallet_c + posb_c + ippb_c;
-            const total_digital_amt = dqr_a + sbipos_card_a + sbipos_bqr_a + sbiepay_bqr_a + sbiepay_upi_a + sbiepay_cc_a + sbiepay_dc_a + sbiepay_neft_a + rtgs_a + wallet_a + posb_a + ippb_a;
-
-            recordsToInsert.push({
-              office_id: String(row['Office ID'] || '').trim(),
-              office_name: rawOfficeName,
-              booking_date: parsedDate,
-              product: String(row['Product'] || 'Postal Booking').trim(),
-              cash_cnt: parseFloat(row['Cash (Cnt)']) || 0,
-              cash_amt: parseFloat(row['Cash (Amt)']) || 0,
-              dqr_cnt: dqr_c,
-              dqr_amt: dqr_a,
-              sbipos_card_cnt: sbipos_card_c,
-              sbipos_card_amt: sbipos_card_a,
-              sbipos_bharatqr_cnt: sbipos_bqr_c,
-              sbipos_bharatqr_amt: sbipos_bqr_a,
-              sbiepay_bharatqr_cnt: sbiepay_bqr_c,
-              sbiepay_bharatqr_amt: sbiepay_bqr_a,
-              sbiepay_upi_cnt: sbiepay_upi_c,
-              sbiepay_upi_amt: sbiepay_upi_a,
-              sbiepay_cc_cnt: sbiepay_cc_c,
-              sbiepay_cc_amt: sbiepay_cc_a,
-              sbiepay_dc_cnt: sbiepay_dc_c,
-              sbiepay_dc_amt: sbiepay_dc_a,
-              sbiepay_neft_cnt: sbiepay_neft_c,
-              sbiepay_neft_amt: sbiepay_neft_a,
-              rtgs_cnt: rtgs_c,
-              rtgs_amt: rtgs_a,
-              wallet_cnt: wallet_c,
-              wallet_amt: wallet_a,
-              posb_cnt: posb_c,
-              posb_amt: posb_a,
-              ippb_cnt: ippb_c,
-              ippb_amt: ippb_a,
-              total_digital_cnt,
-              total_digital_amt,
-              imported_by: currentUser?.id
-            });
-          }
-
-          if (!recordsToInsert.length) {
-            return alert(`No valid data rows found to import! (${skippedRows} empty/dash rows skipped)`);
-          }
-
-          // Use upsert matching on unique constraint (office_name, booking_date, product)
-          const batchSize = 100;
-          for (let i = 0; i < recordsToInsert.length; i += batchSize) {
-            const batch = recordsToInsert.slice(i, i + batchSize);
-            const { error } = await supabaseClient
-              .from('booking_performance')
-              .upsert(batch, { onConflict: 'office_name,booking_date,product' });
-            if (error) throw error;
-          }
-
-          alert(`Successfully imported/updated ${recordsToInsert.length} booking records! (${skippedRows} blank/separator rows skipped)`);
-          $('bookingExcelFileInput').value = '';
-          loadBookingDashboardData();
-
-        } catch (err) {
-          console.error("Import failure:", err);
-          alert("Import failed: " + (err.message || "Invalid file format"));
-        }
+    function renderConsolidatedSummaries(claims) {
+      const moduleStats = {
+        'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
+        'Delivery': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
+        'DSS': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
+        'Others': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 }
       };
-      reader.readAsArrayBuffer(file);
+
+      const statusStats = {
+        'Pending': { count: 0, amount: 0 },
+        'In Progress': { count: 0, amount: 0 },
+        'Settled': { count: 0, amount: 0 },
+        'Rejected': { count: 0, amount: 0 }
+      };
+
+      const officeStats = {};
+
+      claims.forEach(c => {
+        const mod = moduleStats[c.module] ? c.module : 'Others';
+        const amt = parseFloat(c.txn_amount) || 0;
+        const off = c.raised_for_office || 'Unassigned';
+
+        if (!officeStats[off]) {
+          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+
+        officeStats[off].registered++;
+        moduleStats[mod].total++;
+
+        if (c.claim_status === 'Pending') {
+          moduleStats[mod].pending++;
+          moduleStats[mod].activePendingAmount += amt;
+          officeStats[off].pending++;
+          officeStats[off].activePendingAmount += amt;
+        } else if (c.claim_status === 'In Progress') {
+          moduleStats[mod].inprogress++;
+          moduleStats[mod].activePendingAmount += amt;
+          officeStats[off].inprogress++;
+          officeStats[off].activePendingAmount += amt;
+        } else if (c.claim_status === 'Settled') {
+          moduleStats[mod].settled++;
+          officeStats[off].settled++;
+        } else if (c.claim_status === 'Rejected') {
+          moduleStats[mod].rejected++;
+          officeStats[off].rejected++;
+        }
+
+        if (statusStats[c.claim_status]) {
+          statusStats[c.claim_status].count++;
+          statusStats[c.claim_status].amount += amt;
+        }
+      });
+
+      const modTbody = $('moduleSummaryTableBody');
+      if (modTbody) {
+        modTbody.innerHTML = '';
+        let modTotalSum = 0, modPendSum = 0, modInpSum = 0, modSetSum = 0, modActiveAmtSum = 0;
+
+        Object.keys(moduleStats).forEach(m => {
+          const s = moduleStats[m];
+          modTotalSum += s.total;
+          modPendSum += s.pending;
+          modInpSum += s.inprogress;
+          modSetSum += s.settled;
+          modActiveAmtSum += s.activePendingAmount;
+
+          modTbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-1.5 font-bold text-slate-800">${m}</td>
+              <td class="p-1.5 text-center font-bold">${s.total}</td>
+              <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
+              <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
+              <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
+              <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
+            </tr>
+          `;
+        });
+
+        modTbody.innerHTML += `
+          <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
+            <td class="p-1.5">Total</td>
+            <td class="p-1.5 text-center">${modTotalSum}</td>
+            <td class="p-1.5 text-center text-amber-800">${modPendSum}</td>
+            <td class="p-1.5 text-center text-blue-800">${modInpSum}</td>
+            <td class="p-1.5 text-center text-emerald-800">${modSetSum}</td>
+            <td class="p-1.5 text-right text-postRed-700">₹${modActiveAmtSum.toFixed(2)}</td>
+          </tr>
+        `;
+      }
+
+      const statTbody = $('statusSummaryTableBody');
+      if (statTbody) {
+        statTbody.innerHTML = '';
+        let statCountSum = 0, statAmtSum = 0;
+
+        Object.keys(statusStats).forEach(st => {
+          const s = statusStats[st];
+          statCountSum += s.count;
+          statAmtSum += s.amount;
+          const sharePct = claims.length > 0 ? ((s.count / claims.length) * 100).toFixed(1) : "0.0";
+
+          statTbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-1.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusColor(st)}">${st}</span></td>
+              <td class="p-1.5 text-center font-bold">${s.count}</td>
+              <td class="p-1.5 text-center font-semibold text-slate-600">${sharePct}%</td>
+              <td class="p-1.5 text-right font-bold text-slate-800">₹${s.amount.toFixed(2)}</td>
+            </tr>
+          `;
+        });
+
+        statTbody.innerHTML += `
+          <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
+            <td class="p-1.5">Total</td>
+            <td class="p-1.5 text-center">${statCountSum}</td>
+            <td class="p-1.5 text-center">100%</td>
+            <td class="p-1.5 text-right text-postRed-700">₹${statAmtSum.toFixed(2)}</td>
+          </tr>
+        `;
+      }
+
+      const offTbody = $('officeSummaryTableBody');
+      if (offTbody) {
+        offTbody.innerHTML = '';
+        const sortedOffices = Object.keys(officeStats).sort();
+
+        sortedOffices.forEach(off => {
+          const s = officeStats[off];
+          offTbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-1.5 font-bold text-slate-800">${off}</td>
+              <td class="p-1.5 text-center font-bold">${s.registered}</td>
+              <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
+              <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
+              <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
+              <td class="p-1.5 text-center text-rose-700 font-semibold">${s.rejected}</td>
+              <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
+            </tr>
+          `;
+        });
+      }
     }
 
-    function applyBookingQuickPeriod() {
-      const mode = $('bookingQuickPeriod').value;
+    async function generateMISReport(filterType = 'All') {
+      currentMISReportFilter = filterType;
+      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+      const isViewer = userProfile?.role === 'viewer';
+
+      let query = supabaseClient.from('claims').select('*');
+      if (!isAdmin && !isViewer && currentUser) {
+        query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile?.office_name || ''}"`);
+      }
+
+      const from = $('filterFromDate')?.value;
+      const to = $('filterToDate')?.value;
+      const selectedModule = $('filterModule')?.value;
+      const selectedOffice = $('filterOfficeName')?.value;
+      const selectedUser = $('filterEmpUser')?.value;
+
+      if (from) query = query.gte('txn_date', from);
+      if (to) query = query.lte('txn_date', to);
+      if (selectedModule) query = query.eq('module', selectedModule);
+      if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
+      if (selectedUser) query = query.eq('created_by', selectedUser);
+
+      const { data: claims } = await query;
+      const safeClaims = claims || [];
+
+      const { data: profiles } = await supabaseClient.from('profiles').select('id, emp_id, emp_name');
+      const profileMap = {};
+      (profiles || []).forEach(p => { profileMap[p.id] = p; });
+
+      rawMISMasterList = safeClaims.map(c => ({
+        ...c,
+        profiles: profileMap[c.created_by] || { emp_id: 'N/A', emp_name: 'Staff' }
+      }));
+
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      const totalCount = rawMISMasterList.length;
+      const pendingClaims = rawMISMasterList.filter(c => c.claim_status === 'Pending');
+      const inProgressClaims = rawMISMasterList.filter(c => c.claim_status === 'In Progress');
+      const settledClaims = rawMISMasterList.filter(c => c.claim_status === 'Settled');
+      const rejectedClaims = rawMISMasterList.filter(c => c.claim_status === 'Rejected');
+
+      $('misTotal').innerText = totalCount;
+      $('misPending').innerText = pendingClaims.length;
+      $('misInProgress').innerText = inProgressClaims.length;
+      $('misSettled').innerText = settledClaims.length;
+      $('misRejected').innerText = rejectedClaims.length;
+
+      let totalTatSum = 0;
+      let settledCountWithDate = 0;
+      let settledLe3Count = 0;
+      let settled4to15Count = 0;
+      let settledGt15Count = 0;
+
+      settledClaims.forEach(c => {
+        const settleDate = c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null);
+        const days = calculateDaysDifference(c.txn_date, settleDate);
+        if (days !== null) {
+          totalTatSum += days;
+          settledCountWithDate++;
+          if (days <= 3) settledLe3Count++;
+          else if (days <= 15) settled4to15Count++;
+          else settledGt15Count++;
+        }
+      });
+
+      const avgTatDays = settledCountWithDate > 0 ? (totalTatSum / settledCountWithDate).toFixed(1) : "0";
+      $('misAvgTat').innerText = `${avgTatDays} Days`;
+      $('misSettledLe3').innerText = settledLe3Count;
+      $('misSettled4to15').innerText = settled4to15Count;
+      $('misSettledGt15').innerText = settledGt15Count;
+
+      let inProgressLe10Count = 0;
+      let inProgress11to20Count = 0;
+      let inProgress21to30Count = 0;
+      let inProgressGt30Count = 0;
+
+      inProgressClaims.forEach(c => {
+        const days = calculateDaysDifference(c.txn_date, todayStr);
+        if (days !== null) {
+          if (days <= 10) inProgressLe10Count++;
+          else if (days <= 20) inProgress11to20Count++;
+          else if (days <= 30) inProgress21to30Count++;
+          else inProgressGt30Count++;
+        }
+      });
+
+      $('misInProgressLe10').innerText = inProgressLe10Count;
+      $('misInProgress11to20').innerText = inProgress11to20Count;
+      $('misInProgress21to30').innerText = inProgress21to30Count;
+      $('misInProgressGt30').innerText = inProgressGt30Count;
+
+      if (filterType === 'All') {
+        currentMISClaimsList = rawMISMasterList;
+        $('misReportTableTitle').innerText = `Report Summary View: All Registered Claims (${rawMISMasterList.length})`;
+        $('allReportConsolidationContainer').classList.remove('hidden');
+        renderConsolidatedSummaries(rawMISMasterList);
+      } else {
+        $('allReportConsolidationContainer').classList.add('hidden');
+
+        if (filterType === 'Pending') {
+          currentMISClaimsList = pendingClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: Pending Claims (${pendingClaims.length})`;
+        } else if (filterType === 'In Progress') {
+          currentMISClaimsList = inProgressClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: In Progress Claims (${inProgressClaims.length})`;
+        } else if (filterType === 'Settled') {
+          currentMISClaimsList = settledClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: All Settled Claims (${settledClaims.length})`;
+        } else if (filterType === 'Rejected') {
+          currentMISClaimsList = rejectedClaims;
+          $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
+        } else if (filterType === 'Settled_le3') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d <= 3;
+          });
+          $('misReportTableTitle').innerText = `Settlement TAT: Settled within 3 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_4to15') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d >= 4 && d <= 15;
+          });
+          $('misReportTableTitle').innerText = `Settlement TAT: Settled in 4 to 15 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_gt15') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d > 15;
+          });
+          $('misReportTableTitle').innerText = `Settlement TAT: Settled in > 15 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_le10') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d <= 10;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: <= 10 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_11to20') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d >= 11 && d <= 20;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: 11 to 20 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_21to30') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d >= 21 && d <= 30;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: 21 to 30 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'InProgress_gt30') {
+          currentMISClaimsList = inProgressClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, todayStr);
+            return d !== null && d > 30;
+          });
+          $('misReportTableTitle').innerText = `In-Progress Aging: > 30 Days (${currentMISClaimsList.length})`;
+        }
+      }
+
+      renderMISTableRows();
+    }
+
+    function sortMISReport(col) {
+      if (currentMISSortCol === col) {
+        currentMISSortDir = currentMISSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentMISSortCol = col;
+        currentMISSortDir = 'asc';
+      }
+      renderMISTableRows();
+    }
+
+    function renderMISTableRows() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const tbody = $('misReportTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-500">No matching claims found for this filter selection.</td></tr>`;
+        return;
+      }
+
+      currentMISClaimsList.forEach(c => {
+        const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
+        const isSettled = c.claim_status === 'Settled';
+        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
+        
+        let tatOrAgingDisplay = '-';
+        if (isSettled) {
+          const days = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+          tatOrAgingDisplay = days !== null ? `<span class="font-bold text-emerald-800">${days} Days (TAT)</span>` : '-';
+        } else if (c.claim_status === 'In Progress') {
+          const days = calculateDaysDifference(c.txn_date, todayStr);
+          const colorClass = days > 30 ? 'text-rose-700 font-extrabold' : (days > 15 ? 'text-amber-700 font-bold' : 'text-slate-800 font-semibold');
+          tatOrAgingDisplay = days !== null ? `<span class="${colorClass}">${days} Days (Age)</span>` : '-';
+        } else if (c.claim_status === 'Pending') {
+          const days = calculateDaysDifference(c.txn_date, todayStr);
+          tatOrAgingDisplay = days !== null ? `<span class="text-slate-700 font-medium">${days} Days (Age)</span>` : '-';
+        }
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40 transition">
+            <td class="p-2.5 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
+            <td class="p-2.5 font-semibold text-slate-800 whitespace-nowrap">${creatorName}</td>
+            <td class="p-2.5 font-medium text-slate-800 whitespace-nowrap">${c.module}</td>
+            <td class="p-2.5 whitespace-nowrap text-slate-800">${c.raised_for_office}</td>
+            <td class="p-2.5 whitespace-nowrap text-slate-800">${c.txn_date}</td>
+            <td class="p-2.5 whitespace-nowrap font-medium text-slate-800">${settleDate}</td>
+            <td class="p-2.5 whitespace-nowrap">${tatOrAgingDisplay}</td>
+            <td class="p-2.5 font-semibold whitespace-nowrap text-slate-900">₹${c.txn_amount}</td>
+            <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
+            <td class="p-2.5 text-xs text-slate-800">${c.reply_remarks_admin || '-'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function applyMISQuickPeriod() {
+      const mode = $('misQuickPeriod')?.value;
+      const today = new Date();
+      const toStr = today.toISOString().split('T')[0];
+
+      if (mode === 'today') {
+        $('filterFromDate').value = toStr;
+        $('filterToDate').value = toStr;
+      } else if (mode === 'yesterday') {
+        const yest = new Date();
+        yest.setDate(yest.getDate() - 1);
+        const yestStr = yest.toISOString().split('T')[0];
+        $('filterFromDate').value = yestStr;
+        $('filterToDate').value = yestStr;
+      } else if (mode === 'fortnight') {
+        const d = new Date();
+        d.setDate(d.getDate() - 15);
+        $('filterFromDate').value = d.toISOString().split('T')[0];
+        $('filterToDate').value = toStr;
+      } else if (mode === 'month') {
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        $('filterFromDate').value = `${year}-${month}-01`;
+        $('filterToDate').value = toStr;
+      } else if (mode === 'all') {
+        $('filterFromDate').value = '';
+        $('filterToDate').value = '';
+      }
+      generateMISReport('All');
+    }
+
+    async function applyBookingQuickPeriod() {
+      const mode = $('bookingQuickPeriod')?.value;
       const today = new Date();
       const toStr = today.toISOString().split('T')[0];
 
       if (mode === 'today') {
         $('bookingFromDate').value = toStr;
         $('bookingToDate').value = toStr;
+      } else if (mode === 'yesterday') {
+        const yest = new Date();
+        yest.setDate(yest.getDate() - 1);
+        const yestStr = yest.toISOString().split('T')[0];
+        $('bookingFromDate').value = yestStr;
+        $('bookingToDate').value = yestStr;
+      } else if (mode === 'recent') {
+        const { data: latestRow } = await supabaseClient
+          .from('booking_performance')
+          .select('booking_date')
+          .order('booking_date', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (latestRow && latestRow.booking_date) {
+          $('bookingFromDate').value = latestRow.booking_date;
+          $('bookingToDate').value = latestRow.booking_date;
+        } else {
+          $('bookingFromDate').value = toStr;
+          $('bookingToDate').value = toStr;
+        }
       } else if (mode === 'fortnight') {
         const d = new Date();
         d.setDate(d.getDate() - 15);
         $('bookingFromDate').value = d.toISOString().split('T')[0];
         $('bookingToDate').value = toStr;
       } else if (mode === 'month') {
-        const d = new Date(today.getFullYear(), today.getMonth(), 1);
-        $('bookingFromDate').value = d.toISOString().split('T')[0];
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        $('bookingFromDate').value = `${year}-${month}-01`;
         $('bookingToDate').value = toStr;
       } else if (mode === 'all') {
         $('bookingFromDate').value = '';
@@ -1674,7 +2283,6 @@
       loadBookingDashboardData();
     }
 
-    // CALCULATES DIGITAL SUM DYNAMICALLY & UPDATES NON-ZERO CHANNELS AND SUMMARY
     async function loadBookingDashboardData() {
       let query = supabaseClient.from('booking_performance').select('*');
 
@@ -1691,7 +2299,6 @@
 
       bookingImportedRecords = data;
 
-      // Aggregate overall non-zero counts
       const channelSummaryMap = {};
       DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
         channelSummaryMap[cfg.key] = { count: 0, amount: 0 };
@@ -1706,56 +2313,42 @@
 
       renderDynamicChannelChecklist(channelSummaryMap);
 
-      let totalCashCnt = 0, totalCashAmt = 0;
-      let totalDigCnt = 0, totalDigAmt = 0;
+      let totalCashCnt = 0;
+      let totalDigCnt = 0;
       const officeMap = {};
 
       data.forEach(r => {
         const off = r.office_name || 'Unassigned';
         const c_cnt = parseFloat(r.cash_cnt) || 0;
-        const c_amt = parseFloat(r.cash_amt) || 0;
 
         let d_cnt = 0;
-        let d_amt = 0;
-
         DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
           if (activeSelectedChannelKeys.has(cfg.key)) {
             d_cnt += parseFloat(r[cfg.cntField]) || 0;
-            d_amt += parseFloat(r[cfg.amtField]) || 0;
           }
         });
 
         totalCashCnt += c_cnt;
-        totalCashAmt += c_amt;
         totalDigCnt += d_cnt;
-        totalDigAmt += d_amt;
 
-        if (!officeMap[off]) {
-          officeMap[off] = { cash_cnt: 0, cash_amt: 0, dig_cnt: 0, dig_amt: 0 };
-        }
+        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
         officeMap[off].cash_cnt += c_cnt;
-        officeMap[off].cash_amt += c_amt;
         officeMap[off].dig_cnt += d_cnt;
-        officeMap[off].dig_amt += d_amt;
       });
 
-      // Update heading count
-      $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
+      if ($('channelHeadingTxnCount')) $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
 
       const totalBookings = totalCashCnt + totalDigCnt;
-      const totalVal = totalCashAmt + totalDigAmt;
       const digPct = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
 
-      $('dashTotalBookings').innerText = totalBookings.toLocaleString('en-IN');
-      $('dashTotalValue').innerText = `₹${totalVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-      $('dashCashCount').innerText = totalCashCnt.toLocaleString('en-IN');
-      $('dashCashValue').innerText = `₹${totalCashAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-      $('dashDigitalCount').innerText = totalDigCnt.toLocaleString('en-IN');
-      $('dashDigitalValue').innerText = `₹${totalDigAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-      $('dashDigitalSharePct').innerText = `${digPct}%`;
-      $('dashDigitalProgressBar').style.width = `${digPct}%`;
+      if ($('dashTotalBookings')) $('dashTotalBookings').innerText = totalBookings.toLocaleString('en-IN');
+      if ($('dashCashCount')) $('dashCashCount').innerText = totalCashCnt.toLocaleString('en-IN');
+      if ($('dashDigitalCount')) $('dashDigitalCount').innerText = totalDigCnt.toLocaleString('en-IN');
+      if ($('dashDigitalSharePct')) $('dashDigitalSharePct').innerText = `${digPct}%`;
+      if ($('dashDigitalProgressBar')) $('dashDigitalProgressBar').style.width = `${digPct}%`;
 
       const tbody = $('bookingPerfTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       const sortedOffices = Object.keys(officeMap).map(name => {
@@ -1766,7 +2359,7 @@
       }).sort((a, b) => b.pct - a.pct);
 
       if (!sortedOffices.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No booking records found for selected dates.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No booking records found for selected dates.</td></tr>`;
         return;
       }
 
@@ -1776,87 +2369,176 @@
             <td class="p-2 text-center font-bold font-mono ${i < 3 ? 'text-amber-700' : 'text-slate-500'}">#${i + 1}</td>
             <td class="p-2 font-bold text-slate-800">${o.name}</td>
             <td class="p-2 text-center font-semibold">${o.cash_cnt.toLocaleString('en-IN')}</td>
-            <td class="p-2 text-right">₹${o.cash_amt.toFixed(2)}</td>
             <td class="p-2 text-center font-bold text-blue-800">${o.dig_cnt.toLocaleString('en-IN')}</td>
-            <td class="p-2 text-right font-bold text-blue-800">₹${o.dig_amt.toFixed(2)}</td>
             <td class="p-2 text-center font-extrabold text-emerald-700 bg-emerald-50/50">${o.pct.toFixed(2)}%</td>
           </tr>
         `;
       });
 
-      // SUMMARY TOTAL ROW WITH RED HEADER BACKGROUND & 2-DECIMAL SHARE
       tbody.innerHTML += `
         <tr class="bg-postRed-700 text-white font-extrabold border-t-2 border-postRed-900">
           <td class="p-2 text-center font-mono">Σ</td>
           <td class="p-2 font-bold uppercase tracking-wider">Total (${sortedOffices.length} Offices)</td>
           <td class="p-2 text-center">${totalCashCnt.toLocaleString('en-IN')}</td>
-          <td class="p-2 text-right text-postRed-200">-</td>
           <td class="p-2 text-center">${totalDigCnt.toLocaleString('en-IN')}</td>
-          <td class="p-2 text-right text-postRed-200">-</td>
           <td class="p-2 text-center font-extrabold text-postGold-400">${digPct}%</td>
         </tr>
       `;
     }
 
     function resetBookingFilters() {
-      $('bookingQuickPeriod').value = 'all';
-      $('bookingFromDate').value = '';
-      $('bookingToDate').value = '';
-      $('bookingFilterOffice').value = '';
+      if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'all';
+      if ($('bookingFromDate')) $('bookingFromDate').value = '';
+      if ($('bookingToDate')) $('bookingToDate').value = '';
+      if ($('bookingFilterOffice')) $('bookingFilterOffice').value = '';
       activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
       loadBookingDashboardData();
+    }
+
+    async function exportBookingReportImage() {
+      if (!bookingImportedRecords.length) return alert("No booking data available to export as image!");
+      const fromVal = $('bookingFromDate')?.value || 'Inception';
+      const toVal = $('bookingToDate')?.value || 'CurrentDate';
+      const fileName = `Office-wise Digital Adoption-${fromVal}-${toVal}.png`;
+
+      const selectedChannels = activeSelectedChannelKeys;
+      const officeMap = {};
+      let totalCashCnt = 0, totalDigCnt = 0;
+
+      bookingImportedRecords.forEach(r => {
+        const off = r.office_name || 'Unassigned';
+        const c_cnt = parseFloat(r.cash_cnt) || 0;
+        let d_cnt = 0;
+        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+          if (selectedChannels.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
+        });
+
+        totalCashCnt += c_cnt;
+        totalDigCnt += d_cnt;
+        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
+        officeMap[off].cash_cnt += c_cnt;
+        officeMap[off].dig_cnt += d_cnt;
+      });
+
+      const totalBookings = totalCashCnt + totalDigCnt;
+      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+
+      const sortedOffices = Object.keys(officeMap).map(name => {
+        const o = officeMap[name];
+        const tot = o.cash_cnt + o.dig_cnt;
+        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
+        return { name, ...o, tot, pct };
+      }).sort((a, b) => b.pct - a.pct);
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '800px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      sortedOffices.forEach((o, i) => {
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
+            <td style="padding: 7px; text-align: center; font-weight: bold; font-family: monospace;">#${i + 1}</td>
+            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${o.name}</td>
+            <td style="padding: 7px; text-align: center; font-weight: 600;">${o.cash_cnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 7px; text-align: center; font-weight: bold; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 7px; text-align: center; font-weight: 800; color: #15803d; background: #f0fdf4;">${o.pct.toFixed(2)}%</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Digital vs Cash Transaction Performance Report</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Leaderboard</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
+                <th style="padding: 8px; text-align: center; width: 10%;">Rank</th>
+                <th style="padding: 8px; width: 45%;">Office Name</th>
+                <th style="padding: 8px; text-align: center; width: 15%;">Cash Txn (Cnt)</th>
+                <th style="padding: 8px; text-align: center; width: 15%;">Digital Txn (Cnt)</th>
+                <th style="padding: 8px; text-align: center; width: 15%;">Digital % Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
+                <td style="padding: 8px; text-align: center; font-family: monospace;">Σ</td>
+                <td style="padding: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
+                <td style="padding: 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
+                <td style="padding: 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
+                <td style="padding: 8px; text-align: center; color: #FACC15; font-size: 12px;">${totalDigShare}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
     }
 
     async function exportBookingReportPDF() {
       if (!bookingImportedRecords.length) return alert("No performance data to export!");
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape" });
+      const doc = new jsPDF({ orientation: "portrait" });
 
       if (cachedPdfLogoBase64) {
-        try {
-          doc.addImage(cachedPdfLogoBase64, 'PNG', 260, 6, 24, 16);
-        } catch (e) {}
+        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 169, 8, 27, 18); } catch (e) {}
       }
 
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
-      doc.text("Digital vs Cash Transaction Performance Report", 148.5, 12, { align: "center" });
+      doc.text("Digital vs Cash Transaction Performance Report", 105, 14, { align: "center" });
       doc.setFontSize(9.5);
       doc.setTextColor(180, 83, 9);
-      doc.text("Chennai City Central Division • Booking Performance Monitoring", 148.5, 17, { align: "center" });
+      doc.text("Chennai City Central Division • Booking Performance Monitoring", 105, 19, { align: "center" });
 
       const fromVal = $('bookingFromDate')?.value || 'Inception';
       const toVal = $('bookingToDate')?.value || 'Current Date';
       doc.setFontSize(8);
       doc.setTextColor(51, 65, 85);
-      doc.text(`Period: ${fromVal} to ${toVal} | Selected Channels: ${activeSelectedChannelKeys.size} | Generated on: ${new Date().toLocaleString('en-IN')}`, 148.5, 22, { align: "center" });
+      doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 105, 24, { align: "center" });
 
       const officeMap = {};
-      let totalCashCnt = 0, totalCashAmt = 0, totalDigCnt = 0, totalDigAmt = 0;
+      let totalCashCnt = 0, totalDigCnt = 0;
 
       bookingImportedRecords.forEach(r => {
         const off = r.office_name || 'Unassigned';
         const c_cnt = parseFloat(r.cash_cnt) || 0;
-        const c_amt = parseFloat(r.cash_amt) || 0;
-
-        let d_cnt = 0, d_amt = 0;
+        let d_cnt = 0;
         DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          if (activeSelectedChannelKeys.has(cfg.key)) {
-            d_cnt += parseFloat(r[cfg.cntField]) || 0;
-            d_amt += parseFloat(r[cfg.amtField]) || 0;
-          }
+          if (activeSelectedChannelKeys.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
         });
 
         totalCashCnt += c_cnt;
-        totalCashAmt += c_amt;
         totalDigCnt += d_cnt;
-        totalDigAmt += d_amt;
-
-        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, cash_amt: 0, dig_cnt: 0, dig_amt: 0 };
+        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
         officeMap[off].cash_cnt += c_cnt;
-        officeMap[off].cash_amt += c_amt;
         officeMap[off].dig_cnt += d_cnt;
-        officeMap[off].dig_amt += d_amt;
       });
 
       const totalBookings = totalCashCnt + totalDigCnt;
@@ -1866,19 +2548,17 @@
         const o = officeMap[name];
         const tot = o.cash_cnt + o.dig_cnt;
         const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
-        return { name, ...o, pct };
+        return { name, ...o, tot, pct };
       }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
-        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), `Rs. ${o.cash_amt.toFixed(2)}`, o.dig_cnt.toLocaleString('en-IN'), `Rs. ${o.dig_amt.toFixed(2)}`, `${o.pct.toFixed(2)}%`
+        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), o.dig_cnt.toLocaleString('en-IN'), `${o.pct.toFixed(2)}%`
       ]);
 
-      rows.push([
-        'Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), '-', totalDigCnt.toLocaleString('en-IN'), '-', `${totalDigShare}%`
-      ]);
+      rows.push(['Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
 
       doc.autoTable({
-        head: [["Rank", "Office Name", "Cash (Cnt)", "Cash (Amt)", "Digital (Cnt)", "Digital (Amt)", "Digital Share %"]],
+        head: [["Rank", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
         body: rows,
-        startY: 26,
+        startY: 30,
         theme: 'grid',
         headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
         styles: { fontSize: 8 },
@@ -1891,16 +2571,224 @@
         }
       });
 
-      doc.save(`Booking_Performance_Report_${Date.now()}.pdf`);
+      doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
+    }
+
+    async function exportOfficeWiseImage() {
+      if (!rawMISMasterList.length) return alert("No office pendency data available to export as image!");
+
+      const fromVal = $('filterFromDate')?.value || 'Inception';
+      const toVal = $('filterToDate')?.value || 'CurrentDate';
+      const fileName = `Office_Wise_Pendency_${fromVal}_to_${toVal}.png`;
+
+      const officeStats = {};
+      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+      rawMISMasterList.forEach(c => {
+        const off = c.raised_for_office || 'Unassigned';
+        const amt = parseFloat(c.txn_amount) || 0;
+        if (!officeStats[off]) {
+          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+        officeStats[off].registered++;
+        grandReg++;
+
+        if (c.claim_status === 'Pending') {
+          officeStats[off].pending++;
+          officeStats[off].activePendingAmount += amt;
+          grandPend++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'In Progress') {
+          officeStats[off].inprogress++;
+          officeStats[off].activePendingAmount += amt;
+          grandInp++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'Settled') {
+          officeStats[off].settled++;
+          grandSet++;
+        } else if (c.claim_status === 'Rejected') {
+          officeStats[off].rejected++;
+          grandRej++;
+        }
+      });
+
+      const sortedOffices = Object.keys(officeStats).sort();
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '900px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      sortedOffices.forEach((off, idx) => {
+        const s = officeStats[off];
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
+            <td style="padding: 7px; text-align: center;">${idx + 1}</td>
+            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${off}</td>
+            <td style="padding: 7px; text-align: center; font-weight: bold;">${s.registered}</td>
+            <td style="padding: 7px; text-align: center; color: #b45309; font-weight: bold;">${s.pending}</td>
+            <td style="padding: 7px; text-align: center; color: #1d4ed8; font-weight: bold;">${s.inprogress}</td>
+            <td style="padding: 7px; text-align: center; color: #15803d; font-weight: bold;">${s.settled}</td>
+            <td style="padding: 7px; text-align: center; color: #b91c1c; font-weight: bold;">${s.rejected}</td>
+            <td style="padding: 7px; text-align: right; font-weight: bold; color: #991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Office-wise Pendency & Status Breakdown</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Matrix</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
+                <th style="padding: 8px; text-align: center; width: 5%;">#</th>
+                <th style="padding: 8px; width: 33%;">Office Name</th>
+                <th style="padding: 8px; text-align: center; width: 10%;">Registered</th>
+                <th style="padding: 8px; text-align: center; width: 10%;">Pending</th>
+                <th style="padding: 8px; text-align: center; width: 11%;">In Progress</th>
+                <th style="padding: 8px; text-align: center; width: 9%;">Settled</th>
+                <th style="padding: 8px; text-align: center; width: 9%;">Rejected</th>
+                <th style="padding: 8px; text-align: right; width: 13%;">Pending + In Prog (Rs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
+                <td colspan="2" style="padding: 8px; text-align: center; letter-spacing: 0.5px;">GRAND TOTAL (${sortedOffices.length} Offices)</td>
+                <td style="padding: 8px; text-align: center;">${grandReg}</td>
+                <td style="padding: 8px; text-align: center;">${grandPend}</td>
+                <td style="padding: 8px; text-align: center;">${grandInp}</td>
+                <td style="padding: 8px; text-align: center;">${grandSet}</td>
+                <td style="padding: 8px; text-align: center;">${grandRej}</td>
+                <td style="padding: 8px; text-align: right; color: #FACC15;">Rs. ${grandActiveAmt.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
+    }
+
+    async function exportMISReportImage() {
+      if (!currentMISClaimsList.length) return alert("No MIS report data available to export as image!");
+      const fromVal = $('filterFromDate')?.value || 'Inception';
+      const toVal = $('filterToDate')?.value || 'CurrentDate';
+      const fileName = `MIS_Report_${currentMISReportFilter}_${fromVal}_to_${toVal}.png`;
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '1050px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      currentMISClaimsList.forEach((c, idx) => {
+        const isSettled = c.claim_status === 'Settled';
+        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 10px;">
+            <td style="padding: 6px; text-align: center;">${idx + 1}</td>
+            <td style="padding: 6px; font-weight: bold; font-family: monospace; color: #a80f28;">${c.txn_id_ref}</td>
+            <td style="padding: 6px;">${c.profiles?.emp_name || 'Staff'}</td>
+            <td style="padding: 6px;">${c.module}</td>
+            <td style="padding: 6px;">${c.raised_for_office}</td>
+            <td style="padding: 6px;">${c.txn_date}</td>
+            <td style="padding: 6px;">${settleDate}</td>
+            <td style="padding: 6px; text-align: right; font-weight: bold;">₹${c.txn_amount}</td>
+            <td style="padding: 6px; font-weight: bold;">${c.claim_status}</td>
+            <td style="padding: 6px; font-size: 9.5px;">${c.reply_remarks_admin || '-'}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Refund Claims & Settlement TAT Report (${currentMISReportFilter})</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Claims & Turnaround Statement</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Records: <strong>${currentMISClaimsList.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 10.5px; font-weight: bold;">
+                <th style="padding: 7px; text-align: center; width: 4%;">#</th>
+                <th style="padding: 7px; width: 14%;">Ref No</th>
+                <th style="padding: 7px; width: 13%;">Raised By</th>
+                <th style="padding: 7px; width: 8%;">Module</th>
+                <th style="padding: 7px; width: 14%;">Office Name</th>
+                <th style="padding: 7px; width: 9%;">Txn Date</th>
+                <th style="padding: 7px; width: 9%;">Settle Date</th>
+                <th style="padding: 7px; text-align: right; width: 9%;">Amount</th>
+                <th style="padding: 7px; width: 8%;">Status</th>
+                <th style="padding: 7px; width: 12%;">Admin Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
     }
 
     function printClaimDetails(claimId) {
-      const claim = rawClaimsList.find(c => c.id === claimId);
-      if (!claim) return alert("Claim details not found!");
+      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
+      if (!claim) return alert("Claim details not found for docket printing!");
+
+      const creatorEmpId = claim.profiles?.emp_id || 'N/A';
+      const creatorEmpName = claim.profiles?.emp_name || 'N/A';
+      const entryDateTime = formatDateTime(claim.created_at);
 
       const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
+      const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('claims/'));
+
       const printWindow = window.open('', '_blank', 'width=950,height=850');
-      if (!printWindow) return alert("Popup blocked! Please allow popups.");
+      if (!printWindow) return alert("Popup blocked! Please allow popups for this site to print.");
 
       const printHtml = `
         <!DOCTYPE html>
@@ -1909,82 +2797,390 @@
           <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
           <style>
             @page { size: A4 portrait; margin: 10mm 12mm; }
-            body { font-family: sans-serif; color: #1e293b; padding: 14px; font-size: 11px; }
-            .header-banner { border-bottom: 2px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-            td { padding: 4px 8px; border: 1px solid #cbd5e1; }
-            td.label { background: #f8fafc; font-weight: bold; width: 25%; }
-            .preview { max-width: 100%; max-height: 260px; object-fit: contain; }
+            * { box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 14px; font-size: 11px; line-height: 1.3; background: #fff; }
+            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 10.5px; font-weight: bold; }
+            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 12.5px; font-weight: bold; text-align: right; }
+            .section-title { background: #FEF9C3; color: #8A0C21; padding: 3px 8px; font-weight: bold; font-size: 10.5px; margin: 8px 0 5px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
+            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            table.details-grid td { padding: 4px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: top; }
+            table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
+            table.details-grid td.value { width: 28%; color: #0f172a; }
+            .status-pill { display: inline-block; padding: 1.5px 8px; border-radius: 9999px; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
+            .status-Pending { background: #FEF9C3; color: #B45309; border: 1px solid #FACC15; }
+            .status-InProgress { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
+            .status-Settled { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+            .status-Rejected { background: #FFE4E6; color: #BE123C; border: 1px solid #FDA4AF; }
+            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; background: #fafaf9; margin-bottom: 6px; font-size: 11px; min-height: 26px; white-space: pre-wrap; word-break: break-word; }
+            .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
+            .attachments-grid { display: flex; gap: 10px; margin-top: 6px; justify-content: space-between; align-items: flex-start; }
+            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
+            .attachment-col strong { font-size: 10.5px; display: block; margin-bottom: 4px; text-align: left; }
+            .attachment-preview { max-width: 100%; max-height: 260px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
+            .attachment-link { font-size: 10.5px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
+            .end-of-doc { margin-top: 20px; padding-top: 10px; border-top: 1.5px dashed #94a3b8; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; letter-spacing: 2px; text-transform: uppercase; }
+            @media print { body { padding: 0; } .no-print { display: none; } .attachment-preview { max-height: 260px; } }
           </style>
         </head>
         <body>
+          <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
+            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:7px 16px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🖨️ Print Now</button>
+            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:12px;">Close</button>
+          </div>
+
           <div class="header-banner">
-            <div>
-              <h1 style="color:#A80F28; margin:0; font-size:16px;">Refund Claims Portal</h1>
-              <h2 style="color:#D97706; margin:2px 0 0 0; font-size:11px;">Chennai City Central Division</h2>
+            <div class="title-area">
+              <h1>Refund Claims Management Portal</h1>
+              <h2>Chennai City Central Division &bull; Complete Claim Registration Docket</h2>
             </div>
-            <div><strong>Txn ID: ${claim.txn_id_ref}</strong></div>
+            <div class="ref-badge">TRANSACTION ID: ${claim.txn_id_ref}</div>
           </div>
-          <table>
-            <tr><td class="label">Employee:</td><td>${claim.profiles?.emp_name} (${claim.profiles?.emp_id})</td><td class="label">Office:</td><td>${claim.raised_for_office}</td></tr>
-            <tr><td class="label">Module:</td><td>${claim.module}</td><td class="label">Article:</td><td>${claim.article_number}</td></tr>
-            <tr><td class="label">Txn Date:</td><td>${claim.txn_date}</td><td class="label">Amount:</td><td>Rs. ${claim.txn_amount}</td></tr>
-            <tr><td class="label">Status:</td><td>${claim.claim_status}</td><td class="label">Doc Status:</td><td>${claim.doc_status || 'Approved'}</td></tr>
+
+          <div class="section-title">1. REGISTRATION &amp; APPLICANT DETAILS</div>
+          <table class="details-grid">
+            <tr>
+              <td class="label">Created By Employee:</td>
+              <td class="value"><strong>${creatorEmpName}</strong></td>
+              <td class="label">Employee ID:</td>
+              <td class="value"><strong>${creatorEmpId}</strong></td>
+            </tr>
+            <tr>
+              <td class="label">Raised For Office:</td>
+              <td class="value">${claim.raised_for_office}</td>
+              <td class="label">User Contact Mobile:</td>
+              <td class="value font-mono">${claim.user_mobile || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td class="label">Date &amp; Time of Entry:</td>
+              <td class="value">${entryDateTime}</td>
+              <td class="label">Current Status:</td>
+              <td class="value">
+                <span class="status-pill status-${(claim.claim_status || 'Pending').replace(/\s+/g, '')}">
+                  ${claim.claim_status}
+                </span>
+              </td>
+            </tr>
           </table>
-          <p><strong>Remarks by User:</strong> ${claim.remarks_by_user || '-'}</p>
-          <p><strong>Admin Remarks:</strong> ${claim.reply_remarks_admin || '-'}</p>
-          <div>
-            <strong>Attached Document:</strong><br>
-            ${isUserImage ? `<img src="${claim.file_url}" class="preview">` : `<a href="${claim.file_url}" target="_blank">View File</a>`}
+
+          <div class="section-title">2. TRANSACTION &amp; POSTAL CLAIM DATA</div>
+          <table class="details-grid">
+            <tr>
+              <td class="label">Module:</td>
+              <td class="value"><strong>${claim.module}</strong></td>
+              <td class="label">Article Number:</td>
+              <td class="value"><strong>${claim.article_number}</strong></td>
+            </tr>
+            <tr>
+              <td class="label">Transaction ID / Ref:</td>
+              <td class="value" style="font-family: monospace; font-weight:bold;">${claim.txn_id_ref}</td>
+              <td class="label">RRN Number:</td>
+              <td class="value" style="font-family: monospace;">${claim.rrn_number || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td class="label">Transaction Date:</td>
+              <td class="value">${claim.txn_date}</td>
+              <td class="label">Transaction Amount:</td>
+              <td class="value" style="font-size: 11.5px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
+            </tr>
+            <tr>
+              <td class="label">Payment Channel:</td>
+              <td class="value">${claim.payment_channel}</td>
+              <td class="label">Settlement Date:</td>
+              <td class="value"><strong>${claim.settlement_date || 'Pending'}</strong></td>
+            </tr>
+          </table>
+
+          <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
+          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#475569;">Remarks by User:</div>
+          <div class="remarks-box">${claim.remarks_by_user || 'No remarks entered.'}</div>
+
+          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
+          <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Response from Admin.'}</div>
+
+          <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
+          <div class="attachments-grid">
+            <div class="attachment-col">
+              <strong>Primary User Document:</strong>
+              ${isUserImage 
+                ? `<img src="${claim.file_url}" class="attachment-preview" alt="User Document">`
+                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View Primary File</a>` : '<em>No file attached.</em>')
+              }
+            </div>
+
+            ${claim.admin_file_url ? `
+              <div class="attachment-col">
+                <strong style="color: #991b1b;">Admin Resolution Document:</strong>
+                ${isAdminImage 
+                  ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
+                  : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`
+                }
+              </div>
+            ` : ''}
           </div>
+
+          <div class="end-of-doc">
+            *** END OF DOCUMENT ***
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 500);
+            };
+          <\/script>
         </body>
         </html>
       `;
+
       printWindow.document.open();
       printWindow.document.write(printHtml);
       printWindow.document.close();
-      printWindow.print();
     }
 
-    function printOfficeWiseReport() {
-      alert("Office-wise pendency printout ready.");
+    function openReplyModal(claimId) {
+      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
+      if (!claim) return alert("Claim record not found.");
+
+      $('modalClaimId').value = claim.id;
+      $('modalStatus').value = claim.claim_status || 'Pending';
+      $('modalDocStatus').value = claim.doc_status || 'Approved';
+      $('modalAdminRemarks').value = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
+      $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
+      
+      clearModalUserPastedImage();
+      clearModalAdminPastedImage();
+
+      onModalStatusChanged();
+      $('replyModal').classList.remove('hidden');
     }
 
-    function getStatusColor(status) {
-      if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
-      if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
-      if (status === 'Settled') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
-      if (status === 'Rejected') return 'bg-rose-100 text-rose-800 border border-rose-200';
-      return 'bg-slate-100 text-slate-800';
+    function closeModal() { 
+      $('replyModal').classList.add('hidden'); 
+      clearModalUserPastedImage();
+      clearModalAdminPastedImage();
     }
 
-    function toggleSettlementDateField() {
-      if ($('modalStatus').value === 'Settled') $('modalSettlementDateContainer').classList.remove('hidden');
-      else $('modalSettlementDateContainer').classList.add('hidden');
+    async function submitAdminReply() {
+      const id = $('modalClaimId').value;
+      const status = $('modalStatus').value;
+      const docStatus = $('modalDocStatus').value;
+      const remarks = $('modalAdminRemarks').value.trim();
+      const settlementDate = (status === 'Settled') ? $('modalSettlementDate').value : null;
+
+      const saveBtn = $('btnAdminSave');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = "Saving..."; }
+
+      try {
+        let updatedUserFileUrl = null;
+        let updatedAdminFileUrl = null;
+
+        if (modalUserPastedBlob) {
+          const fileExt = (modalUserPastedBlob.name) ? modalUserPastedBlob.name.split('.').pop() : 'png';
+          const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${fileExt}`;
+          const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalUserPastedBlob, { upsert: true });
+          if (!err1) updatedUserFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+        }
+
+        if (modalAdminPastedBlob) {
+          const fileExt = (modalAdminPastedBlob.name) ? modalAdminPastedBlob.name.split('.').pop() : 'png';
+          const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${fileExt}`;
+          const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalAdminPastedBlob, { upsert: true });
+          if (!err2) updatedAdminFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+        }
+
+        const updateData = {
+          claim_status: status,
+          doc_status: docStatus,
+          reply_remarks_admin: remarks,
+          settlement_date: settlementDate
+        };
+
+        if (docStatus === 'Needs Revision') {
+          updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
+        } else {
+          updateData.doc_revision_remarks = null;
+        }
+
+        if (updatedUserFileUrl) {
+          updateData.file_url = updatedUserFileUrl;
+          updateData.doc_status = 'Approved';
+          updateData.doc_revision_remarks = null;
+        }
+
+        if (updatedAdminFileUrl) {
+          updateData.admin_file_url = updatedAdminFileUrl;
+        }
+
+        const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
+        if (error) alert("Error: " + error.message);
+        else {
+          alert("Admin Action & Documents updated successfully!");
+          closeModal();
+          loadClaimsSummary();
+        }
+      } catch (err) {
+        alert("Unexpected Error: " + err.message);
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "Save Changes"; }
+      }
     }
 
-    function handleFileSelectPreview(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      $('userPastedPreviewContainer').classList.remove('hidden');
-      $('userPastedImagePreview').src = URL.createObjectURL(file);
+    function openDetailsModal(claimId) {
+      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
+      if (!claim) return alert("Claim details not found!");
+
+      $('detailsModalContent').innerHTML = `
+        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Txn Reference ID</span><span class="font-bold text-postRed-700 font-mono text-sm">${claim.txn_id_ref}</span></div>
+        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Created By</span><span class="font-bold text-slate-800">${claim.profiles?.emp_name} (${claim.profiles?.emp_id})</span></div>
+        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Raised For Office</span><span class="font-semibold">${claim.raised_for_office}</span></div>
+        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Module / Article</span><span class="font-bold text-postRed-800">${claim.module}</span> / ${claim.article_number}</div>
+        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Amount / Date</span><span class="font-bold text-emerald-800">₹${claim.txn_amount}</span> on ${claim.txn_date}</div>
+        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Status</span><span class="font-bold px-2 py-0.5 rounded text-xs ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span> (${claim.doc_status || 'Approved'})</div>
+        <div class="col-span-2 p-2 bg-slate-50 rounded border"><span class="text-slate-500 block font-bold">User Remarks:</span><p class="whitespace-pre-wrap">${claim.remarks_by_user || '-'}</p></div>
+        <div class="col-span-2 p-2 bg-amber-50/70 rounded border border-amber-300"><span class="text-postRed-800 block font-bold">Admin Remarks:</span><p class="whitespace-pre-wrap">${claim.reply_remarks_admin || 'Pending Response'}</p></div>
+        <div class="col-span-2 flex gap-2 pt-1 border-t">
+          <a href="${claim.file_url}" target="_blank" class="bg-emerald-700 text-white px-3 py-1.5 rounded font-bold">📄 Primary User Document</a>
+          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="bg-amber-600 text-white px-3 py-1.5 rounded font-bold">📎 Admin Document</a>` : ''}
+        </div>
+      `;
+
+      $('modalPrintBtn').onclick = () => printClaimDetails(claim.id);
+      $('detailsModal').classList.remove('hidden');
     }
 
-    function clearUserPastedImage() {
-      userPastedImageBlob = null;
-      $('userPastedPreviewContainer').classList.add('hidden');
-      $('claimFile').value = '';
+    function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
+
+    // User Management Functions
+    async function loadAllUsers() {
+      const { data: users } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+      allLoadedUsers = users || [];
+      renderUserAccounts(allLoadedUsers);
     }
 
-    function exportMISExcel() {
-      const ws = XLSX.utils.json_to_sheet(currentMISClaimsList);
+    function filterUserAccounts() {
+      const query = $('userInstantSearch')?.value.trim().toLowerCase() || '';
+      if (!query) return renderUserAccounts(allLoadedUsers);
+      renderUserAccounts(allLoadedUsers.filter(u => 
+        (u.emp_id || '').toLowerCase().includes(query) ||
+        (u.emp_name || '').toLowerCase().includes(query) ||
+        (u.office_name || '').toLowerCase().includes(query)
+      ));
+    }
+
+    function renderUserAccounts(users) {
+      const tbody = $('usersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-400">No user accounts found.</td></tr>`;
+        return;
+      }
+
+      users.forEach(u => {
+        const isActive = u.is_active !== false;
+        tbody.innerHTML += `
+          <tr class="hover:bg-amber-50/40 transition">
+            <td class="p-2 font-mono font-bold text-slate-800">${u.emp_id}</td>
+            <td class="p-2 font-bold text-slate-800">${u.emp_name}</td>
+            <td class="p-2"><span class="uppercase font-bold text-postRed-700 px-2 py-0.5 rounded bg-postRed-50 border border-postRed-200 text-[10px]">${u.role || 'user'}</span></td>
+            <td class="p-2">${u.created_at ? u.created_at.split('T')[0] : '-'}</td>
+            <td class="p-2 font-mono">${u.mobile_number || '-'}</td>
+            <td class="p-2">${u.office_name || '-'}</td>
+            <td class="p-2 font-bold ${isActive ? 'text-emerald-700' : 'text-rose-700'}">${isActive ? 'Active' : 'Locked'}</td>
+            <td class="p-2 text-center">
+              <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
+                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">✏️ Edit</button>
+                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">🔑 Reset Pwd</button>
+                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">
+                  ${isActive ? '🔒 Lock' : '🔓 Unlock'}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function openAdminUserEditModal(userId) {
+      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
+      if (!user) return alert("User not found!");
+
+      $('editUserId').value = user.id;
+      $('editUserEmpId').value = user.emp_id || '';
+      $('editUserEmpName').value = user.emp_name || '';
+      $('editUserMobile').value = user.mobile_number || '';
+      $('editUserOffice').value = user.office_name || '';
+      $('editUserRole').value = user.role || 'user';
+
+      $('adminUserEditModal').classList.remove('hidden');
+    }
+
+    function closeAdminUserEditModal() { $('adminUserEditModal').classList.add('hidden'); }
+
+    async function submitAdminUserEdit(e) {
+      e.preventDefault();
+      const userId = $('editUserId').value;
+      const emp_name = $('editUserEmpName').value.trim();
+      const mobile_number = $('editUserMobile').value.trim();
+      const office_name = $('editUserOffice').value;
+      const role = $('editUserRole').value;
+
+      const { error } = await supabaseClient.from('profiles').update({ emp_name, mobile_number, office_name, role }).eq('id', userId);
+      if (error) alert("Update error: " + error.message);
+      else {
+        alert("User details updated successfully!");
+        closeAdminUserEditModal();
+        loadAllUsers();
+      }
+    }
+
+    function openAdminResetPwdModal(userId) {
+      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
+      if (!user) return alert("User not found!");
+
+      $('resetPwdUserId').value = user.id;
+      $('resetPwdUserName').innerText = user.emp_name;
+      $('resetPwdUserEmpId').innerText = user.emp_id;
+      $('resetPwdInput').value = '';
+
+      $('adminResetPwdModal').classList.remove('hidden');
+    }
+
+    function closeAdminResetPwdModal() { $('adminResetPwdModal').classList.add('hidden'); }
+
+    async function submitAdminPasswordReset(e) {
+      e.preventDefault();
+      const userId = $('resetPwdUserId').value;
+      const newPassword = $('resetPwdInput').value.trim();
+      if (!newPassword || newPassword.length < 6) return alert("Password must be at least 6 characters!");
+
+      const { error } = await supabaseClient.rpc('admin_reset_user_password', { target_user_id: userId, new_password: newPassword });
+      if (error) alert("Reset error: " + error.message);
+      else {
+        alert(`Password updated successfully!\nNew Password: ${newPassword}`);
+        closeAdminResetPwdModal();
+      }
+    }
+
+    async function toggleUserLock(userId, currentActive) {
+      if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user account?`)) return;
+      await supabaseClient.from('profiles').update({ is_active: !currentActive }).eq('id', userId);
+      loadAllUsers();
+    }
+
+    function exportUsersExcel() {
+      if (!allLoadedUsers.length) return alert("No user data to export!");
+      const ws = XLSX.utils.json_to_sheet(allLoadedUsers);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "MIS");
-      XLSX.writeFile(wb, `MIS_Export_${Date.now()}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, ws, "Users");
+      XLSX.writeFile(wb, `User_Accounts_${Date.now()}.xlsx`);
     }
 
-    async function exportMISPDF() {
-      if (!currentMISClaimsList.length) return alert("No records to export!");
+    async function exportUsersPDF() {
+      if (!allLoadedUsers.length) return alert("No user data to export!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
 
@@ -1994,77 +3190,17 @@
 
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
-      doc.text("Refund Claims & Settlement TAT Report", 148.5, 12, { align: "center" });
+      doc.text("User Accounts & Access Role Directory", 148.5, 12, { align: "center" });
 
-      const headers = [["Sl. No.", "Txn ID (Ref)", "Module", "Office", "Txn Date", "Settlement Date", "Amount (Rs)", "Status", "Admin Remarks"]];
-      const rows = currentMISClaimsList.map((c, idx) => [
-        idx + 1, c.txn_id_ref, c.module, c.raised_for_office, c.txn_date, c.settlement_date || "-", `Rs. ${c.txn_amount}`, c.claim_status, c.reply_remarks_admin || "-"
+      const headers = [["Sl. No.", "Employee ID", "Employee Name", "Role", "Registered On", "Mobile No", "Office Name", "Status"]];
+      const rows = allLoadedUsers.map((u, idx) => [
+        idx + 1, u.emp_id, u.emp_name, (u.role || 'user').toUpperCase(), u.created_at ? u.created_at.split('T')[0] : '-', u.mobile_number || '-', u.office_name || '-', u.is_active !== false ? 'Active' : 'Locked'
       ]);
 
       doc.autoTable({ head: headers, body: rows, startY: 26, theme: 'grid', headStyles: { fillColor: [168, 15, 40] }, styles: { fontSize: 8 } });
-      doc.save(`MIS_Report_${Date.now()}.pdf`);
+      doc.save(`User_Directory_${Date.now()}.pdf`);
     }
 
-    function generateMISReport(filterType = 'All') {
-      currentMISReportFilter = filterType;
-      const claims = rawClaimsList || [];
-      $('misTotal').innerText = claims.length;
-      $('misPending').innerText = claims.filter(c => c.claim_status === 'Pending').length;
-      $('misInProgress').innerText = claims.filter(c => c.claim_status === 'In Progress').length;
-      $('misSettled').innerText = claims.filter(c => c.claim_status === 'Settled').length;
-      $('misRejected').innerText = claims.filter(c => c.claim_status === 'Rejected').length;
-
-      let filtered = claims;
-      if (filterType === 'Pending') filtered = claims.filter(c => c.claim_status === 'Pending');
-      else if (filterType === 'In Progress') filtered = claims.filter(c => c.claim_status === 'In Progress');
-      else if (filterType === 'Settled') filtered = claims.filter(c => c.claim_status === 'Settled');
-      else if (filterType === 'Rejected') filtered = claims.filter(c => c.claim_status === 'Rejected');
-
-      currentMISClaimsList = filtered;
-      const tbody = $('misReportTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      filtered.forEach(c => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-amber-50/40">
-            <td class="p-2 font-mono font-bold text-postRed-700">${c.txn_id_ref}</td>
-            <td class="p-2">${c.profiles?.emp_name || 'Staff'}</td>
-            <td class="p-2">${c.module}</td>
-            <td class="p-2">${c.raised_for_office}</td>
-            <td class="p-2">${c.txn_date}</td>
-            <td class="p-2">${c.settlement_date || '-'}</td>
-            <td class="p-2">-</td>
-            <td class="p-2 font-bold">₹${c.txn_amount}</td>
-            <td class="p-2 font-bold">${c.claim_status}</td>
-            <td class="p-2">${c.reply_remarks_admin || '-'}</td>
-          </tr>
-        `;
-      });
-    }
-
-    async function loadAllUsers() {
-      const { data: users } = await supabaseClient.from('profiles').select('*');
-      const tbody = $('usersTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      (users || []).forEach(u => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-amber-50/40">
-            <td class="p-2 font-mono font-bold">${u.emp_id}</td>
-            <td class="p-2">${u.emp_name}</td>
-            <td class="p-2 uppercase font-bold text-postRed-700">${u.role || 'user'}</td>
-            <td class="p-2">${u.created_at ? u.created_at.split('T')[0] : '-'}</td>
-            <td class="p-2">${u.mobile_number || '-'}</td>
-            <td class="p-2">${u.office_name || '-'}</td>
-            <td class="p-2 font-bold ${u.is_active !== false ? 'text-emerald-700' : 'text-rose-700'}">${u.is_active !== false ? 'Active' : 'Locked'}</td>
-          </tr>
-        `;
-      });
-    }
-
-    // DOM BOOTSTRAP
     document.addEventListener('DOMContentLoaded', () => {
       loadLogoFromDatabase();
       supabaseClient.auth.getSession().then(({ data: { session } }) => {
