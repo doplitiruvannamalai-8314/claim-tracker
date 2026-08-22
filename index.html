@@ -1804,78 +1804,87 @@
     }
 
     function renderClaimsSummaryTable() {
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-      const tbody = $('claimsTableBody');
-      if (!tbody) return;
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+  const tbody = $('claimsTableBody');
+  if (!tbody) return;
 
-      if (!currentClaimsList.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500">No requests found.</td></tr>`;
-        return;
-      }
+  if (!currentClaimsList.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500">No requests found.</td></tr>`;
+    return;
+  }
 
-      let htmlArr = [];
-      currentClaimsList.forEach(c => {
-        const empNameOnly = c.profiles?.emp_name || 'N/A';
-        const empIdOnly = c.profiles?.emp_id ? `[${c.profiles.emp_id}]` : '';
-        const isOwner = c.created_by === currentUser?.id;
-        const isSettled = c.claim_status === 'Settled';
-        const needsRevision = c.doc_status === 'Needs Revision';
+  let htmlArr = [];
+  currentClaimsList.forEach(c => {
+    const empNameOnly = c.profiles?.emp_name || 'N/A';
+    const empIdOnly = c.profiles?.emp_id ? `[${c.profiles.emp_id}]` : '';
+    const isOwner = c.created_by === currentUser?.id;
+    const isSettled = c.claim_status === 'Settled';
+    const isPending = c.claim_status === 'Pending';
+    const needsRevision = c.doc_status === 'Needs Revision';
 
-        let remarksDisplay = c.reply_remarks_admin 
-          ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
-          : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user}</div>`;
+    let remarksDisplay = c.reply_remarks_admin 
+      ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
+      : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user || '-'}</div>`;
 
-        let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
+    let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
 
-        if (needsRevision && isOwner) {
-          userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
-        } else if (needsRevision) {
-          userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
-        }
-
-        let adminDocHtml = '';
-        if (c.admin_file_url) {
-          adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
-        } else if (c.claim_status === 'Pending' || c.claim_status === 'In Progress') {
-          adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">No Admin Doc</span>`;
-        } else {
-          adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
-        }
-
-        htmlArr.push(`
-          <tr class="hover:bg-amber-50/40 transition align-middle">
-            <td class="p-2 whitespace-nowrap">
-              <span class="text-postRed-700 font-bold font-mono text-xs block cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
-              <div class="mt-1 flex items-center gap-2">
-                <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
-                <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer">📋 Copy</button>
-              </div>
-            </td>
-            <td class="p-2 whitespace-nowrap">
-              <div class="font-bold text-slate-800">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono">${empIdOnly}</span></div>
-              <div class="text-[10.5px] text-slate-600">${c.raised_for_office}</div>
-            </td>
-            <td class="p-2 font-bold text-slate-800">${c.txn_date}</td>
-            <td class="p-1.5 max-w-[85px]">${c.created_at ? c.created_at.split('T')[0] : '-'}</td>
-            <td class="p-2 font-bold text-slate-900">₹${c.txn_amount}</td>
-            <td class="p-2 whitespace-nowrap">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${getStatusColor(c.claim_status)}">${c.claim_status}</span>
-              ${isSettled && c.settlement_date ? `<div class="text-[10px] text-emerald-800 font-bold mt-0.5">📅 ${c.settlement_date}</div>` : ''}
-            </td>
-            <td class="p-2">${remarksDisplay}</td>
-            <td class="p-2 text-center min-w-[190px]">
-              <div class="grid grid-cols-2 gap-1 w-[185px] mx-auto">
-                ${isAdmin ? `<button type="button" onclick="openReplyModal('${c.id}')" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Action</button>` : `<div class="w-full"></div>`}
-                <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
-                ${userDocHtml}
-                ${adminDocHtml}
-              </div>
-            </td>
-          </tr>
-        `);
-      });
-      tbody.innerHTML = htmlArr.join('');
+    if (needsRevision && isOwner) {
+      userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
+    } else if (needsRevision) {
+      userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
     }
+
+    let adminDocHtml = '';
+    if (c.admin_file_url) {
+      adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
+    } else {
+      adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
+    }
+
+    // Action button: Admins get full Action modal; Owners get edit rights on pending claims
+    let actionBtnHtml = '';
+    if (isAdmin) {
+      actionBtnHtml = `<button type="button" onclick="openReplyModal('${c.id}')" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Action</button>`;
+    } else if (isOwner && isPending) {
+      actionBtnHtml = `<button type="button" onclick="openReplyModal('${c.id}')" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Edit</button>`;
+    } else {
+      actionBtnHtml = `<button type="button" onclick="openDetailsModal('${c.id}')" class="w-full bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 px-2 py-1 rounded text-[10px] font-bold cursor-pointer">👁️ View</button>`;
+    }
+
+    htmlArr.push(`
+      <tr class="hover:bg-amber-50/40 transition align-middle">
+        <td class="p-2 whitespace-nowrap">
+          <span class="text-postRed-700 font-bold font-mono text-xs block cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+            <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer">📋 Copy</button>
+          </div>
+        </td>
+        <td class="p-2 whitespace-nowrap">
+          <div class="font-bold text-slate-800">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono">${empIdOnly}</span></div>
+          <div class="text-[10.5px] text-slate-600">${c.raised_for_office}</div>
+        </td>
+        <td class="p-2 font-bold text-slate-800">${c.txn_date}</td>
+        <td class="p-1.5 max-w-[85px]">${c.created_at ? c.created_at.split('T')[0] : '-'}</td>
+        <td class="p-2 font-bold text-slate-900">₹${c.txn_amount}</td>
+        <td class="p-2 whitespace-nowrap">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${getStatusColor(c.claim_status)}">${c.claim_status}</span>
+          ${isSettled && c.settlement_date ? `<div class="text-[10px] text-emerald-800 font-bold mt-0.5">📅 ${c.settlement_date}</div>` : ''}
+        </td>
+        <td class="p-2">${remarksDisplay}</td>
+        <td class="p-2 text-center min-w-[190px]">
+          <div class="grid grid-cols-2 gap-1 w-[185px] mx-auto">
+            ${actionBtnHtml}
+            <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
+            ${userDocHtml}
+            ${adminDocHtml}
+          </div>
+        </td>
+      </tr>
+    `);
+  });
+  tbody.innerHTML = htmlArr.join('');
+}
 
     // 7. MIS REPORTS & CONSOLIDATED BREAKDOWNS
     function renderConsolidatedSummaries(claims) {
@@ -3134,7 +3143,116 @@
         if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "Save Changes"; }
       }
     }
+// =========================================================================
+// CLAIM DETAILS VIEW MODAL HANDLERS
+// =========================================================================
+function openDetailsModal(claimId) {
+  const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
+             || (rawMISMasterList && rawMISMasterList.find(c => String(c.id) === String(claimId)))
+             || (currentClaimsList && currentClaimsList.find(c => String(c.id) === String(claimId)));
 
+  if (!claim) return alert("Claim details could not be found.");
+
+  const modal = $('detailsModal');
+  const container = $('detailsModalContent');
+  const printBtn = $('modalPrintBtn');
+  if (!modal || !container) return;
+
+  const creatorName = claim.profiles?.emp_name || 'Staff';
+  const creatorEmpId = claim.profiles?.emp_id ? `[${claim.profiles.emp_id}]` : '';
+  const isSettled = claim.claim_status === 'Settled';
+  const tat = (isSettled && claim.settlement_date)
+    ? calculateDaysDifference(claim.txn_date, claim.settlement_date)
+    : calculateDaysDifference(claim.txn_date, new Date().toISOString().split('T')[0]);
+
+  container.innerHTML = `
+    <div class="space-y-2 border-r border-slate-100 pr-2">
+      <div><strong class="text-slate-500 block text-[10px]">Reference / Txn ID:</strong> <span class="font-bold text-postRed-700 font-mono text-sm">${claim.txn_id_ref || '-'}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Raised By Employee:</strong> <span class="font-semibold text-slate-800">${creatorName} ${creatorEmpId}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Office:</strong> <span class="font-semibold text-slate-800">${claim.raised_for_office || '-'}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Applicant Mobile:</strong> <span class="font-mono text-slate-800">${claim.user_mobile || 'N/A'}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Registration Date & Time:</strong> <span>${formatDateTime(claim.created_at)}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Current Status:</strong> <span class="px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(claim.claim_status)}">${claim.claim_status || 'Pending'}</span></div>
+    </div>
+    <div class="space-y-2 pl-2">
+      <div><strong class="text-slate-500 block text-[10px]">Module / Article:</strong> <span class="font-bold text-postRed-800">${claim.module || '-'}</span> / <span class="font-mono">${claim.article_number || '-'}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Transaction Amount:</strong> <span class="font-bold text-emerald-800 text-sm">₹${claim.txn_amount || '0'}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Transaction Date:</strong> <span>${claim.txn_date || '-'}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Payment Channel / RRN:</strong> <span>${claim.payment_channel || '-'}</span> / <span class="font-mono">${claim.rrn_number || 'N/A'}</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Settlement Date / TAT:</strong> <span>${claim.settlement_date || 'Pending'} (${tat !== null ? tat + ' Days' : '-'})</span></div>
+      <div><strong class="text-slate-500 block text-[10px]">Document Quality:</strong> <span class="font-bold ${claim.doc_status === 'Needs Revision' ? 'text-rose-700' : 'text-emerald-700'}">${claim.doc_status || 'Approved'}</span></div>
+    </div>
+    <div class="md:col-span-2 pt-2 border-t border-slate-200 mt-2 space-y-2">
+      <div class="bg-amber-50/40 p-2 rounded border border-amber-200">
+        <strong class="text-slate-600 block text-[10px]">User Remarks:</strong>
+        <p class="mt-0.5 text-slate-800 whitespace-pre-wrap">${claim.remarks_by_user || 'No user remarks entered.'}</p>
+      </div>
+      <div class="bg-postRed-50/40 p-2 rounded border border-postRed-200">
+        <strong class="text-postRed-800 block text-[10px]">Admin Remarks & Action Trail:</strong>
+        <p class="mt-0.5 text-postRed-900 font-medium whitespace-pre-wrap">${claim.reply_remarks_admin || 'Pending admin resolution.'}</p>
+      </div>
+    </div>
+    <div class="md:col-span-2 flex gap-2 pt-2">
+      ${claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs">📄 Primary File</a>` : ''}
+      ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs">📎 Admin Proof</a>` : ''}
+    </div>
+  `;
+
+  if (printBtn) {
+    printBtn.onclick = () => printClaimDetails(claim.id);
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function closeDetailsModal() {
+  const modal = $('detailsModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+// User Document Re-upload modal triggers
+function openReuploadModal(claimId, reason) {
+  if ($('reuploadClaimId')) $('reuploadClaimId').value = claimId;
+  if ($('reuploadAdminReason')) $('reuploadAdminReason').innerText = reason;
+  if ($('reuploadFileInput')) $('reuploadFileInput').value = '';
+  userPastedImageBlob = null;
+  if ($('reuploadModal')) $('reuploadModal').classList.remove('hidden');
+}
+
+function closeReuploadModal() {
+  if ($('reuploadModal')) $('reuploadModal').classList.add('hidden');
+  userPastedImageBlob = null;
+}
+
+async function submitDocumentReupload() {
+  const id = $('reuploadClaimId')?.value;
+  const fileInput = $('reuploadFileInput')?.files[0];
+  const blob = userPastedImageBlob || fileInput;
+
+  if (!blob) return alert("Please select a clear document or paste a replacement screenshot!");
+
+  const fileExt = (fileInput && fileInput.name) ? fileInput.name.split('.').pop() : 'png';
+  const filePath = `claims/user-reuploaded-${id}-${Date.now()}.${fileExt}`;
+
+  const { error: upErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, blob, { upsert: true });
+  if (upErr) return alert("Upload failed: " + upErr.message);
+
+  const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+
+  const { error } = await supabaseClient.from('claims').update({
+    file_url: publicUrl,
+    doc_status: 'Approved',
+    doc_revision_remarks: null
+  }).eq('id', id);
+
+  if (error) {
+    alert("Error updating record: " + error.message);
+  } else {
+    alert("Replacement document uploaded and submitted successfully!");
+    closeReuploadModal();
+    await loadClaimsSummary();
+  }
+}
     // 12. DOCKET PRINTING ENGINE
     function printClaimDetails(claimId) {
       const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
