@@ -403,7 +403,7 @@
         <div id="reportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
             <div>
-              <h3 class="text-sm font-bold text-postRed-700 uppercase">MIS &amp; Settlement Turnaround Time (TAT) Reports</h3>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">MIS &amp; Refund - Settlement Reports</h3>
             </div>
             <div class="flex gap-2">
               <button type="button" onclick="exportMISExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
@@ -1175,6 +1175,160 @@
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
 
+ function printOfficeWiseReport() {
+    if (!rawMISMasterList || !rawMISMasterList.length) {
+        return alert("No claim records found in the current filtered period!");
+    }
+
+    const fromDateVal = $('filterFromDate')?.value || 'Inception';
+    const toDateVal = $('filterToDate')?.value || 'Current Date';
+    const officeStats = {};
+    
+    let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+    // Process and aggregate raw data
+    rawMISMasterList.forEach(c => {
+        const off = c.raised_for_office || 'Unassigned';
+        const amt = parseFloat(c.txn_amount) || 0;
+
+        if (!officeStats[off]) {
+            officeStats[off] = { 
+                registered: 0, 
+                pending: 0, 
+                inprogress: 0, 
+                settled: 0, 
+                rejected: 0, 
+                activePendingAmount: 0 
+            };
+        }
+
+        officeStats[off].registered++;
+        grandReg++;
+
+        if (c.claim_status === 'Pending') {
+            officeStats[off].pending++;
+            officeStats[off].activePendingAmount += amt;
+            grandPend++;
+            grandActiveAmt += amt;
+        } else if (c.claim_status === 'In Progress') {
+            officeStats[off].inprogress++;
+            officeStats[off].activePendingAmount += amt;
+            grandInp++;
+            grandActiveAmt += amt;
+        } else if (c.claim_status === 'Settled') {
+            officeStats[off].settled++;
+            grandSet++;
+        } else if (c.claim_status === 'Rejected') {
+            officeStats[off].rejected++;
+            grandRej++;
+        }
+    });
+
+    const printWindow = window.open('', '_blank', 'width=950,height=850');
+    if (!printWindow) return alert("Popup blocked! Please allow popups to print office report.");
+
+    const sortedOffices = Object.keys(officeStats).sort();
+    let tableRowsHtml = '';
+
+    // Generate table rows dynamically
+    sortedOffices.forEach((off, idx) => {
+        const s = officeStats[off];
+        tableRowsHtml += `<tr>
+            <td style="text-align:center;">${idx + 1}</td>
+            <td style="font-weight:bold; color:#0f172a;">${off}</td>
+            <td style="text-align:center; font-weight:bold;">${s.registered}</td>
+            <td style="text-align:center; color:#b45309; font-weight:bold;">${s.pending}</td>
+            <td style="text-align:center; color:#1d4ed8; font-weight:bold;">${s.inprogress}</td>
+            <td style="text-align:center; color:#15803d; font-weight:bold;">${s.settled}</td>
+            <td style="text-align:center; color:#b91c1c; font-weight:bold;">${s.rejected}</td>
+            <td style="text-align:right; font-weight:bold; color:#991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    // Generate full HTML template safely
+    const printHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Refund Claims - Office-wise Pendency & Status Report</title>
+        <style>
+            @page { size: A4 portrait; margin: 10mm 12mm; }
+            * { box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; padding: 0; margin: 0; }
+            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; }
+            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 11px; font-weight: bold; }
+            .title-area p { margin: 2px 0 0 0; font-size: 9.5px; color: #475569; font-weight: 600; }
+            .logo-box img { height: 42px; width: 63px; object-fit: contain; }
+            table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10.5px; }
+            th { background: #A80F28; color: #fff; padding: 5px 6px; border: 1px solid #8A0C21; font-weight: bold; }
+            td { padding: 4.5px 6px; border: 1px solid #cbd5e1; }
+            tr:nth-child(even) { background: #f8fafc; }
+            .total-row { background: #fee2e2 !important; font-weight: bold; color: #881337; }
+            .end-of-doc { margin-top: 18px; padding-top: 8px; border-top: 1.5px dashed #94a3b8; text-align: center; font-size: 10px; color: #64748b; font-weight: 600; }
+            @media print { body { padding: 0; } .no-print { display: none; } }
+        </style>
+    </head>
+    <body>
+        <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1;">
+            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:6px 14px; font-weight:bold; cursor:pointer; border-radius:4px; margin-right:5px;">Print Report</button>
+            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; font-weight:bold; cursor:pointer; border-radius:4px;">Close</button>
+        </div>
+        <div class="header-banner">
+            <div class="title-area">
+                <h1>Refund Claims Management Portal</h1>
+                <h2>Chennai City Central Division &bull; Office-wise Pendency &amp; Status Report</h2>
+                <p>Period: <strong>${fromDateVal}</strong> to <strong>${toDateVal}</strong> | Generated on: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            <div class="logo-box">
+                <img src="${typeof currentAppLogo !== 'undefined' ? currentAppLogo : ''}" alt="India Post">
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">Sl</th>
+                    <th style="width: 33%; text-align: left;">Office Name</th>
+                    <th style="width: 10%; text-align: center;">Registered</th>
+                    <th style="width: 10%; text-align: center;">Pending</th>
+                    <th style="width: 11%; text-align: center;">In Progress</th>
+                    <th style="width: 9%; text-align: center;">Settled</th>
+                    <th style="width: 9%; text-align: center;">Rejected</th>
+                    <th style="width: 13%; text-align: right;">Pending + In Prog (Rs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRowsHtml}
+                <tr class="total-row">
+                    <td colspan="2" style="text-align: center;">GRAND TOTAL</td>
+                    <td style="text-align: center;">${grandReg}</td>
+                    <td style="text-align: center;">${grandPend}</td>
+                    <td style="text-align: center;">${grandInp}</td>
+                    <td style="text-align: center;">${grandSet}</td>
+                    <td style="text-align: center;">${grandRej}</td>
+                    <td style="text-align: right;">Rs. ${grandActiveAmt.toFixed(2)}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="end-of-doc">
+            *** END OF OFFICE REPORT &bull; TOTAL OFFICES: ${sortedOffices.length} ***
+        </div>
+        <script>
+            window.onload = function() {
+                setTimeout(function() { window.print(); }, 500);
+            };
+        <\/script>
+    </body>
+    </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(printHtml);
+    printWindow.document.close();
+}
+
+
+
     function getStatusColor(status) {
       if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
       if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
@@ -1541,6 +1695,7 @@
       const overviewFilterOffice = $('overviewFilterOffice');
       const filterOfficeName = $('filterOfficeName');
       const bookingFilterOffice = $('bookingFilterOffice');
+      const editUserOffice = $('editUserOffice'); // <-- Added for User Edit Modal
       const overviewFilterEmpUser = $('overviewFilterEmpUser');
       const filterEmpUser = $('filterEmpUser');
 
@@ -1556,6 +1711,7 @@
         if (overviewFilterOffice) overviewFilterOffice.innerHTML = filterOpts;
         if (filterOfficeName) filterOfficeName.innerHTML = filterOpts;
         if (bookingFilterOffice) bookingFilterOffice.innerHTML = filterOpts;
+        if (editUserOffice) editUserOffice.innerHTML = opts; // <-- Populate User Edit Office Dropdown
       }
 
       if (profiles) {
@@ -1567,6 +1723,7 @@
         if (filterEmpUser) filterEmpUser.innerHTML = userOpts;
       }
     }
+    
 
     // 5. SEARCH & TRACK CLAIM HANDLERS
     function handleTrackInput(e) {
@@ -1738,6 +1895,10 @@
       if ($('claimFile')) $('claimFile').value = '';
       if ($('userPastedImagePreview')) $('userPastedImagePreview').src = '';
       if ($('userPastedPreviewContainer')) $('userPastedPreviewContainer').classList.add('hidden');
+    }
+       function toggleSettlementDateField() {
+      if ($('modalStatus').value === 'Settled') $('modalSettlementDateContainer').classList.remove('hidden');
+      else $('modalSettlementDateContainer').classList.add('hidden');
     }
 
     function handleFileSelectPreview(e) {
@@ -2937,6 +3098,386 @@ function renderClaimsSummaryTable() {
       activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
       loadBookingDashboardData();
     }
+ async function exportBookingReportImage() {
+      if (!bookingImportedRecords.length) return alert("No booking data available to export as image!");
+      const fromVal = $('bookingFromDate')?.value || 'Inception';
+      const toVal = $('bookingToDate')?.value || 'CurrentDate';
+      const fileName = `Office-wise Digital Adoption-${fromVal}-${toVal}.png`;
+
+      const selectedChannels = activeSelectedChannelKeys;
+      const officeMap = {};
+      let totalCashCnt = 0, totalDigCnt = 0;
+
+      bookingImportedRecords.forEach(r => {
+        const off = r.office_name || 'Unassigned';
+        const c_cnt = parseFloat(r.cash_cnt) || 0;
+        let d_cnt = 0;
+        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+          if (selectedChannels.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
+        });
+
+        totalCashCnt += c_cnt;
+        totalDigCnt += d_cnt;
+        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
+        officeMap[off].cash_cnt += c_cnt;
+        officeMap[off].dig_cnt += d_cnt;
+      });
+
+      const totalBookings = totalCashCnt + totalDigCnt;
+      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+
+      const sortedOffices = Object.keys(officeMap).map(name => {
+        const o = officeMap[name];
+        const tot = o.cash_cnt + o.dig_cnt;
+        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
+        return { name, ...o, tot, pct };
+      }).sort((a, b) => b.pct - a.pct);
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '800px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      sortedOffices.forEach((o, i) => {
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
+            <td style="padding: 7px; text-align: center; font-weight: bold; font-family: monospace;">#${i + 1}</td>
+            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${o.name}</td>
+            <td style="padding: 7px; text-align: center; font-weight: 600;">${o.cash_cnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 7px; text-align: center; font-weight: bold; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 7px; text-align: center; font-weight: 800; color: #15803d; background: #f0fdf4;">${o.pct.toFixed(2)}%</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Digital vs Cash Transaction Performance Report</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Leaderboard</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
+                <th style="padding: 8px; text-align: center; width: 10%;">Rank</th>
+                <th style="padding: 8px; width: 45%;">Office Name</th>
+                <th style="padding: 8px; text-align: center; width: 15%;">Cash Txn (Cnt)</th>
+                <th style="padding: 8px; text-align: center; width: 15%;">Digital Txn (Cnt)</th>
+                <th style="padding: 8px; text-align: center; width: 15%;">Digital % Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
+                <td style="padding: 8px; text-align: center; font-family: monospace;">Σ</td>
+                <td style="padding: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
+                <td style="padding: 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
+                <td style="padding: 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
+                <td style="padding: 8px; text-align: center; color: #FACC15; font-size: 12px;">${totalDigShare}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
+    }
+
+    async function exportBookingReportPDF() {
+      if (!bookingImportedRecords.length) return alert("No performance data to export!");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "portrait" });
+
+      if (cachedPdfLogoBase64) {
+        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 169, 8, 27, 18); } catch (e) {}
+      }
+
+      doc.setFontSize(13);
+      doc.setTextColor(168, 15, 40);
+      doc.text("Digital vs Cash Transaction Performance Report", 105, 14, { align: "center" });
+      doc.setFontSize(9.5);
+      doc.setTextColor(180, 83, 9);
+      doc.text("Chennai City Central Division • Booking Performance Monitoring", 105, 19, { align: "center" });
+
+      const fromVal = $('bookingFromDate')?.value || 'Inception';
+      const toVal = $('bookingToDate')?.value || 'Current Date';
+      doc.setFontSize(8);
+      doc.setTextColor(51, 65, 85);
+      doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 105, 24, { align: "center" });
+
+      const officeMap = {};
+      let totalCashCnt = 0, totalDigCnt = 0;
+
+      bookingImportedRecords.forEach(r => {
+        const off = r.office_name || 'Unassigned';
+        const c_cnt = parseFloat(r.cash_cnt) || 0;
+        let d_cnt = 0;
+        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+          if (activeSelectedChannelKeys.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
+        });
+
+        totalCashCnt += c_cnt;
+        totalDigCnt += d_cnt;
+        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
+        officeMap[off].cash_cnt += c_cnt;
+        officeMap[off].dig_cnt += d_cnt;
+      });
+
+      const totalBookings = totalCashCnt + totalDigCnt;
+      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+
+      const rows = Object.keys(officeMap).map(name => {
+        const o = officeMap[name];
+        const tot = o.cash_cnt + o.dig_cnt;
+        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
+        return { name, ...o, tot, pct };
+      }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
+        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), o.dig_cnt.toLocaleString('en-IN'), `${o.pct.toFixed(2)}%`
+      ]);
+
+      rows.push(['Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
+
+      doc.autoTable({
+        head: [["Rank", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
+        body: rows,
+        startY: 30,
+        theme: 'grid',
+        headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
+        styles: { fontSize: 8 },
+        didParseCell: function(data) {
+          if (data.row.index === rows.length - 1) {
+            data.cell.styles.fillColor = [168, 15, 40];
+            data.cell.styles.textColor = [255, 255, 255];
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
+      });
+
+      doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
+    }
+
+    async function exportOfficeWiseImage() {
+      if (!rawMISMasterList.length) return alert("No office pendency data available to export as image!");
+
+      const fromVal = $('filterFromDate')?.value || 'Inception';
+      const toVal = $('filterToDate')?.value || 'CurrentDate';
+      const fileName = `Office_Wise_Pendency_${fromVal}_to_${toVal}.png`;
+
+      const officeStats = {};
+      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+      rawMISMasterList.forEach(c => {
+        const off = c.raised_for_office || 'Unassigned';
+        const amt = parseFloat(c.txn_amount) || 0;
+        if (!officeStats[off]) {
+          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+        officeStats[off].registered++;
+        grandReg++;
+
+        if (c.claim_status === 'Pending') {
+          officeStats[off].pending++;
+          officeStats[off].activePendingAmount += amt;
+          grandPend++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'In Progress') {
+          officeStats[off].inprogress++;
+          officeStats[off].activePendingAmount += amt;
+          grandInp++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'Settled') {
+          officeStats[off].settled++;
+          grandSet++;
+        } else if (c.claim_status === 'Rejected') {
+          officeStats[off].rejected++;
+          grandRej++;
+        }
+      });
+
+      const sortedOffices = Object.keys(officeStats).sort();
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '900px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      sortedOffices.forEach((off, idx) => {
+        const s = officeStats[off];
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
+            <td style="padding: 7px; text-align: center;">${idx + 1}</td>
+            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${off}</td>
+            <td style="padding: 7px; text-align: center; font-weight: bold;">${s.registered}</td>
+            <td style="padding: 7px; text-align: center; color: #b45309; font-weight: bold;">${s.pending}</td>
+            <td style="padding: 7px; text-align: center; color: #1d4ed8; font-weight: bold;">${s.inprogress}</td>
+            <td style="padding: 7px; text-align: center; color: #15803d; font-weight: bold;">${s.settled}</td>
+            <td style="padding: 7px; text-align: center; color: #b91c1c; font-weight: bold;">${s.rejected}</td>
+            <td style="padding: 7px; text-align: right; font-weight: bold; color: #991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Office-wise Pendency & Status Breakdown</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Matrix</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
+                <th style="padding: 8px; text-align: center; width: 5%;">#</th>
+                <th style="padding: 8px; width: 33%;">Office Name</th>
+                <th style="padding: 8px; text-align: center; width: 10%;">Registered</th>
+                <th style="padding: 8px; text-align: center; width: 10%;">Pending</th>
+                <th style="padding: 8px; text-align: center; width: 11%;">In Progress</th>
+                <th style="padding: 8px; text-align: center; width: 9%;">Settled</th>
+                <th style="padding: 8px; text-align: center; width: 9%;">Rejected</th>
+                <th style="padding: 8px; text-align: right; width: 13%;">Pending + In Prog (Rs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
+                <td colspan="2" style="padding: 8px; text-align: center; letter-spacing: 0.5px;">GRAND TOTAL (${sortedOffices.length} Offices)</td>
+                <td style="padding: 8px; text-align: center;">${grandReg}</td>
+                <td style="padding: 8px; text-align: center;">${grandPend}</td>
+                <td style="padding: 8px; text-align: center;">${grandInp}</td>
+                <td style="padding: 8px; text-align: center;">${grandSet}</td>
+                <td style="padding: 8px; text-align: center;">${grandRej}</td>
+                <td style="padding: 8px; text-align: right; color: #FACC15;">Rs. ${grandActiveAmt.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
+    }
+
+    async function exportMISReportImage() {
+      if (!currentMISClaimsList.length) return alert("No MIS report data available to export as image!");
+      const fromVal = $('filterFromDate')?.value || 'Inception';
+      const toVal = $('filterToDate')?.value || 'CurrentDate';
+      const fileName = `MIS_Report_${currentMISReportFilter}_${fromVal}_to_${toVal}.png`;
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '1050px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      currentMISClaimsList.forEach((c, idx) => {
+        const isSettled = c.claim_status === 'Settled';
+        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 10px;">
+            <td style="padding: 6px; text-align: center;">${idx + 1}</td>
+            <td style="padding: 6px; font-weight: bold; font-family: monospace; color: #a80f28;">${c.txn_id_ref}</td>
+           <td style="padding: 6px;">${c.profiles?.emp_name || 'Staff'}</td>
+            <td style="padding: 6px;">${c.module}</td>
+            <td style="padding: 6px;">${c.raised_for_office}</td>
+            <td style="padding: 6px;">${c.txn_date}</td>
+            <td style="padding: 6px;">${settleDate}</td>
+            <td style="padding: 6px; text-align: right; font-weight: bold;">₹${c.txn_amount}</td>
+            <td style="padding: 6px; font-weight: bold;">${c.claim_status}</td>
+            <td style="padding: 6px; font-size: 9.5px;">${c.reply_remarks_admin || '-'}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Refund Claims & Settlement Report (${currentMISReportFilter})</h2>
+              <p style="margin: 2px 0 0 0; font-size: 14px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Digital Transactions Refund Claims & TAT Statement</p>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Records: <strong>${currentMISClaimsList.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 10.5px; font-weight: bold;">
+                <th style="padding: 7px; text-align: center; width: 4%;">#</th>
+                <th style="padding: 7px; width: 14%;">Ref No</th>
+                <th style="padding: 7px; width: 13%;">Raised By</th>
+                <th style="padding: 7px; width: 8%;">Module</th>
+                <th style="padding: 7px; width: 14%;">Office Name</th>
+                <th style="padding: 7px; width: 9%;">Txn Date</th>
+                <th style="padding: 7px; width: 9%;">Settle Date</th>
+                <th style="padding: 7px; text-align: right; width: 9%;">Amount</th>
+                <th style="padding: 7px; width: 8%;">Status</th>
+                <th style="padding: 7px; width: 12%;">Admin Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
+    }
 
     async function handleBookingExcelUpload(e) {
       const file = e.target.files[0];
@@ -3620,7 +4161,7 @@ function openDetailsModal(claimId) {
     </div>
     <div class="md:col-span-2 flex gap-2 pt-2">
       ${claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs">📄 Primary File</a>` : ''}
-      ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs">📎 Admin File</a>` : ''}
+      ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs">📎 Admin Proof</a>` : ''}
     </div>
   `;
 
@@ -4082,6 +4623,210 @@ async function submitUserRemarksEdit() {
   }
 }
 
+ async function exportMISPDF() {
+  if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
+    return alert("No records available to export!");
+  }
+
+  const { jsPDF } = window.jspdf;
+  // A4 Landscape: width ~297mm, height ~210mm
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  // Color Palette Constants
+  const COLOR_PRIMARY = [168, 15, 40];      // Post Red
+  const COLOR_GOLD = [180, 83, 9];          // Accent Gold
+  const COLOR_TEXT_DARK = [30, 41, 59];     // Slate 800
+  const COLOR_TEXT_MUTED = [100, 116, 139]; // Slate 500
+  const COLOR_BORDER = [203, 213, 225];     // Slate 300
+
+  const fromVal = $('filterFromDate')?.value || 'Inception';
+  const toVal = $('filterToDate')?.value || 'Current Date';
+  const todayStr = new Date().toISOString().split('T')[0];
+  const generatedTimeStr = new Date().toLocaleString("en-IN", { 
+    day: '2-digit', month: '2-digit', year: 'numeric', 
+    hour: '2-digit', minute: '2-digit', hour12: true 
+  });
+
+  // --- 1. Top Header Block ---
+  
+  // Outer decorative top accent bar
+  doc.setFillColor(...COLOR_PRIMARY);
+  doc.rect(10, 8, pageWidth - 20, 2, 'F');
+
+  // Header Title & Subtitle (Left-aligned)
+  doc.setFontSize(14); 
+  doc.setTextColor(...COLOR_PRIMARY);
+  doc.setFont("helvetica", "bold");
+  doc.text("REFUND CLAIMS & SETTLEMENT TAT REPORT", 10, 18); 
+
+  doc.setFontSize(10);
+  doc.setTextColor(...COLOR_GOLD);
+  doc.setFont("helvetica", "bold");
+  doc.text("CHENNAI CITY CENTRAL DIVISION", 10, 24);
+
+  // Top-Right Logo Placement (Calculated width alignment: pageWidth - 10 - logoWidth)
+  if (cachedPdfLogoBase64) {
+    try { 
+      const logoWidth = 22;
+      const logoHeight = 15;
+      const logoX = pageWidth - 10 - logoWidth; // Aligns with the right margin
+      const logoY = 12;
+      
+      doc.addImage(cachedPdfLogoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight); 
+    } catch (e) {
+      console.warn("Logo image insertion failed on PDF export", e);
+    }
+  }
+
+  // --- 2. Official Metadata Panel (Compact) ---
+  const metaYStart = 28;
+  const panelHeight = 7;
+  
+  // Clean background strip
+  doc.setFillColor(248, 250, 252); // slate-50
+  doc.setDrawColor(...COLOR_BORDER);
+  doc.roundedRect(10, metaYStart, pageWidth - 20, panelHeight, 0.8, 0.8, 'FD');
+
+  doc.setFontSize(7.5);
+  doc.setTextColor(...COLOR_TEXT_DARK);
+  
+  const textY = metaYStart + 4.8; // Centered vertically in 7mm box
+
+  // Left Column: Period Filter
+  doc.setFont("helvetica", "normal");
+  doc.text("Period Filter: ", 13, textY);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${fromVal} to ${toVal}`, 29, textY);
+
+  // Center Column: Total Records
+  doc.setFont("helvetica", "normal");
+  doc.text("Total Records: ", 125, textY);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${currentMISClaimsList.length}`, 143, textY);
+
+  // Right Column: Report Type
+  doc.setFont("helvetica", "normal");
+  doc.text("Report Type: ", 225, textY);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${currentMISReportFilter || 'General MIS'}`, 242, textY);
+  // --- 3. Table Rows Mapping ---
+  const headers = [["Sl.", "Txn ID (Ref)", "Raised By", "Module", "Office", "Txn Date", "Settlement / Age", "Amount", "Status", "Admin Remarks"]];
+  
+  const rows = currentMISClaimsList.map((c, idx) => {
+    const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name}\n(${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
+    const isSettled = c.claim_status === 'Settled';
+    const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
+    
+    let tatOrAgingStr = '-';
+    if (isSettled) {
+      const days = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+      tatOrAgingStr = days !== null ? `${days} Days (TAT)` : '-';
+    } else {
+      const days = calculateDaysDifference(c.txn_date, todayStr);
+      tatOrAgingStr = days !== null ? `${days} Days (Age)` : '-';
+    }
+
+    const formattedAmount = c.txn_amount 
+      ? `Rs. ${Number(c.txn_amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+      : 'Rs. 0.00';
+
+    return [
+      idx + 1,
+      c.txn_id_ref || '-',
+      creatorName,
+      c.module || '-',
+      c.raised_for_office || '-',
+      c.txn_date || '-',
+      settleDate !== '-' ? `${settleDate}\n[${tatOrAgingStr}]` : tatOrAgingStr,
+      formattedAmount,
+      c.claim_status || 'Pending',
+      c.reply_remarks_admin || '-'
+    ];
+  });
+
+  // --- 4. Render Table with autoTable ---
+ 
+  doc.autoTable({ 
+    head: headers, 
+    body: rows, 
+    startY: 38, // Shifted up from 46 to fit the compact design
+    margin: { left: 10, right: 10, bottom: 15 },  
+    theme: 'grid', 
+    headStyles: { 
+      fillColor: COLOR_PRIMARY, 
+      textColor: [255, 255, 255], 
+      fontStyle: 'bold',
+      fontSize: 8,
+      halign: 'center',
+      valign: 'middle',
+      cellPadding: 2.5
+    }, 
+    styles: { 
+      fontSize: 7.5, 
+      cellPadding: 2,
+      textColor: COLOR_TEXT_DARK,
+      valign: 'middle',
+      lineColor: COLOR_BORDER,
+      lineWidth: 0.1
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
+    },
+    columnStyles: {
+      0: { cellWidth: 10, halign: 'center' },
+      1: { cellWidth: 28, fontStyle: 'bold' },
+      2: { cellWidth: 32 },
+      3: { cellWidth: 18 },
+      4: { cellWidth: 28 },
+      5: { cellWidth: 20, halign: 'center' },
+      6: { cellWidth: 28, halign: 'center' },
+      7: { cellWidth: 25, halign: 'right', fontStyle: 'bold' },
+      8: { cellWidth: 22, halign: 'center', fontStyle: 'bold' },
+      9: { cellWidth: 'auto' }
+    },
+    didParseCell: function (data) {
+      if (data.section === 'body' && data.column.index === 8) {
+        const val = String(data.cell.raw).toLowerCase();
+        if (val === 'settled' || val === 'approved') {
+          data.cell.styles.textColor = [22, 101, 52];
+        } else if (val === 'pending') {
+          data.cell.styles.textColor = [180, 83, 9];
+        } else if (val === 'rejected') {
+          data.cell.styles.textColor = [185, 28, 28];
+        }
+      }
+    }
+  });
+
+  // --- 5. Post-Processing: Headers/Footers on Every Page ---
+  const pageCount = doc.internal.getNumberOfPages();
+
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+
+    // Structural Page Border
+    doc.setDrawColor(...COLOR_BORDER);
+    doc.setLineWidth(0.3);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
+    // Footer Divider Line
+    doc.setDrawColor(226, 232, 240);
+    doc.line(10, pageHeight - 12, pageWidth - 10, pageHeight - 12);
+
+    // Footer Text
+    doc.setFontSize(7.5);
+    doc.setTextColor(...COLOR_TEXT_MUTED);
+    doc.setFont("helvetica", "normal");
+    
+    doc.text(`Generated on: ${generatedTimeStr} | Internal Office Report`, 10, pageHeight - 7);
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth - 10, pageHeight - 7, { align: "right" });
+  }
+
+  // --- 6. Save PDF ---
+  doc.save(`MIS_Report_${currentMISReportFilter}_${fromVal}_to_${toVal}.pdf`);
+}
 // =========================================================================
 // ADMIN MODAL OPEN & SUBMIT (INCLUDES CHANGE OF MODULE)
 // =========================================================================
