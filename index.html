@@ -245,114 +245,118 @@
         </div>
 
         <!-- TAB 2: CLAIM REGISTRATION FORM -->
-        <div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
-          <div class="border-b pb-2 mb-3 border-amber-200">
-            <h3 class="text-sm font-bold text-postRed-700 uppercase">New Claim Registration Form</h3>
-          </div>
-          
-          <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div class="lg:col-span-7 space-y-2.5">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Raised for Office Name *</label>
-                  <select id="claimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
-                    <option value="">-- Loading Offices... --</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Module *</label>
-                  <select id="claimModule" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
-                    <option value="Booking">Booking</option>
-                    <option value="Delivery">Delivery</option>
-                    <option value="DSS">DSS</option>
-                    <option value="Others">Others</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Article Number *</label>
-                  <input type="text" id="claimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Transaction ID *</label>
-                  <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Date *</label>
-                  <input type="date" id="claimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
-                  <input type="number" step="0.01" id="claimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">Payment Channel *</label>
-                  <select id="claimChannel" onchange="handlePaymentChannelChange()" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-800">
-                    <option value="DQR">DQR</option>
-                    <option value="SBI POS">SBI POS</option>
-                    <option value="SBI ePay">SBI ePay</option>
-                  </select>
-                </div>
-                
-                <div id="rrnFieldContainer" class="hidden">
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
-                  <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
-                </div>
-
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-0.5">User Mobile Number (10 Digits) *</label>
-                  <input type="tel" id="claimUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required placeholder="10-digit mobile" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-amber-50/30 font-mono outline-none">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-0.5">Remarks by User *</label>
-                <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-xs h-24 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/10" placeholder="Enter reason and description for claim..."></textarea>
-              </div>
-            </div>
-
-            <!-- RIGHT PANEL: ATTACHMENT & PREVIEW -->
-            <div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
-              <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="block text-xs font-bold text-slate-700">Document Attachment *</label>
-                  <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
-                    <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
-                    <span>☀️ Auto Light Theme</span>
-                  </label>
-                </div>
-
-                <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileSelectPreview(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
-                
-                <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
-                  <span class="text-xl">📋</span>
-                  <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
-                </div>
-              </div>
-
-              <!-- PREVIEW BOX -->
-              <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
-                <div id="previewMediaWrapper" class="flex flex-col items-center justify-center w-full">
-                  <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
-                  <div id="pdfFilePreviewBlock" class="hidden flex items-center gap-2 bg-white px-3 py-2 rounded border border-emerald-300 shadow-xs">
-                    <span class="text-xl">📄</span>
-                    <div>
-                      <p id="pdfPreviewFileName" class="font-bold text-slate-800 text-xs">document.pdf</p>
-                      <p class="text-[10px] text-emerald-700 font-semibold">PDF Document Ready for Upload</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between w-full mt-2 text-[11px] pt-1 border-t border-emerald-200">
-                  <span id="userPastedImageSize" class="font-bold text-emerald-800 text-[10px]">✓ File Attached</span>
-                  <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove Attachment</button>
-                </div>
-              </div>
-
-              <button type="submit" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-md cursor-pointer transition uppercase tracking-wide">
-                Submit Claim Registration
-              </button>
-            </div>
-          </form>
+       <!-- TAB 2: CLAIM REGISTRATION FORM -->
+<div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
+  <div class="border-b pb-2 mb-3 border-amber-200 flex justify-between items-center">
+    <h3 id="claimFormHeading" class="text-sm font-bold text-postRed-700 uppercase">New Claim Registration Form</h3>
+    <button type="button" id="btnCancelEditClaim" onclick="cancelClaimEditing()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1 rounded text-xs font-bold cursor-pointer">✕ Cancel Edit</button>
+  </div>
+  
+  <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <input type="hidden" id="editingClaimId">
+    
+    <div class="lg:col-span-7 space-y-2.5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Raised for Office Name *</label>
+          <select id="claimOffice" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+            <option value="">-- Loading Offices... --</option>
+          </select>
         </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Module *</label>
+          <select id="claimModule" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+            <option value="Booking">Booking</option>
+            <option value="Delivery">Delivery</option>
+            <option value="DSS">DSS</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Article Number *</label>
+          <input type="text" id="claimArticleNo" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Transaction ID *</label>
+          <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Date *</label>
+          <input type="date" id="claimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
+          <input type="number" step="0.01" id="claimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Payment Channel *</label>
+          <select id="claimChannel" onchange="handlePaymentChannelChange()" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-800">
+            <option value="DQR">DQR</option>
+            <option value="SBI POS">SBI POS</option>
+            <option value="SBI ePay">SBI ePay</option>
+          </select>
+        </div>
+        
+        <div id="rrnFieldContainer" class="hidden">
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">RRN Number (SBI POS) *</label>
+          <input type="text" id="claimRrn" class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs outline-none font-mono bg-amber-50/20">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">User Mobile Number (10 Digits) *</label>
+          <input type="tel" id="claimUserMobile" maxlength="10" minlength="10" oninput="cleanPhoneInput(this)" required placeholder="10-digit mobile" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-amber-50/30 font-mono outline-none">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-0.5">Remarks by User *</label>
+        <textarea id="claimUserRemarks" required class="w-full border border-slate-300 p-2 rounded text-xs h-24 outline-none focus:ring-2 focus:ring-postRed-600 bg-amber-50/10" placeholder="Enter reason and description for claim..."></textarea>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: ATTACHMENT & PREVIEW -->
+    <div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="block text-xs font-bold text-slate-700">Document Attachment <span id="docRequiredStar">*</span></label>
+          <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
+            <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
+            <span>☀️ Auto Light Theme</span>
+          </label>
+        </div>
+
+        <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileSelectPreview(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+        
+        <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
+          <span class="text-xl">📋</span>
+          <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
+        </div>
+      </div>
+
+      <!-- PREVIEW BOX -->
+      <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
+        <div id="previewMediaWrapper" class="flex flex-col items-center justify-center w-full">
+          <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
+          <div id="pdfFilePreviewBlock" class="hidden flex items-center gap-2 bg-white px-3 py-2 rounded border border-emerald-300 shadow-xs">
+            <span class="text-xl">📄</span>
+            <div>
+              <p id="pdfPreviewFileName" class="font-bold text-slate-800 text-xs">document.pdf</p>
+              <p class="text-[10px] text-emerald-700 font-semibold">PDF Document Ready for Upload</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between w-full mt-2 text-[11px] pt-1 border-t border-emerald-200">
+          <span id="userPastedImageSize" class="font-bold text-emerald-800 text-[10px]">✓ File Attached</span>
+          <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove Attachment</button>
+        </div>
+      </div>
+
+      <button type="submit" id="btnSubmitClaimForm" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-md cursor-pointer transition uppercase tracking-wide">
+        Submit Claim Registration
+      </button>
+    </div>
+  </form>
+</div>
 
         <!-- TAB 3: THEME CONVERTER (ADMINS ONLY) -->
         <div id="converterTabView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
@@ -854,93 +858,103 @@
       </div>
 
       <!-- ADMIN EDIT/REPLY MODAL -->
-      <div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-5 max-w-xl w-full space-y-3 shadow-2xl border-t-8 border-postRed-600 max-h-[90vh] overflow-y-auto">
-          <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
-            <h3 class="font-bold text-sm text-postRed-700">Admin Action &amp; Document Quality Review</h3>
-            <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer leading-none">&times;</button>
-          </div>
-          
-          <input type="hidden" id="modalClaimId">
+      <!-- ADMIN EDIT/REPLY MODAL -->
+<div id="replyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-5 max-w-xl w-full space-y-3 shadow-2xl border-t-8 border-postRed-600 max-h-[90vh] overflow-y-auto">
+    <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
+      <h3 class="font-bold text-sm text-postRed-700">Admin Action &amp; Document Quality Review</h3>
+      <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer leading-none">&times;</button>
+    </div>
+    
+    <input type="hidden" id="modalClaimId">
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            <div>
-              <label class="block font-bold text-slate-700 mb-0.5">Claim Status</label>
-              <select id="modalStatus" onchange="onModalStatusChanged()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold">
-                <option value="Pending">Pending</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Settled">Settled</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 mb-0.5">Document Quality Action</label>
-              <select id="modalDocStatus" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-700">
-                <option value="Approved">Approved (Legible Document)</option>
-                <option value="Needs Revision">Ask User to Re-upload (Poor / Irrelevant)</option>
-              </select>
-            </div>
-          </div>
+    <!-- 3-Column Top Grid with Module Selector -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Change Module</label>
+        <select id="modalModule" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-800">
+          <option value="Booking">Booking</option>
+          <option value="Delivery">Delivery</option>
+          <option value="DSS">DSS</option>
+          <option value="Others">Others</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Claim Status</label>
+        <select id="modalStatus" onchange="onModalStatusChanged()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold">
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Settled">Settled</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Document Quality Action</label>
+        <select id="modalDocStatus" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-700">
+          <option value="Approved">Approved (Legible)</option>
+          <option value="Needs Revision">Ask User to Re-upload</option>
+        </select>
+      </div>
+    </div>
 
-          <div id="modalSettlementDateContainer" class="hidden bg-emerald-50/70 p-2.5 rounded border border-emerald-300 text-xs">
-            <label class="block font-bold text-emerald-900 mb-0.5">📅 Actual Date of Settlement *</label>
-            <input type="date" id="modalSettlementDate" class="w-full border border-emerald-400 p-1 rounded text-xs bg-white outline-none font-bold text-emerald-900">
-          </div>
+    <div id="modalSettlementDateContainer" class="hidden bg-emerald-50/70 p-2.5 rounded border border-emerald-300 text-xs">
+      <label class="block font-bold text-emerald-900 mb-0.5">📅 Actual Date of Settlement *</label>
+      <input type="date" id="modalSettlementDate" class="w-full border border-emerald-400 p-1 rounded text-xs bg-white outline-none font-bold text-emerald-900">
+    </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-0.5">Admin Remarks / Instructions</label>
-            <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
-          </div>
+    <div>
+      <label class="block text-xs font-bold text-slate-700 mb-0.5">Admin Remarks / Instructions</label>
+      <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
+    </div>
 
-          <!-- ATTACHMENT SECTION 1: USER REPLACEMENT UPLOAD -->
-          <div id="modalPendingUserDocSection" class="p-2.5 bg-rose-50/70 rounded-xl border border-rose-200 space-y-1.5 text-xs">
-            <div class="flex justify-between items-center">
-              <label class="font-bold text-rose-900">1. Replace User Uploaded Document (If Illegible/Wrong)</label>
-              <span class="text-[10px] text-rose-700 font-semibold">Overrides User Doc</span>
-            </div>
-            <input type="file" id="modalUserReplaceFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalUserFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
-            
-            <div id="modalUserPasteDropZone" tabindex="0" class="border border-dashed border-rose-300 hover:border-rose-600 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
-              <p class="text-[11px] font-bold text-rose-800">📋 Click &amp; press <kbd class="bg-rose-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Replacement Image</p>
-            </div>
-
-            <div id="modalUserPastedPreviewContainer" class="hidden relative border border-rose-300 rounded p-1.5 bg-rose-50 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <img id="modalUserPastedImagePreview" src="" alt="Replacement User Preview" class="h-10 w-15 object-cover rounded border border-rose-200">
-                <span class="text-rose-800 font-bold text-xs">✓ User Replacement File Attached</span>
-              </div>
-              <button type="button" onclick="clearModalUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold underline cursor-pointer">Remove</button>
-            </div>
-          </div>
-
-          <!-- ATTACHMENT SECTION 2: ADMIN RESOLUTION ATTACHMENT -->
-          <div id="modalSettledAdminDocSection" class="hidden p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-1.5 text-xs">
-            <div class="flex justify-between items-center">
-              <label class="font-bold text-emerald-900">2. Attach Admin Resolution / Confirmation Proof Document</label>
-              <span class="text-[10px] text-emerald-700 font-semibold">Resolution Proof</span>
-            </div>
-            <input type="file" id="modalAdminFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalAdminFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
-            
-            <div id="modalAdminPasteDropZone" tabindex="0" class="border border-dashed border-emerald-400 hover:border-emerald-700 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
-              <p class="text-[11px] font-bold text-emerald-900">📋 Click &amp; press <kbd class="bg-emerald-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Admin Resolution Image</p>
-            </div>
-
-            <div id="modalAdminPastedPreviewContainer" class="hidden relative border border-emerald-300 rounded p-1.5 bg-emerald-50 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <img id="modalAdminPastedImagePreview" src="" alt="Admin Resolution Preview" class="h-10 w-15 object-cover rounded border border-emerald-200">
-                <span class="text-emerald-800 font-bold text-xs">✓ Admin Resolution File Attached</span>
-              </div>
-              <button type="button" onclick="clearModalAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold underline cursor-pointer">Remove</button>
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
-            <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
-            <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
-          </div>
-        </div>
+    <!-- ATTACHMENT SECTION 1: USER REPLACEMENT UPLOAD -->
+    <div id="modalPendingUserDocSection" class="p-2.5 bg-rose-50/70 rounded-xl border border-rose-200 space-y-1.5 text-xs">
+      <div class="flex justify-between items-center">
+        <label class="font-bold text-rose-900">1. Replace User Uploaded Document (If Illegible/Wrong)</label>
+        <span class="text-[10px] text-rose-700 font-semibold">Overrides User Doc</span>
+      </div>
+      <input type="file" id="modalUserReplaceFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalUserFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+      
+      <div id="modalUserPasteDropZone" tabindex="0" class="border border-dashed border-rose-300 hover:border-rose-600 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+        <p class="text-[11px] font-bold text-rose-800">📋 Click &amp; press <kbd class="bg-rose-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Replacement Image</p>
       </div>
 
+      <div id="modalUserPastedPreviewContainer" class="hidden relative border border-rose-300 rounded p-1.5 bg-rose-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img id="modalUserPastedImagePreview" src="" alt="Replacement User Preview" class="h-10 w-15 object-cover rounded border border-rose-200">
+          <span class="text-rose-800 font-bold text-xs">✓ User Replacement File Attached</span>
+        </div>
+        <button type="button" onclick="clearModalUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold underline cursor-pointer">Remove</button>
+      </div>
+    </div>
+
+    <!-- ATTACHMENT SECTION 2: ADMIN RESOLUTION ATTACHMENT -->
+    <div id="modalSettledAdminDocSection" class="hidden p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-1.5 text-xs">
+      <div class="flex justify-between items-center">
+        <label class="font-bold text-emerald-900">2. Attach Admin Resolution / Confirmation Proof Document</label>
+        <span class="text-[10px] text-emerald-700 font-semibold">Resolution Proof</span>
+      </div>
+      <input type="file" id="modalAdminFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalAdminFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+      
+      <div id="modalAdminPasteDropZone" tabindex="0" class="border border-dashed border-emerald-400 hover:border-emerald-700 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+        <p class="text-[11px] font-bold text-emerald-900">📋 Click &amp; press <kbd class="bg-emerald-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Admin Resolution Image</p>
+      </div>
+
+      <div id="modalAdminPastedPreviewContainer" class="hidden relative border border-emerald-300 rounded p-1.5 bg-emerald-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img id="modalAdminPastedImagePreview" src="" alt="Admin Resolution Preview" class="h-10 w-15 object-cover rounded border border-emerald-200">
+          <span class="text-emerald-800 font-bold text-xs">✓ Admin Resolution File Attached</span>
+        </div>
+        <button type="button" onclick="clearModalAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold underline cursor-pointer">Remove</button>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
+      <button type="button" onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+      <button type="button" id="btnAdminSave" onclick="submitAdminReply()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Save Changes</button>
+    </div>
+  </div>
+</div>
       <!-- ADMIN EDIT USER MODAL -->
       <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
@@ -1742,7 +1756,340 @@
         console.warn("Claims load error:", e);
       }
     }
+// =========================================================================
+// USER CLAIM FORM EDITING ROUTINES
+// =========================================================================
 
+function loadClaimIntoRegistrationForm(claimId) {
+  const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
+  if (!claim) return alert("Claim not found.");
+
+  // Pre-fill form fields
+  if ($('editingClaimId')) $('editingClaimId').value = claim.id;
+  if ($('claimOffice')) $('claimOffice').value = claim.raised_for_office || '';
+  if ($('claimModule')) $('claimModule').value = claim.module || 'Booking';
+  if ($('claimArticleNo')) $('claimArticleNo').value = claim.article_number || '';
+  if ($('claimTxnId')) $('claimTxnId').value = claim.txn_id_ref || '';
+  if ($('claimTxnDate')) $('claimTxnDate').value = claim.txn_date || '';
+  if ($('claimAmount')) $('claimAmount').value = claim.txn_amount || '';
+  if ($('claimChannel')) $('claimChannel').value = claim.payment_channel || 'DQR';
+  if ($('claimUserMobile')) $('claimUserMobile').value = claim.user_mobile || (userProfile?.mobile_number || '');
+  if ($('claimUserRemarks')) $('claimUserRemarks').value = claim.remarks_by_user || '';
+
+  handlePaymentChannelChange();
+  if (claim.payment_channel === 'SBI POS' && $('claimRrn')) {
+    $('claimRrn').value = claim.rrn_number || '';
+  }
+
+  // Adjust Form Title & Buttons
+  if ($('claimFormHeading')) $('claimFormHeading').innerText = `✏️ Edit Claim: ${claim.txn_id_ref}`;
+  if ($('btnSubmitClaimForm')) $('btnSubmitClaimForm').innerText = "Update Claim Registration";
+  if ($('btnCancelEditClaim')) $('btnCancelEditClaim').classList.remove('hidden');
+
+  // Preview existing attached file
+  clearUserPastedImage();
+  if (claim.file_url) {
+    if (claim.file_url.toLowerCase().endsWith('.pdf')) {
+      $('userPastedImagePreview').classList.add('hidden');
+      $('pdfFilePreviewBlock').classList.remove('hidden');
+      $('pdfPreviewFileName').innerText = "Current Document.pdf";
+    } else {
+      $('pdfFilePreviewBlock').classList.add('hidden');
+      $('userPastedImagePreview').classList.remove('hidden');
+      $('userPastedImagePreview').src = claim.file_url;
+    }
+    $('userPastedPreviewContainer').classList.remove('hidden');
+    $('userPastedImageSize').innerText = "✓ Existing Document Attached";
+  }
+
+  // Switch to Tab 2
+  showTab('registerClaim');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelClaimEditing() {
+  const form = $('claimRegistrationForm');
+  if (form) form.reset();
+  if ($('editingClaimId')) $('editingClaimId').value = '';
+  if ($('claimFormHeading')) $('claimFormHeading').innerText = "New Claim Registration Form";
+  if ($('btnSubmitClaimForm')) $('btnSubmitClaimForm').innerText = "Submit Claim Registration";
+  if ($('btnCancelEditClaim')) $('btnCancelEditClaim').classList.add('hidden');
+  clearUserPastedImage();
+  if ($('claimUserMobile') && userProfile?.mobile_number) {
+    $('claimUserMobile').value = userProfile.mobile_number;
+  }
+  showTab('track');
+}
+
+// =========================================================================
+// SUBMIT CLAIM (HANDLES BOTH NEW INSERT & USER EDIT UPDATE)
+// =========================================================================
+
+async function submitClaim(e) {
+  e.preventDefault();
+  const editingId = $('editingClaimId')?.value;
+  const isEditing = Boolean(editingId);
+
+  const fileInput = $('claimFile').files[0];
+  const txn_id_ref = $('claimTxnId').value.trim();
+  const raised_office = $('claimOffice').value;
+  const channel = $('claimChannel').value;
+  const rrn_number = (channel === 'SBI POS') ? $('claimRrn').value.trim() : 'N/A';
+  const user_mobile = $('claimUserMobile').value.trim();
+
+  if (!user_mobile || user_mobile.length !== 10) return alert("Please enter a valid 10-digit mobile number!");
+  if (channel === 'SBI POS' && (!rrn_number || rrn_number === 'N/A')) return alert("Enter RRN for SBI POS!");
+  
+  // Require file only if creating new claim and no file is chosen/pasted
+  if (!isEditing && !fileInput && !userPastedImageBlob) {
+    return alert("Please attach document or screenshot!");
+  }
+
+  let publicUrl = null;
+  let uploadBlob = userPastedImageBlob || fileInput;
+  if (uploadBlob) {
+    const fileExt = (fileInput && fileInput.name) ? fileInput.name.split('.').pop() : 'png';
+    const filePath = `claims/${txn_id_ref}-${Date.now()}.${fileExt}`;
+    const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, uploadBlob, { upsert: true });
+    if (uploadError) return alert("File upload failed: " + uploadError.message);
+    publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+  }
+
+  if (isEditing) {
+    const updatePayload = {
+      raised_for_office: raised_office,
+      module: $('claimModule').value,
+      article_number: $('claimArticleNo').value,
+      txn_id_ref: txn_id_ref,
+      rrn_number: rrn_number,
+      txn_date: $('claimTxnDate').value,
+      txn_amount: $('claimAmount').value,
+      payment_channel: channel,
+      remarks_by_user: $('claimUserRemarks').value,
+      user_mobile: user_mobile
+    };
+    if (publicUrl) updatePayload.file_url = publicUrl;
+
+    const { error } = await supabaseClient.from('claims').update(updatePayload).eq('id', editingId);
+    if (error) return alert("Error updating claim: " + error.message);
+
+    alert("Claim updated successfully!");
+    cancelClaimEditing();
+  } else {
+    const { error } = await supabaseClient.from('claims').insert([{
+      txn_id_ref,
+      raised_for_office: raised_office,
+      module: $('claimModule').value,
+      article_number: $('claimArticleNo').value,
+      rrn_number: rrn_number,
+      txn_date: $('claimTxnDate').value,
+      txn_amount: $('claimAmount').value,
+      payment_channel: channel,
+      remarks_by_user: $('claimUserRemarks').value,
+      user_mobile: user_mobile,
+      file_url: publicUrl,
+      created_by: currentUser.id,
+      doc_status: 'Approved'
+    }]);
+
+    if (error) return alert("Error submitting claim: " + error.message);
+
+    alert("Claim registered successfully!");
+    e.target.reset();
+    clearUserPastedImage();
+    showTab('track');
+  }
+
+  await loadClaimsSummary();
+}
+
+// =========================================================================
+// ADMIN MODAL OPEN & SUBMIT (WITH MODULE UPDATE CAPABILITY)
+// =========================================================================
+
+function openReplyModal(claimId) {
+  const claim = (rawClaimsList && rawClaimsList.find(c => String(c.id) === String(claimId)))
+             || (rawMISMasterList && rawMISMasterList.find(c => String(c.id) === String(claimId)));
+             
+  if (!claim) return alert("Claim record details not found.");
+
+  if ($('modalClaimId')) $('modalClaimId').value = claim.id;
+  if ($('modalModule')) $('modalModule').value = claim.module || 'Booking';
+  if ($('modalStatus')) $('modalStatus').value = claim.claim_status || 'Pending';
+  if ($('modalDocStatus')) $('modalDocStatus').value = claim.doc_status || 'Approved';
+  if ($('modalAdminRemarks')) $('modalAdminRemarks').value = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
+  
+  if ($('modalSettlementDate')) {
+    $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
+  }
+
+  clearModalUserPastedImage();
+  clearModalAdminPastedImage();
+  onModalStatusChanged();
+
+  if ($('replyModal')) $('replyModal').classList.remove('hidden');
+}
+
+async function submitAdminReply() {
+  const id = $('modalClaimId')?.value;
+  if (!id) return alert("Missing Claim ID.");
+
+  const newModule = $('modalModule')?.value || 'Booking';
+  const status = $('modalStatus')?.value || 'Pending';
+  const docStatus = $('modalDocStatus')?.value || 'Approved';
+  const remarks = $('modalAdminRemarks')?.value.trim() || '';
+  const settlementDate = (status === 'Settled') ? ($('modalSettlementDate')?.value || null) : null;
+
+  const saveBtn = $('btnAdminSave');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = "Saving..."; }
+
+  try {
+    let updatedUserFileUrl = null;
+    let updatedAdminFileUrl = null;
+
+    if (modalUserPastedBlob) {
+      const fileExt = modalUserPastedBlob.name ? modalUserPastedBlob.name.split('.').pop() : 'png';
+      const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${fileExt}`;
+      const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalUserPastedBlob, { upsert: true });
+      if (!err1) updatedUserFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    }
+
+    if (modalAdminPastedBlob) {
+      const fileExt = modalAdminPastedBlob.name ? modalAdminPastedBlob.name.split('.').pop() : 'png';
+      const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${fileExt}`;
+      const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalAdminPastedBlob, { upsert: true });
+      if (!err2) updatedAdminFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    }
+
+    const updateData = {
+      module: newModule,
+      claim_status: status,
+      doc_status: docStatus,
+      reply_remarks_admin: remarks,
+      settlement_date: settlementDate
+    };
+
+    if (docStatus === 'Needs Revision') {
+      updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
+    } else {
+      updateData.doc_revision_remarks = null;
+    }
+
+    if (updatedUserFileUrl) {
+      updateData.file_url = updatedUserFileUrl;
+      updateData.doc_status = 'Approved';
+      updateData.doc_revision_remarks = null;
+    }
+
+    if (updatedAdminFileUrl) {
+      updateData.admin_file_url = updatedAdminFileUrl;
+    }
+
+    const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
+    if (error) {
+      alert("Error saving admin update: " + error.message);
+    } else {
+      alert("Admin action, module, and remarks updated successfully!");
+      closeModal();
+      if (typeof loadClaimsSummary === 'function') await loadClaimsSummary();
+      if (typeof generateMISReport === 'function') await generateMISReport(currentMISReportFilter || 'All');
+    }
+  } catch (err) {
+    alert("Unexpected Error: " + err.message);
+  } finally {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "Save Changes"; }
+  }
+}
+
+// =========================================================================
+// CLAIMS TABLE ACTION BUTTONS (USER EDIT ON PENDING / ADMIN ACTION ON ALL)
+// =========================================================================
+
+function renderClaimsSummaryTable() {
+  const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
+  const tbody = $('claimsTableBody');
+  if (!tbody) return;
+
+  if (!currentClaimsList.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500">No requests found.</td></tr>`;
+    return;
+  }
+
+  let htmlArr = [];
+  currentClaimsList.forEach(c => {
+    const empNameOnly = c.profiles?.emp_name || 'N/A';
+    const empIdOnly = c.profiles?.emp_id ? `[${c.profiles.emp_id}]` : '';
+    const isOwner = c.created_by === currentUser?.id;
+    const isSettled = c.claim_status === 'Settled';
+    const isPending = c.claim_status === 'Pending';
+    const needsRevision = c.doc_status === 'Needs Revision';
+
+    let remarksDisplay = c.reply_remarks_admin 
+      ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
+      : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user || '-'}</div>`;
+
+    let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
+
+    if (needsRevision && isOwner) {
+      userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
+    } else if (needsRevision) {
+      userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
+    }
+
+    let adminDocHtml = '';
+    if (c.admin_file_url) {
+      adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
+    } else {
+      adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
+    }
+
+    // Role-based Action Button:
+    // 1. Admin gets Action modal (Status, Doc Review, Change Module)
+    // 2. Claim owner gets Edit form if claim is Pending
+    // 3. Otherwise, View details modal
+    let actionBtnHtml = '';
+    if (isAdmin) {
+      actionBtnHtml = `<button type="button" onclick="openReplyModal('${c.id}')" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Action</button>`;
+    } else if (isOwner && isPending) {
+      actionBtnHtml = `<button type="button" onclick="loadClaimIntoRegistrationForm('${c.id}')" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">✏️ Edit</button>`;
+    } else {
+      actionBtnHtml = `<button type="button" onclick="openDetailsModal('${c.id}')" class="w-full bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 px-2 py-1 rounded text-[10px] font-bold cursor-pointer">👁️ View</button>`;
+    }
+
+    htmlArr.push(`
+      <tr class="hover:bg-amber-50/40 transition align-middle">
+        <td class="p-2 whitespace-nowrap">
+          <span class="text-postRed-700 font-bold font-mono text-xs block cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+            <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer">📋 Copy</button>
+          </div>
+        </td>
+        <td class="p-2 whitespace-nowrap">
+          <div class="font-bold text-slate-800">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono">${empIdOnly}</span></div>
+          <div class="text-[10.5px] text-slate-600">${c.raised_for_office}</div>
+        </td>
+        <td class="p-2 font-bold text-slate-800">${c.txn_date}</td>
+        <td class="p-1.5 max-w-[85px]">${c.created_at ? c.created_at.split('T')[0] : '-'}</td>
+        <td class="p-2 font-bold text-slate-900">₹${c.txn_amount}</td>
+        <td class="p-2 whitespace-nowrap">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${getStatusColor(c.claim_status)}">${c.claim_status}</span>
+          ${isSettled && c.settlement_date ? `<div class="text-[10px] text-emerald-800 font-bold mt-0.5">📅 ${c.settlement_date}</div>` : ''}
+        </td>
+        <td class="p-2">${remarksDisplay}</td>
+        <td class="p-2 text-center min-w-[190px]">
+          <div class="grid grid-cols-2 gap-1 w-[185px] mx-auto">
+            ${actionBtnHtml}
+            <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
+            ${userDocHtml}
+            ${adminDocHtml}
+          </div>
+        </td>
+      </tr>
+    `);
+  });
+  tbody.innerHTML = htmlArr.join('');
+}
     function applyOverviewFilters() {
       const q = ($('overviewInstantSearch')?.value || '').trim().toLowerCase();
       const mod = $('overviewFilterModule')?.value;
