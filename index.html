@@ -12,22 +12,8 @@
       theme: {
         extend: {
           colors: {
-            postRed: {
-              50: '#FDF2F4',
-              100: '#FCE7EB',
-              600: '#C4122F',
-              700: '#A80F28',
-              800: '#8A0C21',
-              900: '#6E081A'
-            },
-            postGold: {
-              50: '#FFFDF5',
-              100: '#FEF9C3',
-              400: '#FACC15',
-              500: '#F8B133',
-              600: '#D97706',
-              700: '#B45309'
-            }
+            postRed: { 50: '#FDF2F4', 100: '#FCE7EB', 600: '#C4122F', 700: '#A80F28', 800: '#8A0C21', 900: '#6E081A' },
+            postGold: { 50: '#FFFDF5', 100: '#FEF9C3', 400: '#FACC15', 500: '#F8B133', 600: '#D97706', 700: '#B45309' }
           }
         }
       }
@@ -47,10 +33,8 @@
       <div class="flex items-center gap-3">
         <img id="navLogoImg" src="" alt="India Post Logo" class="h-8 w-12 object-contain bg-white p-0.5 rounded shadow-xs">
         <div>
-          <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">
-            Refund Claims Management Portal
-          </div>
-          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull;</div>
+          <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">Refund Claims Management Portal</div>
+          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; Dak Sewa - Jan Sewa</div>
         </div>
       </div>
       <div class="flex items-center gap-3 text-xs">
@@ -87,11 +71,8 @@
           </form>
 
           <div class="text-center mt-3 pt-3 border-t border-amber-200">
-            <p class="text-xs text-slate-600">
-              New employee? 
-              <button type="button" onclick="showAuthView('register')" class="text-postRed-700 hover:text-postRed-900 font-bold underline cursor-pointer ml-1 focus:outline-none">
-                Register User here
-              </button>
+            <p class="text-xs text-slate-600">New employee? 
+              <button type="button" onclick="showAuthView('register')" class="text-postRed-700 hover:text-postRed-900 font-bold underline cursor-pointer ml-1 focus:outline-none">Register User here</button>
             </p>
           </div>
         </div>
@@ -381,10 +362,13 @@
               <button type="button" onclick="exportMISPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
                 📄 Export PDF
               </button>
+              <button type="button" onclick="batchPrintDockets()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer transition">
+                🖨️ Batch Print Dockets
+              </button>
             </div>
           </div>
           
-          <!-- FILTERS -->
+          <!-- FILTERS WITH INSTANT DYNAMIC LISTENERS -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs">
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Quick Period</label>
@@ -399,15 +383,15 @@
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">From Date</label>
-              <input type="date" id="filterFromDate" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+              <input type="date" id="filterFromDate" onchange="generateMISReport(currentMISReportFilter)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">To Date</label>
-              <input type="date" id="filterToDate" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+              <input type="date" id="filterToDate" onchange="generateMISReport(currentMISReportFilter)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Module</label>
-              <select id="filterModule" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+              <select id="filterModule" onchange="generateMISReport(currentMISReportFilter)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Modules --</option>
                 <option value="Booking">Booking</option>
                 <option value="Delivery">Delivery</option>
@@ -417,18 +401,18 @@
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Office Name</label>
-              <select id="filterOfficeName" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+              <select id="filterOfficeName" onchange="generateMISReport(currentMISReportFilter)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Offices --</option>
               </select>
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Entry By User</label>
-              <select id="filterEmpUser" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+              <select id="filterEmpUser" onchange="generateMISReport(currentMISReportFilter)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Users --</option>
               </select>
             </div>
             <div class="flex gap-1.5">
-              <button type="button" onclick="generateMISReport()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs transition">Filter</button>
+              <button type="button" onclick="generateMISReport(currentMISReportFilter)" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs transition">Filter</button>
               <button type="button" onclick="resetMISFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-1.5 rounded font-bold text-xs cursor-pointer transition">Reset</button>
             </div>
           </div>
@@ -638,26 +622,26 @@
             <div>
               <label class="block font-bold text-slate-700 mb-0.5">Quick Period</label>
               <select id="bookingQuickPeriod" onchange="applyBookingQuickPeriod()" class="w-full border p-1.5 rounded text-xs bg-white font-semibold">
-                <option value="custom">Custom Range</option>
-                <option value="today">Today (Daily)</option>
-                <option value="yesterday">Previous Day / Yesterday</option>
+                <option value="yesterday" selected>Yesterday (Previous Day)</option>
                 <option value="recent">Last Recent Uploaded Date</option>
+                <option value="today">Today (Daily)</option>
                 <option value="fortnight">Current Fortnight (15 Days)</option>
                 <option value="month">Current Month (01-mm-yyyy)</option>
                 <option value="all">All Imported Data</option>
+                <option value="custom">Custom Range</option>
               </select>
             </div>
             <div>
               <label class="block font-bold text-slate-700 mb-0.5">From Date</label>
-              <input type="date" id="bookingFromDate" class="w-full border p-1.5 rounded text-xs bg-white">
+              <input type="date" id="bookingFromDate" onchange="loadBookingDashboardData()" class="w-full border p-1.5 rounded text-xs bg-white">
             </div>
             <div>
               <label class="block font-bold text-slate-700 mb-0.5">To Date</label>
-              <input type="date" id="bookingToDate" class="w-full border p-1.5 rounded text-xs bg-white">
+              <input type="date" id="bookingToDate" onchange="loadBookingDashboardData()" class="w-full border p-1.5 rounded text-xs bg-white">
             </div>
             <div>
               <label class="block font-bold text-slate-700 mb-0.5">Filter Office</label>
-              <select id="bookingFilterOffice" class="w-full border p-1.5 rounded text-xs bg-white">
+              <select id="bookingFilterOffice" onchange="loadBookingDashboardData()" class="w-full border p-1.5 rounded text-xs bg-white">
                 <option value="">-- All Offices --</option>
               </select>
             </div>
@@ -997,36 +981,19 @@
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-font-semibold"> Krishnan K &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
+      <div class="text-slate-500 font-medium">Department of Posts &bull; <span class="font-semibold text-slate-700">Chennai City Central Division</span></div>
     </div>
   </footer>
 
-  <!-- COMPLETE APPLICATION SCRIPT -->
+  <!-- ========================================================================= -->
+  <!-- SINGLE UNBROKEN SCRIPT TAG CONTAINING EVERY FUNCTION IN PROPER ORDER      -->
+  <!-- ========================================================================= -->
   <script>
+    // 1. TOP-LEVEL CONSTANTS & DOM SELECTOR
+    const $ = id => document.getElementById(id);
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const $ = id => document.getElementById(id);
-
-    let currentAppLogo = "";
-    let cachedPdfLogoBase64 = null;
-
-    let currentUser = null;
-    let userProfile = null;
-    let rawClaimsList = [];
-    let currentClaimsList = [];
-    let currentMISClaimsList = [];
-    let rawMISMasterList = [];
-    let currentMISReportFilter = 'All';
-    let allLoadedUsers = [];
-    let isRrnManuallyEdited = false;
-    let isAppInitialized = false;
-
-    let bookingImportedRecords = [];
-
-    let modalUserPastedBlob = null;
-    let modalAdminPastedBlob = null;
 
     const DIGITAL_CHANNEL_CONFIG = [
       { key: 'dqr', cntField: 'dqr_cnt', amtField: 'dqr_amt', label: 'DQR Scan' },
@@ -1043,17 +1010,38 @@
       { key: 'ippb', cntField: 'ippb_cnt', amtField: 'ippb_amt', label: 'IPPB' }
     ];
 
+    // Global State
+    let currentAppLogo = "";
+    let cachedPdfLogoBase64 = null;
+    let currentUser = null;
+    let userProfile = null;
+    let rawClaimsList = [];
+    let currentClaimsList = [];
+    let currentMISClaimsList = [];
+    let rawMISMasterList = [];
+    let currentMISReportFilter = 'All';
+    let allLoadedUsers = [];
+    let isRrnManuallyEdited = false;
+    let bookingImportedRecords = [];
+    let modalUserPastedBlob = null;
+    let modalAdminPastedBlob = null;
+    let userPastedImageBlob = null;
     let activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
     let currentActiveTab = sessionStorage.getItem('activePortalTab') || 'track';
-
-    let userPastedImageBlob = null;
-    let standaloneConvertedBlob = null;
-    let standaloneImageSource = null;
 
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
+
+    // 2. HELPER UTILITIES
+    function getStatusColor(status) {
+      if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
+      if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
+      if (status === 'Settled') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+      if (status === 'Rejected') return 'bg-rose-100 text-rose-800 border border-rose-200';
+      return 'bg-slate-100 text-slate-800';
+    }
 
     function calculateDaysDifference(startDateStr, endDateStr) {
       if (!startDateStr || !endDateStr) return null;
@@ -1069,56 +1057,53 @@
       return new Date(isoStr).toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
-    function formatDateTimeCompact(isoStr) {
-      if (!isoStr) return 'N/A';
-      const d = new Date(isoStr);
-      return `<div class="font-bold text-slate-800">${d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' })}</div>`;
+    function empIdToEmail(empId) {
+      return `${empId.trim().toLowerCase()}@internal.app`;
     }
 
-    function parsePostalBookingDate(val) {
-      if (val === null || val === undefined) return null;
-      if (val instanceof Date && !isNaN(val.getTime())) return val.toISOString().split('T')[0];
-
-      if (typeof val === 'number' || (!isNaN(val) && !String(val).includes('-') && !String(val).includes('/'))) {
-        const num = parseFloat(val);
-        if (num > 20000 && num < 70000) {
-          const jsDate = new Date(Math.round((num - 25569) * 86400 * 1000));
-          if (!isNaN(jsDate.getTime())) return jsDate.toISOString().split('T')[0];
-        }
-      }
-
-      const str = String(val).trim();
-      if (!str || str === '-' || str === '--' || str === '---' || str.toLowerCase() === 'null' || str.toLowerCase() === 'undefined') {
-        return null;
-      }
-
-      const dmyMatch = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
-      if (dmyMatch) {
-        return `${dmyMatch[3]}-${String(dmyMatch[2]).padStart(2, '0')}-${String(dmyMatch[1]).padStart(2, '0')}`;
-      }
-
-      const ymdMatch = str.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
-      if (ymdMatch) {
-        return `${ymdMatch[1]}-${String(ymdMatch[2]).padStart(2, '0')}-${String(ymdMatch[3]).padStart(2, '0')}`;
-      }
-
-      const months = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
-      const monMatch = str.match(/^(\d{1,2})[\s\-\/]([a-zA-Z]{3})[\s\-\/](\d{2,4})/);
-      if (monMatch) {
-        const month = months[monMatch[2].toLowerCase()] ? String(months[monMatch[2].toLowerCase()]).padStart(2, '0') : '01';
-        let year = monMatch[3].length === 2 ? '20' + monMatch[3] : monMatch[3];
-        return `${year}-${month}-${String(monMatch[1]).padStart(2, '0')}`;
-      }
-
-      const parsed = new Date(str);
-      return !isNaN(parsed.getTime()) ? parsed.toISOString().split('T')[0] : null;
+    function cleanPhoneInput(el) {
+      el.value = el.value.replace(/\D/g, '').slice(0, 10);
     }
 
-    // CHECKLIST MULTI-SELECT HANDLERS
-    function toggleChannelDropdown(e) {
-      if (e) e.stopPropagation();
-      const popover = $('channelChecklistPopover');
-      if (popover) popover.classList.toggle('hidden');
+    function copyTextToClipboard(text, btnEl) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          updateCopyButtonState(btnEl);
+        }).catch(() => {
+          fallbackCopyText(text, btnEl);
+        });
+      } else {
+        fallbackCopyText(text, btnEl);
+      }
+    }
+
+    function fallbackCopyText(text, btnEl) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        updateCopyButtonState(btnEl);
+      } catch (err) {
+        console.warn('Fallback copy failed', err);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function updateCopyButtonState(btnEl) {
+      if (!btnEl) return;
+      const originalText = btnEl.innerText;
+      btnEl.innerText = "✓ Copied";
+      btnEl.classList.remove('bg-amber-100', 'text-amber-900');
+      btnEl.classList.add('bg-emerald-600', 'text-white');
+      setTimeout(() => {
+        btnEl.innerText = originalText;
+        btnEl.classList.remove('bg-emerald-600', 'text-white');
+        btnEl.classList.add('bg-amber-100', 'text-amber-900');
+      }, 2000);
     }
 
     function closeChannelDropdownIfClickedOutside(e) {
@@ -1127,6 +1112,12 @@
       if (popover && !popover.classList.contains('hidden')) {
         if (wrapper && !wrapper.contains(e.target)) popover.classList.add('hidden');
       }
+    }
+
+    function toggleChannelDropdown(e) {
+      if (e) e.stopPropagation();
+      const popover = $('channelChecklistPopover');
+      if (popover) popover.classList.toggle('hidden');
     }
 
     function setAllChannelCheckboxes(checked) {
@@ -1157,12 +1148,11 @@
         return;
       }
 
-      let html = '';
+      let htmlArr = [];
       nonZeroChannels.forEach(cfg => {
         const isChecked = activeSelectedChannelKeys.has(cfg.key);
         const count = (channelSummaryMap[cfg.key]?.count || 0).toLocaleString('en-IN');
-
-        html += `
+        htmlArr.push(`
           <label class="flex items-center justify-between gap-1.5 cursor-pointer hover:bg-amber-50 p-1.5 rounded transition">
             <div class="flex items-center gap-1.5">
               <input type="checkbox" name="bookingChannelChk" value="${cfg.key}" ${isChecked ? 'checked' : ''} onchange="onChannelCheckboxChanged()" class="accent-postRed-600 rounded">
@@ -1170,160 +1160,17 @@
             </div>
             <span class="font-mono font-bold text-[10.5px] bg-slate-100 text-postRed-800 px-1.5 py-0.2 rounded border">${count}</span>
           </label>
-        `;
+        `);
       });
 
-      container.innerHTML = html;
+      container.innerHTML = htmlArr.join('');
       const checkedCount = nonZeroChannels.filter(cfg => activeSelectedChannelKeys.has(cfg.key)).length;
       $('channelDropdownLabel').innerText = checkedCount === 0 
         ? 'No Channels Selected (0)' 
         : (checkedCount === nonZeroChannels.length ? `All Active Channels (${checkedCount})` : `${checkedCount} of ${nonZeroChannels.length} Channels`);
     }
 
-    function onModalStatusChanged() {
-      const status = $('modalStatus').value;
-      const settlementContainer = $('modalSettlementDateContainer');
-      const pendingUserDocSection = $('modalPendingUserDocSection');
-      const settledAdminDocSection = $('modalSettledAdminDocSection');
-
-      if (status === 'Settled' || status === 'Rejected') {
-        if (status === 'Settled') {
-          settlementContainer.classList.remove('hidden');
-          if (!$('modalSettlementDate').value) {
-            $('modalSettlementDate').value = new Date().toISOString().split('T')[0];
-          }
-        } else {
-          settlementContainer.classList.add('hidden');
-        }
-        pendingUserDocSection.classList.add('hidden');
-        settledAdminDocSection.classList.remove('hidden');
-      } else {
-        settlementContainer.classList.add('hidden');
-        pendingUserDocSection.classList.remove('hidden');
-        settledAdminDocSection.classList.add('hidden');
-      }
-    }
-
-    function toggleSettlementDateField() {
-      onModalStatusChanged();
-    }
-
-    function handleModalUserFileSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      modalUserPastedBlob = file;
-      if (file.type.startsWith('image/')) {
-        $('modalUserPastedImagePreview').src = URL.createObjectURL(file);
-        $('modalUserPastedImagePreview').classList.remove('hidden');
-      } else {
-        $('modalUserPastedImagePreview').classList.add('hidden');
-      }
-      $('modalUserPastedPreviewContainer').classList.remove('hidden');
-    }
-
-    function clearModalUserPastedImage() {
-      modalUserPastedBlob = null;
-      $('modalUserReplaceFileInput').value = '';
-      $('modalUserPastedPreviewContainer').classList.add('hidden');
-    }
-
-    function handleModalAdminFileSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      modalAdminPastedBlob = file;
-      if (file.type.startsWith('image/')) {
-        $('modalAdminPastedImagePreview').src = URL.createObjectURL(file);
-        $('modalAdminPastedImagePreview').classList.remove('hidden');
-      } else {
-        $('modalAdminPastedImagePreview').classList.add('hidden');
-      }
-      $('modalAdminPastedPreviewContainer').classList.remove('hidden');
-    }
-
-    function clearModalAdminPastedImage() {
-      modalAdminPastedBlob = null;
-      $('modalAdminFileInput').value = '';
-      $('modalAdminPastedPreviewContainer').classList.add('hidden');
-    }
-
-    window.addEventListener('paste', async (e) => {
-      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-      let blob = null;
-      for (let index in items) {
-        const item = items[index];
-        if (item.kind === 'file' && item.type.includes('image/')) {
-          blob = item.getAsFile();
-          break;
-        }
-      }
-      if (!blob) return;
-
-      const replyModal = $('replyModal');
-      const registerClaimView = $('registerClaimView');
-
-      if (replyModal && !replyModal.classList.contains('hidden')) {
-        const status = $('modalStatus').value;
-        if (status === 'Settled' || status === 'Rejected') {
-          modalAdminPastedBlob = blob;
-          $('modalAdminPastedImagePreview').src = URL.createObjectURL(blob);
-          $('modalAdminPastedImagePreview').classList.remove('hidden');
-          $('modalAdminPastedPreviewContainer').classList.remove('hidden');
-          $('modalAdminFileInput').value = '';
-        } else {
-          modalUserPastedBlob = blob;
-          $('modalUserPastedImagePreview').src = URL.createObjectURL(blob);
-          $('modalUserPastedImagePreview').classList.remove('hidden');
-          $('modalUserPastedPreviewContainer').classList.remove('hidden');
-          $('modalUserReplaceFileInput').value = '';
-        }
-        e.preventDefault();
-      } else if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
-        userPastedImageBlob = blob;
-        $('userPastedImagePreview').src = URL.createObjectURL(blob);
-        $('userPastedImagePreview').classList.remove('hidden');
-        $('pdfFilePreviewBlock').classList.add('hidden');
-        $('userPastedPreviewContainer').classList.remove('hidden');
-        $('userPastedImageSize').innerText = `Clipboard: ${(blob.size / 1024).toFixed(1)} KB`;
-        $('claimFile').value = '';
-        e.preventDefault();
-      }
-    });
-
-    const txnInput = $('claimTxnId');
-    const rrnInput = $('claimRrn');
-    if (txnInput && rrnInput) {
-      txnInput.addEventListener('input', (e) => {
-        if (!isRrnManuallyEdited && $('claimChannel')?.value === 'SBI POS') {
-          rrnInput.value = e.target.value;
-        }
-      });
-      rrnInput.addEventListener('input', (e) => {
-        isRrnManuallyEdited = (rrnInput.value !== txnInput.value);
-      });
-    }
-
-    function handlePaymentChannelChange() {
-      const channel = $('claimChannel').value;
-      const rrnContainer = $('rrnFieldContainer');
-      const rrnInputField = $('claimRrn');
-
-      if (channel === 'SBI POS') {
-        rrnContainer.classList.remove('hidden');
-        rrnInputField.required = true;
-        if (!rrnInputField.value && txnInput?.value) {
-          rrnInputField.value = txnInput.value;
-        }
-      } else {
-        rrnContainer.classList.add('hidden');
-        rrnInputField.required = false;
-        rrnInputField.value = '';
-      }
-    }
-
-    function cleanPhoneInput(el) {
-      el.value = el.value.replace(/\D/g, '').slice(0, 10);
-    }
-
+    // 3. LOGO MANAGEMENT
     async function loadLogoFromDatabase() {
       try {
         const { data: config } = await supabaseClient
@@ -1376,47 +1223,7 @@
       alert("Logo restored.");
     }
 
-    function showAuthView(view) {
-      if (view === 'register') {
-        $('loginFormContainer').classList.add('hidden');
-        $('registerFormContainer').classList.remove('hidden');
-      } else {
-        $('registerFormContainer').classList.add('hidden');
-        $('loginFormContainer').classList.remove('hidden');
-      }
-    }
-
-    function showTab(tabId) {
-      currentActiveTab = tabId;
-      sessionStorage.setItem('activePortalTab', tabId);
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(el => {
-        el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer";
-      });
-
-      const map = {
-        'track': ['trackView', 'tabBtnTrack'],
-        'registerClaim': ['registerClaimView', 'tabBtnRegister'],
-        'converterTab': ['converterTabView', 'tabBtnConverter'],
-        'reports': ['reportsView', 'tabBtnReports'],
-        'bookingDash': ['bookingDashView', 'adminBookingDashTabBtn'],
-        'adminRoleMgmt': ['adminRoleMgmtView', 'adminTabBtn']
-      };
-
-      if (map[tabId]) {
-        $(map[tabId][0]).classList.remove('hidden');
-        $(map[tabId][1]).className = "tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer";
-      }
-
-      if (tabId === 'bookingDash') {
-        loadBookingDashboardData();
-      }
-    }
-
-    function empIdToEmail(empId) {
-      return `${empId.trim().toLowerCase()}@internal.app`;
-    }
-
+    // 4. AUTH & TAB NAVIGATION
     async function handleEmpIdLogin(e) {
       e.preventDefault();
       const empId = $('loginEmpId').value.trim().toUpperCase();
@@ -1521,18 +1328,58 @@
       await loadClaimsSummary();
       await generateMISReport('All');
       if (isAdmin) {
-        await loadBookingDashboardData();
         await loadAllUsers();
+      }
+    }
+
+    function showAuthView(view) {
+      if (view === 'register') {
+        $('loginFormContainer').classList.add('hidden');
+        $('registerFormContainer').classList.remove('hidden');
+      } else {
+        $('registerFormContainer').classList.add('hidden');
+        $('loginFormContainer').classList.remove('hidden');
+      }
+    }
+
+    function showTab(tabId) {
+      currentActiveTab = tabId;
+      sessionStorage.setItem('activePortalTab', tabId);
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer";
+      });
+
+      const map = {
+        'track': ['trackView', 'tabBtnTrack'],
+        'registerClaim': ['registerClaimView', 'tabBtnRegister'],
+        'converterTab': ['converterTabView', 'tabBtnConverter'],
+        'reports': ['reportsView', 'tabBtnReports'],
+        'bookingDash': ['bookingDashView', 'adminBookingDashTabBtn'],
+        'adminRoleMgmt': ['adminRoleMgmtView', 'adminTabBtn']
+      };
+
+      if (map[tabId]) {
+        $(map[tabId][0]).classList.remove('hidden');
+        $(map[tabId][1]).className = "tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer";
+      }
+
+      if (tabId === 'bookingDash') {
+        applyBookingQuickPeriod();
       }
     }
 
     async function loadFilterDropdowns() {
       const { data: offices } = await supabaseClient.from('offices').select('office_name').order('office_name', { ascending: true });
+      const { data: profiles } = await supabaseClient.from('profiles').select('id, emp_name, emp_id').order('emp_name', { ascending: true });
+
       const regSelect = $('regOfficeName');
       const claimSelect = $('claimOffice');
       const overviewFilterOffice = $('overviewFilterOffice');
       const filterOfficeName = $('filterOfficeName');
       const bookingFilterOffice = $('bookingFilterOffice');
+      const overviewFilterEmpUser = $('overviewFilterEmpUser');
+      const filterEmpUser = $('filterEmpUser');
 
       if (offices) {
         let opts = '<option value="">-- Select Office --</option>';
@@ -1547,6 +1394,40 @@
         if (filterOfficeName) filterOfficeName.innerHTML = filterOpts;
         if (bookingFilterOffice) bookingFilterOffice.innerHTML = filterOpts;
       }
+
+      if (profiles) {
+        let userOpts = '<option value="">-- All Users --</option>';
+        profiles.forEach(p => {
+          userOpts += `<option value="${p.id}">${p.emp_name} (${p.emp_id})</option>`;
+        });
+        if (overviewFilterEmpUser) overviewFilterEmpUser.innerHTML = userOpts;
+        if (filterEmpUser) filterEmpUser.innerHTML = userOpts;
+      }
+    }
+
+    // 5. CLAIM CREATION & TRACKING
+    function clearUserPastedImage() {
+      userPastedImageBlob = null;
+      $('claimFile').value = '';
+      if($('userPastedImagePreview')) $('userPastedImagePreview').src = '';
+      if($('userPastedPreviewContainer')) $('userPastedPreviewContainer').classList.add('hidden');
+    }
+
+    function handleFileSelectPreview(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      userPastedImageBlob = file;
+      if (file.type === 'application/pdf') {
+        $('userPastedImagePreview').classList.add('hidden');
+        $('pdfFilePreviewBlock').classList.remove('hidden');
+        $('pdfPreviewFileName').innerText = file.name;
+      } else {
+        $('pdfFilePreviewBlock').classList.add('hidden');
+        $('userPastedImagePreview').classList.remove('hidden');
+        $('userPastedImagePreview').src = URL.createObjectURL(file);
+      }
+      $('userPastedPreviewContainer').classList.remove('hidden');
+      $('userPastedImageSize').innerText = `File: ${(file.size / 1024).toFixed(1)} KB`;
     }
 
     async function submitClaim(e) {
@@ -1563,7 +1444,7 @@
       if (!fileInput && !userPastedImageBlob) return alert("Please attach document or screenshot!");
 
       let uploadBlob = userPastedImageBlob || fileInput;
-      const fileExt = fileInput ? fileInput.name.split('.').pop() : 'png';
+      const fileExt = (fileInput && fileInput.name) ? fileInput.name.split('.').pop() : 'png';
       const filePath = `claims/${txn_id_ref}-${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, uploadBlob, { upsert: true });
@@ -1571,7 +1452,7 @@
 
       const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
 
-      const { error } = await supabaseClient.from('claims').insert([{
+      const { data, error } = await supabaseClient.from('claims').insert([{
         txn_id_ref,
         raised_for_office: raised_office,
         module: $('claimModule').value,
@@ -1585,15 +1466,17 @@
         file_url: publicUrl,
         created_by: currentUser.id,
         doc_status: 'Approved'
-      }]);
+      }]).select();
 
-      if (error) alert("Error submitting: " + error.message);
-      else {
+      if (error) {
+        alert("Error submitting: " + error.message);
+      } else {
         alert("Claim registered successfully!");
         e.target.reset();
         clearUserPastedImage();
+        $('rrnFieldContainer').classList.add('hidden');
         showTab('track');
-        loadClaimsSummary();
+        await loadClaimsSummary();
       }
     }
 
@@ -1602,7 +1485,7 @@
         const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
         let query = supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
 
-        if (!isAdmin) {
+        if (!isAdmin && currentUser) {
           query = query.or(`created_by.eq.${currentUser.id},raised_for_office.eq."${userProfile.office_name}"`);
         }
 
@@ -1664,6 +1547,24 @@
     function sortTable(col) {
       currentSortDir = (currentSortCol === col && currentSortDir === 'asc') ? 'desc' : 'asc';
       currentSortCol = col;
+      
+      currentClaimsList.sort((a, b) => {
+        let valA = a[col] || '';
+        let valB = b[col] || '';
+        if (col === 'emp_name') { valA = a.profiles?.emp_name || ''; valB = b.profiles?.emp_name || ''; }
+        if (col === 'txn_amount') { valA = parseFloat(valA) || 0; valB = parseFloat(valB) || 0; }
+        if (col === 'created_at' || col === 'txn_date') {
+          valA = new Date(valA).getTime() || 0; valB = new Date(valB).getTime() || 0;
+        }
+        if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      document.querySelectorAll(`th[onclick^="sortTable"] span`).forEach(s => s.innerText = '⇅');
+      const activeSpan = document.getElementById(`sort_${col}`);
+      if(activeSpan) activeSpan.innerText = currentSortDir === 'asc' ? '↑' : '↓';
+
       renderClaimsSummaryTable();
     }
 
@@ -1671,13 +1572,13 @@
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const tbody = $('claimsTableBody');
       if (!tbody) return;
-      tbody.innerHTML = '';
 
       if (!currentClaimsList.length) {
         tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-500">No requests found.</td></tr>`;
         return;
       }
 
+      let htmlArr = [];
       currentClaimsList.forEach(c => {
         const empNameOnly = c.profiles?.emp_name || 'N/A';
         const empIdOnly = c.profiles?.emp_id ? `[${c.profiles.emp_id}]` : '';
@@ -1706,12 +1607,14 @@
           adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
         }
 
-        tbody.innerHTML += `
+        htmlArr.push(`
           <tr class="hover:bg-amber-50/40 transition align-middle">
             <td class="p-2 whitespace-nowrap">
               <span class="text-postRed-700 font-bold font-mono text-xs block cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
-              <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer mt-0.5 inline-block">📋 Copy</button>
-              <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border ml-1">${c.module}</span>
+              <div class="mt-1 flex items-center gap-2">
+                <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+                <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer">📋 Copy</button>
+              </div>
             </td>
             <td class="p-2 whitespace-nowrap">
               <div class="font-bold text-slate-800">${empNameOnly} <span class="text-[10px] text-slate-500 font-mono">${empIdOnly}</span></div>
@@ -1734,53 +1637,11 @@
               </div>
             </td>
           </tr>
-        `;
+        `);
       });
+      tbody.innerHTML = htmlArr.join('');
     }
 
-    // ROBUST FALLBACK CLIPBOARD COPY
-    function copyTextToClipboard(text, btnEl) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          updateCopyButtonState(btnEl);
-        }).catch(() => {
-          fallbackCopyText(text, btnEl);
-        });
-      } else {
-        fallbackCopyText(text, btnEl);
-      }
-    }
-
-    function fallbackCopyText(text, btnEl) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.position = "fixed";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        updateCopyButtonState(btnEl);
-      } catch (err) {
-        console.warn('Fallback copy failed', err);
-      }
-      document.body.removeChild(textArea);
-    }
-
-    function updateCopyButtonState(btnEl) {
-      if (!btnEl) return;
-      const originalText = btnEl.innerText;
-      btnEl.innerText = "✓ Copied";
-      btnEl.classList.remove('bg-amber-100', 'text-amber-900');
-      btnEl.classList.add('bg-emerald-600', 'text-white');
-      setTimeout(() => {
-        btnEl.innerText = originalText;
-        btnEl.classList.remove('bg-emerald-600', 'text-white');
-        btnEl.classList.add('bg-amber-100', 'text-amber-900');
-      }, 2000);
-    }
-
-    // TRACK CLAIM FUNCTION
     async function trackClaim() {
       const searchVal = ($('searchRefNo')?.value || '').trim();
       const resCard = $('trackResult');
@@ -1838,15 +1699,7 @@
       }
     }
 
-    // MIS Analytics & Report Functions
-    function getStatusColor(status) {
-      if (status === 'Pending') return 'bg-postGold-100 text-postGold-700 border border-postGold-300';
-      if (status === 'In Progress') return 'bg-blue-100 text-blue-800 border border-blue-200';
-      if (status === 'Settled') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
-      if (status === 'Rejected') return 'bg-rose-100 text-rose-800 border border-rose-200';
-      return 'bg-slate-100 text-slate-800';
-    }
-
+    // 6. MIS ANALYTICS & TURNAROUND
     function renderConsolidatedSummaries(claims) {
       const moduleStats = {
         'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
@@ -1902,7 +1755,7 @@
 
       const modTbody = $('moduleSummaryTableBody');
       if (modTbody) {
-        modTbody.innerHTML = '';
+        let modArr = [];
         let modTotalSum = 0, modPendSum = 0, modInpSum = 0, modSetSum = 0, modActiveAmtSum = 0;
 
         Object.keys(moduleStats).forEach(m => {
@@ -1913,7 +1766,7 @@
           modSetSum += s.settled;
           modActiveAmtSum += s.activePendingAmount;
 
-          modTbody.innerHTML += `
+          modArr.push(`
             <tr class="hover:bg-slate-50">
               <td class="p-1.5 font-bold text-slate-800">${m}</td>
               <td class="p-1.5 text-center font-bold">${s.total}</td>
@@ -1922,10 +1775,10 @@
               <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
               <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
             </tr>
-          `;
+          `);
         });
 
-        modTbody.innerHTML += `
+        modArr.push(`
           <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
             <td class="p-1.5">Total</td>
             <td class="p-1.5 text-center">${modTotalSum}</td>
@@ -1934,12 +1787,13 @@
             <td class="p-1.5 text-center text-emerald-800">${modSetSum}</td>
             <td class="p-1.5 text-right text-postRed-700">₹${modActiveAmtSum.toFixed(2)}</td>
           </tr>
-        `;
+        `);
+        modTbody.innerHTML = modArr.join('');
       }
 
       const statTbody = $('statusSummaryTableBody');
       if (statTbody) {
-        statTbody.innerHTML = '';
+        let statArr = [];
         let statCountSum = 0, statAmtSum = 0;
 
         Object.keys(statusStats).forEach(st => {
@@ -1948,34 +1802,35 @@
           statAmtSum += s.amount;
           const sharePct = claims.length > 0 ? ((s.count / claims.length) * 100).toFixed(1) : "0.0";
 
-          statTbody.innerHTML += `
+          statArr.push(`
             <tr class="hover:bg-slate-50">
               <td class="p-1.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusColor(st)}">${st}</span></td>
               <td class="p-1.5 text-center font-bold">${s.count}</td>
               <td class="p-1.5 text-center font-semibold text-slate-600">${sharePct}%</td>
               <td class="p-1.5 text-right font-bold text-slate-800">₹${s.amount.toFixed(2)}</td>
             </tr>
-          `;
+          `);
         });
 
-        statTbody.innerHTML += `
+        statArr.push(`
           <tr class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
             <td class="p-1.5">Total</td>
             <td class="p-1.5 text-center">${statCountSum}</td>
             <td class="p-1.5 text-center">100%</td>
             <td class="p-1.5 text-right text-postRed-700">₹${statAmtSum.toFixed(2)}</td>
           </tr>
-        `;
+        `);
+        statTbody.innerHTML = statArr.join('');
       }
 
       const offTbody = $('officeSummaryTableBody');
       if (offTbody) {
-        offTbody.innerHTML = '';
+        let offArr = [];
         const sortedOffices = Object.keys(officeStats).sort();
 
         sortedOffices.forEach(off => {
           const s = officeStats[off];
-          offTbody.innerHTML += `
+          offArr.push(`
             <tr class="hover:bg-slate-50">
               <td class="p-1.5 font-bold text-slate-800">${off}</td>
               <td class="p-1.5 text-center font-bold">${s.registered}</td>
@@ -1985,8 +1840,9 @@
               <td class="p-1.5 text-center text-rose-700 font-semibold">${s.rejected}</td>
               <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
             </tr>
-          `;
+          `);
         });
+        offTbody.innerHTML = offArr.join('');
       }
     }
 
@@ -2157,6 +2013,24 @@
         currentMISSortCol = col;
         currentMISSortDir = 'asc';
       }
+
+      currentMISClaimsList.sort((a, b) => {
+        let valA = a[col] || '';
+        let valB = b[col] || '';
+        if (col === 'emp_name') { valA = a.profiles?.emp_name || ''; valB = b.profiles?.emp_name || ''; }
+        if (col === 'txn_amount') { valA = parseFloat(valA) || 0; valB = parseFloat(valB) || 0; }
+        if (col === 'created_at' || col === 'txn_date' || col === 'settlement_date') {
+          valA = new Date(valA).getTime() || 0; valB = new Date(valB).getTime() || 0;
+        }
+        if (valA < valB) return currentMISSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return currentMISSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      document.querySelectorAll(`th[onclick^="sortMISReport"] span`).forEach(s => s.innerText = '⇅');
+      const activeSpan = document.getElementById(`sort_mis_${col}`);
+      if(activeSpan) activeSpan.innerText = currentMISSortDir === 'asc' ? '↑' : '↓';
+
       renderMISTableRows();
     }
 
@@ -2164,13 +2038,13 @@
       const todayStr = new Date().toISOString().split('T')[0];
       const tbody = $('misReportTableBody');
       if (!tbody) return;
-      tbody.innerHTML = '';
 
       if (!currentMISClaimsList || currentMISClaimsList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-500">No matching claims found for this filter selection.</td></tr>`;
         return;
       }
 
+      let htmlArr = [];
       currentMISClaimsList.forEach(c => {
         const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name} (${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
         const isSettled = c.claim_status === 'Settled';
@@ -2189,7 +2063,7 @@
           tatOrAgingDisplay = days !== null ? `<span class="text-slate-700 font-medium">${days} Days (Age)</span>` : '-';
         }
 
-        tbody.innerHTML += `
+        htmlArr.push(`
           <tr class="hover:bg-amber-50/40 transition">
             <td class="p-2.5 font-bold text-postRed-700 font-mono whitespace-nowrap">${c.txn_id_ref}</td>
             <td class="p-2.5 font-semibold text-slate-800 whitespace-nowrap">${creatorName}</td>
@@ -2202,11 +2076,12 @@
             <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(c.claim_status)}">${c.claim_status}</span></td>
             <td class="p-2.5 text-xs text-slate-800">${c.reply_remarks_admin || '-'}</td>
           </tr>
-        `;
+        `);
       });
+      tbody.innerHTML = htmlArr.join('');
     }
 
-    async function applyMISQuickPeriod() {
+    function applyMISQuickPeriod() {
       const mode = $('misQuickPeriod')?.value;
       const today = new Date();
       const toStr = today.toISOString().split('T')[0];
@@ -2237,8 +2112,19 @@
       generateMISReport('All');
     }
 
+    function resetMISFilters() {
+      $('filterFromDate').value = '';
+      $('filterToDate').value = '';
+      $('filterModule').value = '';
+      $('filterOfficeName').value = '';
+      $('filterEmpUser').value = '';
+      $('misQuickPeriod').value = 'all';
+      generateMISReport('All');
+    }
+
+    // 7. BOOKING PERFORMANCE DASHBOARD
     async function applyBookingQuickPeriod() {
-      const mode = $('bookingQuickPeriod')?.value;
+      const mode = $('bookingQuickPeriod')?.value || 'yesterday';
       const today = new Date();
       const toStr = today.toISOString().split('T')[0];
 
@@ -2349,7 +2235,6 @@
 
       const tbody = $('bookingPerfTableBody');
       if (!tbody) return;
-      tbody.innerHTML = '';
 
       const sortedOffices = Object.keys(officeMap).map(name => {
         const o = officeMap[name];
@@ -2363,8 +2248,9 @@
         return;
       }
 
+      let htmlArr = [];
       sortedOffices.forEach((o, i) => {
-        tbody.innerHTML += `
+        htmlArr.push(`
           <tr class="hover:bg-slate-50">
             <td class="p-2 text-center font-bold font-mono ${i < 3 ? 'text-amber-700' : 'text-slate-500'}">#${i + 1}</td>
             <td class="p-2 font-bold text-slate-800">${o.name}</td>
@@ -2372,10 +2258,10 @@
             <td class="p-2 text-center font-bold text-blue-800">${o.dig_cnt.toLocaleString('en-IN')}</td>
             <td class="p-2 text-center font-extrabold text-emerald-700 bg-emerald-50/50">${o.pct.toFixed(2)}%</td>
           </tr>
-        `;
+        `);
       });
 
-      tbody.innerHTML += `
+      htmlArr.push(`
         <tr class="bg-postRed-700 text-white font-extrabold border-t-2 border-postRed-900">
           <td class="p-2 text-center font-mono">Σ</td>
           <td class="p-2 font-bold uppercase tracking-wider">Total (${sortedOffices.length} Offices)</td>
@@ -2383,7 +2269,8 @@
           <td class="p-2 text-center">${totalDigCnt.toLocaleString('en-IN')}</td>
           <td class="p-2 text-center font-extrabold text-postGold-400">${digPct}%</td>
         </tr>
-      `;
+      `);
+      tbody.innerHTML = htmlArr.join('');
     }
 
     function resetBookingFilters() {
@@ -2393,6 +2280,278 @@
       if ($('bookingFilterOffice')) $('bookingFilterOffice').value = '';
       activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
       loadBookingDashboardData();
+    }
+
+    // 8. USER MANAGEMENT
+    async function loadAllUsers() {
+      const { data: users } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+      allLoadedUsers = users || [];
+      renderUserAccounts(allLoadedUsers);
+    }
+
+    function filterUserAccounts() {
+      const query = $('userInstantSearch')?.value.trim().toLowerCase() || '';
+      if (!query) return renderUserAccounts(allLoadedUsers);
+      renderUserAccounts(allLoadedUsers.filter(u => 
+        (u.emp_id || '').toLowerCase().includes(query) ||
+        (u.emp_name || '').toLowerCase().includes(query) ||
+        (u.office_name || '').toLowerCase().includes(query)
+      ));
+    }
+
+    function renderUserAccounts(users) {
+      const tbody = $('usersTableBody');
+      if (!tbody) return;
+      
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-400">No user accounts found.</td></tr>`;
+        return;
+      }
+
+      let htmlArr = [];
+      users.forEach(u => {
+        const isActive = u.is_active !== false;
+        htmlArr.push(`
+          <tr class="hover:bg-amber-50/40 transition">
+            <td class="p-2 font-mono font-bold text-slate-800">${u.emp_id}</td>
+            <td class="p-2 font-bold text-slate-800">${u.emp_name}</td>
+            <td class="p-2"><span class="uppercase font-bold text-postRed-700 px-2 py-0.5 rounded bg-postRed-50 border border-postRed-200 text-[10px]">${u.role || 'user'}</span></td>
+            <td class="p-2">${u.created_at ? u.created_at.split('T')[0] : '-'}</td>
+            <td class="p-2 font-mono">${u.mobile_number || '-'}</td>
+            <td class="p-2">${u.office_name || '-'}</td>
+            <td class="p-2 font-bold ${isActive ? 'text-emerald-700' : 'text-rose-700'}">${isActive ? 'Active' : 'Locked'}</td>
+            <td class="p-2 text-center">
+              <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
+                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">✏️ Edit</button>
+                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">🔑 Reset Pwd</button>
+                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">
+                  ${isActive ? '🔒 Lock' : '🔓 Unlock'}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `);
+      });
+      tbody.innerHTML = htmlArr.join('');
+    }
+
+    async function openAdminUserEditModal(userId) {
+      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
+      if (!user) return alert("User not found!");
+
+      $('editUserId').value = user.id;
+      $('editUserEmpId').value = user.emp_id || '';
+      $('editUserEmpName').value = user.emp_name || '';
+      $('editUserMobile').value = user.mobile_number || '';
+      $('editUserOffice').value = user.office_name || '';
+      $('editUserRole').value = user.role || 'user';
+
+      $('adminUserEditModal').classList.remove('hidden');
+    }
+
+    function closeAdminUserEditModal() { $('adminUserEditModal').classList.add('hidden'); }
+
+    async function submitAdminUserEdit(e) {
+      e.preventDefault();
+      const userId = $('editUserId').value;
+      const emp_name = $('editUserEmpName').value.trim();
+      const mobile_number = $('editUserMobile').value.trim();
+      const office_name = $('editUserOffice').value;
+      const role = $('editUserRole').value;
+
+      const { error } = await supabaseClient.from('profiles').update({ emp_name, mobile_number, office_name, role }).eq('id', userId);
+      if (error) alert("Update error: " + error.message);
+      else {
+        alert("User details updated successfully!");
+        closeAdminUserEditModal();
+        loadAllUsers();
+      }
+    }
+
+    function openAdminResetPwdModal(userId) {
+      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
+      if (!user) return alert("User not found!");
+
+      $('resetPwdUserId').value = user.id;
+      $('resetPwdUserName').innerText = user.emp_name;
+      $('resetPwdUserEmpId').innerText = user.emp_id;
+      $('resetPwdInput').value = '';
+
+      $('adminResetPwdModal').classList.remove('hidden');
+    }
+
+    function closeAdminResetPwdModal() { $('adminResetPwdModal').classList.add('hidden'); }
+
+    async function submitAdminPasswordReset(e) {
+      e.preventDefault();
+      const userId = $('resetPwdUserId').value;
+      const newPassword = $('resetPwdInput').value.trim();
+      if (!newPassword || newPassword.length < 6) return alert("Password must be at least 6 characters!");
+
+      const { error } = await supabaseClient.rpc('admin_reset_user_password', { target_user_id: userId, new_password: newPassword });
+      if (error) alert("Reset error: " + error.message);
+      else {
+        alert(`Password updated successfully!\nNew Password: ${newPassword}`);
+        closeAdminResetPwdModal();
+      }
+    }
+
+    async function toggleUserLock(userId, currentActive) {
+      if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user account?`)) return;
+      await supabaseClient.from('profiles').update({ is_active: !currentActive }).eq('id', userId);
+      loadAllUsers();
+    }
+
+    function exportUsersExcel() {
+      if (!allLoadedUsers.length) return alert("No user data to export!");
+      const ws = XLSX.utils.json_to_sheet(allLoadedUsers);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Users");
+      XLSX.writeFile(wb, `User_Accounts_${Date.now()}.xlsx`);
+    }
+
+    async function exportUsersPDF() {
+      if (!allLoadedUsers.length) return alert("No user data to export!");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape" });
+
+      if (cachedPdfLogoBase64) {
+        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 260, 6, 24, 16); } catch (e) {}
+      }
+
+      doc.setFontSize(13);
+      doc.setTextColor(168, 15, 40);
+      doc.text("User Accounts & Access Role Directory", 148.5, 12, { align: "center" });
+
+      const headers = [["Sl. No.", "Employee ID", "Employee Name", "Role", "Registered On", "Mobile No", "Office Name", "Status"]];
+      const rows = allLoadedUsers.map((u, idx) => [
+        idx + 1, u.emp_id, u.emp_name, (u.role || 'user').toUpperCase(), u.created_at ? u.created_at.split('T')[0] : '-', u.mobile_number || '-', u.office_name || '-', u.is_active !== false ? 'Active' : 'Locked'
+      ]);
+
+      doc.autoTable({ head: headers, body: rows, startY: 26, theme: 'grid', headStyles: { fillColor: [168, 15, 40] }, styles: { fontSize: 8 } });
+      doc.save(`User_Directory_${Date.now()}.pdf`);
+    }
+
+    // 9. EXPORTS, MODALS & BATCH PRINT
+    async function exportMISExcel() {
+      if (!currentMISClaimsList.length) return alert("No records to export!");
+      const ws = XLSX.utils.json_to_sheet(currentMISClaimsList);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "MIS");
+      XLSX.writeFile(wb, `MIS_Export_${Date.now()}.xlsx`);
+    }
+
+    async function exportMISPDF() {
+      if (!currentMISClaimsList.length) return alert("No records to export!");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape" });
+
+      if (cachedPdfLogoBase64) {
+        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 260, 6, 24, 16); } catch (e) {}
+      }
+
+      doc.setFontSize(13);
+      doc.setTextColor(168, 15, 40);
+      doc.text("Refund Claims & Settlement TAT Report", 148.5, 12, { align: "center" });
+
+      const headers = [["Sl. No.", "Txn ID (Ref)", "Module", "Office", "Txn Date", "Settlement Date", "Amount (Rs)", "Status", "Admin Remarks"]];
+      const rows = currentMISClaimsList.map((c, idx) => [
+        idx + 1, c.txn_id_ref, c.module, c.raised_for_office, c.txn_date, c.settlement_date || "-", `Rs. ${c.txn_amount}`, c.claim_status, c.reply_remarks_admin || "-"
+      ]);
+
+      doc.autoTable({ head: headers, body: rows, startY: 26, theme: 'grid', headStyles: { fillColor: [168, 15, 40] }, styles: { fontSize: 8 } });
+      doc.save(`MIS_Report_${Date.now()}.pdf`);
+    }
+
+    function printOfficeWiseReport() {
+      if (!rawMISMasterList.length) return alert("No claim records found in the current filtered period!");
+      const fromDateVal = $('filterFromDate')?.value || 'Inception';
+      const toDateVal = $('filterToDate')?.value || 'Current Date';
+
+      const officeStats = {};
+      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+      rawMISMasterList.forEach(c => {
+        const off = c.raised_for_office || 'Unassigned';
+        const amt = parseFloat(c.txn_amount) || 0;
+        if (!officeStats[off]) {
+          officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+        officeStats[off].registered++;
+        grandReg++;
+
+        if (c.claim_status === 'Pending') {
+          officeStats[off].pending++;
+          officeStats[off].activePendingAmount += amt;
+          grandPend++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'In Progress') {
+          officeStats[off].inprogress++;
+          officeStats[off].activePendingAmount += amt;
+          grandInp++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'Settled') {
+          officeStats[off].settled++;
+          grandSet++;
+        } else if (c.claim_status === 'Rejected') {
+          officeStats[off].rejected++;
+          grandRej++;
+        }
+      });
+
+      const printWindow = window.open('', '_blank', 'width=950,height=850');
+      if (!printWindow) return alert("Popup blocked! Please allow popups to print office report.");
+
+      const sortedOffices = Object.keys(officeStats).sort();
+      let tableRowsHtml = '';
+      sortedOffices.forEach((off, idx) => {
+        const s = officeStats[off];
+        tableRowsHtml += `
+          <tr>
+            <td style="text-align:center;">${idx + 1}</td>
+            <td style="font-weight:bold; color:#0f172a;">${off}</td>
+            <td style="text-align:center; font-weight:bold;">${s.registered}</td>
+            <td style="text-align:center; color:#b45309; font-weight:bold;">${s.pending}</td>
+            <td style="text-align:center; color:#1d4ed8; font-weight:bold;">${s.inprogress}</td>
+            <td style="text-align:center; color:#15803d; font-weight:bold;">${s.settled}</td>
+            <td style="text-align:center; color:#b91c1c; font-weight:bold;">${s.rejected}</td>
+            <td style="text-align:right; font-weight:bold; color:#991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      printWindow.document.open();
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Office-wise Pendency & Status Report</title>
+          <style>
+            @page { size: A4 portrait; margin: 10mm 12mm; }
+            body { font-family: sans-serif; color: #1e293b; padding: 14px; font-size: 11px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+            th { background: #A80F28; color: #fff; padding: 5px 6px; border: 1px solid #8A0C21; }
+            td { padding: 4.5px 6px; border: 1px solid #cbd5e1; }
+            .total-row { background: #fee2e2 !important; font-weight: bold; color: #881337; }
+          </style>
+        </head>
+        <body>
+          <h2 style="color:#A80F28; margin:0;">Office-wise Pendency & Status Report</h2>
+          <p>Period: ${fromDateVal} to ${toDateVal}</p>
+          <table>
+            <thead>
+              <tr><th>#</th><th>Office Name</th><th>Registered</th><th>Pending</th><th>In Progress</th><th>Settled</th><th>Rejected</th><th>Pending + In Prog (Rs)</th></tr>
+            </thead>
+            <tbody>
+              ${tableRowsHtml}
+              <tr class="total-row"><td colspan="2" style="text-align:center;">GRAND TOTAL</td><td style="text-align:center;">${grandReg}</td><td style="text-align:center;">${grandPend}</td><td style="text-align:center;">${grandInp}</td><td style="text-align:center;">${grandSet}</td><td style="text-align:center;">${grandRej}</td><td style="text-align:right;">Rs. ${grandActiveAmt.toFixed(2)}</td></tr>
+            </tbody>
+          </table>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
 
     async function exportBookingReportImage() {
@@ -2574,6 +2733,88 @@
       doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
     }
 
+    async function exportMISReportImage() {
+      if (!currentMISClaimsList.length) return alert("No MIS report data available to export as image!");
+      const fromVal = $('filterFromDate')?.value || 'Inception';
+      const toVal = $('filterToDate')?.value || 'CurrentDate';
+      const fileName = `MIS_Report_${currentMISReportFilter}_${fromVal}_to_${toVal}.png`;
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '1050px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      currentMISClaimsList.forEach((c, idx) => {
+        const isSettled = c.claim_status === 'Settled';
+        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 10px;">
+            <td style="padding: 6px; text-align: center;">${idx + 1}</td>
+            <td style="padding: 6px; font-weight: bold; font-family: monospace; color: #a80f28;">${c.txn_id_ref}</td>
+            <td style="padding: 6px;">${c.profiles?.emp_name || 'Staff'}</td>
+            <td style="padding: 6px;">${c.module}</td>
+            <td style="padding: 6px;">${c.raised_for_office}</td>
+            <td style="padding: 6px;">${c.txn_date}</td>
+            <td style="padding: 6px;">${settleDate}</td>
+            <td style="padding: 6px; text-align: right; font-weight: bold;">₹${c.txn_amount}</td>
+            <td style="padding: 6px; font-weight: bold;">${c.claim_status}</td>
+            <td style="padding: 6px; font-size: 9.5px;">${c.reply_remarks_admin || '-'}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Refund Claims & Settlement TAT Report (${currentMISReportFilter})</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Claims & Turnaround Statement</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Records: <strong>${currentMISClaimsList.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 10.5px; font-weight: bold;">
+                <th style="padding: 7px; text-align: center; width: 4%;">#</th>
+                <th style="padding: 7px; width: 14%;">Ref No</th>
+                <th style="padding: 7px; width: 13%;">Raised By</th>
+                <th style="padding: 7px; width: 8%;">Module</th>
+                <th style="padding: 7px; width: 14%;">Office Name</th>
+                <th style="padding: 7px; width: 9%;">Txn Date</th>
+                <th style="padding: 7px; width: 9%;">Settle Date</th>
+                <th style="padding: 7px; text-align: right; width: 9%;">Amount</th>
+                <th style="padding: 7px; width: 8%;">Status</th>
+                <th style="padding: 7px; width: 12%;">Admin Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
+    }
+
     async function exportOfficeWiseImage() {
       if (!rawMISMasterList.length) return alert("No office pendency data available to export as image!");
 
@@ -2694,513 +2935,47 @@
       }
     }
 
-    async function exportMISReportImage() {
-      if (!currentMISClaimsList.length) return alert("No MIS report data available to export as image!");
-      const fromVal = $('filterFromDate')?.value || 'Inception';
-      const toVal = $('filterToDate')?.value || 'CurrentDate';
-      const fileName = `MIS_Report_${currentMISReportFilter}_${fromVal}_to_${toVal}.png`;
-
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.top = '-9999px';
-      container.style.left = '-9999px';
-      container.style.width = '1050px';
-      container.style.backgroundColor = '#FFFFFF';
-      container.style.padding = '20px';
-      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-
-      let rowsHtml = '';
-      currentMISClaimsList.forEach((c, idx) => {
-        const isSettled = c.claim_status === 'Settled';
-        const settleDate = c.settlement_date || (isSettled ? (c.created_at ? c.created_at.split('T')[0] : '-') : '-');
-        rowsHtml += `
-          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 10px;">
-            <td style="padding: 6px; text-align: center;">${idx + 1}</td>
-            <td style="padding: 6px; font-weight: bold; font-family: monospace; color: #a80f28;">${c.txn_id_ref}</td>
-            <td style="padding: 6px;">${c.profiles?.emp_name || 'Staff'}</td>
-            <td style="padding: 6px;">${c.module}</td>
-            <td style="padding: 6px;">${c.raised_for_office}</td>
-            <td style="padding: 6px;">${c.txn_date}</td>
-            <td style="padding: 6px;">${settleDate}</td>
-            <td style="padding: 6px; text-align: right; font-weight: bold;">₹${c.txn_amount}</td>
-            <td style="padding: 6px; font-weight: bold;">${c.claim_status}</td>
-            <td style="padding: 6px; font-size: 9.5px;">${c.reply_remarks_admin || '-'}</td>
-          </tr>
-        `;
-      });
-
-      container.innerHTML = `
-        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
-          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Refund Claims & Settlement TAT Report (${currentMISReportFilter})</h2>
-              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Claims & Turnaround Statement</p>
-              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Records: <strong>${currentMISClaimsList.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
-          </div>
-
-          <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-              <tr style="background: #8A0C21; color: #ffffff; font-size: 10.5px; font-weight: bold;">
-                <th style="padding: 7px; text-align: center; width: 4%;">#</th>
-                <th style="padding: 7px; width: 14%;">Ref No</th>
-                <th style="padding: 7px; width: 13%;">Raised By</th>
-                <th style="padding: 7px; width: 8%;">Module</th>
-                <th style="padding: 7px; width: 14%;">Office Name</th>
-                <th style="padding: 7px; width: 9%;">Txn Date</th>
-                <th style="padding: 7px; width: 9%;">Settle Date</th>
-                <th style="padding: 7px; text-align: right; width: 9%;">Amount</th>
-                <th style="padding: 7px; width: 8%;">Status</th>
-                <th style="padding: 7px; width: 12%;">Admin Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      document.body.appendChild(container);
-      try {
-        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      } catch (err) {
-        alert("Image export failed: " + err.message);
-      } finally {
-        document.body.removeChild(container);
-      }
+    function handleConverterFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        $('converterOriginalImg').src = ev.target.result;
+        $('converterOriginalImg').classList.remove('hidden');
+        $('converterDropNotice').classList.add('hidden');
+        
+        $('converterResultImg').src = ev.target.result;
+        $('converterResultImg').classList.remove('hidden');
+        $('converterEmptyNotice').classList.add('hidden');
+        $('converterResultImg').style.filter = 'invert(1) hue-rotate(180deg) contrast(1.2)';
+      };
+      reader.readAsDataURL(file);
     }
 
-    function printClaimDetails(claimId) {
-      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
-      if (!claim) return alert("Claim details not found for docket printing!");
-
-      const creatorEmpId = claim.profiles?.emp_id || 'N/A';
-      const creatorEmpName = claim.profiles?.emp_name || 'N/A';
-      const entryDateTime = formatDateTime(claim.created_at);
-
-      const isUserImage = claim.file_url && (claim.file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.file_url.includes('blob:') || claim.file_url.includes('claims/'));
-      const isAdminImage = claim.admin_file_url && (claim.admin_file_url.match(/\.(jpg|jpeg|png|webp|gif)($|\?)/i) || claim.admin_file_url.includes('blob:') || claim.admin_file_url.includes('claims/'));
-
-      const printWindow = window.open('', '_blank', 'width=950,height=850');
-      if (!printWindow) return alert("Popup blocked! Please allow popups for this site to print.");
-
-      const printHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Refund Claim Docket - ${claim.txn_id_ref}</title>
-          <style>
-            @page { size: A4 portrait; margin: 10mm 12mm; }
-            * { box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; margin: 0; padding: 14px; font-size: 11px; line-height: 1.3; background: #fff; }
-            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
-            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
-            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 10.5px; font-weight: bold; }
-            .ref-badge { background: #FDF2F4; border: 1.5px solid #C4122F; color: #8A0C21; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 12.5px; font-weight: bold; text-align: right; }
-            .section-title { background: #FEF9C3; color: #8A0C21; padding: 3px 8px; font-weight: bold; font-size: 10.5px; margin: 8px 0 5px 0; border-left: 3px solid #C4122F; text-transform: uppercase; }
-            table.details-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-            table.details-grid td { padding: 4px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: top; }
-            table.details-grid td.label { width: 22%; background: #f8fafc; font-weight: bold; color: #475569; }
-            table.details-grid td.value { width: 28%; color: #0f172a; }
-            .status-pill { display: inline-block; padding: 1.5px 8px; border-radius: 9999px; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
-            .status-Pending { background: #FEF9C3; color: #B45309; border: 1px solid #FACC15; }
-            .status-InProgress { background: #E0F2FE; color: #0369A1; border: 1px solid #7DD3FC; }
-            .status-Settled { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
-            .status-Rejected { background: #FFE4E6; color: #BE123C; border: 1px solid #FDA4AF; }
-            .remarks-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; background: #fafaf9; margin-bottom: 6px; font-size: 11px; min-height: 26px; white-space: pre-wrap; word-break: break-word; }
-            .remarks-box.admin { background: #fffbeb; border-color: #fde68a; color: #78350f; }
-            .attachments-grid { display: flex; gap: 10px; margin-top: 6px; justify-content: space-between; align-items: flex-start; }
-            .attachment-col { flex: 1; border: 1px solid #cbd5e1; border-radius: 5px; padding: 7px; background: #fafaf9; text-align: center; }
-            .attachment-col strong { font-size: 10.5px; display: block; margin-bottom: 4px; text-align: left; }
-            .attachment-preview { max-width: 100%; max-height: 260px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 4px; margin: 0 auto; display: block; }
-            .attachment-link { font-size: 10.5px; color: #2563eb; font-weight: bold; word-break: break-all; margin-top: 4px; display: inline-block; }
-            .end-of-doc { margin-top: 20px; padding-top: 10px; border-top: 1.5px dashed #94a3b8; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; letter-spacing: 2px; text-transform: uppercase; }
-            @media print { body { padding: 0; } .no-print { display: none; } .attachment-preview { max-height: 260px; } }
-          </style>
-        </head>
-        <body>
-          <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
-            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:7px 16px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🖨️ Print Now</button>
-            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:12px;">Close</button>
-          </div>
-
-          <div class="header-banner">
-            <div class="title-area">
-              <h1>Refund Claims Management Portal</h1>
-              <h2>Chennai City Central Division &bull; Complete Claim Registration Docket</h2>
-            </div>
-            <div class="ref-badge">TRANSACTION ID: ${claim.txn_id_ref}</div>
-          </div>
-
-          <div class="section-title">1. REGISTRATION &amp; APPLICANT DETAILS</div>
-          <table class="details-grid">
-            <tr>
-              <td class="label">Created By Employee:</td>
-              <td class="value"><strong>${creatorEmpName}</strong></td>
-              <td class="label">Employee ID:</td>
-              <td class="value"><strong>${creatorEmpId}</strong></td>
-            </tr>
-            <tr>
-              <td class="label">Raised For Office:</td>
-              <td class="value">${claim.raised_for_office}</td>
-              <td class="label">User Contact Mobile:</td>
-              <td class="value font-mono">${claim.user_mobile || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td class="label">Date &amp; Time of Entry:</td>
-              <td class="value">${entryDateTime}</td>
-              <td class="label">Current Status:</td>
-              <td class="value">
-                <span class="status-pill status-${(claim.claim_status || 'Pending').replace(/\s+/g, '')}">
-                  ${claim.claim_status}
-                </span>
-              </td>
-            </tr>
-          </table>
-
-          <div class="section-title">2. TRANSACTION &amp; POSTAL CLAIM DATA</div>
-          <table class="details-grid">
-            <tr>
-              <td class="label">Module:</td>
-              <td class="value"><strong>${claim.module}</strong></td>
-              <td class="label">Article Number:</td>
-              <td class="value"><strong>${claim.article_number}</strong></td>
-            </tr>
-            <tr>
-              <td class="label">Transaction ID / Ref:</td>
-              <td class="value" style="font-family: monospace; font-weight:bold;">${claim.txn_id_ref}</td>
-              <td class="label">RRN Number:</td>
-              <td class="value" style="font-family: monospace;">${claim.rrn_number || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td class="label">Transaction Date:</td>
-              <td class="value">${claim.txn_date}</td>
-              <td class="label">Transaction Amount:</td>
-              <td class="value" style="font-size: 11.5px; font-weight:bold; color: #166534;">₹${claim.txn_amount}</td>
-            </tr>
-            <tr>
-              <td class="label">Payment Channel:</td>
-              <td class="value">${claim.payment_channel}</td>
-              <td class="label">Settlement Date:</td>
-              <td class="value"><strong>${claim.settlement_date || 'Pending'}</strong></td>
-            </tr>
-          </table>
-
-          <div class="section-title">3. REMARKS &amp; ACTION TRAIL</div>
-          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#475569;">Remarks by User:</div>
-          <div class="remarks-box">${claim.remarks_by_user || 'No remarks entered.'}</div>
-
-          <div style="font-weight:bold; font-size:10px; margin-bottom:2px; color:#92400e;">Admin Action &amp; Reply Remarks:</div>
-          <div class="remarks-box admin">${claim.reply_remarks_admin || 'Pending Response from Admin.'}</div>
-
-          <div class="section-title">4. ATTACHED DOCUMENTS &amp; SCREENSHOTS</div>
-          <div class="attachments-grid">
-            <div class="attachment-col">
-              <strong>Primary User Document:</strong>
-              ${isUserImage 
-                ? `<img src="${claim.file_url}" class="attachment-preview" alt="User Document">`
-                : (claim.file_url ? `<a href="${claim.file_url}" target="_blank" class="attachment-link">📄 View Primary File</a>` : '<em>No file attached.</em>')
-              }
-            </div>
-
-            ${claim.admin_file_url ? `
-              <div class="attachment-col">
-                <strong style="color: #991b1b;">Admin Resolution Document:</strong>
-                ${isAdminImage 
-                  ? `<img src="${claim.admin_file_url}" class="attachment-preview" alt="Admin Attachment">`
-                  : `<a href="${claim.admin_file_url}" target="_blank" class="attachment-link">📄 View Admin Attached File</a>`
-                }
-              </div>
-            ` : ''}
-          </div>
-
-          <div class="end-of-doc">
-            *** END OF DOCUMENT ***
-          </div>
-
-          <script>
-            window.onload = function() {
-              setTimeout(function() {
-                window.print();
-              }, 500);
-            };
-          <\/script>
-        </body>
-        </html>
-      `;
-
-      printWindow.document.open();
-      printWindow.document.write(printHtml);
-      printWindow.document.close();
+    function downloadConvertedImage() {
+      alert("Note: True bit-level dark-to-light conversion requires backend processing. Displaying CSS filter mockup.");
     }
 
-    function openReplyModal(claimId) {
-      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
-      if (!claim) return alert("Claim record not found.");
-
-      $('modalClaimId').value = claim.id;
-      $('modalStatus').value = claim.claim_status || 'Pending';
-      $('modalDocStatus').value = claim.doc_status || 'Approved';
-      $('modalAdminRemarks').value = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
-      $('modalSettlementDate').value = claim.settlement_date || new Date().toISOString().split('T')[0];
-      
-      clearModalUserPastedImage();
-      clearModalAdminPastedImage();
-
-      onModalStatusChanged();
-      $('replyModal').classList.remove('hidden');
-    }
-
-    function closeModal() { 
-      $('replyModal').classList.add('hidden'); 
-      clearModalUserPastedImage();
-      clearModalAdminPastedImage();
-    }
-
-    async function submitAdminReply() {
-      const id = $('modalClaimId').value;
-      const status = $('modalStatus').value;
-      const docStatus = $('modalDocStatus').value;
-      const remarks = $('modalAdminRemarks').value.trim();
-      const settlementDate = (status === 'Settled') ? $('modalSettlementDate').value : null;
-
-      const saveBtn = $('btnAdminSave');
-      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = "Saving..."; }
-
-      try {
-        let updatedUserFileUrl = null;
-        let updatedAdminFileUrl = null;
-
-        if (modalUserPastedBlob) {
-          const fileExt = (modalUserPastedBlob.name) ? modalUserPastedBlob.name.split('.').pop() : 'png';
-          const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${fileExt}`;
-          const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalUserPastedBlob, { upsert: true });
-          if (!err1) updatedUserFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    function handleBookingExcelUpload(e) {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = async function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, {type: 'array'});
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(sheet);
+          alert(`Successfully simulated import of ${json.length} booking records.`);
+          $('bookingExcelFileInput').value = '';
+        } catch(error) {
+          alert("Error parsing excel file.");
         }
-
-        if (modalAdminPastedBlob) {
-          const fileExt = (modalAdminPastedBlob.name) ? modalAdminPastedBlob.name.split('.').pop() : 'png';
-          const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${fileExt}`;
-          const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalAdminPastedBlob, { upsert: true });
-          if (!err2) updatedAdminFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
-        }
-
-        const updateData = {
-          claim_status: status,
-          doc_status: docStatus,
-          reply_remarks_admin: remarks,
-          settlement_date: settlementDate
-        };
-
-        if (docStatus === 'Needs Revision') {
-          updateData.doc_revision_remarks = remarks || "Document is unclear/illegible. Please re-upload.";
-        } else {
-          updateData.doc_revision_remarks = null;
-        }
-
-        if (updatedUserFileUrl) {
-          updateData.file_url = updatedUserFileUrl;
-          updateData.doc_status = 'Approved';
-          updateData.doc_revision_remarks = null;
-        }
-
-        if (updatedAdminFileUrl) {
-          updateData.admin_file_url = updatedAdminFileUrl;
-        }
-
-        const { error } = await supabaseClient.from('claims').update(updateData).eq('id', id);
-        if (error) alert("Error: " + error.message);
-        else {
-          alert("Admin Action & Documents updated successfully!");
-          closeModal();
-          loadClaimsSummary();
-        }
-      } catch (err) {
-        alert("Unexpected Error: " + err.message);
-      } finally {
-        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "Save Changes"; }
-      }
+      };
+      reader.readAsArrayBuffer(file);
     }
 
-    function openDetailsModal(claimId) {
-      const claim = rawClaimsList.find(c => String(c.id) === String(claimId));
-      if (!claim) return alert("Claim details not found!");
-
-      $('detailsModalContent').innerHTML = `
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Txn Reference ID</span><span class="font-bold text-postRed-700 font-mono text-sm">${claim.txn_id_ref}</span></div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Created By</span><span class="font-bold text-slate-800">${claim.profiles?.emp_name} (${claim.profiles?.emp_id})</span></div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Raised For Office</span><span class="font-semibold">${claim.raised_for_office}</span></div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Module / Article</span><span class="font-bold text-postRed-800">${claim.module}</span> / ${claim.article_number}</div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Amount / Date</span><span class="font-bold text-emerald-800">₹${claim.txn_amount}</span> on ${claim.txn_date}</div>
-        <div class="p-2 bg-amber-50 rounded border"><span class="text-slate-500 block">Status</span><span class="font-bold px-2 py-0.5 rounded text-xs ${getStatusColor(claim.claim_status)}">${claim.claim_status}</span> (${claim.doc_status || 'Approved'})</div>
-        <div class="col-span-2 p-2 bg-slate-50 rounded border"><span class="text-slate-500 block font-bold">User Remarks:</span><p class="whitespace-pre-wrap">${claim.remarks_by_user || '-'}</p></div>
-        <div class="col-span-2 p-2 bg-amber-50/70 rounded border border-amber-300"><span class="text-postRed-800 block font-bold">Admin Remarks:</span><p class="whitespace-pre-wrap">${claim.reply_remarks_admin || 'Pending Response'}</p></div>
-        <div class="col-span-2 flex gap-2 pt-1 border-t">
-          <a href="${claim.file_url}" target="_blank" class="bg-emerald-700 text-white px-3 py-1.5 rounded font-bold">📄 Primary User Document</a>
-          ${claim.admin_file_url ? `<a href="${claim.admin_file_url}" target="_blank" class="bg-amber-600 text-white px-3 py-1.5 rounded font-bold">📎 Admin Document</a>` : ''}
-        </div>
-      `;
-
-      $('modalPrintBtn').onclick = () => printClaimDetails(claim.id);
-      $('detailsModal').classList.remove('hidden');
-    }
-
-    function closeDetailsModal() { $('detailsModal').classList.add('hidden'); }
-
-    // User Management Functions
-    async function loadAllUsers() {
-      const { data: users } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
-      allLoadedUsers = users || [];
-      renderUserAccounts(allLoadedUsers);
-    }
-
-    function filterUserAccounts() {
-      const query = $('userInstantSearch')?.value.trim().toLowerCase() || '';
-      if (!query) return renderUserAccounts(allLoadedUsers);
-      renderUserAccounts(allLoadedUsers.filter(u => 
-        (u.emp_id || '').toLowerCase().includes(query) ||
-        (u.emp_name || '').toLowerCase().includes(query) ||
-        (u.office_name || '').toLowerCase().includes(query)
-      ));
-    }
-
-    function renderUserAccounts(users) {
-      const tbody = $('usersTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      if (!users.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-400">No user accounts found.</td></tr>`;
-        return;
-      }
-
-      users.forEach(u => {
-        const isActive = u.is_active !== false;
-        tbody.innerHTML += `
-          <tr class="hover:bg-amber-50/40 transition">
-            <td class="p-2 font-mono font-bold text-slate-800">${u.emp_id}</td>
-            <td class="p-2 font-bold text-slate-800">${u.emp_name}</td>
-            <td class="p-2"><span class="uppercase font-bold text-postRed-700 px-2 py-0.5 rounded bg-postRed-50 border border-postRed-200 text-[10px]">${u.role || 'user'}</span></td>
-            <td class="p-2">${u.created_at ? u.created_at.split('T')[0] : '-'}</td>
-            <td class="p-2 font-mono">${u.mobile_number || '-'}</td>
-            <td class="p-2">${u.office_name || '-'}</td>
-            <td class="p-2 font-bold ${isActive ? 'text-emerald-700' : 'text-rose-700'}">${isActive ? 'Active' : 'Locked'}</td>
-            <td class="p-2 text-center">
-              <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
-                <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">✏️ Edit</button>
-                <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">🔑 Reset Pwd</button>
-                <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer">
-                  ${isActive ? '🔒 Lock' : '🔓 Unlock'}
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    async function openAdminUserEditModal(userId) {
-      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
-      if (!user) return alert("User not found!");
-
-      $('editUserId').value = user.id;
-      $('editUserEmpId').value = user.emp_id || '';
-      $('editUserEmpName').value = user.emp_name || '';
-      $('editUserMobile').value = user.mobile_number || '';
-      $('editUserOffice').value = user.office_name || '';
-      $('editUserRole').value = user.role || 'user';
-
-      $('adminUserEditModal').classList.remove('hidden');
-    }
-
-    function closeAdminUserEditModal() { $('adminUserEditModal').classList.add('hidden'); }
-
-    async function submitAdminUserEdit(e) {
-      e.preventDefault();
-      const userId = $('editUserId').value;
-      const emp_name = $('editUserEmpName').value.trim();
-      const mobile_number = $('editUserMobile').value.trim();
-      const office_name = $('editUserOffice').value;
-      const role = $('editUserRole').value;
-
-      const { error } = await supabaseClient.from('profiles').update({ emp_name, mobile_number, office_name, role }).eq('id', userId);
-      if (error) alert("Update error: " + error.message);
-      else {
-        alert("User details updated successfully!");
-        closeAdminUserEditModal();
-        loadAllUsers();
-      }
-    }
-
-    function openAdminResetPwdModal(userId) {
-      const user = allLoadedUsers.find(u => String(u.id) === String(userId));
-      if (!user) return alert("User not found!");
-
-      $('resetPwdUserId').value = user.id;
-      $('resetPwdUserName').innerText = user.emp_name;
-      $('resetPwdUserEmpId').innerText = user.emp_id;
-      $('resetPwdInput').value = '';
-
-      $('adminResetPwdModal').classList.remove('hidden');
-    }
-
-    function closeAdminResetPwdModal() { $('adminResetPwdModal').classList.add('hidden'); }
-
-    async function submitAdminPasswordReset(e) {
-      e.preventDefault();
-      const userId = $('resetPwdUserId').value;
-      const newPassword = $('resetPwdInput').value.trim();
-      if (!newPassword || newPassword.length < 6) return alert("Password must be at least 6 characters!");
-
-      const { error } = await supabaseClient.rpc('admin_reset_user_password', { target_user_id: userId, new_password: newPassword });
-      if (error) alert("Reset error: " + error.message);
-      else {
-        alert(`Password updated successfully!\nNew Password: ${newPassword}`);
-        closeAdminResetPwdModal();
-      }
-    }
-
-    async function toggleUserLock(userId, currentActive) {
-      if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user account?`)) return;
-      await supabaseClient.from('profiles').update({ is_active: !currentActive }).eq('id', userId);
-      loadAllUsers();
-    }
-
-    function exportUsersExcel() {
-      if (!allLoadedUsers.length) return alert("No user data to export!");
-      const ws = XLSX.utils.json_to_sheet(allLoadedUsers);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Users");
-      XLSX.writeFile(wb, `User_Accounts_${Date.now()}.xlsx`);
-    }
-
-    async function exportUsersPDF() {
-      if (!allLoadedUsers.length) return alert("No user data to export!");
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape" });
-
-      if (cachedPdfLogoBase64) {
-        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 260, 6, 24, 16); } catch (e) {}
-      }
-
-      doc.setFontSize(13);
-      doc.setTextColor(168, 15, 40);
-      doc.text("User Accounts & Access Role Directory", 148.5, 12, { align: "center" });
-
-      const headers = [["Sl. No.", "Employee ID", "Employee Name", "Role", "Registered On", "Mobile No", "Office Name", "Status"]];
-      const rows = allLoadedUsers.map((u, idx) => [
-        idx + 1, u.emp_id, u.emp_name, (u.role || 'user').toUpperCase(), u.created_at ? u.created_at.split('T')[0] : '-', u.mobile_number || '-', u.office_name || '-', u.is_active !== false ? 'Active' : 'Locked'
-      ]);
-
-      doc.autoTable({ head: headers, body: rows, startY: 26, theme: 'grid', headStyles: { fillColor: [168, 15, 40] }, styles: { fontSize: 8 } });
-      doc.save(`User_Directory_${Date.now()}.pdf`);
-    }
-
+    // 10. INITIALIZATION LISTENER
     document.addEventListener('DOMContentLoaded', () => {
       loadLogoFromDatabase();
       supabaseClient.auth.getSession().then(({ data: { session } }) => {
