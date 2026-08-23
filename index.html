@@ -3219,7 +3219,7 @@ function sortTable(col) {
       const doc = new jsPDF({ orientation: "portrait" });
 
       if (cachedPdfLogoBase64) {
-        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 169, 8, 27, 18); } catch (e) {}
+        try { doc.addImage(cachedPdfLogoBase64, 'JPEG', 169, 8, 27, 18,undefined, 'FAST'); } catch (e) {}
       }
 
       doc.setFontSize(13);
@@ -3937,9 +3937,14 @@ function sortTable(col) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
 
-      if (cachedPdfLogoBase64) {
-        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 260, 6, 24, 16); } catch (e) {}
-      }
+     if (cachedPdfLogoBase64) {
+  try { 
+        doc.addImage(cachedPdfLogoBase64, 'JPEG', 169, 8, 27, 18, undefined, 'FAST'); 
+  } catch (e) {
+    console.error("Logo compression failed, rendering default:", e);
+  }
+}
+
 
       doc.setFontSize(13);
       doc.setTextColor(168, 15, 40);
@@ -4683,7 +4688,7 @@ async function submitUserRemarksEdit() {
       const logoX = pageWidth - 10 - logoWidth; // Aligns with the right margin
       const logoY = 12;
       
-      doc.addImage(cachedPdfLogoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight); 
+      doc.addImage(cachedPdfLogoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight,undefined, 'FAST'); 
     } catch (e) {
       console.warn("Logo image insertion failed on PDF export", e);
     }
