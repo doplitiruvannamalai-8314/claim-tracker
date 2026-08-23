@@ -1931,11 +1931,19 @@
       if (channel === 'SBI POS' && (!rrn_number || rrn_number === 'N/A')) return alert("Enter RRN for SBI POS!");
       if (!fileInput && !userPastedImageBlob) return alert("Please attach document or screenshot!");
 
-      let uploadBlob = userPastedImageBlob || fileInput;
-      const fileExt = (fileInput && fileInput.name) ? fileInput.name.split('.').pop() : 'png';
+      const rawBlob = userPastedImageBlob || fileInput;
+
+      // 1. Automatically Compress and Optimize
+      const { blob: optimizedBlob, extension: fileExt } = await optimizeImageForUpload(rawBlob);
       const filePath = `claims/${txn_id_ref}-${Date.now()}.${fileExt}`;
       
-      const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(filePath, uploadBlob, { upsert: true });
+      const { error: uploadError } = await supabaseClient.storage
+        .from('claim-attachments')
+        .upload(filePath, optimizedBlob, { 
+          upsert: true,
+          contentType: fileExt === 'pdf' ? 'application/pdf' : 'image/jpeg'
+        });
+
       if (uploadError) return alert("File upload failed: " + uploadError.message);
 
       const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
@@ -1959,11 +1967,9 @@
       if (error) {
         alert("Error submitting claim: " + error.message);
       } else {
-        alert("Claim registered successfully!");
+        alert("Claim registered successfully with optimized image attachment!");
         e.target.reset();
         clearUserPastedImage();
-        if ($('rrnFieldContainer')) $('rrnFieldContainer').classList.add('hidden');
-        if ($('userPastedPreviewContainer')) $('userPastedPreviewContainer').classList.add('hidden');
         showTab('track');
         await loadClaimsSummary();
       }
@@ -2187,17 +2193,19 @@ async function submitAdminReply() {
     let updatedUserFileUrl = null;
     let updatedAdminFileUrl = null;
 
+    // 1. Upload compressed replacement user document if present
     if (modalUserPastedBlob) {
-      const fileExt = modalUserPastedBlob.name ? modalUserPastedBlob.name.split('.').pop() : 'png';
-      const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${fileExt}`;
-      const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalUserPastedBlob, { upsert: true });
+      const { blob: optUserBlob, extension: uExt } = await optimizeImageForUpload(modalUserPastedBlob);
+      const filePath = `claims/admin-replaced-userdoc-${id}-${Date.now()}.${uExt}`;
+      const { error: err1 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, optUserBlob, { upsert: true, contentType: uExt === 'pdf' ? 'application/pdf' : 'image/jpeg' });
       if (!err1) updatedUserFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
     }
 
+    // 2. Upload compressed admin resolution proof if present
     if (modalAdminPastedBlob) {
-      const fileExt = modalAdminPastedBlob.name ? modalAdminPastedBlob.name.split('.').pop() : 'png';
-      const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${fileExt}`;
-      const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, modalAdminPastedBlob, { upsert: true });
+      const { blob: optAdminBlob, extension: aExt } = await optimizeImageForUpload(modalAdminPastedBlob);
+      const filePath = `claims/admin-resolution-proof-${id}-${Date.now()}.${aExt}`;
+      const { error: err2 } = await supabaseClient.storage.from('claim-attachments').upload(filePath, optAdminBlob, { upsert: true, contentType: aExt === 'pdf' ? 'application/pdf' : 'image/jpeg' });
       if (!err2) updatedAdminFileUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
     }
 
@@ -4208,14 +4216,17 @@ function closeReuploadModal() {
 async function submitDocumentReupload() {
   const id = $('reuploadClaimId')?.value;
   const fileInput = $('reuploadFileInput')?.files[0];
-  const blob = userPastedImageBlob || fileInput;
+  const rawBlob = userPastedImageBlob || fileInput;
 
-  if (!blob) return alert("Please select a clear document or paste a replacement screenshot!");
+  if (!rawBlob) return alert("Please select a clear document or paste a replacement screenshot!");
 
-  const fileExt = (fileInput && fileInput.name) ? fileInput.name.split('.').pop() : 'png';
+  const { blob: optBlob, extension: fileExt } = await optimizeImageForUpload(rawBlob);
   const filePath = `claims/user-reuploaded-${id}-${Date.now()}.${fileExt}`;
 
-  const { error: upErr } = await supabaseClient.storage.from('claim-attachments').upload(filePath, blob, { upsert: true });
+  const { error: upErr } = await supabaseClient.storage
+    .from('claim-attachments')
+    .upload(filePath, optBlob, { upsert: true, contentType: fileExt === 'pdf' ? 'application/pdf' : 'image/jpeg' });
+
   if (upErr) return alert("Upload failed: " + upErr.message);
 
   const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
@@ -4229,7 +4240,7 @@ async function submitDocumentReupload() {
   if (error) {
     alert("Error updating record: " + error.message);
   } else {
-    alert("Replacement document uploaded and submitted successfully!");
+    alert("Replacement document optimized and submitted successfully!");
     closeReuploadModal();
     await loadClaimsSummary();
   }
@@ -4606,7 +4617,62 @@ function openUserEditRemarksModal(claimId) {
 function closeUserEditRemarksModal() {
   if ($('userEditRemarksModal')) $('userEditRemarksModal').classList.add('hidden');
 }
+// =========================================================================
+// AUTOMATIC CLIENT-SIDE IMAGE COMPRESSOR & OPTIMIZER (< 800 KB)
+// =========================================================================
+async function optimizeImageForUpload(fileOrBlob, maxDimension = 1600, quality = 0.82) {
+  // If it's a PDF, we cannot compress it via Canvas; return as-is
+  if (fileOrBlob.type === 'application/pdf') {
+    if (fileOrBlob.size > 2 * 1024 * 1024) {
+      alert(`Warning: The attached PDF is ${(fileOrBlob.size / (1024 * 1024)).toFixed(2)} MB. Please ensure uploaded PDFs are below 2 MB.`);
+    }
+    return { blob: fileOrBlob, extension: 'pdf' };
+  }
 
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.naturalWidth || img.width;
+        let height = img.naturalHeight || img.height;
+
+        // Scale down dimensions proportionally if larger than maxDimension
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        // Fill white background to prevent transparent PNGs turning black when saved as JPEG
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Export as optimized JPEG (targets 200 KB - 600 KB)
+        canvas.toBlob(
+          (compressedBlob) => {
+            console.log(`Original: ${(fileOrBlob.size / 1024).toFixed(1)} KB -> Compressed: ${(compressedBlob.size / 1024).toFixed(1)} KB`);
+            resolve({ blob: compressedBlob, extension: 'jpg' });
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(fileOrBlob);
+  });
+}
 async function submitUserRemarksEdit() {
   const id = $('userEditClaimId')?.value;
   const newRemarks = $('userEditRemarksInput')?.value.trim();
