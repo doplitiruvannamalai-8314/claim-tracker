@@ -590,73 +590,73 @@
     </div>
 
     <!-- 3. Office-wise Matrix (LEFT SIDE) -->
-    <div id="officeWiseMatrixArea" class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs flex flex-col justify-between">
-      <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-1.5">
-        <div class="flex items-center gap-1">
-          <span class="text-sm">🏢</span>
-          <span>3. Office-wise Pendency &amp; Status</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <button type="button" onclick="exportOfficeWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-            🖼️ Image
-          </button>
-          <button type="button" onclick="printOfficeWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-            🖨️ Print
-          </button>
-        </div>
-      </div>
-      <div class="max-h-60 overflow-y-auto">
-        <table class="w-full text-left text-[10.5px] border-collapse">
-          <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
-            <tr>
-              <th class="p-1.5">Office</th>
-              <th class="p-1.5 text-center">Reg</th>
-              <th class="p-1.5 text-center text-amber-700">Pend</th>
-              <th class="p-1.5 text-center text-blue-700">InProg</th>
-              <th class="p-1.5 text-center text-emerald-700">Set</th>
-              <th class="p-1.5 text-center text-rose-700">Rej</th>
-              <th class="p-1.5 text-right font-bold text-postRed-800">Pend+Prog (₹)</th>
-            </tr>
-          </thead>
-          <tbody id="officeSummaryTableBody" class="divide-y divide-slate-100"></tbody>
-        </table>
-      </div>
+<div id="officeWiseMatrixArea" class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs flex flex-col justify-start">
+  <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-1.5">
+    <div class="flex items-center gap-1">
+      <span class="text-sm">🏢</span>
+      <span>3. Office-wise Pendency &amp; Status</span>
     </div>
-
-    <!-- 4. Month-wise Matrix (RIGHT SIDE) -->
-    <div id="monthWiseMatrixArea" class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs flex flex-col justify-between">
-      <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-1.5">
-        <div class="flex items-center gap-1">
-          <span class="text-sm">📅</span>
-          <span>4. Month-wise Pendency &amp; Status</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <button type="button" onclick="exportMonthWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-            🖼️ Image
-          </button>
-          <button type="button" onclick="exportMonthWisePDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-            📄 PDF
-          </button>
-        </div>
-      </div>
-      <div class="max-h-60 overflow-y-auto">
-        <table class="w-full text-left text-[10.5px] border-collapse">
-          <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
-            <tr>
-              <th class="p-1.5">Month</th>
-              <th class="p-1.5 text-center">Reg</th>
-              <th class="p-1.5 text-center text-amber-700">Pend</th>
-              <th class="p-1.5 text-center text-blue-700">InProg</th>
-              <th class="p-1.5 text-center text-emerald-700">Set</th>
-              <th class="p-1.5 text-center text-rose-700">Rej</th>
-              <th class="p-1.5 text-right font-bold text-postRed-800">Pend+Prog (₹)</th>
-            </tr>
-          </thead>
-          <tbody id="monthSummaryTableBody" class="divide-y divide-slate-100"></tbody>
-        </table>
-      </div>
+    <div class="flex items-center gap-1.5">
+      <button type="button" onclick="exportOfficeWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+        🖼️ Image
+      </button>
+      <button type="button" onclick="printOfficeWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+        🖨️ Print
+      </button>
     </div>
   </div>
+  <div class="max-h-60 overflow-y-auto">
+    <table class="w-full text-left text-[10.5px] border-collapse">
+      <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
+        <tr>
+          <th class="p-1.5">Office</th>
+          <th class="p-1.5 text-center">Reg</th>
+          <th class="p-1.5 text-center text-amber-700">Pend</th>
+          <th class="p-1.5 text-center text-blue-700">InProg</th>
+          <th class="p-1.5 text-center text-emerald-700">Set</th>
+          <th class="p-1.5 text-center text-rose-700">Rej</th>
+          <th class="p-1.5 text-right font-bold text-postRed-800">Pend+Prog (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="officeSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 4. Month-wise Matrix (RIGHT SIDE) -->
+<div id="monthWiseMatrixArea" class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs flex flex-col justify-start">
+  <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-1.5">
+    <div class="flex items-center gap-1">
+      <span class="text-sm">📅</span>
+      <span>4. Month-wise Pendency &amp; Status</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button type="button" onclick="exportMonthWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+        🖼️ Image
+      </button>
+      <button type="button" onclick="exportMonthWisePDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+        📄 PDF
+      </button>
+    </div>
+  </div>
+  <div class="max-h-60 overflow-y-auto">
+    <table class="w-full text-left text-[10.5px] border-collapse">
+      <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
+        <tr>
+          <th class="p-1.5">Month</th>
+          <th class="p-1.5 text-center">Reg</th>
+          <th class="p-1.5 text-center text-amber-700">Pend</th>
+          <th class="p-1.5 text-center text-blue-700">InProg</th>
+          <th class="p-1.5 text-center text-emerald-700">Set</th>
+          <th class="p-1.5 text-center text-rose-700">Rej</th>
+          <th class="p-1.5 text-right font-bold text-postRed-800">Pend+Prog (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="monthSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+    </table>
+  </div>
+</div>
+</div>
 </div>
 
           <!-- MIS TABLE -->
@@ -2709,10 +2709,11 @@ function sortTable(col) {
         offTbody.innerHTML = offArr.join('');
       }
 
-      // 4. Month Summary Table (Right Box)
+     // 4. Render Month Summary Table (Right Box) - Top Down
       const monthTbody = $('monthSummaryTableBody');
       if (monthTbody) {
         let monthArr = [];
+        // Sorts descending (latest YYYY-MM first at the top)
         const sortedMonthKeys = Object.keys(monthStats).sort().reverse();
 
         sortedMonthKeys.forEach(mKey => {
