@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -634,8 +632,8 @@
       <button type="button" onclick="exportMonthWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
         🖼️ Image
       </button>
-      <button type="button" onclick="exportMonthWisePDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-        📄 PDF
+      <button type="button" onclick="printMonthWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+        🖨️ Print
       </button>
     </div>
   </div>
@@ -1158,7 +1156,7 @@
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Developed by :  Krishnan K</div>
-      <div class="text-slate-500 font-medium">Last Update : <span class="font-semibold text-slate-700"><span id="upload-date"></span></span></div>
+      <div class="text-slate-500 font-medium"><span class="font-semibold text-slate-700"><span id="upload-date"></span></span></div>
     </div>
   </footer>
 
@@ -1171,15 +1169,6 @@
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = now.getFullYear();
-    const datePart = `${day}-${month}-${year}`; 
-    const timePart = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const fullDateTime = `${datePart} at ${timePart}`;
-    document.getElementById("upload-date").innerHTML = fullDateTime;
 
     const DIGITAL_CHANNEL_CONFIG = [
       { key: 'dqr', cntField: 'dqr_cnt', amtField: 'dqr_amt', label: 'DQR Scan' },
@@ -1219,158 +1208,225 @@
     let currentMISSortCol = 'txn_date';
     let currentMISSortDir = 'desc';
 
- function printOfficeWiseReport() {
-    if (!rawMISMasterList || !rawMISMasterList.length) {
-        return alert("No claim records found in the current filtered period!");
+ // =========================================================================
+// 3. OFFICE-WISE PENDENCY & STATUS PRINT REPORT
+// =========================================================================
+function printOfficeWiseReport() {
+  if (!rawMISMasterList || !rawMISMasterList.length) {
+    return alert("No claim records found in the current filtered period!");
+  }
+
+  const fromDateVal = $('filterFromDate')?.value || 'Inception';
+  const toDateVal = $('filterToDate')?.value || 'Current Date';
+  const generatedTimeStr = new Date().toLocaleString("en-IN", { 
+    day: '2-digit', month: '2-digit', year: 'numeric', 
+    hour: '2-digit', minute: '2-digit', second: '2-digit', 
+    hour12: true 
+  });
+
+  const officeStats = {};
+  let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+  rawMISMasterList.forEach(c => {
+    const off = (c.raised_for_office || 'Unassigned').trim();
+    const amt = parseFloat(c.txn_amount) || 0;
+
+    if (!officeStats[off]) {
+      officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
     }
 
-    const fromDateVal = $('filterFromDate')?.value || 'Inception';
-    const toDateVal = $('filterToDate')?.value || 'Current Date';
-    const officeStats = {};
-    
-    let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+    officeStats[off].registered++;
+    grandReg++;
 
-    // Process and aggregate raw data
-    rawMISMasterList.forEach(c => {
-        const off = c.raised_for_office || 'Unassigned';
-        const amt = parseFloat(c.txn_amount) || 0;
+    if (c.claim_status === 'Pending') {
+      officeStats[off].pending++;
+      officeStats[off].activePendingAmount += amt;
+      grandPend++;
+      grandActiveAmt += amt;
+    } else if (c.claim_status === 'In Progress') {
+      officeStats[off].inprogress++;
+      officeStats[off].activePendingAmount += amt;
+      grandInp++;
+      grandActiveAmt += amt;
+    } else if (c.claim_status === 'Settled') {
+      officeStats[off].settled++;
+      grandSet++;
+    } else if (c.claim_status === 'Rejected') {
+      officeStats[off].rejected++;
+      grandRej++;
+    }
+  });
 
-        if (!officeStats[off]) {
-            officeStats[off] = { 
-                registered: 0, 
-                pending: 0, 
-                inprogress: 0, 
-                settled: 0, 
-                rejected: 0, 
-                activePendingAmount: 0 
-            };
-        }
+  const sortedOffices = Object.keys(officeStats).sort();
+  let tableRowsHtml = '';
 
-        officeStats[off].registered++;
-        grandReg++;
+  sortedOffices.forEach((off, idx) => {
+    const s = officeStats[off];
+    tableRowsHtml += `
+      <tr>
+        <td style="text-align:center;">${idx + 1}</td>
+        <td style="font-weight:bold; color:#0f172a;">${off}</td>
+        <td style="text-align:center; font-weight:bold;">${s.registered}</td>
+        <td style="text-align:center; color:#b45309; font-weight:bold;">${s.pending}</td>
+        <td style="text-align:center; color:#1d4ed8; font-weight:bold;">${s.inprogress}</td>
+        <td style="text-align:center; color:#15803d; font-weight:bold;">${s.settled}</td>
+        <td style="text-align:center; color:#b91c1c; font-weight:bold;">${s.rejected}</td>
+        <td style="text-align:right; font-weight:bold; color:#991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
+      </tr>
+    `;
+  });
 
-        if (c.claim_status === 'Pending') {
-            officeStats[off].pending++;
-            officeStats[off].activePendingAmount += amt;
-            grandPend++;
-            grandActiveAmt += amt;
-        } else if (c.claim_status === 'In Progress') {
-            officeStats[off].inprogress++;
-            officeStats[off].activePendingAmount += amt;
-            grandInp++;
-            grandActiveAmt += amt;
-        } else if (c.claim_status === 'Settled') {
-            officeStats[off].settled++;
-            grandSet++;
-        } else if (c.claim_status === 'Rejected') {
-            officeStats[off].rejected++;
-            grandRej++;
-        }
-    });
+  const printWindow = window.open('', '_blank', 'width=950,height=850');
+  if (!printWindow) return alert("Popup blocked! Please allow popups to print report.");
 
-    const printWindow = window.open('', '_blank', 'width=950,height=850');
-    if (!printWindow) return alert("Popup blocked! Please allow popups to print office report.");
-
-    const sortedOffices = Object.keys(officeStats).sort();
-    let tableRowsHtml = '';
-
-    // Generate table rows dynamically
-    sortedOffices.forEach((off, idx) => {
-        const s = officeStats[off];
-        tableRowsHtml += `<tr>
-            <td style="text-align:center;">${idx + 1}</td>
-            <td style="font-weight:bold; color:#0f172a;">${off}</td>
-            <td style="text-align:center; font-weight:bold;">${s.registered}</td>
-            <td style="text-align:center; color:#b45309; font-weight:bold;">${s.pending}</td>
-            <td style="text-align:center; color:#1d4ed8; font-weight:bold;">${s.inprogress}</td>
-            <td style="text-align:center; color:#15803d; font-weight:bold;">${s.settled}</td>
-            <td style="text-align:center; color:#b91c1c; font-weight:bold;">${s.rejected}</td>
-            <td style="text-align:right; font-weight:bold; color:#991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
-        </tr>`;
-    });
-
-    // Generate full HTML template safely
-    const printHtml = `
+  printWindow.document.open();
+  printWindow.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Refund Claims - Office-wise Pendency & Status Report</title>
-        <style>
-            @page { size: A4 portrait; margin: 10mm 12mm; }
-            * { box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1e293b; padding: 0; margin: 0; }
-            .header-banner { border-bottom: 2.5px solid #C4122F; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-            .title-area h1 { margin: 0; color: #A80F28; font-size: 15px; text-transform: uppercase; font-weight: 800; }
-            .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 11px; font-weight: bold; }
-            .title-area p { margin: 2px 0 0 0; font-size: 9.5px; color: #475569; font-weight: 600; }
-            .logo-box img { height: 42px; width: 63px; object-fit: contain; }
-            table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10.5px; }
-            th { background: #A80F28; color: #fff; padding: 5px 6px; border: 1px solid #8A0C21; font-weight: bold; }
-            td { padding: 4.5px 6px; border: 1px solid #cbd5e1; }
-            tr:nth-child(even) { background: #f8fafc; }
-            .total-row { background: #fee2e2 !important; font-weight: bold; color: #881337; }
-            .end-of-doc { margin-top: 18px; padding-top: 8px; border-top: 1.5px dashed #94a3b8; text-align: center; font-size: 10px; color: #64748b; font-weight: 600; }
-            @media print { body { padding: 0; } .no-print { display: none; } }
-        </style>
+      <title>Office-wise Pendency & Status Report</title>
+      <style>
+        @page { size: A4 portrait; margin: 10mm 12mm; }
+        * { box-sizing: border-box; }
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+          color: #1e293b; 
+          padding: 14px; 
+          font-size: 11px; 
+          margin: 0; 
+          background: #fff; 
+        }
+        .header-banner { 
+          border-bottom: 2.5px solid #C4122F; 
+          padding-bottom: 8px; 
+          margin-bottom: 10px; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+        }
+        .title-area h1 { 
+          margin: 0; 
+          color: #A80F28; 
+          font-size: 15px; 
+          text-transform: uppercase; 
+          font-weight: 800; 
+          letter-spacing: 0.5px; 
+        }
+        .title-area h2 { 
+          margin: 2px 0 0 0; 
+          color: #D97706; 
+          font-size: 12.5px; 
+          font-weight: bold; 
+        }
+        .title-area .meta-info {
+          margin: 4px 0 0 0;
+          font-size: 11px;
+          color: #475569;
+          font-weight: bold;
+        }
+        .logo-img {
+          height: 48px;
+          width: 72px;
+          object-fit: contain;
+          background: #fff;
+          padding: 2px;
+          border-radius: 4px;
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin-top: 8px; 
+        }
+        th { 
+          background: #A80F28; 
+          color: #fff; 
+          padding: 6px 7px; 
+          border: 1px solid #8A0C21; 
+          font-size: 10.5px; 
+        }
+        td { 
+          padding: 5px 7px; 
+          border: 1px solid #cbd5e1; 
+          font-size: 10.5px; 
+        }
+        .total-row { 
+          background: #fee2e2 !important; 
+          font-weight: bold; 
+          color: #881337; 
+        }
+        .footer-banner {
+          margin-top: 22px;
+          padding-top: 10px;
+          border-top: 1.5px dashed #94a3b8;
+          text-align: center;
+          font-weight: bold;
+          font-size: 11px;
+          color: #64748b;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+        }
+        @media print { 
+          .no-print { display: none !important; } 
+          body { padding: 0; } 
+        }
+      </style>
     </head>
     <body>
-        <div class="no-print" style="background:#f1f5f9; padding:8px 14px; text-align:right; border-bottom:1px solid #cbd5e1;">
-            <button onclick="window.print()" style="background:#C4122F; color:white; border:none; padding:6px 14px; font-weight:bold; cursor:pointer; border-radius:4px; margin-right:5px;">Print Report</button>
-            <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; font-weight:bold; cursor:pointer; border-radius:4px;">Close</button>
+      <div class="no-print" style="background:#f1f5f9; padding:6px 12px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
+        <button onclick="window.print()" style="background:#A80F28; color:white; border:none; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🖨️ Print Report</button>
+        <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:11px;">Close</button>
+      </div>
+
+      <div class="header-banner">
+        <div class="title-area">
+          <h1>Refund Claims Management Portal</h1>
+          <h2>Chennai City Central Division &bull; Office-wise Pendency &amp; Status Report</h2>
+          <div class="meta-info">Period: <strong>${fromDateVal}</strong> to <strong>${toDateVal}</strong> | Generated on: <strong>${generatedTimeStr}</strong></div>
         </div>
-        <div class="header-banner">
-            <div class="title-area">
-                <h1>Refund Claims Management Portal</h1>
-                <h2>Chennai City Central Division &bull; Office-wise Pendency &amp; Status Report</h2>
-                <p>Period: <strong>${fromDateVal}</strong> to <strong>${toDateVal}</strong> | Generated on: ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-            <div class="logo-box">
-                <img src="${typeof currentAppLogo !== 'undefined' ? currentAppLogo : ''}" alt="India Post">
-            </div>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 5%;">Sl</th>
-                    <th style="width: 33%; text-align: left;">Office Name</th>
-                    <th style="width: 10%; text-align: center;">Registered</th>
-                    <th style="width: 10%; text-align: center;">Pending</th>
-                    <th style="width: 11%; text-align: center;">In Progress</th>
-                    <th style="width: 9%; text-align: center;">Settled</th>
-                    <th style="width: 9%; text-align: center;">Rejected</th>
-                    <th style="width: 13%; text-align: right;">Pending + In Prog (Rs)</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${tableRowsHtml}
-                <tr class="total-row">
-                    <td colspan="2" style="text-align: center;">GRAND TOTAL</td>
-                    <td style="text-align: center;">${grandReg}</td>
-                    <td style="text-align: center;">${grandPend}</td>
-                    <td style="text-align: center;">${grandInp}</td>
-                    <td style="text-align: center;">${grandSet}</td>
-                    <td style="text-align: center;">${grandRej}</td>
-                    <td style="text-align: right;">Rs. ${grandActiveAmt.toFixed(2)}</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="end-of-doc">
-            *** END OF OFFICE REPORT &bull; TOTAL OFFICES: ${sortedOffices.length} ***
-        </div>
-        <script>
-            window.onload = function() {
-                setTimeout(function() { window.print(); }, 500);
-            };
-        <\/script>
+        ${currentAppLogo ? `<img src="${currentAppLogo}" class="logo-img" alt="India Post Logo">` : ''}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 5%;">#</th>
+            <th style="text-align: left; width: 33%;">Office Name</th>
+            <th style="width: 10%;">Registered</th>
+            <th style="width: 10%;">Pending</th>
+            <th style="width: 11%;">In Progress</th>
+            <th style="width: 9%;">Settled</th>
+            <th style="width: 9%;">Rejected</th>
+            <th style="text-align: right; width: 13%;">Pending + In Prog (Rs)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRowsHtml}
+          <tr class="total-row">
+            <td colspan="2" style="text-align:center; letter-spacing:0.5px;">GRAND TOTAL (${sortedOffices.length} Offices)</td>
+            <td style="text-align:center;">${grandReg}</td>
+            <td style="text-align:center;">${grandPend}</td>
+            <td style="text-align:center;">${grandInp}</td>
+            <td style="text-align:center;">${grandSet}</td>
+            <td style="text-align:center;">${grandRej}</td>
+            <td style="text-align:right; color:#991b1b;">Rs. ${grandActiveAmt.toFixed(2)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footer-banner">
+        *** END OF OFFICE REPORT &bull; TOTAL OFFICES: ${sortedOffices.length} ***
+      </div>
+
+      <script>
+        window.onload = function() {
+          setTimeout(function() { window.print(); }, 400);
+        };
+      <\/script>
     </body>
     </html>
-    `;
-
-    printWindow.document.open();
-    printWindow.document.write(printHtml);
-    printWindow.document.close();
+  `);
+  printWindow.document.close();
 }
-
 
 
     function getStatusColor(status) {
@@ -5190,8 +5246,243 @@ function renderClaimsSummaryTable() {
   });
   tbody.innerHTML = htmlArr.join('');
 }
+// =========================================================================
+// 4. MONTH-WISE PENDENCY & STATUS PRINT REPORT (MATCHED TO REPORT 3 FORMAT)
+// =========================================================================
+function printMonthWiseReport() {
+  if (!rawMISMasterList || !rawMISMasterList.length) {
+    return alert("No claim records found in the current filtered period!");
+  }
 
+  const fromDateVal = $('filterFromDate')?.value || 'Inception';
+  const toDateVal = $('filterToDate')?.value || 'Current Date';
+  const generatedTimeStr = new Date().toLocaleString("en-IN", { 
+    day: '2-digit', month: '2-digit', year: 'numeric', 
+    hour: '2-digit', minute: '2-digit', second: '2-digit', 
+    hour12: true 
+  });
 
+  const monthStats = {};
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+  rawMISMasterList.forEach(c => {
+    let monthKey = "Unknown";
+    let monthLabel = "Unknown";
+    if (c.txn_date && c.txn_date.length >= 7) {
+      monthKey = c.txn_date.substring(0, 7);
+      const parts = monthKey.split('-');
+      if (parts.length === 2) {
+        const mIndex = parseInt(parts[1], 10) - 1;
+        monthLabel = `${monthNames[mIndex] || parts[1]} ${parts[0]}`;
+      }
+    }
+
+    const amt = parseFloat(c.txn_amount) || 0;
+    if (!monthStats[monthKey]) {
+      monthStats[monthKey] = { 
+        label: monthLabel, 
+        registered: 0, 
+        pending: 0, 
+        inprogress: 0, 
+        settled: 0, 
+        rejected: 0, 
+        activePendingAmount: 0 
+      };
+    }
+
+    monthStats[monthKey].registered++;
+    grandReg++;
+
+    if (c.claim_status === 'Pending') {
+      monthStats[monthKey].pending++;
+      monthStats[monthKey].activePendingAmount += amt;
+      grandPend++;
+      grandActiveAmt += amt;
+    } else if (c.claim_status === 'In Progress') {
+      monthStats[monthKey].inprogress++;
+      monthStats[monthKey].activePendingAmount += amt;
+      grandInp++;
+      grandActiveAmt += amt;
+    } else if (c.claim_status === 'Settled') {
+      monthStats[monthKey].settled++;
+      grandSet++;
+    } else if (c.claim_status === 'Rejected') {
+      monthStats[monthKey].rejected++;
+      grandRej++;
+    }
+  });
+
+  const sortedMonthKeys = Object.keys(monthStats).sort().reverse();
+  let tableRowsHtml = '';
+
+  sortedMonthKeys.forEach((mKey, idx) => {
+    const s = monthStats[mKey];
+    tableRowsHtml += `
+      <tr>
+        <td style="text-align:center;">${idx + 1}</td>
+        <td style="font-weight:bold; color:#0f172a;">${s.label}</td>
+        <td style="text-align:center; font-weight:bold;">${s.registered}</td>
+        <td style="text-align:center; color:#b45309; font-weight:bold;">${s.pending}</td>
+        <td style="text-align:center; color:#1d4ed8; font-weight:bold;">${s.inprogress}</td>
+        <td style="text-align:center; color:#15803d; font-weight:bold;">${s.settled}</td>
+        <td style="text-align:center; color:#b91c1c; font-weight:bold;">${s.rejected}</td>
+        <td style="text-align:right; font-weight:bold; color:#991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  const printWindow = window.open('', '_blank', 'width=950,height=850');
+  if (!printWindow) return alert("Popup blocked! Please allow popups to print report.");
+
+  printWindow.document.open();
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Month-wise Pendency & Status Report</title>
+      <style>
+        @page { size: A4 portrait; margin: 10mm 12mm; }
+        * { box-sizing: border-box; }
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+          color: #1e293b; 
+          padding: 14px; 
+          font-size: 11px; 
+          margin: 0; 
+          background: #fff; 
+        }
+        .header-banner { 
+          border-bottom: 2.5px solid #C4122F; 
+          padding-bottom: 8px; 
+          margin-bottom: 10px; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+        }
+        .title-area h1 { 
+          margin: 0; 
+          color: #A80F28; 
+          font-size: 15px; 
+          text-transform: uppercase; 
+          font-weight: 800; 
+          letter-spacing: 0.5px; 
+        }
+        .title-area h2 { 
+          margin: 2px 0 0 0; 
+          color: #D97706; 
+          font-size: 13.5px; 
+          font-weight: bold; 
+        }
+        .title-area .meta-info {
+          margin: 4px 0 0 0;
+          font-size: 10px;
+          color: #475569;
+          font-weight: bold;
+        }
+        .logo-img {
+          height: 48px;
+          width: 72px;
+          object-fit: contain;
+          background: #fff;
+          padding: 2px;
+          border-radius: 4px;
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin-top: 8px; 
+        }
+        th { 
+          background: #A80F28; 
+          color: #fff; 
+          padding: 6px 7px; 
+          border: 1px solid #8A0C21; 
+          font-size: 10.5px; 
+        }
+        td { 
+          padding: 5px 7px; 
+          border: 1px solid #cbd5e1; 
+          font-size: 10.5px; 
+        }
+        .total-row { 
+          background: #fee2e2 !important; 
+          font-weight: bold; 
+          color: #881337; 
+        }
+        .footer-banner {
+          margin-top: 22px;
+          padding-top: 10px;
+          border-top: 1.5px dashed #94a3b8;
+          text-align: center;
+          font-weight: bold;
+          font-size: 11px;
+          color: #64748b;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+        }
+        @media print { 
+          .no-print { display: none !important; } 
+          body { padding: 0; } 
+        }
+      </style>
+    </head>
+    <body>
+      <div class="no-print" style="background:#f1f5f9; padding:6px 12px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
+        <button onclick="window.print()" style="background:#A80F28; color:white; border:none; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🖨️ Print Report</button>
+        <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:11px;">Close</button>
+      </div>
+
+      <div class="header-banner">
+        <div class="title-area">
+          <h1>Refund Claims Management Portal</h1>
+          <h2>Chennai City Central Division &bull; Month-wise Pendency &amp; Status Report</h2>
+          <div class="meta-info">Period: <strong>${fromDateVal}</strong> to <strong>${toDateVal}</strong> | Generated on: <strong>${generatedTimeStr}</strong></div>
+        </div>
+        ${currentAppLogo ? `<img src="${currentAppLogo}" class="logo-img" alt="India Post Logo">` : ''}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 5%;">#</th>
+            <th style="text-align: left; width: 33%;">Month</th>
+            <th style="width: 10%;">Registered</th>
+            <th style="width: 10%;">Pending</th>
+            <th style="width: 11%;">In Progress</th>
+            <th style="width: 9%;">Settled</th>
+            <th style="width: 9%;">Rejected</th>
+            <th style="text-align: right; width: 13%;">Pending + In Prog (Rs)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRowsHtml}
+          <tr class="total-row">
+            <td colspan="2" style="text-align:center; letter-spacing:0.5px;">GRAND TOTAL (${sortedMonthKeys.length} Months)</td>
+            <td style="text-align:center;">${grandReg}</td>
+            <td style="text-align:center;">${grandPend}</td>
+            <td style="text-align:center;">${grandInp}</td>
+            <td style="text-align:center;">${grandSet}</td>
+            <td style="text-align:center;">${grandRej}</td>
+            <td style="text-align:right; color:#991b1b;">Rs. ${grandActiveAmt.toFixed(2)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footer-banner">
+        *** END OF MONTHLY REPORT &bull; TOTAL MONTHS: ${sortedMonthKeys.length} ***
+      </div>
+
+      <script>
+        window.onload = function() {
+          setTimeout(function() { window.print(); }, 400);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
 // =========================================================================
     // MONTH-WISE EXPORT: PNG IMAGE
     // =========================================================================
@@ -5664,12 +5955,54 @@ async function deleteClaimByAdmin() {
       const container = $('userPastedPreviewContainer');
       if (container) container.classList.remove('hidden');
     });
+// =========================================================================
+// FETCH TRUE REPO LAST-COMMIT DATE & TIME FROM GITHUB API
+// =========================================================================
+async function loadGitHubLastUpdatedDate(username, repoName) {
+  const targetEl = document.getElementById("upload-date");
+  if (!targetEl) return;
 
+  try {
+    // 1. Query the latest commit from your repository's default branch
+    const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=1`);
+    
+    if (!response.ok) throw new Error("GitHub API response not ok");
+
+    const commits = await response.json();
+    if (!commits || !commits.length) return;
+
+    // 2. Extract commit timestamp (ISO string, e.g. "2026-08-23T17:45:00Z")
+    const commitDateRaw = commits[0].commit.committer.date || commits[0].commit.author.date;
+    const commitDate = new Date(commitDateRaw);
+
+    // 3. Format date as DD-MM-YYYY in Indian Standard Time (IST)
+    const day = String(commitDate.getDate()).padStart(2, '0');
+    const month = String(commitDate.getMonth() + 1).padStart(2, '0');
+    const year = commitDate.getFullYear();
+    const datePart = `${day}-${month}-${year}`;
+
+    // 4. Format 12-hour time (e.g. "05:45 PM")
+    const timePart = commitDate.toLocaleTimeString('en-IN', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+
+    const fullDateTime = `${datePart} at ${timePart}`;
+
+    // 5. Update UI
+    targetEl.innerHTML = `Last updated on: <strong>${fullDateTime}</strong>`;
+  } catch (err) {
+    console.warn("Could not load GitHub commit timestamp:", err);
+  }
+}
     // 14. INITIALIZATION LISTENER
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof loadLogoFromDatabase === 'function') {
         loadLogoFromDatabase();
       }
+
+      loadGitHubLastUpdatedDate('doplitiruvannamalai-8314', 'claim-tracker');
 
       supabaseClient.auth.getSession().then(({ data: { session } }) => {
         if (session?.user && typeof initApp === 'function') {
