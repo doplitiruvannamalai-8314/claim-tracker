@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +35,7 @@
         <img id="navLogoImg" src="" alt="India Post Logo" class="h-8 w-12 object-contain bg-white p-0.5 rounded shadow-xs">
         <div>
           <div class="font-bold text-sm md:text-base tracking-wide text-white drop-shadow-xs leading-tight">Refund Claims Management Portal</div>
-          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; TN Circle</div>
+          <div class="text-postGold-300 text-[11px] font-semibold">Chennai City Central Division &bull; Tamil Nadu Circle</div>
         </div>
       </div>
       <div class="flex items-center gap-3 text-xs">
@@ -184,7 +185,7 @@
           <!-- FILTERS -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
             <div class="col-span-2">
-              <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Search (Ref / Article / Name / Office)</label>
+              <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Search (Ref No / Ticket / Name / Office)</label>
               <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type to filter..." class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
             <div>
@@ -244,7 +245,6 @@
           </div>
         </div>
 
-        <!-- TAB 2: CLAIM REGISTRATION FORM -->
        <!-- TAB 2: CLAIM REGISTRATION FORM -->
 <div id="registerClaimView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200">
   <div class="border-b pb-2 mb-3 border-amber-200 flex justify-between items-center">
@@ -1123,7 +1123,7 @@
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
       <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Maintained by : &bull; <span class="font-semibold text-slate-700">Krishnan K</span></div>
+      <div class="text-slate-500 font-medium">Developed by : &bull; <span class="font-semibold text-slate-700">Krishnan K</span></div>
     </div>
   </footer>
 
@@ -2330,66 +2330,75 @@ function renderClaimsSummaryTable() {
   });
   tbody.innerHTML = htmlArr.join('');
 }
-    function applyOverviewFilters() {
-      const q = ($('overviewInstantSearch')?.value || '').trim().toLowerCase();
-      const mod = $('overviewFilterModule')?.value;
-      const off = $('overviewFilterOffice')?.value;
-      const user = $('overviewFilterEmpUser')?.value;
-      const st = $('overviewFilterStatus')?.value;
+   function applyOverviewFilters() { 
+    const q = ($('overviewInstantSearch')?.value || '').trim().toLowerCase(); 
+    const mod = $('overviewFilterModule')?.value; 
+    const off = $('overviewFilterOffice')?.value; 
+    const user = $('overviewFilterEmpUser')?.value; 
+    const st = $('overviewFilterStatus')?.value; 
 
-      currentClaimsList = rawClaimsList.filter(c => {
-        if (q) {
-          const matchTxn = (c.txn_id_ref || '').toLowerCase().includes(q);
-          const matchArticle = (c.article_number || '').toLowerCase().includes(q);
-          const matchEmpName = (c.profiles?.emp_name || '').toLowerCase().includes(q);
-          const matchEmpId = (c.profiles?.emp_id || '').toLowerCase().includes(q);
-          const matchOffice = (c.raised_for_office || '').toLowerCase().includes(q);
-          if (!matchTxn && !matchArticle && !matchEmpName && !matchEmpId && !matchOffice) return false;
-        }
-        if (mod && c.module !== mod) return false;
-        if (off && c.raised_for_office !== off) return false;
-        if (user && c.created_by !== user) return false;
-        if (st && c.claim_status !== st) return false;
-        return true;
-      });
+    currentClaimsList = rawClaimsList.filter(c => { 
+        if (q) { 
+            const matchTxn = (c.txn_id_ref || '').toLowerCase().includes(q); 
+            const matchArticle = (c.article_number || '').toLowerCase().includes(q); 
+            const matchEmpName = (c.profiles?.emp_name || '').toLowerCase().includes(q); 
+            const matchEmpId = (c.profiles?.emp_id || '').toLowerCase().includes(q); 
+            const matchOffice = (c.raised_for_office || '').toLowerCase().includes(q); 
+            // Added check for admin reply remarks
+            const matchAdminRemarks = (c.reply_remarks_admin || '').toLowerCase().includes(q); 
+            // Added check for transaction amount (converted to string for partial matching)
+            const matchAmount = (c.txn_amount != null ? c.txn_amount.toString() : '').toLowerCase().includes(q);
 
-      renderClaimsSummaryTable();
-    }
+            if (!matchTxn && !matchArticle && !matchEmpName && !matchEmpId && !matchOffice && !matchAdminRemarks && !matchAmount) return false; 
+        } 
+        if (mod && c.module !== mod) return false; 
+        if (off && c.raised_for_office !== off) return false; 
+        if (user && c.created_by !== user) return false; 
+        if (st && c.claim_status !== st) return false; 
+        return true; 
+    }); 
+    renderClaimsSummaryTable(); 
+} 
 
-    function resetOverviewFilters() {
-      if ($('overviewInstantSearch')) $('overviewInstantSearch').value = '';
-      if ($('overviewFilterModule')) $('overviewFilterModule').value = '';
-      if ($('overviewFilterOffice')) $('overviewFilterOffice').value = '';
-      if ($('overviewFilterEmpUser')) $('overviewFilterEmpUser').value = '';
-      if ($('overviewFilterStatus')) $('overviewFilterStatus').value = '';
-      currentClaimsList = [...rawClaimsList];
-      renderClaimsSummaryTable();
-    }
+function resetOverviewFilters() { 
+    if ($('overviewInstantSearch')) $('overviewInstantSearch').value = ''; 
+    if ($('overviewFilterModule')) $('overviewFilterModule').value = ''; 
+    if ($('overviewFilterOffice')) $('overviewFilterOffice').value = ''; 
+    if ($('overviewFilterEmpUser')) $('overviewFilterEmpUser').value = ''; 
+    if ($('overviewFilterStatus')) $('overviewFilterStatus').value = ''; 
+    currentClaimsList = [...rawClaimsList]; 
+    renderClaimsSummaryTable(); 
+} 
 
-    function sortTable(col) {
-      currentSortDir = (currentSortCol === col && currentSortDir === 'asc') ? 'desc' : 'asc';
-      currentSortCol = col;
-      
-      currentClaimsList.sort((a, b) => {
-        let valA = a[col] || '';
-        let valB = b[col] || '';
-        if (col === 'emp_name') { valA = a.profiles?.emp_name || ''; valB = b.profiles?.emp_name || ''; }
-        if (col === 'txn_amount') { valA = parseFloat(valA) || 0; valB = parseFloat(valB) || 0; }
-        if (col === 'created_at' || col === 'txn_date') {
-          valA = new Date(valA).getTime() || 0; valB = new Date(valB).getTime() || 0;
-        }
-        if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
-        if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
-        return 0;
-      });
+function sortTable(col) { 
+    currentSortDir = (currentSortCol === col && currentSortDir === 'asc') ? 'desc' : 'asc'; 
+    currentSortCol = col; 
+    currentClaimsList.sort((a, b) => { 
+        let valA = a[col] || ''; 
+        let valB = b[col] || ''; 
+        if (col === 'emp_name') { 
+            valA = a.profiles?.emp_name || ''; 
+            valB = b.profiles?.emp_name || ''; 
+        } 
+        if (col === 'txn_amount') { 
+            valA = parseFloat(valA) || 0; 
+            valB = parseFloat(valB) || 0; 
+        } 
+        if (col === 'created_at' || col === 'txn_date') { 
+            valA = new Date(valA).getTime() || 0; 
+            valB = new Date(valB).getTime() || 0; 
+        } 
+        if (valA < valB) return currentSortDir === 'asc' ? -1 : 1; 
+        if (valA > valB) return currentSortDir === 'asc' ? 1 : -1; 
+        return 0; 
+    }); 
+    document.querySelectorAll(`th[onclick^="sortTable"] span`).forEach(s => s.innerText = '⇅'); 
+    const activeSpan = document.getElementById(`sort_${col}`); 
+    if(activeSpan) activeSpan.innerText = currentSortDir === 'asc' ? '↑' : '↓'; 
+    renderClaimsSummaryTable(); 
+}
 
-      document.querySelectorAll(`th[onclick^="sortTable"] span`).forEach(s => s.innerText = '⇅');
-      const activeSpan = document.getElementById(`sort_${col}`);
-      if(activeSpan) activeSpan.innerText = currentSortDir === 'asc' ? '↑' : '↓';
-
-      renderClaimsSummaryTable();
-    }
-
+  
     function renderClaimsSummaryTable() {
   const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
   const tbody = $('claimsTableBody');
@@ -3347,8 +3356,8 @@ function renderClaimsSummaryTable() {
         <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
           <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Office-wise Pendency & Status Breakdown</h2>
-              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Matrix</p>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">REFUND CLAIMS MANAGEMENT PORTAL </h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Office-wise Pendency & Status Breakdown</p>
               <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
             </div>
             ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
@@ -3436,8 +3445,8 @@ function renderClaimsSummaryTable() {
         <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
           <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Refund Claims & Settlement Report (${currentMISReportFilter})</h2>
-              <p style="margin: 2px 0 0 0; font-size: 14px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Digital Transactions Refund Claims & TAT Statement</p>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">REFUND CLAIMS MANAGEMENT PORTAL</h2>
+              <p style="margin: 2px 0 0 0; font-size: 14px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Refund Claims & Settlement Report (${currentMISReportFilter})</p>
               <p style="margin: 4px 0 0 0; font-size: 12px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Records: <strong>${currentMISClaimsList.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
             </div>
             ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
@@ -3451,11 +3460,11 @@ function renderClaimsSummaryTable() {
                 <th style="padding: 7px; width: 13%;">Raised By</th>
                 <th style="padding: 7px; width: 8%;">Module</th>
                 <th style="padding: 7px; width: 14%;">Office Name</th>
-                <th style="padding: 7px; width: 9%;">Txn Date</th>
-                <th style="padding: 7px; width: 9%;">Settle Date</th>
-                <th style="padding: 7px; text-align: right; width: 9%;">Amount</th>
+                <th style="padding: 7px; width: 8%;">Txn Date</th>
+                <th style="padding: 7px; width: 8%;">Settle Date</th>
+                <th style="padding: 7px; width: 8%;">Amount</th>
                 <th style="padding: 7px; width: 8%;">Status</th>
-                <th style="padding: 7px; width: 12%;">Admin Remarks</th>
+                <th style="padding: 7px; width: 15%;">Admin Remarks</th>
               </tr>
             </thead>
             <tbody>
@@ -4659,12 +4668,12 @@ async function submitUserRemarksEdit() {
   doc.setFontSize(14); 
   doc.setTextColor(...COLOR_PRIMARY);
   doc.setFont("helvetica", "bold");
-  doc.text("REFUND CLAIMS & SETTLEMENT TAT REPORT", 10, 18); 
-
+  doc.text("REFUND CLAIMS MANAGEMENT PORTAL", 10, 18); 
+  
   doc.setFontSize(10);
   doc.setTextColor(...COLOR_GOLD);
   doc.setFont("helvetica", "bold");
-  doc.text("CHENNAI CITY CENTRAL DIVISION", 10, 24);
+  doc.text("CHENNAI CITY CENTRAL DIVISION - REFUND CLAIMS & SETTLEMENT TAT REPORT", 10, 24);
 
   // Top-Right Logo Placement (Calculated width alignment: pageWidth - 10 - logoWidth)
   if (cachedPdfLogoBase64) {
@@ -4820,7 +4829,7 @@ async function submitUserRemarksEdit() {
     doc.setTextColor(...COLOR_TEXT_MUTED);
     doc.setFont("helvetica", "normal");
     
-    doc.text(`Generated on: ${generatedTimeStr} | Internal Office Report`, 10, pageHeight - 7);
+    doc.text(`Generated on: ${generatedTimeStr} `, 10, pageHeight - 7);
     doc.text(`Page ${i} of ${pageCount}`, pageWidth - 10, pageHeight - 7, { align: "right" });
   }
 
