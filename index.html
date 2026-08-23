@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,7 +54,7 @@
           <div class="flex justify-center mb-2">
             <img id="loginLogoImg" src="" alt="India Post Logo" class="h-16 w-24 object-contain bg-white p-1 rounded border-2 border-postGold-500 shadow-sm">
           </div>
-          <h1 class="text-lg font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Portal</h1>
+          <h1 class="text-lg font-extrabold text-postRed-700 uppercase tracking-tight">Refund Claims Management Portal</h1>
           <p class="text-xs font-bold text-postGold-700 mt-0.5 uppercase tracking-wide">Chennai City Central Division</p>
           <div class="h-1 w-16 bg-postGold-500 mx-auto mt-1.5 rounded"></div>
         </div>
@@ -72,8 +73,8 @@
           </form>
 
           <div class="text-center mt-3 pt-3 border-t border-amber-200">
-            <p class="text-xs text-slate-600">New employee? 
-              <button type="button" onclick="showAuthView('register')" class="text-postRed-700 hover:text-postRed-900 font-bold underline cursor-pointer ml-1 focus:outline-none">Register User here</button>
+            <p class="text-xs text-slate-600">Not Registered Yet? 
+              <button type="button" onclick="showAuthView('register')" class="text-postRed-700 hover:text-postRed-900 font-bold underline cursor-pointer ml-1 focus:outline-none">Create an account</button>
             </p>
           </div>
         </div>
@@ -123,12 +124,12 @@
 
         <!-- TABS NAVIGATION -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
-          <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer">Track Claim</button>
-          <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">Claim Registration</button>
+          <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer">🔍Track Claim</button>
+          <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📝 Claim Registration</button>
           <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
-          <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">MIS &amp; Pendency Reports</button>
-          <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📊 Digital vs Cash Performance</button>
-          <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">User Management</button>
+          <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📊MIS &amp; Pendency Reports</button>
+          <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📈  Digital vs Cash Performance</button>
+          <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">👥 User Management</button>
         </div>
 
         <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW & TRACKING -->
@@ -543,86 +544,120 @@
             </div>
           </div>
 
-          <!-- CONSOLIDATED SUMMARY MATRICES -->
-          <div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
-            <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
-              <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
-            </h4>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
-              <!-- 1. Module Table -->
-              <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-                <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
-                  1. Module-wise Breakdown (Pending + In Progress Value)
-                </div>
-                <table class="w-full text-left text-[11px] border-collapse">
-                  <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
-                    <tr>
-                      <th class="p-1.5">Module</th>
-                      <th class="p-1.5 text-center">Total</th>
-                      <th class="p-1.5 text-center text-amber-700">Pending</th>
-                      <th class="p-1.5 text-center text-blue-700">In Prog</th>
-                      <th class="p-1.5 text-center text-emerald-700">Settled</th>
-                      <th class="p-1.5 text-center font-bold text-postRed-800">Pending + In Prog Amt (₹)</th>
-                    </tr>
-                  </thead>
-                  <tbody id="moduleSummaryTableBody" class="divide-y divide-slate-100"></tbody>
-                </table>
-              </div>
+         <!-- CONSOLIDATED SUMMARY MATRICES -->
+<div id="allReportConsolidationContainer" class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 space-y-3">
+  <h4 class="font-bold text-xs text-postRed-800 uppercase flex items-center gap-1.5">
+    <span>📈 Consolidated Analytics Matrix (All Registered Claims)</span>
+  </h4>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
+    <!-- 1. Module Table -->
+    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+      <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
+        1. Module-wise Breakdown (Pending + In Progress Value)
+      </div>
+      <table class="w-full text-left text-[11px] border-collapse">
+        <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+          <tr>
+            <th class="p-1.5">Module</th>
+            <th class="p-1.5 text-center">Total</th>
+            <th class="p-1.5 text-center text-amber-700">Pending</th>
+            <th class="p-1.5 text-center text-blue-700">In Prog</th>
+            <th class="p-1.5 text-center text-emerald-700">Settled</th>
+            <th class="p-1.5 text-right font-bold text-postRed-800">Pending + In Prog Amt (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="moduleSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+      </table>
+    </div>
 
-              <!-- 2. Status Table -->
-              <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-                <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
-                  2. Status-wise Financial Summary
-                </div>
-                <table class="w-full text-left text-[11px] border-collapse">
-                  <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
-                    <tr>
-                      <th class="p-1.5">Status</th>
-                      <th class="p-1.5 text-center">Count</th>
-                      <th class="p-1.5 text-center">Share (%)</th>
-                      <th class="p-1.5 text-center">Total Amount (₹)</th>
-                    </tr>
-                  </thead>
-                  <tbody id="statusSummaryTableBody" class="divide-y divide-slate-100"></tbody>
-                </table>
-              </div>
+    <!-- 2. Status Table -->
+    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+      <div class="bg-slate-100 p-1.5 font-bold text-slate-700 text-[11px] border-b border-slate-200">
+        2. Status-wise Financial Summary
+      </div>
+      <table class="w-full text-left text-[11px] border-collapse">
+        <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+          <tr>
+            <th class="p-1.5">Status</th>
+            <th class="p-1.5 text-center">Count</th>
+            <th class="p-1.5 text-center">Share (%)</th>
+            <th class="p-1.5 text-right">Total Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="statusSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+      </table>
+    </div>
 
-              <!-- 3. Office-wise Matrix with Printout & Image Export -->
-              <div id="officeWiseMatrixArea" class="lg:col-span-2 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-                <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-sm">🏢</span>
-                    <span>3. Office-wise Pendency &amp; Status Breakdown</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button type="button" onclick="exportOfficeWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-                      🖼️ Export Image
-                    </button>
-                    <button type="button" onclick="printOfficeWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
-                      🖨️ Print Office Report
-                    </button>
-                  </div>
-                </div>
-                <div class="max-h-60 overflow-y-auto">
-                  <table class="w-full text-left text-[11px] border-collapse">
-                    <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
-                      <tr>
-                        <th class="p-1.5">Office Name</th>
-                        <th class="p-1.5 text-center">Registered</th>
-                        <th class="p-1.5 text-center text-amber-700">Pending</th>
-                        <th class="p-1.5 text-center text-blue-700">In Progress</th>
-                        <th class="p-1.5 text-center text-emerald-700">Settled</th>
-                        <th class="p-1.5 text-center text-rose-700">Rejected</th>
-                        <th class="p-1.5 text-center font-bold text-postRed-800">Pending + In Prog Amt (₹)</th>
-                      </tr>
-                    </thead>
-                    <tbody id="officeSummaryTableBody" class="divide-y divide-slate-100"></tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
+    <!-- 3. Office-wise Matrix (LEFT SIDE) -->
+    <div id="officeWiseMatrixArea" class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs flex flex-col justify-between">
+      <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-1.5">
+        <div class="flex items-center gap-1">
+          <span class="text-sm">🏢</span>
+          <span>3. Office-wise Pendency &amp; Status</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="exportOfficeWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+            🖼️ Image
+          </button>
+          <button type="button" onclick="printOfficeWiseReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+            🖨️ Print
+          </button>
+        </div>
+      </div>
+      <div class="max-h-60 overflow-y-auto">
+        <table class="w-full text-left text-[10.5px] border-collapse">
+          <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
+            <tr>
+              <th class="p-1.5">Office</th>
+              <th class="p-1.5 text-center">Reg</th>
+              <th class="p-1.5 text-center text-amber-700">Pend</th>
+              <th class="p-1.5 text-center text-blue-700">InProg</th>
+              <th class="p-1.5 text-center text-emerald-700">Set</th>
+              <th class="p-1.5 text-center text-rose-700">Rej</th>
+              <th class="p-1.5 text-right font-bold text-postRed-800">Pend+Prog (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="officeSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. Month-wise Matrix (RIGHT SIDE) -->
+    <div id="monthWiseMatrixArea" class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs flex flex-col justify-between">
+      <div class="bg-slate-100 p-2 font-bold text-slate-700 text-[11px] border-b border-slate-200 flex justify-between items-center flex-wrap gap-1.5">
+        <div class="flex items-center gap-1">
+          <span class="text-sm">📅</span>
+          <span>4. Month-wise Pendency &amp; Status</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="exportMonthWiseImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+            🖼️ Image
+          </button>
+          <button type="button" onclick="exportMonthWisePDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-2 py-0.5 rounded text-[10.5px] font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+            📄 PDF
+          </button>
+        </div>
+      </div>
+      <div class="max-h-60 overflow-y-auto">
+        <table class="w-full text-left text-[10.5px] border-collapse">
+          <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600 sticky top-0">
+            <tr>
+              <th class="p-1.5">Month</th>
+              <th class="p-1.5 text-center">Reg</th>
+              <th class="p-1.5 text-center text-amber-700">Pend</th>
+              <th class="p-1.5 text-center text-blue-700">InProg</th>
+              <th class="p-1.5 text-center text-emerald-700">Set</th>
+              <th class="p-1.5 text-center text-rose-700">Rej</th>
+              <th class="p-1.5 text-right font-bold text-postRed-800">Pend+Prog (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="monthSummaryTableBody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
           <!-- MIS TABLE -->
           <div class="max-h-[550px] overflow-auto border border-slate-200 rounded-xl shadow-xs">
@@ -1122,8 +1157,8 @@
   <!-- FOOTER -->
   <footer class="w-full bg-white border-t border-amber-300 py-3 mt-8 text-center text-xs text-slate-600 shadow-inner">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-1.5">
-      <div class="font-bold text-postRed-700">Refund Claims Management Portal &bull; Chennai City Central Division</div>
-      <div class="text-slate-500 font-medium">Developed by : &bull; <span class="font-semibold text-slate-700">Krishnan K</span></div>
+      <div class="font-bold text-postRed-700">Developed by :  Krishnan K</div>
+      <div class="text-slate-500 font-medium">Last Update : <span class="font-semibold text-slate-700"><span id="upload-date"></span></span></div>
     </div>
   </footer>
 
@@ -1136,6 +1171,15 @@
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const datePart = `${day}-${month}-${year}`; 
+    const timePart = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const fullDateTime = `${datePart} at ${timePart}`;
+    document.getElementById("upload-date").innerHTML = fullDateTime;
 
     const DIGITAL_CHANNEL_CONFIG = [
       { key: 'dqr', cntField: 'dqr_cnt', amtField: 'dqr_amt', label: 'DQR Scan' },
@@ -2491,7 +2535,7 @@ function sortTable(col) {
 }
 
     // 7. MIS REPORTS & CONSOLIDATED BREAKDOWNS
-    function renderConsolidatedSummaries(claims) {
+   function renderConsolidatedSummaries(claims) {
       const moduleStats = {
         'Booking': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
         'Delivery': { total: 0, pending: 0, inprogress: 0, settled: 0, activePendingAmount: 0 },
@@ -2507,18 +2551,36 @@ function sortTable(col) {
       };
 
       const officeStats = {};
+      const monthStats = {};
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-      claims.forEach(c => {
+      (claims || []).forEach(c => {
         const off = (c.raised_for_office || 'Unassigned').trim();
         const amt = parseFloat(c.txn_amount) || 0;
         const statusNormalized = (c.claim_status || '').trim();
         const mod = moduleStats[c.module] ? c.module : 'Others';
 
+        let monthKey = "Unknown";
+        let monthLabel = "Unknown";
+        if (c.txn_date && c.txn_date.length >= 7) {
+          monthKey = c.txn_date.substring(0, 7);
+          const parts = monthKey.split('-');
+          if (parts.length === 2) {
+            const mIndex = parseInt(parts[1], 10) - 1;
+            monthLabel = `${monthNames[mIndex] || parts[1]} ${parts[0]}`;
+          }
+        }
+
         if (!officeStats[off]) {
           officeStats[off] = { registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
         }
 
+        if (!monthStats[monthKey]) {
+          monthStats[monthKey] = { label: monthLabel, registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+
         officeStats[off].registered++;
+        monthStats[monthKey].registered++;
         moduleStats[mod].total++;
 
         if (statusNormalized === 'Pending') {
@@ -2526,17 +2588,23 @@ function sortTable(col) {
           moduleStats[mod].activePendingAmount += amt;
           officeStats[off].pending++;
           officeStats[off].activePendingAmount += amt;
+          monthStats[monthKey].pending++;
+          monthStats[monthKey].activePendingAmount += amt;
         } else if (statusNormalized === 'In Progress') {
           moduleStats[mod].inprogress++;
           moduleStats[mod].activePendingAmount += amt;
           officeStats[off].inprogress++;
           officeStats[off].activePendingAmount += amt;
+          monthStats[monthKey].inprogress++;
+          monthStats[monthKey].activePendingAmount += amt;
         } else if (statusNormalized === 'Settled') {
           moduleStats[mod].settled++;
           officeStats[off].settled++;
+          monthStats[monthKey].settled++;
         } else if (statusNormalized === 'Rejected') {
           moduleStats[mod].rejected++;
           officeStats[off].rejected++;
+          monthStats[monthKey].rejected++;
         }
 
         if (statusStats[statusNormalized]) {
@@ -2545,6 +2613,7 @@ function sortTable(col) {
         }
       });
 
+      // 1. Module Table
       const modTbody = $('moduleSummaryTableBody');
       if (modTbody) {
         let modArr = [];
@@ -2583,16 +2652,18 @@ function sortTable(col) {
         modTbody.innerHTML = modArr.join('');
       }
 
+      // 2. Status Table
       const statTbody = $('statusSummaryTableBody');
       if (statTbody) {
         let statArr = [];
         let statCountSum = 0, statAmtSum = 0;
+        const totalClaimsCount = (claims || []).length;
 
         Object.keys(statusStats).forEach(st => {
           const s = statusStats[st];
           statCountSum += s.count;
           statAmtSum += s.amount;
-          const sharePct = claims.length > 0 ? ((s.count / claims.length) * 100).toFixed(1) : "0.0";
+          const sharePct = totalClaimsCount > 0 ? ((s.count / totalClaimsCount) * 100).toFixed(1) : "0.0";
 
           statArr.push(`
             <tr class="hover:bg-slate-50">
@@ -2615,6 +2686,7 @@ function sortTable(col) {
         statTbody.innerHTML = statArr.join('');
       }
 
+      // 3. Office Summary Table (Left Box)
       const offTbody = $('officeSummaryTableBody');
       if (offTbody) {
         let offArr = [];
@@ -2624,7 +2696,7 @@ function sortTable(col) {
           const s = officeStats[off];
           offArr.push(`
             <tr class="hover:bg-slate-50">
-              <td class="p-1.5 font-bold text-slate-800">${off}</td>
+              <td class="p-1.5 font-bold text-slate-800 truncate max-w-[120px]" title="${off}">${off}</td>
               <td class="p-1.5 text-center font-bold">${s.registered}</td>
               <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
               <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
@@ -2636,8 +2708,30 @@ function sortTable(col) {
         });
         offTbody.innerHTML = offArr.join('');
       }
-    }
 
+      // 4. Month Summary Table (Right Box)
+      const monthTbody = $('monthSummaryTableBody');
+      if (monthTbody) {
+        let monthArr = [];
+        const sortedMonthKeys = Object.keys(monthStats).sort().reverse();
+
+        sortedMonthKeys.forEach(mKey => {
+          const s = monthStats[mKey];
+          monthArr.push(`
+            <tr class="hover:bg-slate-50">
+              <td class="p-1.5 font-bold text-slate-800 whitespace-nowrap">${s.label}</td>
+              <td class="p-1.5 text-center font-bold">${s.registered}</td>
+              <td class="p-1.5 text-center text-amber-700 font-semibold">${s.pending}</td>
+              <td class="p-1.5 text-center text-blue-700 font-semibold">${s.inprogress}</td>
+              <td class="p-1.5 text-center text-emerald-700 font-semibold">${s.settled}</td>
+              <td class="p-1.5 text-center text-rose-700 font-semibold">${s.rejected}</td>
+              <td class="p-1.5 text-right font-bold text-postRed-800">₹${s.activePendingAmount.toFixed(2)}</td>
+            </tr>
+          `);
+        });
+        monthTbody.innerHTML = monthArr.join('');
+      }
+    }
     async function generateMISReport(filterType = 'All') {
       currentMISReportFilter = filterType;
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
@@ -5095,6 +5189,277 @@ function renderClaimsSummaryTable() {
   });
   tbody.innerHTML = htmlArr.join('');
 }
+
+
+// =========================================================================
+    // MONTH-WISE EXPORT: PNG IMAGE
+    // =========================================================================
+    async function exportMonthWiseImage() {
+      if (!rawMISMasterList.length) return alert("No claim records found in the current period!");
+
+      const fromVal = $('filterFromDate')?.value || 'Inception';
+      const toVal = $('filterToDate')?.value || 'CurrentDate';
+      const fileName = `Month_Wise_Pendency_${fromVal}_to_${toVal}.png`;
+
+      const monthStats = {};
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+      rawMISMasterList.forEach(c => {
+        let monthKey = "Unknown";
+        let monthLabel = "Unknown";
+        if (c.txn_date && c.txn_date.length >= 7) {
+          monthKey = c.txn_date.substring(0, 7);
+          const parts = monthKey.split('-');
+          if (parts.length === 2) {
+            const mIndex = parseInt(parts[1], 10) - 1;
+            monthLabel = `${monthNames[mIndex] || parts[1]} ${parts[0]}`;
+          }
+        }
+
+        const amt = parseFloat(c.txn_amount) || 0;
+        if (!monthStats[monthKey]) {
+          monthStats[monthKey] = { label: monthLabel, registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+
+        monthStats[monthKey].registered++;
+        grandReg++;
+
+        if (c.claim_status === 'Pending') {
+          monthStats[monthKey].pending++;
+          monthStats[monthKey].activePendingAmount += amt;
+          grandPend++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'In Progress') {
+          monthStats[monthKey].inprogress++;
+          monthStats[monthKey].activePendingAmount += amt;
+          grandInp++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'Settled') {
+          monthStats[monthKey].settled++;
+          grandSet++;
+        } else if (c.claim_status === 'Rejected') {
+          monthStats[monthKey].rejected++;
+          grandRej++;
+        }
+      });
+
+      const sortedMonthKeys = Object.keys(monthStats).sort().reverse();
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.style.width = '900px';
+      container.style.backgroundColor = '#FFFFFF';
+      container.style.padding = '20px';
+      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+      let rowsHtml = '';
+      sortedMonthKeys.forEach((mKey, idx) => {
+        const s = monthStats[mKey];
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
+            <td style="padding: 7px; text-align: center;">${idx + 1}</td>
+            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${s.label}</td>
+            <td style="padding: 7px; text-align: center; font-weight: bold;">${s.registered}</td>
+            <td style="padding: 7px; text-align: center; color: #b45309; font-weight: bold;">${s.pending}</td>
+            <td style="padding: 7px; text-align: center; color: #1d4ed8; font-weight: bold;">${s.inprogress}</td>
+            <td style="padding: 7px; text-align: center; color: #15803d; font-weight: bold;">${s.settled}</td>
+            <td style="padding: 7px; text-align: center; color: #b91c1c; font-weight: bold;">${s.rejected}</td>
+            <td style="padding: 7px; text-align: right; font-weight: bold; color: #991b1b;">Rs. ${s.activePendingAmount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Month-wise Pendency & Status Breakdown</h2>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Monthly Claim Intake &amp; Clearance Trend</p>
+              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Claims: <strong>${grandReg}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
+                <th style="padding: 8px; text-align: center; width: 5%;">#</th>
+                <th style="padding: 8px; width: 33%;">Month</th>
+                <th style="padding: 8px; text-align: center; width: 10%;">Registered</th>
+                <th style="padding: 8px; text-align: center; width: 10%;">Pending</th>
+                <th style="padding: 8px; text-align: center; width: 11%;">In Progress</th>
+                <th style="padding: 8px; text-align: center; width: 9%;">Settled</th>
+                <th style="padding: 8px; text-align: center; width: 9%;">Rejected</th>
+                <th style="padding: 8px; text-align: right; width: 13%;">Pending + In Prog (Rs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
+                <td colspan="2" style="padding: 8px; text-align: center; letter-spacing: 0.5px;">GRAND TOTAL (${sortedMonthKeys.length} Months)</td>
+                <td style="padding: 8px; text-align: center;">${grandReg}</td>
+                <td style="padding: 8px; text-align: center;">${grandPend}</td>
+                <td style="padding: 8px; text-align: center;">${grandInp}</td>
+                <td style="padding: 8px; text-align: center;">${grandSet}</td>
+                <td style="padding: 8px; text-align: center;">${grandRej}</td>
+                <td style="padding: 8px; text-align: right; color: #FACC15;">Rs. ${grandActiveAmt.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.body.appendChild(container);
+      try {
+        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Image export failed: " + err.message);
+      } finally {
+        document.body.removeChild(container);
+      }
+    }
+
+    // =========================================================================
+    // MONTH-WISE EXPORT: PDF REPORT
+    // =========================================================================
+    async function exportMonthWisePDF() {
+      if (!rawMISMasterList.length) return alert("No claim records found in the current period!");
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "portrait" });
+
+      if (cachedPdfLogoBase64) {
+        try { doc.addImage(cachedPdfLogoBase64, 'PNG', 169, 8, 27, 18); } catch (e) {}
+      }
+
+      const fromVal = $('filterFromDate')?.value || 'Inception';
+      const toVal = $('filterToDate')?.value || 'Current Date';
+      const generatedTimeStr = new Date().toLocaleString("en-IN", { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+
+      doc.setFontSize(13);
+      doc.setTextColor(168, 15, 40);
+      doc.text("Month-wise Claim Pendency & Clearance Report", 105, 14, { align: "center" });
+      doc.setFontSize(9.5);
+      doc.setTextColor(180, 83, 9);
+      doc.text("Chennai City Central Division • Monthly Trend Analysis", 105, 19, { align: "center" });
+
+      doc.setFontSize(8);
+      doc.setTextColor(51, 65, 85);
+      doc.text(`Period: ${fromVal} to ${toVal} | Generated: ${generatedTimeStr}`, 105, 24, { align: "center" });
+
+      const monthStats = {};
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      let grandReg = 0, grandPend = 0, grandInp = 0, grandSet = 0, grandRej = 0, grandActiveAmt = 0;
+
+      rawMISMasterList.forEach(c => {
+        let monthKey = "Unknown";
+        let monthLabel = "Unknown";
+        if (c.txn_date && c.txn_date.length >= 7) {
+          monthKey = c.txn_date.substring(0, 7);
+          const parts = monthKey.split('-');
+          if (parts.length === 2) {
+            const mIndex = parseInt(parts[1], 10) - 1;
+            monthLabel = `${monthNames[mIndex] || parts[1]} ${parts[0]}`;
+          }
+        }
+
+        const amt = parseFloat(c.txn_amount) || 0;
+        if (!monthStats[monthKey]) {
+          monthStats[monthKey] = { label: monthLabel, registered: 0, pending: 0, inprogress: 0, settled: 0, rejected: 0, activePendingAmount: 0 };
+        }
+
+        monthStats[monthKey].registered++;
+        grandReg++;
+
+        if (c.claim_status === 'Pending') {
+          monthStats[monthKey].pending++;
+          monthStats[monthKey].activePendingAmount += amt;
+          grandPend++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'In Progress') {
+          monthStats[monthKey].inprogress++;
+          monthStats[monthKey].activePendingAmount += amt;
+          grandInp++;
+          grandActiveAmt += amt;
+        } else if (c.claim_status === 'Settled') {
+          monthStats[monthKey].settled++;
+          grandSet++;
+        } else if (c.claim_status === 'Rejected') {
+          monthStats[monthKey].rejected++;
+          grandRej++;
+        }
+      });
+
+      const sortedMonthKeys = Object.keys(monthStats).sort().reverse();
+      const rows = sortedMonthKeys.map((mKey, idx) => {
+        const s = monthStats[mKey];
+        return [
+          idx + 1,
+          s.label,
+          s.registered,
+          s.pending,
+          s.inprogress,
+          s.settled,
+          s.rejected,
+          `Rs. ${s.activePendingAmount.toFixed(2)}`
+        ];
+      });
+
+      rows.push([
+        'Σ',
+        `Grand Total (${sortedMonthKeys.length} Months)`,
+        grandReg,
+        grandPend,
+        grandInp,
+        grandSet,
+        grandRej,
+        `Rs. ${grandActiveAmt.toFixed(2)}`
+      ]);
+
+      doc.autoTable({
+        head: [["#", "Month", "Registered", "Pending", "In Progress", "Settled", "Rejected", "Pending + In Prog (Rs)"]],
+        body: rows,
+        startY: 28,
+        theme: 'grid',
+        headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255], fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 2.5 },
+        columnStyles: {
+          0: { cellWidth: 10, halign: 'center' },
+          1: { cellWidth: 38, fontStyle: 'bold' },
+          2: { cellWidth: 22, halign: 'center' },
+          3: { cellWidth: 20, halign: 'center' },
+          4: { cellWidth: 22, halign: 'center' },
+          5: { cellWidth: 18, halign: 'center' },
+          6: { cellWidth: 18, halign: 'center' },
+          7: { cellWidth: 35, halign: 'right', fontStyle: 'bold' }
+        },
+        didParseCell: function(data) {
+          if (data.row.index === rows.length - 1) {
+            data.cell.styles.fillColor = [168, 15, 40];
+            data.cell.styles.textColor = [255, 255, 255];
+            data.cell.styles.fontStyle = 'bold';
+          }
+        },
+        didDrawPage: function () {
+          const pageCount = doc.internal.getNumberOfPages();
+          doc.setFontSize(8);
+          doc.setTextColor(100, 116, 139);
+          doc.setFont("helvetica", "italic");
+          
+          doc.text(`Generated on: ${generatedTimeStr}`, 14, doc.internal.pageSize.getHeight() - 10);
+          doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`, doc.internal.pageSize.getWidth() - 14, doc.internal.pageSize.getHeight() - 10, { align: "right" });
+        }
+      });
+
+      doc.save(`Month_Wise_Pendency_${Date.now()}.pdf`);
+    }
 // =========================================================================
 // 1. DELETE BOOKING PERFORMANCE DATA (BY SINGLE DATE OR DATE RANGE)
 // =========================================================================
