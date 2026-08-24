@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,7 +99,7 @@
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-0.5">Office Name *</label>
               <select id="regOfficeName" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none">
-                <option value="Chennai GPO">Chennai GPO</option>
+                <option value="">-- Loading Offices... --</option>
               </select>
             </div>
             <div>
@@ -1786,43 +1787,55 @@ function printOfficeWiseReport() {
       }
     }
 
-    async function loadFilterDropdowns() {
-      const { data: offices } = await supabaseClient.from('offices').select('office_name').order('office_name', { ascending: true });
-      const { data: profiles } = await supabaseClient.from('profiles').select('id, emp_name, emp_id').order('emp_name', { ascending: true });
+   async function loadFilterDropdowns() {
+  try {
+    const { data: offices, error: offErr } = await supabaseClient
+      .from('offices')
+      .select('office_name')
+      .order('office_name', { ascending: true });
 
-      const regSelect = $('regOfficeName');
-      const claimSelect = $('claimOffice');
-      const overviewFilterOffice = $('overviewFilterOffice');
-      const filterOfficeName = $('filterOfficeName');
-      const bookingFilterOffice = $('bookingFilterOffice');
-      const editUserOffice = $('editUserOffice'); // <-- Added for User Edit Modal
-      const overviewFilterEmpUser = $('overviewFilterEmpUser');
-      const filterEmpUser = $('filterEmpUser');
+    if (!offErr && offices) {
+      let selectOpts = '<option value="">-- Select Office --</option>';
+      let filterOpts = '<option value="">-- All Offices --</option>';
 
-      if (offices) {
-        let opts = '<option value="">-- Select Office --</option>';
-        let filterOpts = '<option value="">-- All Offices --</option>';
-        offices.forEach(o => {
-          opts += `<option value="${o.office_name}">${o.office_name}</option>`;
-          filterOpts += `<option value="${o.office_name}">${o.office_name}</option>`;
-        });
-        if (regSelect) regSelect.innerHTML = opts;
-        if (claimSelect) claimSelect.innerHTML = opts;
-        if (overviewFilterOffice) overviewFilterOffice.innerHTML = filterOpts;
-        if (filterOfficeName) filterOfficeName.innerHTML = filterOpts;
-        if (bookingFilterOffice) bookingFilterOffice.innerHTML = filterOpts;
-        if (editUserOffice) editUserOffice.innerHTML = opts; // <-- Populate User Edit Office Dropdown
-      }
+      offices.forEach(o => {
+        selectOpts += `<option value="${o.office_name}">${o.office_name}</option>`;
+        filterOpts += `<option value="${o.office_name}">${o.office_name}</option>`;
+      });
 
-      if (profiles) {
-        let userOpts = '<option value="">-- All Users --</option>';
-        profiles.forEach(p => {
-          userOpts += `<option value="${p.id}">${p.emp_name} (${p.emp_id})</option>`;
-        });
-        if (overviewFilterEmpUser) overviewFilterEmpUser.innerHTML = userOpts;
-        if (filterEmpUser) filterEmpUser.innerHTML = userOpts;
-      }
+      // 1. Auth Registration dropdown
+      if ($('regOfficeName')) $('regOfficeName').innerHTML = selectOpts;
+
+      // 2. Claim Submission form dropdown
+      if ($('claimOffice')) $('claimOffice').innerHTML = selectOpts;
+
+      // 3. Admin User Edit modal dropdown
+      if ($('editUserOffice')) $('editUserOffice').innerHTML = selectOpts;
+
+      // 4. Filter dropdowns across tabs
+      if ($('overviewFilterOffice')) $('overviewFilterOffice').innerHTML = filterOpts;
+      if ($('filterOfficeName')) $('filterOfficeName').innerHTML = filterOpts;
+      if ($('bookingFilterOffice')) $('bookingFilterOffice').innerHTML = filterOpts;
     }
+
+    // User profiles (loaded for active logged-in views)
+    const { data: profiles } = await supabaseClient
+      .from('profiles')
+      .select('id, emp_name, emp_id')
+      .order('emp_name', { ascending: true });
+
+    if (profiles) {
+      let userOpts = '<option value="">-- All Users --</option>';
+      profiles.forEach(p => {
+        userOpts += `<option value="${p.id}">${p.emp_name} (${p.emp_id})</option>`;
+      });
+      if ($('overviewFilterEmpUser')) $('overviewFilterEmpUser').innerHTML = userOpts;
+      if ($('filterEmpUser')) $('filterEmpUser').innerHTML = userOpts;
+    }
+  } catch (err) {
+    console.warn("Error loading office dropdowns:", err);
+  }
+}
     
 
     // 5. SEARCH & TRACK CLAIM HANDLERS
@@ -5996,6 +6009,24 @@ async function loadGitHubLastUpdatedDate(username, repoName) {
     console.warn("Could not load GitHub commit timestamp:", err);
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Load office options for registration form immediately on page boot
+  loadFilterDropdowns();
+
+  if (typeof loadLogoFromDatabase === 'function') {
+    loadLogoFromDatabase();
+  }
+
+  supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user && typeof initApp === 'function') {
+      initApp();
+    }
+  }).catch(err => {
+    console.warn("Session check error:", err);
+  });
+});
+
     // 14. INITIALIZATION LISTENER
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof loadLogoFromDatabase === 'function') {
@@ -6003,6 +6034,23 @@ async function loadGitHubLastUpdatedDate(username, repoName) {
       }
 
       loadGitHubLastUpdatedDate('doplitiruvannamalai-8314', 'claim-tracker');
+
+      document.addEventListener('DOMContentLoaded', () => {
+  // Load office options for registration form immediately on page boot
+  loadFilterDropdowns();
+
+  if (typeof loadLogoFromDatabase === 'function') {
+    loadLogoFromDatabase();
+  }
+
+  supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user && typeof initApp === 'function') {
+      initApp();
+    }
+  }).catch(err => {
+    console.warn("Session check error:", err);
+  });
+});
 
       supabaseClient.auth.getSession().then(({ data: { session } }) => {
         if (session?.user && typeof initApp === 'function') {
