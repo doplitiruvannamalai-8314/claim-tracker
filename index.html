@@ -3407,28 +3407,50 @@ function sortTable(col) {
       }
     }
 
-    async function exportBookingReportPDF() {
+   async function exportBookingReportPDF() {
   if (!bookingImportedRecords.length) return alert("No performance data to export!");
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: "portrait" });
+  // A4 Portrait: width 210mm, height 297mm
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  // Color constants
+  const COLOR_PRIMARY = [168, 15, 40];
+  const COLOR_GOLD = [180, 83, 9];
+  const COLOR_BORDER = [203, 213, 225];
+  const COLOR_TEXT_MUTED = [100, 116, 139];
 
   if (cachedPdfLogoBase64) {
-    try { doc.addImage(cachedPdfLogoBase64, 'JPEG', 169, 8, 27, 18, undefined, 'FAST'); } catch (e) {}
+    try { 
+      doc.addImage(cachedPdfLogoBase64, 'JPEG', 169, 8, 27, 18, undefined, 'FAST'); 
+    } catch (e) {
+      console.warn("Logo rendering failed:", e);
+    }
   }
 
   doc.setFontSize(13);
-  doc.setTextColor(168, 15, 40);
+  doc.setTextColor(...COLOR_PRIMARY);
+  doc.setFont("helvetica", "bold");
   doc.text("Digital vs Cash Transaction Performance Report", 105, 14, { align: "center" });
+
   doc.setFontSize(9.5);
-  doc.setTextColor(180, 83, 9);
+  doc.setTextColor(...COLOR_GOLD);
+  doc.setFont("helvetica", "bold");
   doc.text("Chennai City Central Division • Booking Performance Monitoring", 105, 19, { align: "center" });
 
   const fromVal = $('bookingFromDate')?.value || 'Inception';
   const toVal = $('bookingToDate')?.value || 'Current Date';
-  doc.setFontSize(8);
-  doc.setTextColor(0, 0, 0); // Pure Black
-  doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 105, 24, { align: "center" });
+  const generatedTimeStr = new Date().toLocaleString('en-IN', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: true
+  });
 
+  doc.setFontSize(8);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "bold");
+ // doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${generatedTimeStr}`, 105, 24, { align: "center" });
+ doc.text(`Period: ${fromVal} to ${toVal} }`, 105, 24, { align: "center" });
   const officeMap = {};
   let totalCashCnt = 0, totalDigCnt = 0;
 
@@ -3449,43 +3471,53 @@ function sortTable(col) {
 
   const totalBookings = totalCashCnt + totalDigCnt;
   const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+  const sortedOffices = Object.keys(officeMap);
 
-  const rows = Object.keys(officeMap).map(name => {
+  const rows = sortedOffices.map(name => {
     const o = officeMap[name];
     const tot = o.cash_cnt + o.dig_cnt;
     const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
     return { name, ...o, tot, pct };
   }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
-    idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), o.dig_cnt.toLocaleString('en-IN'), `${o.pct.toFixed(2)}%`
+    idx + 1, 
+    o.name, 
+    o.cash_cnt.toLocaleString('en-IN'), 
+    o.dig_cnt.toLocaleString('en-IN'), 
+    `${o.pct.toFixed(2)}%`
   ]);
 
-  rows.push(['Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
+  rows.push(['Σ', `Grand Total (${sortedOffices.length} Offices)`, totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
 
+  // --- 1. Render Table ---
   doc.autoTable({
     head: [["#", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
     body: rows,
-    startY: 30,
+    startY: 29,
+    margin: { left: 10, right: 10, bottom: 16 },
     theme: 'grid',
     headStyles: { 
-      fillColor: [168, 15, 40], 
+      fillColor: COLOR_PRIMARY, 
       textColor: [255, 255, 255], 
-      fontStyle: 'bold' 
+      fontStyle: 'bold',
+      fontSize: 8.5,
+      halign: 'center',
+      cellPadding: 2.5
     },
     styles: { 
       fontSize: 8, 
-      textColor: [0, 0, 0],       // Explicit solid black font for body
-      lineColor: [180, 180, 180], // Sharp grid border
-      lineWidth: 0.1
+      textColor: [0, 0, 0],
+      lineColor: [180, 180, 180],
+      lineWidth: 0.1,
+      cellPadding: 2
     },
     columnStyles: {
-      0: { cellWidth: 12, halign: 'center', textColor: [0, 0, 0] },
-      1: { fontStyle: 'bold', textColor: [0, 0, 0] },
-      2: { halign: 'right', textColor: [0, 0, 0] },
-      3: { halign: 'right', textColor: [0, 0, 0] },
-      4: { halign: 'right', fontStyle: 'bold', textColor: [0, 0, 0] }
+      0: { cellWidth: 10, halign: 'center' },
+      1: { fontStyle: 'bold' },
+      2: { cellWidth: 32, halign: 'right' },
+      3: { cellWidth: 32, halign: 'right' },
+      4: { cellWidth: 32, halign: 'right', fontStyle: 'bold' }
     },
     didParseCell: function(data) {
-      // Grand Total Row Highlight
       if (data.row.index === rows.length - 1) {
         data.cell.styles.fillColor = [168, 15, 40];
         data.cell.styles.textColor = [255, 255, 255];
@@ -3493,6 +3525,50 @@ function sortTable(col) {
       }
     }
   });
+
+  // --- 2. End of Document Summary Banner ---
+  let finalY = doc.lastAutoTable.finalY + 6;
+  if (finalY > pageHeight - 22) {
+    doc.addPage();
+    finalY = 6;
+  }
+
+  doc.setFillColor(254, 242, 242);
+  doc.setDrawColor(...COLOR_PRIMARY);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(10, finalY, pageWidth - 20, 6, 1, 1, 'FD');
+
+  doc.setFontSize(8);
+  doc.setTextColor(...COLOR_PRIMARY);
+  doc.setFont("helvetica", "bold");
+  
+ // const endBannerText = `*** END OF PERFORMANCE REPORT • OFFICES: ${sortedOffices.length} | TOTAL BOOKINGS: ${totalBookings.toLocaleString('en-IN')} | DIGITAL SHARE: ${totalDigShare}% ***`;
+   const endBannerText = `***** END OF  REPORT  *****`;
+  doc.text(endBannerText, pageWidth / 2, finalY + 4.0, { align: "center" });
+
+  // --- 3. Page Borders and Footers ---
+  const pageCount = doc.internal.getNumberOfPages();
+
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+
+    // Structural Outer Border
+    doc.setDrawColor(...COLOR_BORDER);
+    doc.setLineWidth(0.3);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
+    // Footer Divider Line
+    doc.setDrawColor(226, 232, 240);
+    doc.line(10, pageHeight - 12, pageWidth - 10, pageHeight - 12);
+
+    // Footer Text
+    doc.setFontSize(7.5);
+    doc.setTextColor(...COLOR_TEXT_MUTED);
+    doc.setFont("helvetica", "normal");
+    
+    doc.text(`Generated on: ${generatedTimeStr}`, 10, pageHeight - 7);
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth - 10, pageHeight - 7, { align: "right" });
+  }
 
   doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
 }
@@ -4968,13 +5044,24 @@ async function submitUserRemarksEdit() {
     hour: '2-digit', minute: '2-digit', hour12: true 
   });
 
+  // Toggle: Set to false to omit "Raised By" and allocate extra width to Admin Remarks
+  const includeRaisedBy = false;
+
+  // Calculate totals
+  let totalAmountSum = 0;
+  let settledCount = 0;
+  let pendingCount = 0;
+
+  currentMISClaimsList.forEach(c => {
+    totalAmountSum += parseFloat(c.txn_amount) || 0;
+    if (c.claim_status === 'Settled') settledCount++;
+    if (c.claim_status === 'Pending' || c.claim_status === 'In Progress') pendingCount++;
+  });
+
   // --- 1. Top Header Block ---
-  
-  // Outer decorative top accent bar
   doc.setFillColor(...COLOR_PRIMARY);
   doc.rect(10, 8, pageWidth - 20, 2, 'F');
 
-  // Header Title & Subtitle (Left-aligned)
   doc.setFontSize(14); 
   doc.setTextColor(...COLOR_PRIMARY);
   doc.setFont("helvetica", "bold");
@@ -4985,53 +5072,79 @@ async function submitUserRemarksEdit() {
   doc.setFont("helvetica", "bold");
   doc.text("CHENNAI CITY CENTRAL DIVISION - REFUND CLAIMS & SETTLEMENT TAT REPORT", 10, 24);
 
-  // Top-Right Logo Placement (Calculated width alignment: pageWidth - 10 - logoWidth)
+  // Top-Right Logo
   if (cachedPdfLogoBase64) {
     try { 
       const logoWidth = 22;
       const logoHeight = 15;
-      const logoX = pageWidth - 10 - logoWidth; // Aligns with the right margin
+      const logoX = pageWidth - 10 - logoWidth;
       const logoY = 12;
-      
-      doc.addImage(cachedPdfLogoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight,undefined, 'FAST'); 
+      doc.addImage(cachedPdfLogoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight, undefined, 'FAST'); 
     } catch (e) {
       console.warn("Logo image insertion failed on PDF export", e);
     }
   }
 
-  // --- 2. Official Metadata Panel (Compact) ---
+  // --- 2. Official Metadata Panel ---
   const metaYStart = 28;
   const panelHeight = 7;
   
-  // Clean background strip
-  doc.setFillColor(248, 250, 252); // slate-50
+  doc.setFillColor(248, 250, 252);
   doc.setDrawColor(...COLOR_BORDER);
   doc.roundedRect(10, metaYStart, pageWidth - 20, panelHeight, 0.8, 0.8, 'FD');
 
   doc.setFontSize(7.5);
   doc.setTextColor(...COLOR_TEXT_DARK);
   
-  const textY = metaYStart + 4.8; // Centered vertically in 7mm box
-
-  // Left Column: Period Filter
+  const textY = metaYStart + 4.8;
   doc.setFont("helvetica", "normal");
   doc.text("Period Filter: ", 13, textY);
   doc.setFont("helvetica", "bold");
-  doc.text(`${fromVal} to ${toVal}`, 29, textY);
+  doc.text(`${fromVal} to ${toVal}`, 30, textY);
 
-  // Center Column: Total Records
   doc.setFont("helvetica", "normal");
-  doc.text("Total Records: ", 125, textY);
+  doc.text("Total Requests: ", 120, textY);
   doc.setFont("helvetica", "bold");
-  doc.text(`${currentMISClaimsList.length}`, 143, textY);
+  doc.text(`${currentMISClaimsList.length}`, 142, textY);
 
-  // Right Column: Report Type
   doc.setFont("helvetica", "normal");
-  doc.text("Report Type: ", 225, textY);
+  doc.text("Report Filter: ", 215, textY);
   doc.setFont("helvetica", "bold");
-  doc.text(`${currentMISReportFilter || 'General MIS'}`, 242, textY);
-  // --- 3. Table Rows Mapping ---
-  const headers = [["Sl.", "Txn ID (Ref)", "Raised By", "Module", "Office", "Txn Date", "Settlement / Age", "Amount", "Status", "Admin Remarks"]];
+  doc.text(`${currentMISReportFilter || 'General MIS'}`, 233, textY);
+
+  // --- 3. Dynamic Headers & Rows Mapping ---
+  let headers = [];
+  let columnStylesConfig = {};
+
+  if (includeRaisedBy) {
+    headers = [["Sl.", "Txn ID (Ref)", "Raised By", "Module", "Office", "Txn Date", "Settlement / Age", "Amount", "Status", "Admin Remarks"]];
+    columnStylesConfig = {
+      0: { cellWidth: 8, halign: 'center' },
+      1: { cellWidth: 26, fontStyle: 'bold' },
+      2: { cellWidth: 28 },
+      3: { cellWidth: 16, halign: 'center' },
+      4: { cellWidth: 26 },
+      5: { cellWidth: 18, halign: 'center' },
+      6: { cellWidth: 26, halign: 'center' },
+      7: { cellWidth: 24, halign: 'right', fontStyle: 'bold' },
+      8: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
+      9: { cellWidth: 'auto' }
+    };
+  } else {
+    // With "Raised By" removed, Admin Remarks gains ~28mm extra width
+    headers = [["Sl.", "Txn ID (Ref)", "Module", "Office", "Txn Date", "Settlement / Age", "Amount", "Status", "Admin Remarks & Action Details"]];
+    columnStylesConfig = {
+      0: { cellWidth: 9, halign: 'center' },
+      1: { cellWidth: 30, fontStyle: 'bold' },
+      2: { cellWidth: 18, halign: 'center' },
+      3: { cellWidth: 32 },
+      4: { cellWidth: 20, halign: 'center' },
+      5: { cellWidth: 28, halign: 'center' },
+      6: { cellWidth: 26, halign: 'right', fontStyle: 'bold' },
+      7: { cellWidth: 22, halign: 'center', fontStyle: 'bold' },
+      8: { cellWidth: 'auto' } // Expanded remarks column
+    };
+  }
   
   const rows = currentMISClaimsList.map((c, idx) => {
     const creatorName = c.profiles?.emp_name ? `${c.profiles.emp_name}\n(${c.profiles?.emp_id || 'N/A'})` : (c.profiles?.emp_id || 'N/A');
@@ -5047,31 +5160,49 @@ async function submitUserRemarksEdit() {
       tatOrAgingStr = days !== null ? `${days} Days (Age)` : '-';
     }
 
-    const formattedAmount = c.txn_amount 
-      ? `Rs. ${Number(c.txn_amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
-      : 'Rs. 0.00';
+    const formattedAmount = `Rs. ${Number(c.txn_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-    return [
-      idx + 1,
-      c.txn_id_ref || '-',
-      creatorName,
-      c.module || '-',
-      c.raised_for_office || '-',
-      c.txn_date || '-',
-      settleDate !== '-' ? `${settleDate}\n[${tatOrAgingStr}]` : tatOrAgingStr,
-      formattedAmount,
-      c.claim_status || 'Pending',
-      c.reply_remarks_admin || '-'
-    ];
+    if (includeRaisedBy) {
+      return [
+        idx + 1,
+        c.txn_id_ref || '-',
+        creatorName,
+        c.module || '-',
+        c.raised_for_office || '-',
+        c.txn_date || '-',
+        settleDate !== '-' ? `${settleDate}\n[${tatOrAgingStr}]` : tatOrAgingStr,
+        formattedAmount,
+        c.claim_status || 'Pending',
+        c.reply_remarks_admin || '-'
+      ];
+    } else {
+      return [
+        idx + 1,
+        c.txn_id_ref || '-',
+        c.module || '-',
+        c.raised_for_office || '-',
+        c.txn_date || '-',
+        settleDate !== '-' ? `${settleDate}\n[${tatOrAgingStr}]` : tatOrAgingStr,
+        formattedAmount,
+        c.claim_status || 'Pending',
+        c.reply_remarks_admin || '-'
+      ];
+    }
   });
 
+  // Table Grand Total Row
+  const grandTotalRow = includeRaisedBy 
+    ? ['Σ', `Total (${currentMISClaimsList.length} Requests)`, '', '', '', '', '', `Rs. ${totalAmountSum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, '', '']
+    : ['Σ', `Total (${currentMISClaimsList.length} Requests)`, '', '', '', '', `Rs. ${totalAmountSum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, '', ''];
+
+  rows.push(grandTotalRow);
+
   // --- 4. Render Table with autoTable ---
- 
   doc.autoTable({ 
     head: headers, 
     body: rows, 
-    startY: 38, // Shifted up from 46 to fit the compact design
-    margin: { left: 10, right: 10, bottom: 15 },  
+    startY: 38,
+    margin: { left: 10, right: 10, bottom: 16 },  
     theme: 'grid', 
     headStyles: { 
       fillColor: COLOR_PRIMARY, 
@@ -5093,20 +5224,18 @@ async function submitUserRemarksEdit() {
     alternateRowStyles: {
       fillColor: [248, 250, 252]
     },
-    columnStyles: {
-      0: { cellWidth: 10, halign: 'center' },
-      1: { cellWidth: 28, fontStyle: 'bold' },
-      2: { cellWidth: 32 },
-      3: { cellWidth: 18 },
-      4: { cellWidth: 28 },
-      5: { cellWidth: 20, halign: 'center' },
-      6: { cellWidth: 28, halign: 'center' },
-      7: { cellWidth: 25, halign: 'right', fontStyle: 'bold' },
-      8: { cellWidth: 22, halign: 'center', fontStyle: 'bold' },
-      9: { cellWidth: 'auto' }
-    },
+    columnStyles: columnStylesConfig,
     didParseCell: function (data) {
-      if (data.section === 'body' && data.column.index === 8) {
+      // Highlight Grand Total Row
+      if (data.row.index === rows.length - 1) {
+        data.cell.styles.fillColor = [254, 226, 226]; // Light Rose
+        data.cell.styles.textColor = [153, 27, 27];
+        data.cell.styles.fontStyle = 'bold';
+      }
+
+      // Status text colors
+      const statusColIndex = includeRaisedBy ? 8 : 7;
+      if (data.section === 'body' && data.column.index === statusColIndex && data.row.index !== rows.length - 1) {
         const val = String(data.cell.raw).toLowerCase();
         if (val === 'settled' || val === 'approved') {
           data.cell.styles.textColor = [22, 101, 52];
@@ -5119,13 +5248,32 @@ async function submitUserRemarksEdit() {
     }
   });
 
-  // --- 5. Post-Processing: Headers/Footers on Every Page ---
+  // --- 5. End of Document Summary Banner ---
+  let finalY = doc.lastAutoTable.finalY + 6;
+  if (finalY > pageHeight - 24) {
+    doc.addPage();
+    finalY = 16;
+  }
+
+  doc.setFillColor(254, 242, 242); // Soft red background
+  doc.setDrawColor(...COLOR_PRIMARY);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(10, finalY, pageWidth - 20, 10, 1, 1, 'FD');
+
+  doc.setFontSize(8);
+  doc.setTextColor(...COLOR_PRIMARY);
+  doc.setFont("helvetica", "bold");
+  
+  const endBannerText = `*** END OF REPORT • TOTAL CLAIMS: ${currentMISClaimsList.length} | SETTLED: ${settledCount} | ACTIVE PENDING: ${pendingCount} | TOTAL AMOUNT: Rs. ${totalAmountSum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ***`;
+  doc.text(endBannerText, pageWidth / 2, finalY + 6.2, { align: "center" });
+
+  // --- 6. Post-Processing: Borders & Footer on Every Page ---
   const pageCount = doc.internal.getNumberOfPages();
 
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
 
-    // Structural Page Border
+    // Outer Page Border
     doc.setDrawColor(...COLOR_BORDER);
     doc.setLineWidth(0.3);
     doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
@@ -5139,12 +5287,12 @@ async function submitUserRemarksEdit() {
     doc.setTextColor(...COLOR_TEXT_MUTED);
     doc.setFont("helvetica", "normal");
     
-    doc.text(`Generated on: ${generatedTimeStr} `, 10, pageHeight - 7);
+    doc.text(`Generated on: ${generatedTimeStr}`, 10, pageHeight - 7);
     doc.text(`Page ${i} of ${pageCount}`, pageWidth - 10, pageHeight - 7, { align: "right" });
   }
 
-  // --- 6. Save PDF ---
-  doc.save(`Refund_claims_${currentMISReportFilter}_${fromVal}_to_${toVal}.pdf`);
+  // --- 7. Save PDF ---
+  doc.save(`Refund_Claims_MIS_${currentMISReportFilter}_${fromVal}_to_${toVal}.pdf`);
 }
 // =========================================================================
 // ADMIN MODAL OPEN & SUBMIT (INCLUDES CHANGE OF MODULE)
