@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -281,11 +280,11 @@
           <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Date *</label>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Transaction Date *</label>
           <input type="date" id="claimTxnDate" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-0.5">Txn Amount (₹) *</label>
+          <label class="block text-xs font-bold text-slate-700 mb-0.5">Transaction Amount (₹) *</label>
           <input type="number" step="0.01" id="claimAmount" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none">
         </div>
         <div>
@@ -1675,57 +1674,66 @@ function printOfficeWiseReport() {
     }
 
     async function initApp() {
-      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-      if (authError || !user) return;
-      currentUser = user;
+  const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+  if (authError || !user) return;
+  currentUser = user;
 
-      let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
-      if (!profile) {
-        profile = {
-          id: user.id,
-          emp_id: user.user_metadata?.emp_id || "EMP",
-          emp_name: user.user_metadata?.emp_name || "Staff",
-          role: user.user_metadata?.role || "user",
-          office_name: user.user_metadata?.office_name || "Chennai GPO",
-          mobile_number: user.user_metadata?.mobile_number || ""
-        };
-      }
+  let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+  if (!profile) {
+    profile = {
+      id: user.id,
+      emp_id: user.user_metadata?.emp_id || "EMP",
+      emp_name: user.user_metadata?.emp_name || "Staff",
+      role: user.user_metadata?.role || "user",
+      office_name: user.user_metadata?.office_name || "Chennai GPO",
+      mobile_number: user.user_metadata?.mobile_number || ""
+    };
+  }
 
-      userProfile = profile;
+  userProfile = profile;
 
-      $('authSection').classList.add('hidden');
-      $('navbar').classList.remove('hidden');
-      $('mainDashboard').classList.remove('hidden');
-      $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${(profile.role || 'user').toUpperCase()})`;
+  $('authSection').classList.add('hidden');
+  $('navbar').classList.remove('hidden');
+  $('mainDashboard').classList.remove('hidden');
+ $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}]  (${(profile.role || 'user').toUpperCase()})\n ${profile.office_name || 'N/A'}`;
 
-      const role = profile.role || 'user';
-      const isAdmin = role === 'admin' || role === 'superadmin';
-      const isSuperadmin = role === 'superadmin';
+  const role = (profile.role || 'user').toLowerCase();
+  const isAdmin = role === 'admin' || role === 'superadmin';
+  const isSuperadmin = role === 'superadmin';
 
-      if (isAdmin) {
-        $('adminTabBtn').classList.remove('hidden');
-        $('adminBookingDashTabBtn').classList.remove('hidden');
-        $('tabBtnConverter').classList.remove('hidden');
-        if (isSuperadmin) $('superadminLogoPanel').classList.remove('hidden');
-      } else {
-        $('adminTabBtn').classList.add('hidden');
-        $('adminBookingDashTabBtn').classList.add('hidden');
-        $('tabBtnConverter').classList.add('hidden');
-      }
+  // Toggle Admin & Restricted Tab Buttons
+  if (isAdmin) {
+    if ($('adminTabBtn')) $('adminTabBtn').classList.remove('hidden');
+    if ($('adminBookingDashTabBtn')) $('adminBookingDashTabBtn').classList.remove('hidden');
+    if ($('tabBtnConverter')) $('tabBtnConverter').classList.remove('hidden');
+    if (isSuperadmin && $('superadminLogoPanel')) $('superadminLogoPanel').classList.remove('hidden');
+  } else {
+    if ($('adminTabBtn')) $('adminTabBtn').classList.add('hidden');
+    if ($('adminBookingDashTabBtn')) $('adminBookingDashTabBtn').classList.add('hidden');
+    if ($('tabBtnConverter')) $('tabBtnConverter').classList.add('hidden');
+    if ($('superadminLogoPanel')) $('superadminLogoPanel').classList.add('hidden');
 
-      const mobileInput = $('claimUserMobile');
-      if (mobileInput) mobileInput.value = profile.mobile_number || "";
-
-      await loadLogoFromDatabase();
-      await loadFilterDropdowns();
-      showTab(currentActiveTab);
-
-      await loadClaimsSummary();
-      await generateMISReport('All');
-      if (isAdmin) {
-        await loadAllUsers();
-      }
+    // If active tab is restricted, redirect to 'track'
+    if (['converterTab', 'bookingDash', 'adminRoleMgmt'].includes(currentActiveTab)) {
+      currentActiveTab = 'track';
     }
+  }
+
+  const mobileInput = $('claimUserMobile');
+  if (mobileInput) mobileInput.value = profile.mobile_number || "";
+
+  await loadLogoFromDatabase();
+  await loadFilterDropdowns();
+  
+  // Show permitted active tab
+  showTab(currentActiveTab || 'track');
+
+  await loadClaimsSummary();
+  await generateMISReport('All');
+  if (isAdmin && typeof loadAllUsers === 'function') {
+    await loadAllUsers();
+  }
+}
 
     function showAuthView(view) {
       if (view === 'register') {
@@ -1736,56 +1744,70 @@ function printOfficeWiseReport() {
         $('loginFormContainer').classList.remove('hidden');
       }
     }
+function showTab(tabName) {
+  const role = (userProfile?.role || 'user').toLowerCase();
+  const isAdmin = role === 'admin' || role === 'superadmin';
+  const restrictedTabs = ['converterTab', 'bookingDash', 'adminRoleMgmt'];
 
-    // 4. CLEAN TAB SWITCHER
-    function showTab(tabId) {
-      const tabsConfig = {
-        'track': { view: 'trackView', btn: 'tabBtnTrack' },
-        'registerClaim': { view: 'registerClaimView', btn: 'tabBtnRegister' },
-        'converterTab': { view: 'converterTabView', btn: 'tabBtnConverter' },
-        'reports': { view: 'reportsView', btn: 'tabBtnReports' },
-        'bookingDash': { view: 'bookingDashView', btn: 'adminBookingDashTabBtn' },
-        'adminRoleMgmt': { view: 'adminRoleMgmtView', btn: 'adminTabBtn' }
-      };
+  // Guard: Block regular users / viewers from accessing restricted views
+  if (!isAdmin && restrictedTabs.includes(tabName)) {
+    alert("Access Restricted: You do not have permission to access this module.");
+    tabName = 'track';
+  }
 
-      if (!tabsConfig[tabId]) tabId = 'track';
+  currentActiveTab = tabName;
 
-      const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
-      if (!isAdmin && ['converterTab', 'bookingDash', 'adminRoleMgmt'].includes(tabId)) {
-        tabId = 'track';
-      }
+  // 1. Hide all tab view containers
+  const viewMap = {
+    'track': 'trackView',
+    'registerClaim': 'registerClaimView',
+    'converterTab': 'converterTabView',
+    'reports': 'reportsView',
+    'bookingDash': 'bookingDashView',
+    'adminRoleMgmt': 'adminRoleMgmtView'
+  };
 
-      currentActiveTab = tabId;
-      sessionStorage.setItem('activePortalTab', tabId);
+  Object.values(viewMap).forEach(viewId => {
+    const el = $(viewId) || $(viewId.replace('View', ''));
+    if (el) el.classList.add('hidden');
+  });
 
-      // Hide all known tab containers explicitly
-      ['trackView', 'registerClaimView', 'converterTabView', 'reportsView', 'bookingDashView', 'adminRoleMgmtView'].forEach(id => {
-        const el = $(id);
-        if (el) el.classList.add('hidden');
-      });
+  // 2. Reset navigation button styles
+  const btnMap = {
+    'track': 'tabBtnTrack',
+    'registerClaim': 'tabBtnRegister',
+    'converterTab': 'tabBtnConverter',
+    'reports': 'tabBtnReports',
+    'bookingDash': 'adminBookingDashTabBtn',
+    'adminRoleMgmt': 'adminTabBtn'
+  };
 
-      document.querySelectorAll('.tab-content').forEach(viewEl => {
-        if (viewEl) viewEl.classList.add('hidden');
-      });
-
-      document.querySelectorAll('.tab-btn').forEach(btnEl => {
-        if (btnEl) {
-          btnEl.className = "tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer transition";
-        }
-      });
-
-      const activeView = $(tabsConfig[tabId].view);
-      const activeBtn = $(tabsConfig[tabId].btn);
-
-      if (activeView) activeView.classList.remove('hidden');
-      if (activeBtn) {
-        activeBtn.className = "tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer transition";
-      }
-
-      if (tabId === 'bookingDash' && typeof applyBookingQuickPeriod === 'function') {
-        applyBookingQuickPeriod();
-      }
+  Object.values(btnMap).forEach(btnId => {
+    const btn = $(btnId);
+    if (btn) {
+      btn.classList.remove('bg-postRed-600', 'text-white');
+      btn.classList.add('bg-white', 'text-slate-700');
     }
+  });
+
+  // 3. Show active container and highlight active button
+  const targetView = $(viewMap[tabName]) || $(tabName);
+  if (targetView) targetView.classList.remove('hidden');
+
+  const activeBtn = $(btnMap[tabName]);
+  if (activeBtn) {
+    activeBtn.classList.remove('bg-white', 'text-slate-700');
+    activeBtn.classList.add('bg-postRed-600', 'text-white');
+  }
+
+  // 4. Trigger on-demand loaders for selected tab
+  if (tabName === 'bookingDash' && isAdmin && typeof loadBookingDashboardData === 'function') {
+    loadBookingDashboardData();
+  }
+  if (tabName === 'adminRoleMgmt' && isAdmin && typeof loadAllUsers === 'function') {
+    loadAllUsers();
+  }
+}
 
    async function loadFilterDropdowns() {
   try {
@@ -4837,6 +4859,42 @@ async function optimizeImageForUpload(fileOrBlob, maxDimension = 1600, quality =
     reader.readAsDataURL(fileOrBlob);
   });
 }
+
+function applyRoleBasedUI() {
+  const role = (userProfile?.role || 'user').toLowerCase();
+  const isAdmin = role === 'admin' || role === 'superadmin';
+
+  // 1. Theme Converter Button
+  const btnConverter = $('tabBtnConverter');
+  if (btnConverter) {
+    if (isAdmin) {
+      btnConverter.classList.remove('hidden');
+    } else {
+      btnConverter.classList.add('hidden');
+    }
+  }
+
+  // 2. Digital vs Cash Performance Button
+  const btnBooking = $('adminBookingDashTabBtn');
+  if (btnBooking) {
+    if (isAdmin) {
+      btnBooking.classList.remove('hidden');
+    } else {
+      btnBooking.classList.add('hidden');
+    }
+  }
+
+  // 3. User Management Button
+  const btnAdmin = $('adminTabBtn');
+  if (btnAdmin) {
+    if (isAdmin) {
+      btnAdmin.classList.remove('hidden');
+    } else {
+      btnAdmin.classList.add('hidden');
+    }
+  }
+}
+
 async function submitUserRemarksEdit() {
   const id = $('userEditClaimId')?.value;
   const newRemarks = $('userEditRemarksInput')?.value.trim();
