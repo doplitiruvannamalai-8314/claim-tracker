@@ -523,19 +523,19 @@
                 <span class="text-[10px] text-slate-500">From Txn Date</span>
               </div>
               <div class="grid grid-cols-4 gap-1 text-center text-xs">
-                <div onclick="generateMISReport('InProgress_le10')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_lessthan10')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">&le; 10 Days</span>
                   <span id="misInProgressLe10" class="text-sm font-extrabold text-slate-800">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_11to20')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_11to20days')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">11-20 Days</span>
                   <span id="misInProgress11to20" class="text-sm font-extrabold text-amber-700">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_21to30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_21to30days')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">21-30 Days</span>
                   <span id="misInProgress21to30" class="text-sm font-extrabold text-orange-700">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_gt30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_morethan30days')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">&gt; 30 Days</span>
                   <span id="misInProgressGt30" class="text-sm font-extrabold text-rose-700">0</span>
                 </div>
@@ -803,7 +803,7 @@
               <table class="w-full text-left text-xs border-collapse">
                 <thead class="bg-postRed-700 text-white font-bold sticky top-0">
                   <tr>
-                    <th class="p-2 text-center">Rank</th>
+                    <th class="p-2 text-center">#</th>
                     <th class="p-2">Office Name</th>
                     <th class="p-2 text-center">Cash Txn (Cnt)</th>
                     <th class="p-2 text-center">Digital Txn (Cnt)</th>
@@ -3350,7 +3350,7 @@ function sortTable(col) {
           <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
               <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
-                <th style="padding: 8px; text-align: center; width: 10%;">Rank</th>
+                <th style="padding: 8px; text-align: center; width: 10%;">#</th>
                 <th style="padding: 8px; width: 45%;">Office Name</th>
                 <th style="padding: 8px; text-align: center; width: 15%;">Cash Txn (Cnt)</th>
                 <th style="padding: 8px; text-align: center; width: 15%;">Digital Txn (Cnt)</th>
@@ -3440,7 +3440,7 @@ function sortTable(col) {
       rows.push(['Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
 
       doc.autoTable({
-        head: [["Rank", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
+        head: [["#", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
         body: rows,
         startY: 30,
         theme: 'grid',
@@ -5069,7 +5069,7 @@ async function submitUserRemarksEdit() {
   }
 
   // --- 6. Save PDF ---
-  doc.save(`MIS_Report_${currentMISReportFilter}_${fromVal}_to_${toVal}.pdf`);
+  doc.save(`Refund_claims_${currentMISReportFilter}_${fromVal}_to_${toVal}.pdf`);
 }
 // =========================================================================
 // ADMIN MODAL OPEN & SUBMIT (INCLUDES CHANGE OF MODULE)
