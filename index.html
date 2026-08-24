@@ -3408,77 +3408,94 @@ function sortTable(col) {
     }
 
     async function exportBookingReportPDF() {
-      if (!bookingImportedRecords.length) return alert("No performance data to export!");
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "portrait" });
+  if (!bookingImportedRecords.length) return alert("No performance data to export!");
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "portrait" });
 
-      if (cachedPdfLogoBase64) {
-        try { doc.addImage(cachedPdfLogoBase64, 'JPEG', 169, 8, 27, 18,undefined, 'FAST'); } catch (e) {}
+  if (cachedPdfLogoBase64) {
+    try { doc.addImage(cachedPdfLogoBase64, 'JPEG', 169, 8, 27, 18, undefined, 'FAST'); } catch (e) {}
+  }
+
+  doc.setFontSize(13);
+  doc.setTextColor(168, 15, 40);
+  doc.text("Digital vs Cash Transaction Performance Report", 105, 14, { align: "center" });
+  doc.setFontSize(9.5);
+  doc.setTextColor(180, 83, 9);
+  doc.text("Chennai City Central Division • Booking Performance Monitoring", 105, 19, { align: "center" });
+
+  const fromVal = $('bookingFromDate')?.value || 'Inception';
+  const toVal = $('bookingToDate')?.value || 'Current Date';
+  doc.setFontSize(8);
+  doc.setTextColor(0, 0, 0); // Pure Black
+  doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 105, 24, { align: "center" });
+
+  const officeMap = {};
+  let totalCashCnt = 0, totalDigCnt = 0;
+
+  bookingImportedRecords.forEach(r => {
+    const off = r.office_name || 'Unassigned';
+    const c_cnt = parseFloat(r.cash_cnt) || 0;
+    let d_cnt = 0;
+    DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+      if (activeSelectedChannelKeys.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
+    });
+
+    totalCashCnt += c_cnt;
+    totalDigCnt += d_cnt;
+    if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
+    officeMap[off].cash_cnt += c_cnt;
+    officeMap[off].dig_cnt += d_cnt;
+  });
+
+  const totalBookings = totalCashCnt + totalDigCnt;
+  const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+
+  const rows = Object.keys(officeMap).map(name => {
+    const o = officeMap[name];
+    const tot = o.cash_cnt + o.dig_cnt;
+    const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
+    return { name, ...o, tot, pct };
+  }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
+    idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), o.dig_cnt.toLocaleString('en-IN'), `${o.pct.toFixed(2)}%`
+  ]);
+
+  rows.push(['Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
+
+  doc.autoTable({
+    head: [["#", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
+    body: rows,
+    startY: 30,
+    theme: 'grid',
+    headStyles: { 
+      fillColor: [168, 15, 40], 
+      textColor: [255, 255, 255], 
+      fontStyle: 'bold' 
+    },
+    styles: { 
+      fontSize: 8, 
+      textColor: [0, 0, 0],       // Explicit solid black font for body
+      lineColor: [180, 180, 180], // Sharp grid border
+      lineWidth: 0.1
+    },
+    columnStyles: {
+      0: { cellWidth: 12, halign: 'center', textColor: [0, 0, 0] },
+      1: { fontStyle: 'bold', textColor: [0, 0, 0] },
+      2: { halign: 'right', textColor: [0, 0, 0] },
+      3: { halign: 'right', textColor: [0, 0, 0] },
+      4: { halign: 'right', fontStyle: 'bold', textColor: [0, 0, 0] }
+    },
+    didParseCell: function(data) {
+      // Grand Total Row Highlight
+      if (data.row.index === rows.length - 1) {
+        data.cell.styles.fillColor = [168, 15, 40];
+        data.cell.styles.textColor = [255, 255, 255];
+        data.cell.styles.fontStyle = 'bold';
       }
-
-      doc.setFontSize(13);
-      doc.setTextColor(168, 15, 40);
-      doc.text("Digital vs Cash Transaction Performance Report", 105, 14, { align: "center" });
-      doc.setFontSize(9.5);
-      doc.setTextColor(180, 83, 9);
-      doc.text("Chennai City Central Division • Booking Performance Monitoring", 105, 19, { align: "center" });
-
-      const fromVal = $('bookingFromDate')?.value || 'Inception';
-      const toVal = $('bookingToDate')?.value || 'Current Date';
-      doc.setFontSize(8);
-      doc.setTextColor(51, 65, 85);
-      doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${new Date().toLocaleString('en-IN')}`, 105, 24, { align: "center" });
-
-      const officeMap = {};
-      let totalCashCnt = 0, totalDigCnt = 0;
-
-      bookingImportedRecords.forEach(r => {
-        const off = r.office_name || 'Unassigned';
-        const c_cnt = parseFloat(r.cash_cnt) || 0;
-        let d_cnt = 0;
-        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          if (activeSelectedChannelKeys.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
-        });
-
-        totalCashCnt += c_cnt;
-        totalDigCnt += d_cnt;
-        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
-        officeMap[off].cash_cnt += c_cnt;
-        officeMap[off].dig_cnt += d_cnt;
-      });
-
-      const totalBookings = totalCashCnt + totalDigCnt;
-      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
-
-      const rows = Object.keys(officeMap).map(name => {
-        const o = officeMap[name];
-        const tot = o.cash_cnt + o.dig_cnt;
-        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
-        return { name, ...o, tot, pct };
-      }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
-        idx + 1, o.name, o.cash_cnt.toLocaleString('en-IN'), o.dig_cnt.toLocaleString('en-IN'), `${o.pct.toFixed(2)}%`
-      ]);
-
-      rows.push(['Total', 'Grand Total', totalCashCnt.toLocaleString('en-IN'), totalDigCnt.toLocaleString('en-IN'), `${totalDigShare}%`]);
-
-      doc.autoTable({
-        head: [["#", "Office Name", "Cash Txn (Cnt)", "Digital Txn (Cnt)", "Digital Share %"]],
-        body: rows,
-        startY: 30,
-        theme: 'grid',
-        headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
-        styles: { fontSize: 8 },
-        didParseCell: function(data) {
-          if (data.row.index === rows.length - 1) {
-            data.cell.styles.fillColor = [168, 15, 40];
-            data.cell.styles.textColor = [255, 255, 255];
-            data.cell.styles.fontStyle = 'bold';
-          }
-        }
-      });
-
-      doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
     }
+  });
+
+  doc.save(`Office-wise Digital Adoption-${fromVal}-${toVal}.pdf`);
+}
 
     async function exportOfficeWiseImage() {
       if (!rawMISMasterList.length) return alert("No office pendency data available to export as image!");
@@ -5068,7 +5085,7 @@ async function submitUserRemarksEdit() {
     styles: { 
       fontSize: 7.5, 
       cellPadding: 2,
-      textColor: COLOR_TEXT_DARK,
+      textColor: [0, 0, 0],
       valign: 'middle',
       lineColor: COLOR_BORDER,
       lineWidth: 0.1
