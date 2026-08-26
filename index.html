@@ -122,13 +122,15 @@
 
         <!-- TABS NAVIGATION -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
-          <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-postRed-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-xs cursor-pointer">🔍Track Claim</button>
+
+          <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">🔍Track Claim</button>
           <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📝 Claim Registration</button>
           <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📊MIS &amp; Pendency Reports</button>
           <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📈  Digital vs Cash Performance</button>
           <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">👥 User Management</button>
         </div>
+
 
         <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW & TRACKING -->
         <div id="trackView" class="tab-content bg-white p-4 rounded-xl shadow-md border border-amber-200 space-y-4">
@@ -690,22 +692,22 @@
               <p class="text-[11px] text-slate-500">Daily / Fortnightly / Monthly comparisons of Cash vs Digital transactions across division offices</p>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
-  <input type="file" id="bookingExcelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleBookingExcelUpload(event)">
-  <button type="button" onclick="$('bookingExcelFileInput').click()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
-    📥 Import Excel / CSV
-  </button>
-  <!-- PURGE DATE DATA BUTTON (ADMINS) -->
-  <button type="button" onclick="openDeleteBookingDataModal()" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
-    🗑️ Delete by Date
-  </button>
-  <button type="button" onclick="exportBookingReportImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
-    🖼️ Export as Image (PNG)
-  </button>
-  <button type="button" onclick="exportBookingReportPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">
-    📄 Export PDF
-  </button>
-</div>
-          </div>
+              <input type="file" id="bookingExcelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleBookingExcelUpload(event)">
+              <button type="button" onclick="$('bookingExcelFileInput').click()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
+                📥 Import Excel / CSV
+              </button>
+              <!-- PURGE DATE DATA BUTTON (ADMINS) -->
+              <button type="button" onclick="openDeleteBookingDataModal()" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
+                🗑️ Delete by Date
+              </button>
+              <button type="button" onclick="exportBookingReportImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1">
+                🖼️ Export as Image (PNG)
+              </button>
+              <button type="button" onclick="exportBookingReportPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">
+                📄 Export PDF
+              </button>
+              </div>
+            </div>
 
           <!-- TIME PERIOD & MULTI-CHANNEL COMPARISON CHECKLIST FILTER BAR -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end text-xs">
@@ -816,7 +818,47 @@
             </div>
           </div>
         </div>
-
+         <!-- HORIZONTAL PIVOT: DAY-WISE & OFFICE-WISE PERFORMANCE MATRIX -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white p-2 mt-3">
+              <div class="bg-slate-100 p-2 font-bold text-slate-700 text-xs flex justify-between items-center rounded-t-lg flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-sm">📅</span>
+                    <span>Detailed Day-wise &amp; Office-wise Trend Matrix</span>
+                  </div>
+                  <!-- METRIC SELECTOR (DEFAULT: DIGITAL %) -->
+                  <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-amber-300 shadow-2xs">
+                    <label class="text-[11px] font-bold text-postRed-800">Metric View:</label>
+                    <select id="pivotMetricSelector" onchange="renderDayWisePivotTable()" class="bg-transparent text-[11px] font-bold text-slate-800 outline-none cursor-pointer">
+                      <option value="pct" selected>Digital % Share</option>
+                      <option value="dig">Digital Txn (Cnt)</option>
+                      <option value="cash">Cash Txn (Cnt)</option>
+                      <option value="all">Combined (Dig / Cash / %)</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="exportDayWisePivotImage()" class="bg-blue-700 hover:bg-blue-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+                    🖼️ Image Export
+                  </button>
+                  <button type="button" onclick="printDayWisePivotReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 rounded text-xs font-bold shadow-xs cursor-pointer transition flex items-center gap-1">
+                    🖨️ Print Matrix
+                  </button>
+                </div>
+              </div>
+              
+              <div class="max-h-[460px] overflow-x-auto overflow-y-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead id="dayWisePivotThead" class="bg-postRed-700 text-white font-bold sticky top-0 z-10">
+                    <!-- Dynamic horizontal date columns populated via JS -->
+                  </thead>
+                  <tbody id="dayWisePivotTbody" class="divide-y divide-slate-100">
+                    <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading horizontal performance matrix...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
         <!-- TAB 6: USER MANAGEMENT -->
         <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-3">
           <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
@@ -1801,9 +1843,17 @@ function showTab(tabName) {
   }
 
   // 4. Trigger on-demand loaders for selected tab
-  if (tabName === 'bookingDash' && isAdmin && typeof loadBookingDashboardData === 'function') {
-    loadBookingDashboardData();
+  if (tabName === 'bookingDash' && isAdmin) {
+    if (!$('bookingFromDate')?.value || !$('bookingToDate')?.value) {
+      if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'yesterday';
+      if (typeof applyBookingQuickPeriod === 'function') {
+        applyBookingQuickPeriod();
+      }
+    } else if (typeof loadBookingDashboardData === 'function') {
+      loadBookingDashboardData();
+    }
   }
+
   if (tabName === 'adminRoleMgmt' && isAdmin && typeof loadAllUsers === 'function') {
     loadAllUsers();
   }
@@ -2984,33 +3034,63 @@ function sortTable(col) {
       renderMISTableRows();
     }
 
-    function sortMISReport(col) {
-      if (currentMISSortCol === col) {
-        currentMISSortDir = currentMISSortDir === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentMISSortCol = col;
-        currentMISSortDir = 'asc';
-      }
+   function sortMISReport(col) {
+  if (currentMISSortCol === col) {
+    currentMISSortDir = currentMISSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentMISSortCol = col;
+    currentMISSortDir = 'asc';
+  }
 
-      currentMISClaimsList.sort((a, b) => {
-        let valA = a[col] || '';
-        let valB = b[col] || '';
-        if (col === 'emp_name') { valA = a.profiles?.emp_name || ''; valB = b.profiles?.emp_name || ''; }
-        if (col === 'txn_amount') { valA = parseFloat(valA) || 0; valB = parseFloat(valB) || 0; }
-        if (col === 'created_at' || col === 'txn_date' || col === 'settlement_date') {
-          valA = new Date(valA).getTime() || 0; valB = new Date(valB).getTime() || 0;
-        }
-        if (valA < valB) return currentMISSortDir === 'asc' ? -1 : 1;
-        if (valA > valB) return currentMISSortDir === 'asc' ? 1 : -1;
-        return 0;
-      });
+  const todayStr = new Date().toISOString().split('T')[0];
 
-      document.querySelectorAll(`th[onclick^="sortMISReport"] span`).forEach(s => s.innerText = '⇅');
-      const activeSpan = document.getElementById(`sort_mis_${col}`);
-      if(activeSpan) activeSpan.innerText = currentMISSortDir === 'asc' ? '↑' : '↓';
+  // Helper to compute TAT / Aging days for a given record
+  const getTatOrAgingDays = (item) => {
+    if (!item.txn_date) return -1;
 
-      renderMISTableRows();
+    if (item.claim_status === 'Settled') {
+      const endDate = item.settlement_date || (item.created_at ? item.created_at.split('T')[0] : null);
+      const days = calculateDaysDifference(item.txn_date, endDate);
+      return days !== null ? days : -1;
+    } else if (item.claim_status === 'In Progress' || item.claim_status === 'Pending') {
+      const days = calculateDaysDifference(item.txn_date, todayStr);
+      return days !== null ? days : -1;
     }
+    return -1;
+  };
+
+  currentMISClaimsList.sort((a, b) => {
+    let valA = a[col] || '';
+    let valB = b[col] || '';
+
+    if (col === 'tat_aging' || col === 'tat' || col === 'aging') {
+      valA = getTatOrAgingDays(a);
+      valB = getTatOrAgingDays(b);
+    } else if (col === 'emp_name') {
+      valA = (a.profiles?.emp_name || '').toLowerCase();
+      valB = (b.profiles?.emp_name || '').toLowerCase();
+    } else if (col === 'txn_amount') {
+      valA = parseFloat(valA) || 0;
+      valB = parseFloat(valB) || 0;
+    } else if (col === 'created_at' || col === 'txn_date' || col === 'settlement_date') {
+      valA = new Date(valA).getTime() || 0;
+      valB = new Date(valB).getTime() || 0;
+    } else if (typeof valA === 'string') {
+      valA = valA.toLowerCase();
+      valB = valB.toLowerCase();
+    }
+
+    if (valA < valB) return currentMISSortDir === 'asc' ? -1 : 1;
+    if (valA > valB) return currentMISSortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  document.querySelectorAll(`th[onclick^="sortMISReport"] span`).forEach(s => s.innerText = '⇅');
+  const activeSpan = document.getElementById(`sort_mis_${col}`);
+  if (activeSpan) activeSpan.innerText = currentMISSortDir === 'asc' ? '↑' : '↓';
+
+  renderMISTableRows();
+}
 
     function renderMISTableRows() {
       const todayStr = new Date().toISOString().split('T')[0];
@@ -3100,183 +3180,224 @@ function sortTable(col) {
       generateMISReport('All');
     }
 
-    // 8. BOOKING PERFORMANCE & DIGITAL ADOPTION
-    async function applyBookingQuickPeriod() {
-      const mode = $('bookingQuickPeriod')?.value || 'recent';
+    // =========================================================================
+// 8. BOOKING PERFORMANCE & DIGITAL ADOPTION
+// =========================================================================
 
-      const getLocalDateStr = (d = new Date()) => {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
+async function applyBookingQuickPeriod() {
+  const mode = $('bookingQuickPeriod')?.value || 'yesterday';
 
-      const todayStr = getLocalDateStr(new Date());
+  const getLocalDateStr = (d = new Date()) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
-      if (mode === 'all') {
-        if ($('bookingFromDate')) $('bookingFromDate').value = '';
-        if ($('bookingToDate')) $('bookingToDate').value = '';
-      } 
-      else if (mode === 'today') {
-        if ($('bookingFromDate')) $('bookingFromDate').value = todayStr;
-        if ($('bookingToDate')) $('bookingToDate').value = todayStr;
-      } 
-      else if (mode === 'yesterday') {
-        const yest = new Date();
-        yest.setDate(yest.getDate() - 1);
-        const yestStr = getLocalDateStr(yest);
-        if ($('bookingFromDate')) $('bookingFromDate').value = yestStr;
-        if ($('bookingToDate')) $('bookingToDate').value = yestStr;
-      } 
-      else if (mode === 'recent') {
-        try {
-          const { data: latestRows, error } = await supabaseClient
-            .from('booking_performance')
-            .select('booking_date')
-            .not('booking_date', 'is', null)
-            .neq('booking_date', '-')
-            .order('booking_date', { ascending: false })
-            .limit(1);
+  const todayStr = getLocalDateStr(new Date());
 
-          let targetRecentDate = null;
+  if (mode === 'all') {
+    if ($('bookingFromDate')) $('bookingFromDate').value = '';
+    if ($('bookingToDate')) $('bookingToDate').value = '';
+  } 
+  else if (mode === 'today') {
+    if ($('bookingFromDate')) $('bookingFromDate').value = todayStr;
+    if ($('bookingToDate')) $('bookingToDate').value = todayStr;
+  } 
+  else if (mode === 'yesterday') {
+    const yest = new Date();
+    yest.setDate(yest.getDate() - 1);
+    const yestStr = getLocalDateStr(yest);
+    if ($('bookingFromDate')) $('bookingFromDate').value = yestStr;
+    if ($('bookingToDate')) $('bookingToDate').value = yestStr;
+  } 
+  else if (mode === 'recent') {
+    try {
+      const { data: latestRows, error } = await supabaseClient
+        .from('booking_performance')
+        .select('booking_date')
+        .not('booking_date', 'is', null)
+        .neq('booking_date', '-')
+        .order('booking_date', { ascending: false })
+        .limit(1);
 
-          if (!error && latestRows && latestRows.length > 0) {
-            targetRecentDate = latestRows[0].booking_date;
-          }
+      let targetRecentDate = null;
 
-          if (!targetRecentDate && Array.isArray(bookingImportedRecords) && bookingImportedRecords.length > 0) {
-            const memoryDates = bookingImportedRecords
-              .map(r => r.booking_date)
-              .filter(d => d && d !== '-' && !isNaN(new Date(d).getTime()))
-              .sort();
-            if (memoryDates.length > 0) {
-              targetRecentDate = memoryDates[memoryDates.length - 1];
-            }
-          }
+      if (!error && latestRows && latestRows.length > 0) {
+        targetRecentDate = latestRows[0].booking_date;
+      }
 
-          if (!targetRecentDate) {
-            targetRecentDate = todayStr;
-          }
-
-          if ($('bookingFromDate')) $('bookingFromDate').value = targetRecentDate;
-          if ($('bookingToDate')) $('bookingToDate').value = targetRecentDate;
-        } catch (err) {
-          console.warn("Error resolving recent booking date:", err);
-          if ($('bookingFromDate')) $('bookingFromDate').value = todayStr;
-          if ($('bookingToDate')) $('bookingToDate').value = todayStr;
+      if (!targetRecentDate && Array.isArray(bookingImportedRecords) && bookingImportedRecords.length > 0) {
+        const memoryDates = bookingImportedRecords
+          .map(r => r.booking_date)
+          .filter(d => d && d !== '-' && !isNaN(new Date(d).getTime()))
+          .sort();
+        if (memoryDates.length > 0) {
+          targetRecentDate = memoryDates[memoryDates.length - 1];
         }
-      } 
-      else if (mode === 'fortnight') {
-        const d = new Date();
-        d.setDate(d.getDate() - 15);
-        if ($('bookingFromDate')) $('bookingFromDate').value = getLocalDateStr(d);
-        if ($('bookingToDate')) $('bookingToDate').value = todayStr;
-      } 
-      else if (mode === 'month') {
-        const d = new Date();
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        if ($('bookingFromDate')) $('bookingFromDate').value = `${year}-${month}-01`;
-        if ($('bookingToDate')) $('bookingToDate').value = todayStr;
       }
 
-      await loadBookingDashboardData();
+      if (!targetRecentDate) {
+        targetRecentDate = todayStr;
+      }
+
+      if ($('bookingFromDate')) $('bookingFromDate').value = targetRecentDate;
+      if ($('bookingToDate')) $('bookingToDate').value = targetRecentDate;
+    } catch (err) {
+      console.warn("Error resolving recent booking date:", err);
+      if ($('bookingFromDate')) $('bookingFromDate').value = todayStr;
+      if ($('bookingToDate')) $('bookingToDate').value = todayStr;
     }
+  } 
+  else if (mode === 'fortnight') {
+    const d = new Date();
+    d.setDate(d.getDate() - 15);
+    if ($('bookingFromDate')) $('bookingFromDate').value = getLocalDateStr(d);
+    if ($('bookingToDate')) $('bookingToDate').value = todayStr;
+  } 
+  else if (mode === 'month') {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    if ($('bookingFromDate')) $('bookingFromDate').value = `${year}-${month}-01`;
+    if ($('bookingToDate')) $('bookingToDate').value = todayStr;
+  }
 
-    async function loadBookingDashboardData() {
-      let query = supabaseClient.from('booking_performance').select('*');
+  await loadBookingDashboardData();
+}
 
-      const from = $('bookingFromDate')?.value;
-      const to = $('bookingToDate')?.value;
-      const office = $('bookingFilterOffice')?.value;
+async function loadBookingDashboardData() {
+  let query = supabaseClient.from('booking_performance').select('*');
 
-      if (from) query = query.gte('booking_date', from);
-      if (to) query = query.lte('booking_date', to);
-      if (office) query = query.eq('office_name', office);
+  const from = $('bookingFromDate')?.value;
+  const to = $('bookingToDate')?.value;
+  const office = $('bookingFilterOffice')?.value;
 
-      const { data, error } = await query;
-      if (error) {
-        console.error("Booking data fetch error:", error);
-        return;
+  if (from) query = query.gte('booking_date', from);
+  if (to) query = query.lte('booking_date', to);
+  if (office) query = query.eq('office_name', office);
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("Booking data fetch error:", error);
+    return;
+  }
+
+  bookingImportedRecords = data || [];
+
+  if (!activeSelectedChannelKeys || activeSelectedChannelKeys.size === 0) {
+    activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
+  }
+
+  const channelSummaryMap = {};
+  DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+    channelSummaryMap[cfg.key] = { count: 0, amount: 0 };
+  });
+
+  bookingImportedRecords.forEach(r => {
+    DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+      channelSummaryMap[cfg.key].count += parseFloat(r[cfg.cntField]) || 0;
+      channelSummaryMap[cfg.key].amount += parseFloat(r[cfg.amtField]) || 0;
+    });
+  });
+
+  if (typeof renderDynamicChannelChecklist === 'function') {
+    renderDynamicChannelChecklist(channelSummaryMap);
+  }
+
+  let totalCashCnt = 0;
+  let totalDigCnt = 0;
+  const officeMap = {};
+  const dayWiseList = [];
+
+  // Group by (Date + Office) and Aggregate totals
+  bookingImportedRecords.forEach(r => {
+    const off = (r.office_name || 'Unassigned').trim();
+    const dateStr = (r.booking_date || '-').trim();
+    const c_cnt = parseFloat(r.cash_cnt) || 0;
+
+    let d_cnt = 0;
+    DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+      if (activeSelectedChannelKeys.has(cfg.key)) {
+        d_cnt += parseFloat(r[cfg.cntField]) || 0;
       }
+    });
 
-      bookingImportedRecords = data || [];
+    totalCashCnt += c_cnt;
+    totalDigCnt += d_cnt;
 
-      if (!activeSelectedChannelKeys || activeSelectedChannelKeys.size === 0) {
-        activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
-      }
+    // 1. Office Summary
+    if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
+    officeMap[off].cash_cnt += c_cnt;
+    officeMap[off].dig_cnt += d_cnt;
 
-      const channelSummaryMap = {};
-      DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-        channelSummaryMap[cfg.key] = { count: 0, amount: 0 };
-      });
+    // 2. Day-wise Row Record
+    const tot = c_cnt + d_cnt;
+    const isZero = tot === 0;
+    const pct = tot > 0 ? (d_cnt / tot) * 100 : 0;
 
-      bookingImportedRecords.forEach(r => {
-        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          channelSummaryMap[cfg.key].count += parseFloat(r[cfg.cntField]) || 0;
-          channelSummaryMap[cfg.key].amount += parseFloat(r[cfg.amtField]) || 0;
-        });
-      });
+    dayWiseList.push({
+      date: dateStr,
+      office: off,
+      cash_cnt: c_cnt,
+      dig_cnt: d_cnt,
+      tot: tot,
+      pct: pct,
+      isZero: isZero
+    });
+  });
 
-      renderDynamicChannelChecklist(channelSummaryMap);
+// Trigger Horizontal Day-wise Cross-Tab Matrix
+  processDayWisePivotData();
+  renderDayWisePivotTable();
 
-      let totalCashCnt = 0;
-      let totalDigCnt = 0;
-      const officeMap = {};
+  const totalBookings = totalCashCnt + totalDigCnt;
+  const digPct = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
 
-      bookingImportedRecords.forEach(r => {
-        const off = (r.office_name || 'Unassigned').trim();
-        const c_cnt = parseFloat(r.cash_cnt) || 0;
+  // Update Scorecards
+  if ($('channelHeadingTxnCount')) $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
+  if ($('dashTotalBookings')) $('dashTotalBookings').innerText = totalBookings.toLocaleString('en-IN');
+  if ($('dashCashCount')) $('dashCashCount').innerText = totalCashCnt.toLocaleString('en-IN');
+  if ($('dashDigitalCount')) $('dashDigitalCount').innerText = totalDigCnt.toLocaleString('en-IN');
+  if ($('dashDigitalSharePct')) $('dashDigitalSharePct').innerText = `${digPct}%`;
+  if ($('dashDigitalProgressBar')) $('dashDigitalProgressBar').style.width = `${digPct}%`;
 
-        let d_cnt = 0;
-        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          if (activeSelectedChannelKeys.has(cfg.key)) {
-            d_cnt += parseFloat(r[cfg.cntField]) || 0;
-          }
-        });
-
-        totalCashCnt += c_cnt;
-        totalDigCnt += d_cnt;
-
-        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
-        officeMap[off].cash_cnt += c_cnt;
-        officeMap[off].dig_cnt += d_cnt;
-      });
-
-      const totalBookings = totalCashCnt + totalDigCnt;
-      const digPct = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
-
-      if ($('channelHeadingTxnCount')) $('channelHeadingTxnCount').innerText = `${totalDigCnt.toLocaleString('en-IN')} Txns`;
-      if ($('dashTotalBookings')) $('dashTotalBookings').innerText = totalBookings.toLocaleString('en-IN');
-      if ($('dashCashCount')) $('dashCashCount').innerText = totalCashCnt.toLocaleString('en-IN');
-      if ($('dashDigitalCount')) $('dashDigitalCount').innerText = totalDigCnt.toLocaleString('en-IN');
-      if ($('dashDigitalSharePct')) $('dashDigitalSharePct').innerText = `${digPct}%`;
-      if ($('dashDigitalProgressBar')) $('dashDigitalProgressBar').style.width = `${digPct}%`;
-
-      const tbody = $('bookingPerfTableBody');
-      if (!tbody) return;
-
-      const sortedOffices = Object.keys(officeMap).map(name => {
+  // -------------------------------------------------------------
+  // RENDER TABLE 1: OFFICE-WISE LEADERBOARD
+  // -------------------------------------------------------------
+  const tbodyLeaderboard = $('bookingPerfTableBody');
+  if (tbodyLeaderboard) {
+    const officeNames = Object.keys(officeMap);
+    if (!officeNames.length) {
+      tbodyLeaderboard.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No booking records found for selected period.</td></tr>`;
+    } else {
+      const processedOffices = officeNames.map(name => {
         const o = officeMap[name];
         const tot = o.cash_cnt + o.dig_cnt;
+        const isZero = tot === 0;
         const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
-        return { name, ...o, tot, pct };
-      }).sort((a, b) => b.pct - a.pct);
-
-      if (!sortedOffices.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No booking records found for the selected date range.</td></tr>`;
-        return;
-      }
+        return { name, cash_cnt: o.cash_cnt, dig_cnt: o.dig_cnt, tot, pct, isZero };
+      }).sort((a, b) => {
+        if (a.isZero && !b.isZero) return 1;
+        if (!a.isZero && b.isZero) return -1;
+        return b.pct - a.pct;
+      });
 
       let htmlArr = [];
-      sortedOffices.forEach((o, i) => {
+      processedOffices.forEach((o, i) => {
+        let pctDisplay = o.isZero 
+          ? `<span class="font-bold text-slate-400">-</span>`
+          : (o.pct >= 50 
+              ? `<span class="font-extrabold text-emerald-700">${o.pct.toFixed(2)}%</span>`
+              : `<span class="font-extrabold text-rose-700">${o.pct.toFixed(2)}%</span>`);
+
         htmlArr.push(`
-          <tr class="hover:bg-slate-50">
-            <td class="p-2 text-center font-bold font-mono ${i < 3 ? 'text-amber-700' : 'text-slate-500'}">#${i + 1}</td>
-            <td class="p-2 font-bold text-slate-800">${o.name}</td>
-            <td class="p-2 text-center font-semibold">${o.cash_cnt.toLocaleString('en-IN')}</td>
+          <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+            <td class="p-2 text-center font-bold font-mono ${i < 3 && !o.isZero ? 'text-amber-700' : 'text-slate-400'}">#${i + 1}</td>
+            <td class="p-2 font-bold ${o.isZero ? 'text-slate-500 font-normal' : 'text-slate-800'}">${o.name}</td>
+            <td class="p-2 text-center font-semibold text-slate-700">${o.cash_cnt.toLocaleString('en-IN')}</td>
             <td class="p-2 text-center font-bold text-blue-800">${o.dig_cnt.toLocaleString('en-IN')}</td>
-            <td class="p-2 text-center font-extrabold text-emerald-700 bg-emerald-50/50">${o.pct.toFixed(2)}%</td>
+            <td class="p-2 text-center">${pctDisplay}</td>
           </tr>
         `);
       });
@@ -3284,128 +3405,554 @@ function sortTable(col) {
       htmlArr.push(`
         <tr class="bg-postRed-700 text-white font-extrabold border-t-2 border-postRed-900">
           <td class="p-2 text-center font-mono">Σ</td>
-          <td class="p-2 font-bold uppercase tracking-wider">Total (${sortedOffices.length} Offices)</td>
+          <td class="p-2 font-bold uppercase tracking-wider">Grand Total (${processedOffices.length} Offices)</td>
           <td class="p-2 text-center">${totalCashCnt.toLocaleString('en-IN')}</td>
           <td class="p-2 text-center">${totalDigCnt.toLocaleString('en-IN')}</td>
-          <td class="p-2 text-center font-extrabold text-postGold-400">${digPct}%</td>
+          <td class="p-2 text-center font-extrabold text-postGold-300 text-[13px]">${totalBookings === 0 ? '-' : `${digPct}%`}</td>
         </tr>
       `);
-      tbody.innerHTML = htmlArr.join('');
+      tbodyLeaderboard.innerHTML = htmlArr.join('');
     }
+  }
 
-    function resetBookingFilters() {
-      if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'all';
-      if ($('bookingFromDate')) $('bookingFromDate').value = '';
-      if ($('bookingToDate')) $('bookingToDate').value = '';
-      if ($('bookingFilterOffice')) $('bookingFilterOffice').value = '';
-      activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
-      loadBookingDashboardData();
-    }
- async function exportBookingReportImage() {
-      if (!bookingImportedRecords.length) return alert("No booking data available to export as image!");
-      const fromVal = $('bookingFromDate')?.value || 'Inception';
-      const toVal = $('bookingToDate')?.value || 'CurrentDate';
-      const fileName = `Office-wise Digital Adoption-${fromVal}-${toVal}.png`;
-
-      const selectedChannels = activeSelectedChannelKeys;
-      const officeMap = {};
-      let totalCashCnt = 0, totalDigCnt = 0;
-
-      bookingImportedRecords.forEach(r => {
-        const off = r.office_name || 'Unassigned';
-        const c_cnt = parseFloat(r.cash_cnt) || 0;
-        let d_cnt = 0;
-        DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
-          if (selectedChannels.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
-        });
-
-        totalCashCnt += c_cnt;
-        totalDigCnt += d_cnt;
-        if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
-        officeMap[off].cash_cnt += c_cnt;
-        officeMap[off].dig_cnt += d_cnt;
+  // -------------------------------------------------------------
+  // RENDER TABLE 2: DETAILED DAY-WISE & OFFICE-WISE MATRIX
+  // -------------------------------------------------------------
+  const tbodyDayWise = $('dayWisePerfTableBody');
+  if (tbodyDayWise) {
+    if (!dayWiseList.length) {
+      tbodyDayWise.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No day-wise transaction records found for selected period.</td></tr>`;
+    } else {
+      // Sort day-wise records: Latest date first, then office name
+      dayWiseList.sort((a, b) => {
+        if (b.date !== a.date) return b.date.localeCompare(a.date);
+        return a.office.localeCompare(b.office);
       });
 
-      const totalBookings = totalCashCnt + totalDigCnt;
-      const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+      let dayHtmlArr = [];
+      dayWiseList.forEach((d, idx) => {
+        let pctDisplay = d.isZero 
+          ? `<span class="font-bold text-slate-400">-</span>`
+          : (d.pct >= 50 
+              ? `<span class="font-extrabold text-emerald-700">${d.pct.toFixed(2)}%</span>`
+              : `<span class="font-extrabold text-rose-700">${d.pct.toFixed(2)}%</span>`);
 
-      const sortedOffices = Object.keys(officeMap).map(name => {
-        const o = officeMap[name];
-        const tot = o.cash_cnt + o.dig_cnt;
-        const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
-        return { name, ...o, tot, pct };
-      }).sort((a, b) => b.pct - a.pct);
-
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.top = '-9999px';
-      container.style.left = '-9999px';
-      container.style.width = '800px';
-      container.style.backgroundColor = '#FFFFFF';
-      container.style.padding = '20px';
-      container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-
-      let rowsHtml = '';
-      sortedOffices.forEach((o, i) => {
-        rowsHtml += `
-          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
-            <td style="padding: 7px; text-align: center; font-weight: bold; font-family: monospace;">#${i + 1}</td>
-            <td style="padding: 7px; font-weight: bold; color: #0f172a;">${o.name}</td>
-            <td style="padding: 7px; text-align: center; font-weight: 600;">${o.cash_cnt.toLocaleString('en-IN')}</td>
-            <td style="padding: 7px; text-align: center; font-weight: bold; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
-            <td style="padding: 7px; text-align: center; font-weight: 800; color: #15803d; background: #f0fdf4;">${o.pct.toFixed(2)}%</td>
+        dayHtmlArr.push(`
+          <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+            <td class="p-2 text-center font-bold text-slate-400 font-mono">${idx + 1}</td>
+            <td class="p-2 text-center font-bold text-slate-700 whitespace-nowrap">${d.date}</td>
+            <td class="p-2 font-bold ${d.isZero ? 'text-slate-500 font-normal' : 'text-slate-900'}">${d.office}</td>
+            <td class="p-2 text-center font-semibold text-slate-700">${d.cash_cnt.toLocaleString('en-IN')}</td>
+            <td class="p-2 text-center font-bold text-blue-800">${d.dig_cnt.toLocaleString('en-IN')}</td>
+            <td class="p-2 text-center font-extrabold text-slate-900">${d.tot.toLocaleString('en-IN')}</td>
+            <td class="p-2 text-center">${pctDisplay}</td>
           </tr>
-        `;
+        `);
       });
 
-      container.innerHTML = `
-        <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
-          <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Digital vs Cash Transaction Performance Report</h2>
-              <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Complete Division Performance Leaderboard</p>
-              <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
-          </div>
+      dayHtmlArr.push(`
+        <tr class="bg-postRed-700 text-white font-extrabold border-t-2 border-postRed-900">
+          <td class="p-2 text-center font-mono">Σ</td>
+          <td class="p-2 text-center font-bold uppercase tracking-wider" colspan="2">Day-wise Grand Total (${dayWiseList.length} Entries)</td>
+          <td class="p-2 text-center">${totalCashCnt.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-center">${totalDigCnt.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-center">${totalBookings.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-center font-extrabold text-postGold-300 text-[13px]">${totalBookings === 0 ? '-' : `${digPct}%`}</td>
+        </tr>
+      `);
 
-          <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-              <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
-                <th style="padding: 8px; text-align: center; width: 10%;">#</th>
-                <th style="padding: 8px; width: 45%;">Office Name</th>
-                <th style="padding: 8px; text-align: center; width: 15%;">Cash Txn (Cnt)</th>
-                <th style="padding: 8px; text-align: center; width: 15%;">Digital Txn (Cnt)</th>
-                <th style="padding: 8px; text-align: center; width: 15%;">Digital % Share</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-              <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
-                <td style="padding: 8px; text-align: center; font-family: monospace;">Σ</td>
-                <td style="padding: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
-                <td style="padding: 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
-                <td style="padding: 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
-                <td style="padding: 8px; text-align: center; color: #FACC15; font-size: 12px;">${totalDigShare}%</td>
-              </tr>
-            </tbody>
-          </table>
+      tbodyDayWise.innerHTML = dayHtmlArr.join('');
+    }
+  }
+}
+
+function resetBookingFilters() {
+  if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'yesterday';
+  applyBookingQuickPeriod();
+}
+
+// =========================================================================
+// HORIZONTAL PIVOT EXPORT: PNG IMAGE (CAPTURES ALL HORIZONTAL COLUMNS)
+// =========================================================================
+async function exportDayWisePivotImage() {
+  if (!bookingImportedRecords.length) return alert("No booking records to export!");
+  
+  const fromVal = $('bookingFromDate')?.value || 'Inception';
+  const toVal = $('bookingToDate')?.value || 'CurrentDate';
+  const metric = $('pivotMetricSelector')?.value || 'pct';
+  const metricLabel = metric === 'pct' ? 'Digital Share %' : (metric === 'dig' ? 'Digital Txn (Cnt)' : (metric === 'cash' ? 'Cash Txn (Cnt)' : 'Combined'));
+  const fileName = `Day_Wise_Horizontal_Matrix_${fromVal}_to_${toVal}.png`;
+
+  const { dates, offices, grid, totalsByDate, grandOfficeTotals } = cachedPivotMatrixData;
+
+  if (!dates.length || !offices.length) {
+    return alert("No pivot data available to render image!");
+  }
+
+  const baseWidth = 400; 
+  const colWidth = metric === 'all' ? 75 : 55;
+  const totalCalculatedWidth = Math.max(1100, baseWidth + (dates.length * colWidth));
+
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.top = '0';
+  container.style.left = '-99999px';
+  container.style.width = `${totalCalculatedWidth}px`;
+  container.style.minWidth = `${totalCalculatedWidth}px`;
+  container.style.maxWidth = 'none';
+  container.style.backgroundColor = '#FFFFFF';
+  container.style.padding = '20px';
+  container.style.boxSizing = 'border-box';
+  container.style.overflow = 'visible';
+  container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+  let theadThs = '';
+  dates.forEach(d => {
+    const shortDate = d.length === 10 ? `${d.substring(8, 10)}/${d.substring(5, 7)}` : d;
+    theadThs += `<th style="padding: 6px 4px; text-align: center; border: 1px solid #8A0C21; font-size: 10px; min-width: ${colWidth}px; white-space: nowrap;">${shortDate}</th>`;
+  });
+
+  let tbodyRows = '';
+  let grandTotalCashAll = 0, grandTotalDigAll = 0;
+
+  offices.forEach((off, idx) => {
+    const oTot = grandOfficeTotals[off] || { cash: 0, dig: 0 };
+    grandTotalCashAll += oTot.cash;
+    grandTotalDigAll += oTot.dig;
+    const totOverall = oTot.cash + oTot.dig;
+    const pctOverall = totOverall > 0 ? (oTot.dig / totOverall) * 100 : 0;
+
+    let overallText = '-';
+    if (metric === 'pct') {
+      overallText = totOverall === 0 ? '-' : `${pctOverall.toFixed(2)}%`;
+    } else if (metric === 'dig') {
+      overallText = oTot.dig.toLocaleString('en-IN');
+    } else if (metric === 'cash') {
+      overallText = oTot.cash.toLocaleString('en-IN');
+    } else if (metric === 'all') {
+      overallText = `${oTot.dig}/${oTot.cash} (${totOverall > 0 ? pctOverall.toFixed(2) + '%' : '-'})`;
+    }
+
+    let rowTds = '';
+    dates.forEach(d => {
+      const cellData = grid[off]?.[d] || { cash: 0, dig: 0 };
+      const tot = cellData.cash + cellData.dig;
+      const pct = tot > 0 ? (cellData.dig / tot) * 100 : 0;
+
+      let cellText = '-';
+      let fontColor = '#94a3b8';
+      
+      if (metric === 'pct') {
+        if (tot > 0) {
+          cellText = `${pct.toFixed(2)}`;
+          fontColor = pct >= 50 ? '#15803d' : '#be123c';
+        }
+      } else if (metric === 'dig') {
+        cellText = tot > 0 ? cellData.dig.toLocaleString('en-IN') : '-';
+        fontColor = '#1e40af';
+      } else if (metric === 'cash') {
+        cellText = tot > 0 ? cellData.cash.toLocaleString('en-IN') : '-';
+        fontColor = '#334155';
+      } else if (metric === 'all') {
+        if (tot > 0) {
+          cellText = `${cellData.dig}/${cellData.cash} (${pct.toFixed(2)})`;
+          fontColor = pct >= 50 ? '#15803d' : '#be123c';
+        }
+      }
+
+      rowTds += `<td style="padding: 5px 3px; text-align: center; border: 1px solid #e2e8f0; font-weight: 700; color: ${fontColor}; font-size: 10px; white-space: nowrap;">${cellText}</td>`;
+    });
+
+    tbodyRows += `
+      <tr style="background: ${idx % 2 === 0 ? '#FFFFFF' : '#f8fafc'};">
+        <td style="padding: 5px; text-align: center; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10px; color: #64748b;">${idx + 1}</td>
+        <td style="padding: 5px 8px; border: 1px solid #e2e8f0; font-weight: bold; font-size: 10.5px; color: #0f172a; white-space: nowrap;">${off}</td>
+        ${rowTds}
+        <td style="padding: 5px; text-align: center; border: 1px solid #cbd5e1; font-weight: 800; font-size: 10.5px; background: #f1f5f9; color: #0f172a; white-space: nowrap;">${overallText}</td>
+      </tr>
+    `;
+  });
+
+  const grandBookings = grandTotalCashAll + grandTotalDigAll;
+  const grandPct = grandBookings > 0 ? (grandTotalDigAll / grandBookings) * 100 : 0;
+  
+  let grandOverallText = grandBookings === 0 ? '-' : `${grandPct.toFixed(2)}%`;
+  if (metric === 'dig') grandOverallText = grandTotalDigAll.toLocaleString('en-IN');
+  if (metric === 'cash') grandOverallText = grandTotalCashAll.toLocaleString('en-IN');
+  if (metric === 'all') grandOverallText = `${grandTotalDigAll} / ${grandTotalCashAll} (${grandPct.toFixed(2)}%)`;
+
+  let footerTds = '';
+  dates.forEach(d => {
+    const dTot = totalsByDate[d] || { cash: 0, dig: 0 };
+    const tot = dTot.cash + dTot.dig;
+    const pct = tot > 0 ? (dTot.dig / tot) * 100 : 0;
+    
+    let dayText = '-';
+    if (metric === 'pct') {
+      dayText = tot === 0 ? '-' : `${pct.toFixed(2)}`;
+    } else if (metric === 'dig') {
+      dayText = dTot.dig.toLocaleString('en-IN');
+    } else if (metric === 'cash') {
+      dayText = dTot.cash.toLocaleString('en-IN');
+    } else if (metric === 'all') {
+      dayText = tot === 0 ? '-' : `${dTot.dig}/${dTot.cash} (${pct.toFixed(2)})`;
+    }
+
+    footerTds += `<td style="padding: 6px 3px; text-align: center; border: 1px solid #8A0C21; color: #FEF08A; font-size: 10px; font-weight: 800; white-space: nowrap;">${dayText}</td>`;
+  });
+
+  container.innerHTML = `
+    <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: visible; background: #fff; width: 100%;">
+      <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="margin: 0; font-size: 15px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Day-wise Digital Performance Matrix (${metricLabel})</h2>
+          <p style="margin: 2px 0 0 0; font-size: 11px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Horizontal Daily Performance Matrix</p>
+          <p style="margin: 4px 0 0 0; font-size: 10px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Metric: <strong>${metricLabel}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
         </div>
-      `;
+        ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+      </div>
 
-      document.body.appendChild(container);
-      try {
-        const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      } catch (err) {
-        alert("Image export failed: " + err.message);
-      } finally {
-        document.body.removeChild(container);
+      <table style="width: 100%; border-collapse: collapse; text-align: left; table-layout: auto;">
+        <thead>
+          <tr style="background: #8A0C21; color: #ffffff; font-weight: bold;">
+            <th style="padding: 6px 4px; text-align: center; width: 35px; border: 1px solid #8A0C21;">#</th>
+            <th style="padding: 6px 8px; min-width: 180px; border: 1px solid #8A0C21;">Office Name</th>
+            ${theadThs}
+            <th style="padding: 6px 8px; text-align: center; min-width: 80px; background: #6E081A; border: 1px solid #8A0C21;">Overall %</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tbodyRows}
+          <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11px; border-top: 2px solid #6E081A;">
+            <td style="padding: 6px; text-align: center; font-family: monospace; border: 1px solid #8A0C21;">Σ</td>
+            <td style="padding: 6px 8px; text-transform: uppercase; border: 1px solid #8A0C21;">DIVISION TOTAL</td>
+            ${footerTds}
+            <td style="padding: 6px; text-align: center; color: #FEF08A; font-size: 11.5px; background: #6E081A; border: 1px solid #8A0C21;">${grandOverallText}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.body.appendChild(container);
+
+  try {
+    const fullRenderWidth = container.scrollWidth;
+    const fullRenderHeight = container.scrollHeight;
+
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      backgroundColor: '#FFFFFF',
+      useCORS: true,
+      width: fullRenderWidth,
+      height: fullRenderHeight,
+      windowWidth: fullRenderWidth + 200,
+      windowHeight: fullRenderHeight + 200
+    });
+
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    alert("Image export failed: " + err.message);
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
+// =========================================================================
+// HORIZONTAL PIVOT EXPORT: PRINT REPORT (LANDSCAPE)
+// =========================================================================
+function printDayWisePivotReport() {
+  if (!bookingImportedRecords.length) return alert("No performance data to print!");
+
+  const fromVal = $('bookingFromDate')?.value || 'Inception';
+  const toVal = $('bookingToDate')?.value || 'Current Date';
+  const metric = $('pivotMetricSelector')?.value || 'pct';
+  const metricLabel = metric === 'pct' ? 'Digital Share %' : (metric === 'dig' ? 'Digital Txn (Cnt)' : 'Cash Txn (Cnt)');
+  const generatedTimeStr = new Date().toLocaleString("en-IN", { 
+    day: '2-digit', month: '2-digit', year: 'numeric', 
+    hour: '2-digit', minute: '2-digit', second: '2-digit', 
+    hour12: true 
+  });
+
+  const { dates, offices, grid, totalsByDate, grandOfficeTotals } = cachedPivotMatrixData;
+
+  const printWindow = window.open('', '_blank', 'width=1100,height=850');
+  if (!printWindow) return alert("Popup blocked! Please allow popups to print.");
+
+  let theadThs = '';
+  dates.forEach(d => {
+    const shortDate = d.length === 10 ? `${d.substring(8, 10)}/${d.substring(5, 7)}` : d;
+    theadThs += `<th style="text-align:center;">${shortDate}</th>`;
+  });
+
+  let tbodyRows = '';
+  let grandTotalCashAll = 0, grandTotalDigAll = 0;
+
+  offices.forEach((off, idx) => {
+    const oTot = grandOfficeTotals[off] || { cash: 0, dig: 0 };
+    grandTotalCashAll += oTot.cash;
+    grandTotalDigAll += oTot.dig;
+    const totOverall = oTot.cash + oTot.dig;
+    const pctOverall = totOverall > 0 ? (oTot.dig / totOverall) * 100 : 0;
+
+    let overallText = totOverall === 0 ? '-' : `${pctOverall.toFixed(2)}%`;
+    if (metric === 'dig') overallText = oTot.dig.toLocaleString('en-IN');
+    if (metric === 'cash') overallText = oTot.cash.toLocaleString('en-IN');
+
+    let rowTds = '';
+    dates.forEach(d => {
+      const cellData = grid[off]?.[d] || { cash: 0, dig: 0 };
+      const tot = cellData.cash + cellData.dig;
+      const pct = tot > 0 ? (cellData.dig / tot) * 100 : 0;
+
+      let cellText = '-';
+      let fontColor = '#94a3b8';
+      if (metric === 'pct') {
+        if (tot > 0) {
+          cellText = `${pct.toFixed(2)}`;
+          fontColor = pct >= 50 ? '#15803d' : '#be123c';
+        }
+      } else if (metric === 'dig') {
+        cellText = tot > 0 ? cellData.dig : '-';
+        fontColor = '#1d4ed8';
+      } else if (metric === 'cash') {
+        cellText = tot > 0 ? cellData.cash : '-';
+        fontColor = '#334155';
+      }
+
+      rowTds += `<td style="text-align:center; font-weight:bold; color:${fontColor};">${cellText}</td>`;
+    });
+
+    tbodyRows += `
+      <tr>
+        <td style="text-align:center;">${idx + 1}</td>
+        <td style="font-weight:bold; color:#0f172a; white-space:nowrap;">${off}</td>
+        ${rowTds}
+        <td style="text-align:center; font-weight:bold; background:#f1f5f9;">${overallText}</td>
+      </tr>
+    `;
+  });
+
+  const grandBookings = grandTotalCashAll + grandTotalDigAll;
+  const grandPct = grandBookings > 0 ? (grandTotalDigAll / grandBookings) * 100 : 0;
+  let grandOverallText = grandBookings === 0 ? '-' : `${grandPct.toFixed(2)}%`;
+  if (metric === 'dig') grandOverallText = grandTotalDigAll.toLocaleString('en-IN');
+  if (metric === 'cash') grandOverallText = grandTotalCashAll.toLocaleString('en-IN');
+
+  let footerTds = '';
+  dates.forEach(d => {
+    const dTot = totalsByDate[d] || { cash: 0, dig: 0 };
+    const tot = dTot.cash + dTot.dig;
+    const pct = tot > 0 ? (dTot.dig / tot) * 100 : 0;
+    let dayText = tot === 0 ? '-' : `${pct.toFixed(2)}`;
+    if (metric === 'dig') dayText = dTot.dig.toLocaleString('en-IN');
+    if (metric === 'cash') dayText = dTot.cash.toLocaleString('en-IN');
+
+    footerTds += `<td style="text-align:center;">${dayText}</td>`;
+  });
+
+  printWindow.document.open();
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Day-wise Digital Performance Matrix</title>
+      <style>
+        @page { size: A4 landscape; margin: 8mm 10mm; }
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; padding: 12px; font-size: 10px; margin: 0; background: #fff; }
+        .header-banner { border-bottom: 2px solid #C4122F; padding-bottom: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .title-area h1 { margin: 0; color: #A80F28; font-size: 14px; text-transform: uppercase; font-weight: 800; }
+        .title-area h2 { margin: 2px 0 0 0; color: #D97706; font-size: 12px; font-weight: bold; }
+        .title-area .meta-info { margin: 3px 0 0 0; font-size: 10px; color: #475569; }
+        .logo-img { height: 42px; width: 64px; object-fit: contain; }
+        table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        th { background: #A80F28; color: #fff; padding: 5px 4px; border: 1px solid #8A0C21; font-size: 9.5px; }
+        td { padding: 4px; border: 1px solid #cbd5e1; font-size: 9.5px; }
+        .total-row { background: #fee2e2 !important; font-weight: bold; color: #881337; }
+        .footer-banner { margin-top: 18px; padding-top: 8px; border-top: 1.5px dashed #94a3b8; text-align: center; font-weight: bold; font-size: 10px; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; }
+        @media print { .no-print { display: none !important; } body { padding: 0; } }
+      </style>
+    </head>
+    <body>
+      <div class="no-print" style="background:#f1f5f9; padding:6px 12px; text-align:right; border-bottom:1px solid #cbd5e1; margin-bottom:10px;">
+        <button onclick="window.print()" style="background:#A80F28; color:white; border:none; padding:5px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🖨️ Print Matrix</button>
+        <button onclick="window.close()" style="background:#64748b; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; margin-left:4px; font-size:11px;">Close</button>
+      </div>
+
+      <div class="header-banner">
+        <div class="title-area">
+          <h1>Day-wise Digital Performance Matrix</h1>
+          <h2>Chennai City Central Division &bull; Horizontal Day-wise Trend Matrix (${metricLabel})</h2>
+          <div class="meta-info">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Metric: <strong>${metricLabel}</strong> | Generated on: <strong>${generatedTimeStr}</strong></div>
+        </div>
+        ${currentAppLogo ? `<img src="${currentAppLogo}" class="logo-img" alt="India Post Logo">` : ''}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 3%;">#</th>
+            <th style="text-align:left; width: 22%;">Office Name</th>
+            ${theadThs}
+            <th style="width: 8%;">Overall %</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tbodyRows}
+          <tr class="total-row">
+            <td colspan="2" style="text-align:center; letter-spacing:0.5px;">DIVISION TOTAL</td>
+            ${footerTds}
+            <td style="text-align:center;">${grandOverallText}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footer-banner">
+        *** END OF MATRIX REPORT &bull; TOTAL OFFICES: ${offices.length} | TOTAL DATES: ${dates.length} ***
+      </div>
+
+      <script>
+        window.onload = function() {
+          setTimeout(function() { window.print(); }, 400);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+async function exportBookingReportImage() {
+  if (!bookingImportedRecords.length) return alert("No booking data available to export as image!");
+  const fromVal = $('bookingFromDate')?.value || 'Inception';
+  const toVal = $('bookingToDate')?.value || 'CurrentDate';
+  const fileName = `Office-wise Digital Adoption-${fromVal}-${toVal}.png`;
+
+  const selectedChannels = activeSelectedChannelKeys;
+  const officeMap = {};
+  let totalCashCnt = 0, totalDigCnt = 0;
+
+  bookingImportedRecords.forEach(r => {
+    const off = r.office_name || 'Unassigned';
+    const c_cnt = parseFloat(r.cash_cnt) || 0;
+    let d_cnt = 0;
+    DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+      if (selectedChannels.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
+    });
+
+    totalCashCnt += c_cnt;
+    totalDigCnt += d_cnt;
+    if (!officeMap[off]) officeMap[off] = { cash_cnt: 0, dig_cnt: 0 };
+    officeMap[off].cash_cnt += c_cnt;
+    officeMap[off].dig_cnt += d_cnt;
+  });
+
+  const totalBookings = totalCashCnt + totalDigCnt;
+  const totalDigShare = totalBookings > 0 ? ((totalDigCnt / totalBookings) * 100).toFixed(2) : "0.00";
+
+  const sortedOffices = Object.keys(officeMap).map(name => {
+    const o = officeMap[name];
+    const tot = o.cash_cnt + o.dig_cnt;
+    const isZero = tot === 0;
+    const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
+    return { name, cash_cnt: o.cash_cnt, dig_cnt: o.dig_cnt, tot, pct, isZero };
+  }).sort((a, b) => {
+    if (a.isZero && !b.isZero) return 1;
+    if (!a.isZero && b.isZero) return -1;
+    return b.pct - a.pct;
+  });
+
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.top = '-9999px';
+  container.style.left = '-9999px';
+  container.style.width = '850px';
+  container.style.backgroundColor = '#FFFFFF';
+  container.style.padding = '20px';
+  container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+  let rowsHtml = '';
+  sortedOffices.forEach((o, i) => {
+    let fontColor = '#94a3b8'; // Slate 400 default for 0 txns
+    let pctValText = '-';
+
+    if (!o.isZero) {
+      if (o.pct >= 50) {
+        fontColor = '#15803d'; // Forest Green
+        pctValText = `${o.pct.toFixed(2)}%`;
+      } else {
+        fontColor = '#be123c'; // Dark Rose/Red
+        pctValText = `${o.pct.toFixed(2)}%`;
       }
     }
+
+    rowsHtml += `
+      <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
+        <td style="padding: 7px; text-align: center; font-weight: bold; font-family: monospace; color: #64748b;">#${i + 1}</td>
+        <td style="padding: 7px; font-weight: bold; color: ${o.isZero ? '#64748b' : '#0f172a'};">${o.name}</td>
+        <td style="padding: 7px; text-align: center; font-weight: 600; color: #334155;">${o.cash_cnt.toLocaleString('en-IN')}</td>
+        <td style="padding: 7px; text-align: center; font-weight: bold; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
+        <td style="padding: 7px; text-align: center; font-weight: 800; color: ${fontColor};">${pctValText}</td>
+      </tr>
+    `;
+  });
+
+ const grandTotalPctText = totalBookings === 0 
+    ? '-' 
+    : `${totalDigShare}%`;
+
+  container.innerHTML = `
+    <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
+      <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Digital vs Cash Transaction Performance Report</h2>
+          <p style="margin: 2px 0 0 0; font-size: 14px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Divisional Performance Leaderboard</p>
+          <p style="margin: 4px 0 0 0; font-size: 12px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
+        </div>
+        ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
+            <th style="padding: 8px; text-align: center; width: 8%;">#</th>
+            <th style="padding: 8px; width: 44%;">Office Name</th>
+            <th style="padding: 8px; text-align: center; width: 16%;">Cash Txn (Cnt)</th>
+            <th style="padding: 8px; text-align: center; width: 16%;">Digital Txn (Cnt)</th>
+            <th style="padding: 8px; text-align: center; width: 16%;">Digital % Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+          <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
+            <td style="padding: 9px 8px; text-align: center; font-family: monospace;">Σ</td>
+            <td style="padding: 9px 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
+            <td style="padding: 9px 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 9px 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 9px 8px; text-align: center; color: #FEF08A; font-size: 12px; font-weight: 900;">${grandTotalPctText}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+  `;
+
+  document.body.appendChild(container);
+  try {
+    const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    alert("Image export failed: " + err.message);
+  } finally {
+    document.body.removeChild(container);
+  }
+}
 
    async function exportBookingReportPDF() {
   if (!bookingImportedRecords.length) return alert("No performance data to export!");
@@ -3434,7 +3981,7 @@ function sortTable(col) {
   doc.setFont("helvetica", "bold");
   doc.text("Digital vs Cash Transaction Performance Report", 105, 14, { align: "center" });
 
-  doc.setFontSize(9.5);
+  doc.setFontSize(10.5);
   doc.setTextColor(...COLOR_GOLD);
   doc.setFont("helvetica", "bold");
   doc.text("Chennai City Central Division • Booking Performance Monitoring", 105, 19, { align: "center" });
@@ -3446,7 +3993,7 @@ function sortTable(col) {
     hour: '2-digit', minute: '2-digit', hour12: true
   });
 
-  doc.setFontSize(8);
+  doc.setFontSize(9);
   doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "bold");
  // doc.text(`Period: ${fromVal} to ${toVal} | Generated on: ${generatedTimeStr}`, 105, 24, { align: "center" });
@@ -6191,6 +6738,192 @@ async function deleteClaimByAdmin() {
       const container = $('userPastedPreviewContainer');
       if (container) container.classList.remove('hidden');
     });
+
+    // Global pivot data cache
+let cachedPivotMatrixData = { dates: [], offices: [], grid: {}, totalsByDate: {}, grandOfficeTotals: {} };
+
+function processDayWisePivotData() {
+  const selectedChannels = activeSelectedChannelKeys;
+  const dateSet = new Set();
+  const officeSet = new Set();
+  const grid = {}; // grid[office][date] = { cash: 0, dig: 0 }
+  const totalsByDate = {}; // totalsByDate[date] = { cash: 0, dig: 0 }
+  const grandOfficeTotals = {}; // grandOfficeTotals[office] = { cash: 0, dig: 0 }
+
+  bookingImportedRecords.forEach(r => {
+    const off = (r.office_name || 'Unassigned').trim();
+    const dateStr = (r.booking_date || '-').trim();
+    if (dateStr === '-' || !dateStr) return;
+
+    dateSet.add(dateStr);
+    officeSet.add(off);
+
+    const c_cnt = parseFloat(r.cash_cnt) || 0;
+    let d_cnt = 0;
+    DIGITAL_CHANNEL_CONFIG.forEach(cfg => {
+      if (selectedChannels.has(cfg.key)) d_cnt += parseFloat(r[cfg.cntField]) || 0;
+    });
+
+    if (!grid[off]) grid[off] = {};
+    if (!grid[off][dateStr]) grid[off][dateStr] = { cash: 0, dig: 0 };
+    grid[off][dateStr].cash += c_cnt;
+    grid[off][dateStr].dig += d_cnt;
+
+    if (!totalsByDate[dateStr]) totalsByDate[dateStr] = { cash: 0, dig: 0 };
+    totalsByDate[dateStr].cash += c_cnt;
+    totalsByDate[dateStr].dig += d_cnt;
+
+    if (!grandOfficeTotals[off]) grandOfficeTotals[off] = { cash: 0, dig: 0 };
+    grandOfficeTotals[off].cash += c_cnt;
+    grandOfficeTotals[off].dig += d_cnt;
+  });
+
+  const sortedDates = Array.from(dateSet).sort(); // Chronological: Date 1 -> Date N
+  const sortedOffices = Array.from(officeSet).sort();
+
+  cachedPivotMatrixData = {
+    dates: sortedDates,
+    offices: sortedOffices,
+    grid,
+    totalsByDate,
+    grandOfficeTotals
+  };
+}
+
+function renderDayWisePivotTable() {
+  const thead = $('dayWisePivotThead');
+  const tbody = $('dayWisePivotTbody');
+  if (!thead || !tbody) return;
+
+  const { dates, offices, grid, totalsByDate, grandOfficeTotals } = cachedPivotMatrixData;
+  const metric = $('pivotMetricSelector')?.value || 'pct';
+
+  if (!dates.length || !offices.length) {
+    thead.innerHTML = `<tr><th class="p-2">Office Name</th></tr>`;
+    tbody.innerHTML = `<tr><td class="p-4 text-center text-slate-400">No transaction data found for the selected period.</td></tr>`;
+    return;
+  }
+
+  // 1. Build Header Row with Horizontal Dates
+  let theadHtml = `
+    <tr>
+      <th class="p-2 text-center sticky left-0 z-20 bg-postRed-800 border-r border-postRed-600">#</th>
+      <th class="p-2 text-left sticky left-8 z-20 bg-postRed-800 border-r border-postRed-600 min-w-[140px]">Office Name</th>
+  `;
+
+  dates.forEach(d => {
+    const shortDate = d.length === 10 ? `${d.substring(8, 10)}/${d.substring(5, 7)}` : d;
+    theadHtml += `<th class="p-2 text-center whitespace-nowrap border-r border-postRed-600/50" title="${d}">${shortDate}</th>`;
+  });
+
+  theadHtml += `<th class="p-2 text-center whitespace-nowrap bg-postRed-900 sticky right-0 z-20 min-w-[90px]">Overall %</th></tr>`;
+  thead.innerHTML = theadHtml;
+
+  // 2. Build Body Rows
+  let tbodyHtml = '';
+  let grandTotalCashAll = 0;
+  let grandTotalDigAll = 0;
+
+  offices.forEach((off, idx) => {
+    const oTot = grandOfficeTotals[off] || { cash: 0, dig: 0 };
+    grandTotalCashAll += oTot.cash;
+    grandTotalDigAll += oTot.dig;
+
+    const totOverall = oTot.cash + oTot.dig;
+    const pctOverall = totOverall > 0 ? (oTot.dig / totOverall) * 100 : 0;
+
+    let overallCell = '-';
+    if (metric === 'pct') {
+      overallCell = totOverall === 0 ? '-' : (pctOverall >= 50 
+        ? `<span class="font-extrabold text-emerald-700">${pctOverall.toFixed(2)}%</span>` 
+        : `<span class="font-extrabold text-rose-700">${pctOverall.toFixed(2)}%</span>`);
+    } else if (metric === 'dig') {
+      overallCell = `<span class="font-bold text-blue-800">${oTot.dig.toLocaleString('en-IN')}</span>`;
+    } else if (metric === 'cash') {
+      overallCell = `<span class="font-semibold text-slate-700">${oTot.cash.toLocaleString('en-IN')}</span>`;
+    } else if (metric === 'all') {
+      overallCell = `<div class="text-[10px] leading-tight"><b>${oTot.dig}</b>/${oTot.cash} <span class="${pctOverall >= 50 ? 'text-emerald-700' : 'text-rose-700'} font-bold">(${totOverall > 0 ? pctOverall.toFixed(2) + '%' : '-'})</span></div>`;
+    }
+
+    tbodyHtml += `
+      <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
+        <td class="p-1.5 text-center font-bold font-mono text-slate-400 sticky left-0 bg-white border-r border-slate-200">${idx + 1}</td>
+        <td class="p-1.5 font-bold text-slate-800 sticky left-8 bg-white border-r border-slate-200 whitespace-nowrap">${off}</td>
+    `;
+
+    dates.forEach(d => {
+      const cellData = grid[off]?.[d] || { cash: 0, dig: 0 };
+      const tot = cellData.cash + cellData.dig;
+      const pct = tot > 0 ? (cellData.dig / tot) * 100 : 0;
+
+      let valDisplay = '-';
+      if (metric === 'pct') {
+        if (tot === 0) {
+          valDisplay = `<span class="text-slate-300">-</span>`;
+        } else if (pct >= 50) {
+          valDisplay = `<span class="font-extrabold text-emerald-700">${pct.toFixed(2)}</span>`;
+        } else {
+          valDisplay = `<span class="font-extrabold text-rose-700">${pct.toFixed(2)}</span>`;
+        }
+      } else if (metric === 'dig') {
+        valDisplay = tot === 0 ? `<span class="text-slate-300">-</span>` : `<span class="font-bold text-blue-800">${cellData.dig}</span>`;
+      } else if (metric === 'cash') {
+        valDisplay = tot === 0 ? `<span class="text-slate-300">-</span>` : `<span class="font-semibold text-slate-700">${cellData.cash}</span>`;
+      } else if (metric === 'all') {
+        valDisplay = tot === 0 ? `<span class="text-slate-300">-</span>` : `<div class="text-[10px] leading-tight"><b>${cellData.dig}</b>/${cellData.cash}<br><span class="${pct >= 50 ? 'text-emerald-700' : 'text-rose-700'} font-bold">${pct.toFixed(2)}</span></div>`;
+      }
+
+      tbodyHtml += `<td class="p-1.5 text-center whitespace-nowrap border-r border-slate-100">${valDisplay}</td>`;
+    });
+
+    tbodyHtml += `<td class="p-1.5 text-center whitespace-nowrap bg-slate-50 sticky right-0 font-bold border-l border-slate-200">${overallCell}</td></tr>`;
+  });
+
+  // 3. Grand Total Footer Row
+  const totalAllBookings = grandTotalCashAll + grandTotalDigAll;
+  const grandDigPctAll = totalAllBookings > 0 ? (grandTotalDigAll / totalAllBookings) * 100 : 0;
+
+  let grandOverallCell = '-';
+  if (metric === 'pct') {
+    grandOverallCell = totalAllBookings === 0 ? '-' : `${grandDigPctAll.toFixed(2)}%`;
+  } else if (metric === 'dig') {
+    grandOverallCell = grandTotalDigAll.toLocaleString('en-IN');
+  } else if (metric === 'cash') {
+    grandOverallCell = grandTotalCashAll.toLocaleString('en-IN');
+  } else if (metric === 'all') {
+    grandOverallCell = `${grandTotalDigAll} / ${grandTotalCashAll} (${grandDigPctAll.toFixed(2)}%)`;
+  }
+
+  tbodyHtml += `
+    <tr class="bg-postRed-700 text-white font-extrabold sticky bottom-0 z-10 border-t-2 border-postRed-900">
+      <td class="p-2 text-center sticky left-0 bg-postRed-800 border-r border-postRed-600 font-mono">Σ</td>
+      <td class="p-2 uppercase sticky left-8 bg-postRed-800 border-r border-postRed-600 whitespace-nowrap">Division Total</td>
+  `;
+
+  dates.forEach(d => {
+    const dTot = totalsByDate[d] || { cash: 0, dig: 0 };
+    const tot = dTot.cash + dTot.dig;
+    const pct = tot > 0 ? (dTot.dig / tot) * 100 : 0;
+
+    let daySummaryVal = '-';
+    if (metric === 'pct') {
+      daySummaryVal = tot === 0 ? '-' : `${pct.toFixed(2)}`;
+    } else if (metric === 'dig') {
+      daySummaryVal = dTot.dig.toLocaleString('en-IN');
+    } else if (metric === 'cash') {
+      daySummaryVal = dTot.cash.toLocaleString('en-IN');
+    } else if (metric === 'all') {
+      daySummaryVal = `${dTot.dig}/${dTot.cash} (${tot > 0 ? pct.toFixed(2) : '-'})`;
+    }
+
+    tbodyHtml += `<td class="p-2 text-center whitespace-nowrap border-r border-postRed-600/50 text-postGold-200">${daySummaryVal}</td>`;
+  });
+
+  tbodyHtml += `<td class="p-2 text-center whitespace-nowrap bg-postRed-900 sticky right-0 font-extrabold text-postGold-300 text-[12px]">${grandOverallCell}</td></tr>`;
+
+  tbody.innerHTML = tbodyHtml;
+}
+
 // =========================================================================
 // FETCH TRUE REPO LAST-COMMIT DATE & TIME FROM GITHUB API
 // =========================================================================
