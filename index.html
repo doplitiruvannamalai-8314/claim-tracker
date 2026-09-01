@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4841,12 +4843,14 @@ async function exportBookingReportImage() {
       alert(`Successfully imported ${validRecordsToInsert.length} booking records!`);
       $('bookingExcelFileInput').value = '';
 
-      const importedDates = [...new Set(validRecordsToInsert.map(r => r.booking_date))].sort();
-      if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'custom';
-      if ($('bookingFromDate')) $('bookingFromDate').value = importedDates[0];
-      if ($('bookingToDate')) $('bookingToDate').value = importedDates[importedDates.length - 1];
+      // Sort dates chronologically (handling YYYY-MM-DD cleanly)
+  const importedDates = [...new Set(validRecordsToInsert.map(r => r.booking_date))]
+    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'custom';
+  if ($('bookingFromDate') && importedDates.length > 0) $('bookingFromDate').value = importedDates[0];
+  if ($('bookingToDate') && importedDates.length > 0) $('bookingToDate').value = importedDates[importedDates.length - 1];
 
-      await loadBookingDashboardData();
+  await loadBookingDashboardData();
     } catch (err) {
       alert("Excel import failed: " + err.message);
     }
@@ -7331,7 +7335,149 @@ function processDayWisePivotData() {
     grandOfficeTotals
   };
 }
+// Helper to format Date objects as 'YYYY-MM-DD' without UTC timezone offset shifts
+// Local helper to format Date objects as 'YYYY-MM-DD'
+function formatDateToYMD(d) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
 
+async function applyBookingQuickPeriod() {
+  const period = $('bookingQuickPeriod')?.value || 'yesterday';
+  const fromInput = $('bookingFromDate');
+  const toInput = $('bookingToDate');
+  if (!fromInput || !toInput) return;
+
+  const today = new Date();
+
+  switch (period) {
+    case 'today': {
+      const todayStr = formatDateToYMD(today);
+      fromInput.value = todayStr;
+      toInput.value = todayStr;
+      break;
+    }
+
+    case 'yesterday': {
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+      const yesterdayStr = formatDateToYMD(yesterday);
+      fromInput.value = yesterdayStr;
+      toInput.value = yesterdayStr;
+      break;
+    }
+
+    case 'recent': {
+      // Fetch latest actual uploaded date directly from DB
+      const { data, error } = await supabaseClient
+        .from('booking_performance')
+        .select('booking_date')
+        .order('booking_date', { ascending: false })
+        .limit(1);
+
+      if (!error && data && data.length > 0) {
+        fromInput.value = data[0].booking_date;
+        toInput.value = data[0].booking_date;
+      } else {
+        const todayStr = formatDateToYMD(today);
+        fromInput.value = todayStr;
+        toInput.value = todayStr;
+      }
+      break;
+    }
+
+    case 'fortnight': {
+      const currentDay = today.getDate();
+      const yyyy = today.getFullYear();
+      const monthIdx = today.getMonth();
+      
+      let startD, endD;
+      if (currentDay <= 15) {
+        startD = new Date(yyyy, monthIdx, 1);
+        endD = new Date(yyyy, monthIdx, 15);
+      } else {
+        startD = new Date(yyyy, monthIdx, 16);
+        endD = new Date(yyyy, monthIdx + 1, 0);
+      }
+      fromInput.value = formatDateToYMD(startD);
+      toInput.value = formatDateToYMD(endD);
+      break;
+    }
+
+    case 'month': {
+      // 01-MM-YYYY to current date of current month
+      const yyyy = today.getFullYear();
+      const monthIdx = today.getMonth();
+      const startOfMonth = new Date(yyyy, monthIdx, 1);
+      
+      fromInput.value = formatDateToYMD(startOfMonth);
+      toInput.value = formatDateToYMD(today);
+      break;
+    }
+
+    case 'all': {
+      // Get true minimum date
+      const { data: minData } = await supabaseClient
+        .from('booking_performance')
+        .select('booking_date')
+        .order('booking_date', { ascending: true })
+        .limit(1);
+
+      // Get true maximum date
+      const { data: maxData } = await supabaseClient
+        .from('booking_performance')
+        .select('booking_date')
+        .order('booking_date', { ascending: false })
+        .limit(1);
+
+      if (minData && minData.length > 0 && maxData && maxData.length > 0) {
+        fromInput.value = minData[0].booking_date;
+        toInput.value = maxData[0].booking_date;
+      }
+      break;
+    }
+
+    case 'custom':
+    default:
+      break;
+  }
+
+  await loadBookingDashboardData();
+}
+
+// -------------------------------------------------------------
+// RESET FILTERS
+// -------------------------------------------------------------
+async function resetBookingFilters() {
+  if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'yesterday';
+  if ($('bookingFilterOffice')) $('bookingFilterOffice').value = '';
+  
+  // Re-select all digital channels
+  if (typeof DIGITAL_CHANNEL_CONFIG !== 'undefined' && Array.isArray(DIGITAL_CHANNEL_CONFIG)) {
+    activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
+  }
+
+  await applyBookingQuickPeriod();
+}
+async function populateBookingOfficeFilterDropdown() {
+  const officeDropdown = $('bookingFilterOffice');
+  if (!officeDropdown || officeDropdown.options.length > 1) return;
+
+  const { data, error } = await supabaseClient
+    .from('booking_performance')
+    .select('office_name');
+
+  if (!error && data) {
+    const uniqueOffices = [...new Set(data.map(o => o.office_name).filter(Boolean))].sort();
+    let optHtml = `<option value="">-- All Offices --</option>`;
+    uniqueOffices.forEach(off => {
+      optHtml += `<option value="${off}">${off}</option>`;
+    });
+    officeDropdown.innerHTML = optHtml;
+  }
+}
 function exportMISExcel() {
   // 1. Resolve Active Filtered Claims Dataset
   const claimsToExport = (typeof currentMISClaimsList !== 'undefined' && currentMISClaimsList && currentMISClaimsList.length)
