@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4644,196 +4643,216 @@ async function exportBookingReportImage() {
     }
 
     async function handleBookingExcelUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = async function(evt) {
-        try {
-          const data = new Uint8Array(evt.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: 0, raw: false });
+  const reader = new FileReader();
+  reader.onload = async function(evt) {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array', raw: true });
+      const sheetName = workbook.SheetNames[0];
+      const jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: 0, raw: false });
 
-          if (!jsonRows.length) return alert("The selected sheet contains no data rows!");
+      if (!jsonRows.length) return alert("The selected sheet contains no data rows!");
 
-          const parseDateSafe = (val) => {
-            if (!val) return null;
-            const str = String(val).trim();
-            if (['-', '--', 'NA', 'N/A', '0', 'null', 'undefined', ''].includes(str)) return null;
+      // ROBUST DD-MM-YYYY PARSER (NO TIMEZONE DRIFT)
+      const parseDateSafe = (val) => {
+        if (!val) return null;
+        let str = String(val).trim();
+        if (['-', '--', 'NA', 'N/A', '0', 'null', 'undefined', ''].includes(str)) return null;
 
-            if (!isNaN(str) && Number(str) > 1000) {
-              const d = new Date(Math.round((Number(str) - 25569) * 86400 * 1000));
-              return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
-            }
-
-            if (str.includes('/') || str.includes('-')) {
-              const delim = str.includes('/') ? '/' : '-';
-              const parts = str.split(delim);
-              if (parts.length === 3) {
-                if (parts[2].length === 4) {
-                  const yyyy = parts[2];
-                  const mm = parts[1].padStart(2, '0');
-                  const dd = parts[0].padStart(2, '0');
-                  const d = new Date(`${yyyy}-${mm}-${dd}`);
-                  return isNaN(d.getTime()) ? null : `${yyyy}-${mm}-${dd}`;
-                }
-                if (parts[0].length === 4) {
-                  const d = new Date(str);
-                  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
-                }
-              }
-            }
-
-            const d = new Date(str);
-            return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
-          };
-
-          const validRecordsToInsert = [];
-          const currentUserId = currentUser?.id || null;
-
-          jsonRows.forEach(row => {
-            const rawDate = row['Booking Date'] || row['booking_date'] || row['DATE'] || row['Date'] || row['__EMPTY_2'];
-            const validatedDate = parseDateSafe(rawDate);
-            if (!validatedDate) return;
-
-            const office = String(row['Office Name'] || row['office_name'] || row['OFFICE'] || row['Office'] || row['__EMPTY_1'] || '').trim();
-            if (!office || office.toLowerCase().includes('total') || office === '-' || office === '--') return;
-
-            const office_id = String(row['Office ID'] || row['office_id'] || row['OFFICE ID'] || row['__EMPTY'] || '').trim() || null;
-            const productVal = String(row['Product'] || row['product'] || row['PRODUCT'] || row['__EMPTY_3'] || 'ALL').trim();
-
-            const normMap = {};
-            Object.keys(row).forEach(k => {
-              const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
-              normMap[cleanK] = row[k];
-            });
-
-            const num = (...matchKeys) => {
-              for (let mk of matchKeys) {
-                if (row[mk] !== undefined && row[mk] !== null) {
-                  const cleaned = String(row[mk]).replace(/[₹, ]/g, '').trim();
-                  if (cleaned !== '' && cleaned !== '-') {
-                    const val = parseFloat(cleaned);
-                    if (!isNaN(val)) return val;
-                  }
-                }
-                const cleanTarget = mk.toLowerCase().replace(/[^a-z0-9]/g, '');
-                if (normMap[cleanTarget] !== undefined && normMap[cleanTarget] !== null) {
-                  const cleaned = String(normMap[cleanTarget]).replace(/[₹, ]/g, '').trim();
-                  if (cleaned !== '' && cleaned !== '-') {
-                    const val = parseFloat(cleaned);
-                    if (!isNaN(val)) return val;
-                  }
-                }
-              }
-              return 0;
-            };
-
-            const cash_cnt = num('Cash (Cnt)', 'Cash Count', 'cash_cnt');
-            const cash_amt = num('Cash (Amt)', 'Cash Amount', 'cash_amt');
-            const ops_cnt = num('On Postal Service (Cnt)', 'OPS (Cnt)', 'ops_cnt');
-            const ops_amt = num('On Postal Service (Amt)', 'OPS (Amt)', 'ops_amt');
-            const postage_stamp_cnt = num('Postage Stamp (Cnt)', 'Postage Stamp Count', 'postage_stamp_cnt');
-            const postage_stamp_amt = num('Postage Stamp (Amt)', 'Postage Stamp Amount', 'postage_stamp_amt');
-            const service_stamp_cnt = num('Service Stamp (Cnt)', 'Service Stamp Count', 'service_stamp_cnt');
-            const service_stamp_amt = num('Service Stamp (Amt)', 'Service Stamp Amount', 'service_stamp_amt');
-            const franking_cnt = num('Franking Machine (Cnt)', 'Franking (Cnt)', 'franking_cnt');
-            const franking_amt = num('Franking Machine (Amt)', 'Franking (Amt)', 'franking_amt');
-            const contract_cnt = num('Contract (Cnt)', 'Contract Count', 'contract_cnt');
-            const contract_amt = num('Contract (Amt)', 'Contract Amount', 'contract_amt');
-            const dqr_cnt = num('DQR Scan (Cnt)', 'DQR (Cnt)', 'dqr_cnt');
-            const dqr_amt = num('DQR Scan (Amt)', 'DQR (Amt)', 'dqr_amt');
-            const franchise_wallet_cnt = num('Franchise Wallet (Cnt)', 'franchise_wallet_cnt');
-            const franchise_wallet_amt = num('Franchise Wallet (Amt)', 'franchise_wallet_amt');
-            const sbipos_card_cnt = num('SBIPOS-CARD (Cnt)', 'SBIPOS CARD (Cnt)', 'sbipos_card_cnt');
-            const sbipos_card_amt = num('SBIPOS-CARD (Amt)', 'SBIPOS CARD (Amt)', 'sbipos_card_amt');
-            const sbipos_bharatqr_cnt = num('SBIPOS BHARATQR (Cnt)', 'SBIPOS BharatQR (Cnt)', 'sbipos_bharatqr_cnt');
-            const sbipos_bharatqr_amt = num('SBIPOS BHARATQR (Amt)', 'SBIPOS BharatQR (Amt)', 'sbipos_bharatqr_amt');
-            const sbiepay_bharatqr_cnt = num('SBIEPAY BHARATQR (Cnt)', 'SBIEPAY BharatQR (Cnt)', 'sbiepay_bharatqr_cnt');
-            const sbiepay_bharatqr_amt = num('SBIEPAY BHARATQR (Amt)', 'SBIEPAY BharatQR (Amt)', 'sbiepay_bharatqr_amt');
-            const sbiepay_upi_cnt = num('SBIEPAY UPI (Cnt)', 'sbiepay_upi_cnt');
-            const sbiepay_upi_amt = num('SBIEPAY UPI (Amt)', 'sbiepay_upi_amt');
-            const sbiepay_cc_cnt = num('SBIEPAY Credit Card (Cnt)', 'SBIEPAY CC (Cnt)', 'sbiepay_cc_cnt');
-            const sbiepay_cc_amt = num('SBIEPAY Credit Card (Amt)', 'SBIEPAY CC (Amt)', 'sbiepay_cc_amt');
-            const sbiepay_dc_cnt = num('SBIEPAY Debit Card (Cnt)', 'SBIEPAY DC (Cnt)', 'sbiepay_dc_cnt');
-            const sbiepay_dc_amt = num('SBIEPAY Debit Card (Amt)', 'SBIEPAY DC (Amt)', 'sbiepay_dc_amt');
-            const sbiepay_neft_cnt = num('SBIEPAY NEFT (Cnt)', 'sbiepay_neft_cnt');
-            const sbiepay_neft_amt = num('SBIEPAY NEFT (Amt)', 'sbiepay_neft_amt');
-            const rtgs_cnt = num('RTGS (Cnt)', 'rtgs_cnt');
-            const rtgs_amt = num('RTGS (Amt)', 'rtgs_amt');
-            const wallet_cnt = num('Wallet (Cnt)', 'wallet_cnt');
-            const wallet_amt = num('Wallet (Amt)', 'wallet_amt');
-            const posb_cnt = num('POSB (Cnt)', 'posb_cnt');
-            const posb_amt = num('POSB (Amt)', 'posb_amt');
-            const ippb_cnt = num('IPPB (Cnt)', 'ippb_cnt');
-            const ippb_amt = num('IPPB (Amt)', 'ippb_amt');
-            const other_cnt = num('Other (Cnt)', 'other_cnt');
-            const other_amt = num('Other (Amt)', 'other_amt');
-
-            const total_digital_cnt = dqr_cnt + franchise_wallet_cnt + sbipos_card_cnt + sbipos_bharatqr_cnt + 
-                                      sbiepay_bharatqr_cnt + sbiepay_upi_cnt + sbiepay_cc_cnt + sbiepay_dc_cnt + 
-                                      sbiepay_neft_cnt + rtgs_cnt + wallet_cnt + posb_cnt + ippb_cnt + other_cnt;
-
-            const total_digital_amt = dqr_amt + franchise_wallet_amt + sbipos_card_amt + sbipos_bharatqr_amt + 
-                                      sbiepay_bharatqr_amt + sbiepay_upi_amt + sbiepay_cc_amt + sbiepay_dc_amt + 
-                                      sbiepay_neft_amt + rtgs_amt + wallet_amt + posb_amt + ippb_amt + other_amt;
-
-            validRecordsToInsert.push({
-              office_id,
-              office_name: office,
-              booking_date: validatedDate,
-              product: productVal,
-              cash_cnt, cash_amt,
-              ops_cnt, ops_amt,
-              postage_stamp_cnt, postage_stamp_amt,
-              service_stamp_cnt, service_stamp_amt,
-              franking_cnt, franking_amt,
-              contract_cnt, contract_amt,
-              dqr_cnt, dqr_amt,
-              franchise_wallet_cnt, franchise_wallet_amt,
-              sbipos_card_cnt, sbipos_card_amt,
-              sbipos_bharatqr_cnt, sbipos_bharatqr_amt,
-              sbiepay_bharatqr_cnt, sbiepay_bharatqr_amt,
-              sbiepay_upi_cnt, sbiepay_upi_amt,
-              sbiepay_cc_cnt, sbiepay_cc_amt,
-              sbiepay_dc_cnt, sbiepay_dc_amt,
-              sbiepay_neft_cnt, sbiepay_neft_amt,
-              rtgs_cnt, rtgs_amt,
-              wallet_cnt, wallet_amt,
-              posb_cnt, posb_amt,
-              ippb_cnt, ippb_amt,
-              other_cnt, other_amt,
-              total_digital_cnt, total_digital_amt,
-              imported_by: currentUserId
-            });
-          });
-
-          if (!validRecordsToInsert.length) {
-            return alert("No valid date and office rows found in the sheet.");
-          }
-
-          const { error } = await supabaseClient
-            .from('booking_performance')
-            .upsert(validRecordsToInsert, { onConflict: 'office_name,booking_date,product' });
-
-          if (error) throw error;
-
-          alert(`Successfully imported ${validRecordsToInsert.length} booking records!`);
-          $('bookingExcelFileInput').value = '';
-
-          const importedDates = [...new Set(validRecordsToInsert.map(r => r.booking_date))].sort();
-          if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'custom';
-          if ($('bookingFromDate')) $('bookingFromDate').value = importedDates[0];
-          if ($('bookingToDate')) $('bookingToDate').value = importedDates[importedDates.length - 1];
-
-          await loadBookingDashboardData();
-        } catch (err) {
-          alert("Excel import failed: " + err.message);
+        // 1. Handle Excel Serial Numeric Dates (e.g. 46266)
+        if (!isNaN(str) && Number(str) > 1000) {
+          const excelDate = new Date(Math.round((Number(str) - 25569) * 86400 * 1000));
+          if (isNaN(excelDate.getTime())) return null;
+          const yyyy = excelDate.getUTCFullYear();
+          const mm = String(excelDate.getUTCMonth() + 1).padStart(2, '0');
+          const dd = String(excelDate.getUTCDate()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}`;
         }
+
+        // Clean any timestamps attached to the date (e.g. "01-09-2026 00:00:00")
+        str = str.split(' ')[0].split('T')[0];
+
+        // 2. Handle Delimited Strings (DD-MM-YYYY, DD/MM/YYYY, YYYY-MM-DD)
+        if (str.includes('/') || str.includes('-') || str.includes('.')) {
+          const delim = str.includes('/') ? '/' : (str.includes('-') ? '-' : '.');
+          const parts = str.split(delim);
+
+          if (parts.length === 3) {
+            // Format: YYYY-MM-DD
+            if (parts[0].length === 4) {
+              const yyyy = parts[0];
+              const mm = parts[1].padStart(2, '0');
+              const dd = parts[2].padStart(2, '0');
+              return `${yyyy}-${mm}-${dd}`;
+            }
+
+            // Format: DD-MM-YYYY or DD-MM-YY (Default for Indian Post Reports)
+            if (parts[2].length === 4 || parts[2].length === 2) {
+              const yyyy = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
+              const mm = parts[1].padStart(2, '0');
+              const dd = parts[0].padStart(2, '0');
+              return `${yyyy}-${mm}-${dd}`;
+            }
+          }
+        }
+
+        // 3. Last Fallback: Native parsing using Local getters (Avoids toISOString UTC shift)
+        const d = new Date(str);
+        if (isNaN(d.getTime())) return null;
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
       };
-      reader.readAsArrayBuffer(file);
+
+      const validRecordsToInsert = [];
+      const currentUserId = currentUser?.id || null;
+
+      jsonRows.forEach(row => {
+        const rawDate = row['Booking Date'] || row['booking_date'] || row['DATE'] || row['Date'] || row['__EMPTY_2'];
+        const validatedDate = parseDateSafe(rawDate);
+        if (!validatedDate) return;
+
+        const office = String(row['Office Name'] || row['office_name'] || row['OFFICE'] || row['Office'] || row['__EMPTY_1'] || '').trim();
+        if (!office || office.toLowerCase().includes('total') || office === '-' || office === '--') return;
+
+        const office_id = String(row['Office ID'] || row['office_id'] || row['OFFICE ID'] || row['__EMPTY'] || '').trim() || null;
+        const productVal = String(row['Product'] || row['product'] || row['PRODUCT'] || row['__EMPTY_3'] || 'ALL').trim();
+
+        const normMap = {};
+        Object.keys(row).forEach(k => {
+          const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+          normMap[cleanK] = row[k];
+        });
+
+        const num = (...matchKeys) => {
+          for (let mk of matchKeys) {
+            if (row[mk] !== undefined && row[mk] !== null) {
+              const cleaned = String(row[mk]).replace(/[₹, ]/g, '').trim();
+              if (cleaned !== '' && cleaned !== '-') {
+                const val = parseFloat(cleaned);
+                if (!isNaN(val)) return val;
+              }
+            }
+            const cleanTarget = mk.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (normMap[cleanTarget] !== undefined && normMap[cleanTarget] !== null) {
+              const cleaned = String(normMap[cleanTarget]).replace(/[₹, ]/g, '').trim();
+              if (cleaned !== '' && cleaned !== '-') {
+                const val = parseFloat(cleaned);
+                if (!isNaN(val)) return val;
+              }
+            }
+          }
+          return 0;
+        };
+
+        const cash_cnt = num('Cash (Cnt)', 'Cash Count', 'cash_cnt');
+        const cash_amt = num('Cash (Amt)', 'Cash Amount', 'cash_amt');
+        const ops_cnt = num('On Postal Service (Cnt)', 'OPS (Cnt)', 'ops_cnt');
+        const ops_amt = num('On Postal Service (Amt)', 'OPS (Amt)', 'ops_amt');
+        const postage_stamp_cnt = num('Postage Stamp (Cnt)', 'Postage Stamp Count', 'postage_stamp_cnt');
+        const postage_stamp_amt = num('Postage Stamp (Amt)', 'Postage Stamp Amount', 'postage_stamp_amt');
+        const service_stamp_cnt = num('Service Stamp (Cnt)', 'Service Stamp Count', 'service_stamp_cnt');
+        const service_stamp_amt = num('Service Stamp (Amt)', 'Service Stamp Amount', 'service_stamp_amt');
+        const franking_cnt = num('Franking Machine (Cnt)', 'Franking (Cnt)', 'franking_cnt');
+        const franking_amt = num('Franking Machine (Amt)', 'Franking (Amt)', 'franking_amt');
+        const contract_cnt = num('Contract (Cnt)', 'Contract Count', 'contract_cnt');
+        const contract_amt = num('Contract (Amt)', 'Contract Amount', 'contract_amt');
+        const dqr_cnt = num('DQR Scan (Cnt)', 'DQR (Cnt)', 'dqr_cnt');
+        const dqr_amt = num('DQR Scan (Amt)', 'DQR (Amt)', 'dqr_amt');
+        const franchise_wallet_cnt = num('Franchise Wallet (Cnt)', 'franchise_wallet_cnt');
+        const franchise_wallet_amt = num('Franchise Wallet (Amt)', 'franchise_wallet_amt');
+        const sbipos_card_cnt = num('SBIPOS-CARD (Cnt)', 'SBIPOS CARD (Cnt)', 'sbipos_card_cnt');
+        const sbipos_card_amt = num('SBIPOS-CARD (Amt)', 'SBIPOS CARD (Amt)', 'sbipos_card_amt');
+        const sbipos_bharatqr_cnt = num('SBIPOS BHARATQR (Cnt)', 'SBIPOS BharatQR (Cnt)', 'sbipos_bharatqr_cnt');
+        const sbipos_bharatqr_amt = num('SBIPOS BHARATQR (Amt)', 'SBIPOS BharatQR (Amt)', 'sbipos_bharatqr_amt');
+        const sbiepay_bharatqr_cnt = num('SBIEPAY BHARATQR (Cnt)', 'SBIEPAY BharatQR (Cnt)', 'sbiepay_bharatqr_cnt');
+        const sbiepay_bharatqr_amt = num('SBIEPAY BHARATQR (Amt)', 'SBIEPAY BharatQR (Amt)', 'sbiepay_bharatqr_amt');
+        const sbiepay_upi_cnt = num('SBIEPAY UPI (Cnt)', 'sbiepay_upi_cnt');
+        const sbiepay_upi_amt = num('SBIEPAY UPI (Amt)', 'sbiepay_upi_amt');
+        const sbiepay_cc_cnt = num('SBIEPAY Credit Card (Cnt)', 'SBIEPAY CC (Cnt)', 'sbiepay_cc_cnt');
+        const sbiepay_cc_amt = num('SBIEPAY Credit Card (Amt)', 'SBIEPAY CC (Amt)', 'sbiepay_cc_amt');
+        const sbiepay_dc_cnt = num('SBIEPAY Debit Card (Cnt)', 'SBIEPAY DC (Cnt)', 'sbiepay_dc_cnt');
+        const sbiepay_dc_amt = num('SBIEPAY Debit Card (Amt)', 'SBIEPAY DC (Amt)', 'sbiepay_dc_amt');
+        const sbiepay_neft_cnt = num('SBIEPAY NEFT (Cnt)', 'sbiepay_neft_cnt');
+        const sbiepay_neft_amt = num('SBIEPAY NEFT (Amt)', 'sbiepay_neft_amt');
+        const rtgs_cnt = num('RTGS (Cnt)', 'rtgs_cnt');
+        const rtgs_amt = num('RTGS (Amt)', 'rtgs_amt');
+        const wallet_cnt = num('Wallet (Cnt)', 'wallet_cnt');
+        const wallet_amt = num('Wallet (Amt)', 'wallet_amt');
+        const posb_cnt = num('POSB (Cnt)', 'posb_cnt');
+        const posb_amt = num('POSB (Amt)', 'posb_amt');
+        const ippb_cnt = num('IPPB (Cnt)', 'ippb_cnt');
+        const ippb_amt = num('IPPB (Amt)', 'ippb_amt');
+        const other_cnt = num('Other (Cnt)', 'other_cnt');
+        const other_amt = num('Other (Amt)', 'other_amt');
+
+        const total_digital_cnt = dqr_cnt + franchise_wallet_cnt + sbipos_card_cnt + sbipos_bharatqr_cnt + 
+                                  sbiepay_bharatqr_cnt + sbiepay_upi_cnt + sbiepay_cc_cnt + sbiepay_dc_cnt + 
+                                  sbiepay_neft_cnt + rtgs_cnt + wallet_cnt + posb_cnt + ippb_cnt + other_cnt;
+
+        const total_digital_amt = dqr_amt + franchise_wallet_amt + sbipos_card_amt + sbipos_bharatqr_amt + 
+                                  sbiepay_bharatqr_amt + sbiepay_upi_amt + sbiepay_cc_amt + sbiepay_dc_amt + 
+                                  sbiepay_neft_amt + rtgs_amt + wallet_amt + posb_amt + ippb_amt + other_amt;
+
+        validRecordsToInsert.push({
+          office_id,
+          office_name: office,
+          booking_date: validatedDate,
+          product: productVal,
+          cash_cnt, cash_amt,
+          ops_cnt, ops_amt,
+          postage_stamp_cnt, postage_stamp_amt,
+          service_stamp_cnt, service_stamp_amt,
+          franking_cnt, franking_amt,
+          contract_cnt, contract_amt,
+          dqr_cnt, dqr_amt,
+          franchise_wallet_cnt, franchise_wallet_amt,
+          sbipos_card_cnt, sbipos_card_amt,
+          sbipos_bharatqr_cnt, sbipos_bharatqr_amt,
+          sbiepay_bharatqr_cnt, sbiepay_bharatqr_amt,
+          sbiepay_upi_cnt, sbiepay_upi_amt,
+          sbiepay_cc_cnt, sbiepay_cc_amt,
+          sbiepay_dc_cnt, sbiepay_dc_amt,
+          sbiepay_neft_cnt, sbiepay_neft_amt,
+          rtgs_cnt, rtgs_amt,
+          wallet_cnt, wallet_amt,
+          posb_cnt, posb_amt,
+          ippb_cnt, ippb_amt,
+          other_cnt, other_amt,
+          total_digital_cnt, total_digital_amt,
+          imported_by: currentUserId
+        });
+      });
+
+      if (!validRecordsToInsert.length) {
+        return alert("No valid date and office rows found in the sheet.");
+      }
+
+      const { error } = await supabaseClient
+        .from('booking_performance')
+        .upsert(validRecordsToInsert, { onConflict: 'office_name,booking_date,product' });
+
+      if (error) throw error;
+
+      alert(`Successfully imported ${validRecordsToInsert.length} booking records!`);
+      $('bookingExcelFileInput').value = '';
+
+      const importedDates = [...new Set(validRecordsToInsert.map(r => r.booking_date))].sort();
+      if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'custom';
+      if ($('bookingFromDate')) $('bookingFromDate').value = importedDates[0];
+      if ($('bookingToDate')) $('bookingToDate').value = importedDates[importedDates.length - 1];
+
+      await loadBookingDashboardData();
+    } catch (err) {
+      alert("Excel import failed: " + err.message);
     }
+  };
+  reader.readAsArrayBuffer(file);
+}
 
     // 9. THEME CONVERTER ENGINE
     function resetConverter() {
@@ -7311,6 +7330,95 @@ function processDayWisePivotData() {
     totalsByDate,
     grandOfficeTotals
   };
+}
+
+function exportMISExcel() {
+  // 1. Resolve Active Filtered Claims Dataset
+  const claimsToExport = (typeof currentMISClaimsList !== 'undefined' && currentMISClaimsList && currentMISClaimsList.length)
+    ? currentMISClaimsList
+    : ((typeof rawMISMasterList !== 'undefined' && rawMISMasterList && rawMISMasterList.length)
+        ? rawMISMasterList
+        : ((typeof rawClaimsList !== 'undefined' && rawClaimsList && rawClaimsList.length)
+            ? rawClaimsList
+            : ((typeof allClaimsList !== 'undefined' && allClaimsList && allClaimsList.length)
+                ? allClaimsList
+                : [])));
+
+  if (!claimsToExport.length) {
+    return alert("No MIS claim records available to export!");
+  }
+
+  // 2. Map Database Fields to Clean Excel Columns
+  const excelRows = claimsToExport.map((c, index) => {
+    const rawAmt = parseFloat(c.txn_amount) || 0;
+    
+    return {
+      "Sl. No.": index + 1,
+      "Txn ID (Ref)": c.txn_id_ref || '-',
+      "Office Name": c.raised_for_office || '-',
+      "Module": c.module || 'Booking',
+      "Article Number": c.article_number || '-',
+      "RRN Number": c.rrn_number || '-',
+      "Txn Date": c.txn_date || '-',
+      "Txn Amount (₹)": rawAmt,
+      "Payment Channel": c.payment_channel || '-',
+      "Claim Status": c.claim_status || 'Pending',
+      "Document Status": c.doc_status || 'Approved',
+      "User Contact No": c.user_mobile || '-',
+      "User Remarks": c.remarks_by_user || '-',
+      "Admin Reply / Remarks": c.reply_remarks_admin || c.doc_revision_remarks || '-',
+      "Settlement Date": c.settlement_date || '-',
+      "Claim Registered On": c.created_at ? c.created_at.replace('T', ' ').substring(0, 19) : '-',
+      "Primary File Attached": c.file_url ? 'Yes' : 'No',
+      "Admin Proof Attached": c.admin_file_url ? 'Yes' : 'No'
+    };
+  });
+
+  // 3. Build SheetJS Workbook
+  const worksheet = XLSX.utils.json_to_sheet(excelRows);
+
+  // Auto-size columns to fit content
+  const colWidths = [
+    { wch: 8 },  // Sl. No.
+    { wch: 18 }, // Txn ID (Ref)
+    { wch: 26 }, // Office Name
+    { wch: 12 }, // Module
+    { wch: 16 }, // Article Number
+    { wch: 16 }, // RRN Number
+    { wch: 13 }, // Txn Date
+    { wch: 15 }, // Txn Amount
+    { wch: 16 }, // Payment Channel
+    { wch: 14 }, // Claim Status
+    { wch: 16 }, // Document Status
+    { wch: 15 }, // User Contact No
+    { wch: 30 }, // User Remarks
+    { wch: 30 }, // Admin Reply
+    { wch: 15 }, // Settlement Date
+    { wch: 20 }, // Claim Registered On
+    { wch: 18 }, // Primary File
+    { wch: 18 }  // Admin Proof
+  ];
+  worksheet['!cols'] = colWidths;
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "MIS_Claims_Report");
+
+  // 4. Generate Dynamic Filename with Date Range / Timestamp
+  const fromVal = $('misFromDate')?.value || '';
+  const toVal = $('misToDate')?.value || '';
+  const statusVal = $('misFilterStatus')?.value || 'All';
+
+  let dateSegment = '';
+  if (fromVal && toVal) {
+    dateSegment = `_${fromVal}_to_${toVal}`;
+  } else {
+    dateSegment = `_${new Date().toISOString().split('T')[0]}`;
+  }
+
+  const fileName = `MIS_Claims_Report_${statusVal}${dateSegment}.xlsx`;
+
+  // 5. Trigger File Download
+  XLSX.writeFile(workbook, fileName);
 }
 
 function renderDayWisePivotTable() {
