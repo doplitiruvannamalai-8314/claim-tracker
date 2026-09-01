@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -321,17 +322,17 @@
         <div class="flex items-center justify-between mb-1.5">
           <label class="block text-xs font-bold text-slate-700">Document Attachment <span id="docRequiredStar">*</span></label>
           <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
-            <input type="checkbox" id="autoConvertDark" checked class="accent-postRed-600 rounded">
-            <span>☀️ Auto Light Theme</span>
-          </label>
+          <input type="checkbox" id="autoConvertDark" checked onchange="handleAutoLightToggle()" class="accent-postRed-600 rounded">
+          <span>☀️ Auto Light Theme</span>
+        </label>
         </div>
 
         <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileSelectPreview(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
         
         <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
-          <span class="text-xl">📋</span>
-          <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
-        </div>
+        <span class="text-xl">📋</span>
+        <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
+      </div>
       </div>
 
       <!-- PREVIEW BOX -->
@@ -2100,33 +2101,275 @@ function showTab(tabName) {
       }
     }
 
-    function clearUserPastedImage() {
-      userPastedImageBlob = null;
-      if ($('claimFile')) $('claimFile').value = '';
-      if ($('userPastedImagePreview')) $('userPastedImagePreview').src = '';
-      if ($('userPastedPreviewContainer')) $('userPastedPreviewContainer').classList.add('hidden');
-    }
-       function toggleSettlementDateField() {
-      if ($('modalStatus').value === 'Settled') $('modalSettlementDateContainer').classList.remove('hidden');
-      else $('modalSettlementDateContainer').classList.add('hidden');
-    }
-
+    
     function handleFileSelectPreview(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      userPastedImageBlob = file;
-      if (file.type === 'application/pdf') {
-        $('userPastedImagePreview').classList.add('hidden');
-        $('pdfFilePreviewBlock').classList.remove('hidden');
-        $('pdfPreviewFileName').innerText = file.name;
-      } else {
-        $('pdfFilePreviewBlock').classList.add('hidden');
-        $('userPastedImagePreview').classList.remove('hidden');
-        $('userPastedImagePreview').src = URL.createObjectURL(file);
-      }
-      $('userPastedPreviewContainer').classList.remove('hidden');
-      $('userPastedImageSize').innerText = `File: ${(file.size / 1024).toFixed(1)} KB`;
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const previewContainer = document.getElementById('userPastedPreviewContainer');
+  const imgPreview = document.getElementById('userPastedImagePreview');
+  const pdfBlock = document.getElementById('pdfFilePreviewBlock');
+  const pdfName = document.getElementById('pdfPreviewFileName');
+  const sizeLabel = document.getElementById('userPastedImageSize');
+
+  if (file.type === 'application/pdf') {
+    currentUploadedUserFile = file;
+    if (imgPreview) imgPreview.classList.add('hidden');
+    if (pdfBlock) pdfBlock.classList.remove('hidden');
+    if (pdfName) pdfName.innerText = file.name;
+    if (sizeLabel) sizeLabel.innerText = `✓ PDF Attached (${(file.size / 1024).toFixed(1)} KB)`;
+    if (previewContainer) previewContainer.classList.remove('hidden');
+  } else if (file.type.startsWith('image/')) {
+    const shouldAutoLight = document.getElementById('autoConvertDark')?.checked;
+    if (shouldAutoLight) {
+      processImageToLightTheme(file, (processedFile, previewUrl) => {
+        setUserPastedFile(processedFile, previewUrl);
+      });
+    } else {
+      setUserPastedFile(file, URL.createObjectURL(file));
     }
+  }
+}
+// Global references for the active submission payload and the raw original file
+let currentUploadedUserFile = null;
+let originalRawUserImageFile = null;
+
+// Initialize Paste Listeners on Load
+document.addEventListener('DOMContentLoaded', () => {
+  initUserPasteHandlers();
+});
+
+function initUserPasteHandlers() {
+  const dropZone = document.getElementById('userPasteDropZone');
+
+  if (dropZone) {
+    dropZone.addEventListener('paste', handleUserClipboardPaste);
+    dropZone.addEventListener('click', () => dropZone.focus());
+  }
+
+  // Global listener for Ctrl + V across registration views
+  document.addEventListener('paste', (e) => {
+    const activeEl = document.activeElement;
+    const isTextInput = activeEl && (
+      (activeEl.tagName === 'INPUT' && activeEl.type !== 'checkbox' && activeEl.type !== 'file') || 
+      activeEl.tagName === 'TEXTAREA'
+    );
+
+    const regForm = document.getElementById('registrationForm') || document.getElementById('newClaimForm');
+    const isRegVisible = regForm && !regForm.closest('.tab-content')?.classList.contains('hidden');
+
+    if (!isTextInput && isRegVisible) {
+      handleUserClipboardPaste(e);
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// DYNAMIC CHECKBOX TOGGLE HANDLER (DARK <-> LIGHT ON DEMAND)
+// -------------------------------------------------------------
+function handleAutoLightToggle() {
+  if (!originalRawUserImageFile) return; // No image attached yet
+
+  // If the attached file is a PDF, theme inversion does not apply
+  if (originalRawUserImageFile.type === 'application/pdf') return;
+
+  const isChecked = document.getElementById('autoConvertDark')?.checked;
+
+  if (isChecked) {
+    // Re-run light conversion on the stored original file
+    processImageToLightTheme(originalRawUserImageFile, (processedFile, previewUrl) => {
+      setUserPastedFile(processedFile, previewUrl, false);
+    });
+  } else {
+    // Restore the raw untouched original image
+    const rawPreviewUrl = URL.createObjectURL(originalRawUserImageFile);
+    setUserPastedFile(originalRawUserImageFile, rawPreviewUrl, false);
+  }
+}
+
+// -------------------------------------------------------------
+// CLIPBOARD PASTE HANDLER
+// -------------------------------------------------------------
+async function handleUserClipboardPaste(e) {
+  const clipboardItems = e.clipboardData?.items;
+  if (!clipboardItems) return;
+
+  let imageItem = null;
+  for (let i = 0; i < clipboardItems.length; i++) {
+    if (clipboardItems[i].type.indexOf('image') !== -1) {
+      imageItem = clipboardItems[i];
+      break;
+    }
+  }
+
+  if (!imageItem) return;
+
+  e.preventDefault();
+
+  const blob = imageItem.getAsFile();
+  if (!blob) return;
+
+  // Cache raw untouched paste as original
+  const rawFile = new File([blob], `pasted_screenshot_${Date.now()}.png`, { type: blob.type });
+  originalRawUserImageFile = rawFile;
+
+  const shouldAutoLight = document.getElementById('autoConvertDark')?.checked;
+
+  if (shouldAutoLight) {
+    processImageToLightTheme(rawFile, (processedFile, previewUrl) => {
+      setUserPastedFile(processedFile, previewUrl, true);
+    });
+  } else {
+    setUserPastedFile(rawFile, URL.createObjectURL(rawFile), true);
+  }
+}
+
+// -------------------------------------------------------------
+// FILE INPUT SELECTION HANDLER (MANUAL BROWSE)
+// -------------------------------------------------------------
+function handleFileSelectPreview(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.type === 'application/pdf') {
+    originalRawUserImageFile = file;
+    currentUploadedUserFile = file;
+
+    const imgPreview = document.getElementById('userPastedImagePreview');
+    const pdfBlock = document.getElementById('pdfFilePreviewBlock');
+    const pdfName = document.getElementById('pdfPreviewFileName');
+    const sizeLabel = document.getElementById('userPastedImageSize');
+    const previewContainer = document.getElementById('userPastedPreviewContainer');
+
+    if (imgPreview) imgPreview.classList.add('hidden');
+    if (pdfBlock) pdfBlock.classList.remove('hidden');
+    if (pdfName) pdfName.innerText = file.name;
+    if (sizeLabel) sizeLabel.innerText = `✓ PDF Attached (${(file.size / 1024).toFixed(1)} KB)`;
+    if (previewContainer) previewContainer.classList.remove('hidden');
+    return;
+  }
+
+  if (file.type.startsWith('image/')) {
+    originalRawUserImageFile = file;
+    const shouldAutoLight = document.getElementById('autoConvertDark')?.checked;
+
+    if (shouldAutoLight) {
+      processImageToLightTheme(file, (processedFile, previewUrl) => {
+        setUserPastedFile(processedFile, previewUrl, true);
+      });
+    } else {
+      setUserPastedFile(file, URL.createObjectURL(file), true);
+    }
+  }
+}
+
+// -------------------------------------------------------------
+// AUTO LIGHT THEME CONVERSION (CANVAS INVERSION)
+// -------------------------------------------------------------
+function processImageToLightTheme(fileOrBlob, callback) {
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw original
+      ctx.drawImage(img, 0, 0);
+
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+
+      // Sample dark pixels to detect dark mode
+      let darkPixels = 0;
+      let totalSamples = 0;
+      const step = 4 * 10;
+
+      for (let i = 0; i < data.length; i += step) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+        if (brightness < 85) darkPixels++;
+        totalSamples++;
+      }
+
+      const isDarkMode = (darkPixels / totalSamples) > 0.40;
+
+      // Invert if background is predominantly dark
+      if (isDarkMode) {
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = 255 - data[i];       // Red
+          data[i + 1] = 255 - data[i + 1]; // Green
+          data[i + 2] = 255 - data[i + 2]; // Blue
+        }
+        ctx.putImageData(imgData, 0, 0);
+      }
+
+      canvas.toBlob((convertedBlob) => {
+        const processedFile = new File([convertedBlob], `claim_doc_${Date.now()}.png`, { type: 'image/png' });
+        const previewUrl = canvas.toDataURL('image/png');
+        callback(processedFile, previewUrl);
+      }, 'image/png', 0.92);
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(fileOrBlob);
+}
+
+// -------------------------------------------------------------
+// UPDATE UI & SYNC PAYLOAD
+// -------------------------------------------------------------
+function setUserPastedFile(file, previewUrl, isNewAttachment = false) {
+  currentUploadedUserFile = file;
+
+  // Sync with file input for seamless form submission
+  const fileInput = document.getElementById('claimFile');
+  if (fileInput) {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.files = dataTransfer.files;
+  }
+
+  // Update DOM Preview Elements
+  const previewContainer = document.getElementById('userPastedPreviewContainer');
+  const imgPreview = document.getElementById('userPastedImagePreview');
+  const pdfBlock = document.getElementById('pdfFilePreviewBlock');
+  const sizeLabel = document.getElementById('userPastedImageSize');
+
+  if (imgPreview) {
+    imgPreview.src = previewUrl;
+    imgPreview.classList.remove('hidden');
+  }
+  if (pdfBlock) pdfBlock.classList.add('hidden');
+
+  if (sizeLabel) {
+    const sizeKb = (file.size / 1024).toFixed(1);
+    const isLightModeApplied = document.getElementById('autoConvertDark')?.checked;
+    sizeLabel.innerText = `✓ ${isLightModeApplied ? 'Light-Theme ' : ''}Image Ready (${sizeKb} KB)`;
+  }
+
+  if (previewContainer) previewContainer.classList.remove('hidden');
+}
+
+// -------------------------------------------------------------
+// CLEAR ATTACHMENT
+// -------------------------------------------------------------
+function clearUserPastedImage() {
+  currentUploadedUserFile = null;
+  originalRawUserImageFile = null;
+
+  const fileInput = document.getElementById('claimFile');
+  if (fileInput) fileInput.value = '';
+
+  const previewContainer = document.getElementById('userPastedPreviewContainer');
+  const imgPreview = document.getElementById('userPastedImagePreview');
+  
+  if (imgPreview) imgPreview.src = '';
+  if (previewContainer) previewContainer.classList.add('hidden');
+}
 
     async function submitClaim(e) {
       e.preventDefault();
