@@ -9305,12 +9305,12 @@ function renderSb46PrintWindow(accounts) {
         </div>
 
         <div class="subject-line">
-          <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.account_type})
+          <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme})
         </div>
 
         <div class="body-content">
           <p>Dear Customer,</p>
-          <p>In accordance with the statutory requirements of Post Office Savings Bank General Rules, your <b>${acc.account_type}</b> account standing at <b>${acc.office_name}</b> has been selected for Cent Percent Passbook / Balance Verification.</p>
+          <p>In accordance with the statutory requirements of Post Office Savings Bank General Rules, your <b>${acc.scheme}</b> account standing at <b>${acc.office_name}</b> has been selected for Cent Percent Passbook / Balance Verification.</p>
           
           <table class="data-table">
             <tr>
@@ -9318,8 +9318,8 @@ function renderSb46PrintWindow(accounts) {
               <td><b>${acc.account_no}</b></td>
             </tr>
             <tr>
-              <th>Account Type / Scheme</th>
-              <td>${acc.account_type}</td>
+              <th> Scheme - Account Type</th>
+              <td>${acc.scheme} - ${acc.account_type}</td>
             </tr>
             <tr>
               <th>Balance as per Office Ledger</th>
@@ -9340,20 +9340,53 @@ function renderSb46PrintWindow(accounts) {
           <p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division</p>
         </div>
 
-        <div class="tear-strip">
+        <div class="tear-strip" style="margin: 18px 0 10px 0; text-align: center; font-size: 10px; color: #475569; letter-spacing: 1px; user-select: none;">
           ✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂
         </div>
 
-        <div class="reply-slip">
-          <div style="text-align: center; font-weight: bold; font-size: 11px;">ACKNOWLEDGMENT / CONFIRMATION SLIP (SB-46)</div>
-          <p style="margin: 4px 0 8px 0;">To: The Senior Superintendent of Post Offices, Chennai City Central Division, Chennai - 600017</p>
-          <p>I hereby confirm that the balance of <b>₹ ${balStr}</b> in my <b>${acc.account_type}</b> Account No: <b>${acc.account_no}</b> at <b>${acc.office_name}</b>:</p>
-          <p style="margin-left: 15px;">[ &nbsp; ] Tallies with my passbook balance.</p>
-          <p style="margin-left: 15px;">[ &nbsp; ] Does NOT tally with my passbook. Difference explanation attached.</p>
-          <br>
-          <div style="display: flex; justify-content: space-between; margin-top: 15px;">
-            <div>Date: ______________</div>
-            <div>Signature / LTI of Depositor: __________________________</div>
+        <div class="reply-slip" style="border: 1.5px dashed #334155; padding: 14px 18px; background: #fafafa; border-radius: 6px; font-size: 11.5px; line-height: 1.6;">
+          <div style="text-align: center; font-weight: 800; font-size: 12.5px; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 8px;">
+            REPLY FORM (SB-46)
+          </div>
+
+          <div style="margin-bottom: 10px; font-size: 11px; line-height: 1.4;">
+            <b>To:</b><br>
+            The Senior Superintendent of Post Offices,<br>
+            Chennai City Central Division, Chennai - 600017
+          </div>
+
+          <p style="margin: 0 0 12px 0; text-align: justify; line-height: 1.8;">
+            I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace; font-size: 12px;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
+          <!-- LINE 1: Figures & As On Date -->
+          <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 16px;">
+            <span style="white-space: nowrap; font-weight: 600;">In Figures: <b>₹</b></span>
+            <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 24px;"></div>
+            <span style="white-space: nowrap; font-weight: 600; margin-left: 12px;">as on (Date):</span>
+            <div style="width: 140px; border-bottom: 1px dotted #000; min-height: 24px;"></div>
+          </div></p>
+
+          <!-- LINE 2 & 3: Words (Two Full Lines with Generous Handwriting Space) -->
+          <div style="margin-bottom: 8px;">
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 14px;">
+              <span style="white-space: nowrap; font-weight: 600;">In Words: Rupees</span>
+              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 24px;"></div>
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px;">
+              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 24px;"></div>
+              <span style="white-space: nowrap; font-weight: 600;">only.</span>
+            </div>
+          </div>
+
+          <!-- SIGNATURE & DATE BLOCK -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 36px; padding-top: 10px;">
+            <div style="font-size: 11px;">
+              <div style="margin-bottom: 6px;"><b>Date:</b> ____________________</div>
+              <div><b>Contact / Mobile No:</b> ____________________</div>
+            </div>
+            <div style="text-align: center; font-size: 11px;">
+              <div style="width: 220px; border-bottom: 1px solid #000; margin-bottom: 4px;"></div>
+              <b>Signature / LTI of Depositor</b>
+            </div>
           </div>
         </div>
       </div>
