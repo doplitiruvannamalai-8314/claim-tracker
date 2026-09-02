@@ -129,6 +129,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📊MIS &amp; Pendency Reports</button>
           <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📈  Digital vs Cash Performance</button>
           <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">👥 User Management</button>
+          <button type="button" id="tabBtnCentVfn" onclick="showTab('centVfnView')" class="nav-tab-btn hidden px-3 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 cursor-pointer text-slate-700 hover:bg-amber-100">  <span>🔍</span> <span>Cent Percent Verification</span></button>
         </div>
 
 
@@ -911,7 +912,406 @@
             </table>
           </div>
         </div>
+<!-- TAB 6: CENT PERCENT VERIFICATION -->
+<div id="centVfnView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
+  
+  <!-- HEADER & PRIMARY ACTIONS -->
+  <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
+    <div>
+      <h3 class="text-sm font-bold text-postRed-700 uppercase flex items-center gap-1.5">
+        <span>📑</span> Cent Percent Verification (SB-46 Management Portal)
+      </h3>
+      <p class="text-[11px] text-slate-500">Import accounts, monitor dispatch, manage reply receipts, and print bulk or individual SB-46 verification notices</p>
+    </div>
+    
+    <div class="flex items-center gap-2 flex-wrap">
+      <input type="file" id="centVfnExcelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCentVfnExcelUpload(event)">
+      <button type="button" onclick="openVfnImportModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        📥 Import Accounts (CSV/Excel)
+      </button>
+      <button type="button" onclick="openSb46GeneratorModal()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        ✉️ Prepare SB-46 Notices
+      </button>
+      <button type="button" onclick="exportCentVfnExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        📊 Export Data (XLSX)
+      </button>
+   
+      <!-- ADDITIONAL ACTION BUTTONS (Add to your Header Button Bar in CentVfn) -->
+      <input type="file" id="centVfnBatchStatusInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCentVfnBatchStatusUpload(event)">
+      <button type="button" onclick="$('centVfnBatchStatusInput').click()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        📮 Map Dispatch / Reply (Excel)
+      </button>
 
+      <!-- ADMIN ONLY BULK DELETE BUTTON -->
+      <button type="button" id="btnAdminVfnBulkDelete" onclick="openAdminVfnDeleteModal()" class="hidden bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        🗑️ Delete Records
+      </button>
+
+      <!-- MODAL: ADMIN BULK DELETE -->
+      <div id="vfnAdminDeleteModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-rose-600">
+          <div class="border-b pb-2 border-rose-200 flex justify-between items-center">
+            <h3 class="font-bold text-sm text-rose-700 flex items-center gap-1.5">
+              <span>⚠️</span> Admin Bulk Deletion (CentVfn)
+            </h3>
+            <button type="button" onclick="closeAdminVfnDeleteModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+          </div>
+
+          <p class="text-xs text-slate-600">This action permanently deletes verification accounts from the database. Please select the deletion scope carefully.</p>
+
+          <div class="space-y-2 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 mb-0.5">Delete Scope</label>
+              <select id="vfnDeleteScope" onchange="toggleVfnDeleteScopeInput()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white outline-none">
+                <option value="office">By Office Name</option>
+                <option value="scheme">By Scheme Identifier</option>
+                <option value="date">By Import Date (YYYY-MM-DD)</option>
+              </select>
+            </div>
+
+            <div id="vfnDeleteInputContainer">
+              <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Office Name *</label>
+              <input type="text" id="vfnDeleteScopeVal" placeholder="Enter target office name exactly" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold">
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2 border-t border-rose-100">
+            <button type="button" onclick="closeAdminVfnDeleteModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold text-xs cursor-pointer">Cancel</button>
+            <button type="button" onclick="executeAdminVfnBulkDelete()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 rounded font-bold text-xs cursor-pointer shadow-xs">
+              Permanently Delete
+            </button>
+          </div>
+        </div>
+      </div>
+       </div>
+  </div>
+  <!-- MODAL: CENT VFN IMPORT CONFIGURATION -->
+<div id="vfnImportModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-emerald-600">
+    <div class="border-b pb-2 border-emerald-200 flex justify-between items-center">
+      <h3 class="font-bold text-sm text-emerald-800 flex items-center gap-1.5">
+        <span>📥</span> Import Accounts for Cent Percent Verification
+      </h3>
+      <div id="vfnImportProgressContainer" class="hidden space-y-1.5 bg-emerald-50/90 border border-emerald-300 p-2.5 rounded-xl text-xs">
+  <div class="flex justify-between items-center text-emerald-900 font-bold">
+    <span id="vfnImportProgressStatus">Reading file rows...</span>
+    <span id="vfnImportProgressCount" class="font-mono text-emerald-700">0 / 0</span>
+  </div>
+  <div class="w-full bg-emerald-200/80 rounded-full h-2.5 overflow-hidden">
+    <div id="vfnImportProgressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+  </div>
+</div>
+      <button type="button" onclick="closeVfnImportModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+    </div>
+
+    <!-- MODE SELECTOR RADIO BUTTONS -->
+<div class="bg-emerald-50/80 p-3 rounded-xl border border-emerald-200 space-y-2 text-xs">
+  <label class="block font-bold text-emerald-950">Select Import Mode:</label>
+  
+  <div class="flex flex-col sm:flex-row gap-3">
+    <label class="inline-flex items-center gap-2 cursor-pointer">
+      <input type="radio" name="vfnImportModeRadio" value="manual" checked onchange="toggleVfnImportModeUI()" class="accent-emerald-700">
+      <span class="font-semibold text-slate-800">1. Select Office &amp; Scheme via Dropdown</span>
+    </label>
+    
+    <label class="inline-flex items-center gap-2 cursor-pointer">
+      <input type="radio" name="vfnImportModeRadio" value="auto" onchange="toggleVfnImportModeUI()" class="accent-emerald-700">
+      <span class="font-semibold text-slate-800">2. Auto-Detect from File Header</span>
+    </label>
+  </div>
+
+  <p id="vfnImportModeHelpText" class="text-[11px] text-emerald-900 mt-1"></p>
+</div>
+
+<!-- MANUAL SELECTION DROPDOWNS -->
+<div id="vfnManualModeFields" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs mt-2">
+  <div>
+    <label class="block font-bold text-slate-700 mb-0.5">Select Office Name *</label>
+    <select id="vfnImportOfficeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
+      <option value="">-- Select Office --</option>
+    </select>
+  </div>
+  <div>
+    <label class="block font-bold text-slate-700 mb-0.5">Select Scheme Name *</label>
+    <select id="vfnImportSchemeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
+      <option value="TDIP5">TDIP5 - 5 Year TD</option>
+      <option value="TDIP1">TDIP1 - 1 Year TD</option>
+      <option value="TDIP2">TDIP2 - 2 Year TD</option>
+      <option value="TDIP3">TDIP3 - 3 Year TD</option>
+      <option value="SBGEN">SBGEN - Savings Bank</option>
+      <option value="RD">RD - Recurring Deposit</option>
+      <option value="MIS">MIS - Monthly Income Scheme</option>
+      <option value="SCSS">SCSS - Senior Citizen</option>
+      <option value="PPF">PPF - Public Provident Fund</option>
+      <option value="SSA">SSA - Sukanya Samriddhi</option>
+    </select>
+  </div>
+</div>
+
+    <!-- MANUAL SELECTION DROPDOWNS (Mode 1) -->
+    <div id="vfnManualModeFields" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Select Office Name *</label>
+        <select id="vfnImportOfficeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
+          <option value="">-- Select Office --</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Select Scheme Name *</label>
+        <select id="vfnImportSchemeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
+          <option value="TDIP5">TDIP5 - 5 Year TD</option>
+          <option value="TDIP1">TDIP1 - 1 Year TD</option>
+          <option value="TDIP2">TDIP2 - 2 Year TD</option>
+          <option value="TDIP3">TDIP3 - 3 Year TD</option>
+          <option value="SBGEN">SBGEN - Savings Bank</option>
+          <option value="RD">RD - Recurring Deposit</option>
+          <option value="MIS">MIS - Monthly Income Scheme</option>
+          <option value="SCSS">SCSS - Senior Citizen</option>
+          <option value="PPF">PPF - Public Provident Fund</option>
+          <option value="SSA">SSA - Sukanya Samriddhi</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- FILE UPLOAD INPUT -->
+    <div class="space-y-1 text-xs">
+      <label class="block font-bold text-slate-700">Select Finacle Report File (CSV or Excel) *</label>
+      <input type="file" id="centVfnModalFileInput" accept=".csv, .xlsx, .xls" class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium">
+      <p class="text-[10px] text-slate-500">Supported date formats: <code>11-JAN-21</code>, <code>11-JAN-2021</code>, <code>DD/MM/YYYY</code>, <code>YYYY-MM-DD</code></p>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+      <button type="button" onclick="closeVfnImportModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Cancel</button>
+      <button type="button" id="btnRunVfnImport" onclick="startCentVfnImportProcess()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">
+        Start Import
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- KPI SUMMARY SCORECARDS -->
+  <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+    <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-slate-500 font-bold uppercase">Total Accounts Imported</p>
+      <p id="vfnCardTotal" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
+    </div>
+    <div class="bg-white border-2 border-blue-600 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-blue-700 font-bold uppercase">Dispatched (SB-46 Sent)</p>
+      <p id="vfnCardDispatched" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
+    </div>
+    <div class="bg-white border-2 border-emerald-600 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-emerald-700 font-bold uppercase">Reply Received</p>
+      <p id="vfnCardReplyReceived" class="text-base font-extrabold text-emerald-800 mt-0.5">0</p>
+    </div>
+    <div class="bg-white border-2 border-amber-500 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-amber-700 font-bold uppercase">Pending for Reply / Notice</p>
+      <p id="vfnCardPending" class="text-base font-extrabold text-amber-800 mt-0.5">0</p>
+    </div>
+  </div>
+
+  <!-- FILTER & SEARCH CONTROL BAR -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
+    <div>
+      <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name / Article</label>
+      <input type="text" id="vfnSearchQuery" oninput="debounceCentVfnSearch()" placeholder="Search..." class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium outline-none focus:border-postRed-600">
+    </div>
+    <div>
+      <label class="block font-bold text-slate-700 mb-0.5">Filter by Office</label>
+      <select id="vfnFilterOffice" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+        <option value="">-- All Offices --</option>
+      </select>
+    </div>
+    <div>
+      <label class="block font-bold text-slate-700 mb-0.5">Scheme / Account Type</label>
+      <select id="vfnFilterScheme" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+        <option value="">-- All Schemes --</option>
+        <option value="SB">Savings Bank (SB)</option>
+        <option value="RD">Recurring Deposit (RD)</option>
+        <option value="TD">Time Deposit (TD)</option>
+        <option value="MIS">Monthly Income Scheme (MIS)</option>
+        <option value="SCSS">Senior Citizens Scheme (SCSS)</option>
+        <option value="PPF">Public Provident Fund (PPF)</option>
+        <option value="SSA">Sukanya Samriddhi (SSA)</option>
+        <option value="KVP">KVP / NSC</option>
+      </select>
+    </div>
+    <div>
+      <label class="block font-bold text-slate-700 mb-0.5">Verification Status</label>
+      <select id="vfnFilterStatus" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+        <option value="">-- All Statuses --</option>
+        <option value="imported">Imported (Notice Pending)</option>
+        <option value="dispatched">Notice Dispatched</option>
+        <option value="reply_received">Reply Received</option>
+      </select>
+    </div>
+    <div class="flex gap-1.5">
+      <button type="button" onclick="loadCentVfnData()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white p-1.5 rounded font-bold text-xs cursor-pointer transition shadow-2xs">
+        Filter
+      </button>
+      <button type="button" onclick="resetCentVfnFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer transition">
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- ACCOUNTS DATA TABLE -->
+  <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+    <div class="bg-slate-100 p-2.5 font-bold text-slate-700 text-xs flex justify-between items-center border-b border-slate-200">
+      <span>📋 Registered Accounts for Cent Percent Verification</span>
+      <span id="vfnTableRecordCount" class="text-slate-500 font-semibold text-[11px]">Showing 0 records</span>
+    </div>
+    <div class="max-h-[480px] overflow-x-auto overflow-y-auto">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead class="bg-postRed-700 text-white font-bold sticky top-0 z-10 whitespace-nowrap">
+          <tr>
+            <th class="p-2 text-center">Sl.</th>
+            <th class="p-2">Office Name</th>
+            <th class="p-2">Account No</th>
+            <th class="p-2">Customer Name &amp; Address</th>
+            <th class="p-2 text-center">Scheme</th>
+            <th class="p-2 text-right">Balance (₹)</th>
+            <th class="p-2 text-center">Last Txn</th>
+            <th class="p-2 text-center">Article No</th>
+            <th class="p-2 text-center">Status</th>
+            <th class="p-2 text-center">Action / Update</th>
+          </tr>
+        </thead>
+        <tbody id="centVfnTableBody" class="divide-y divide-slate-100">
+          <tr><td colspan="10" class="p-4 text-center text-slate-400">Loading accounts...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: UPDATE ACCOUNT STATUS / REPLY RECEIVED -->
+<div id="vfnStatusModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-4 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
+    <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
+      <h3 class="font-bold text-sm text-postRed-700">Update Verification Status</h3>
+      <button type="button" onclick="closeVfnStatusModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+    </div>
+
+    <!-- Micro Header Badge -->
+    <div class="bg-amber-50 rounded-lg p-2 border border-amber-200 text-xs flex justify-between">
+      <div>
+        <span class="text-[9px] uppercase font-bold text-slate-400 block">Account No</span>
+        <span id="vfnModalAccNo" class="font-mono font-bold text-postRed-700">-</span>
+      </div>
+      <div>
+        <span class="text-[9px] uppercase font-bold text-slate-400 block">Customer</span>
+        <span id="vfnModalCustName" class="font-bold text-slate-800">-</span>
+      </div>
+    </div>
+
+    <input type="hidden" id="vfnModalRecordId">
+
+    <div class="space-y-2 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Verification Status *</label>
+        <select id="vfnModalStatusSelect" onchange="toggleVfnModalFields()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white outline-none">
+          <option value="imported">Imported (Notice Pending)</option>
+          <option value="dispatched">Dispatched (SB-46 Sent)</option>
+          <option value="reply_received">Reply Received (Verified)</option>
+        </select>
+      </div>
+
+      <div id="vfnModalDispatchFields" class="hidden space-y-2 bg-blue-50/70 p-2 rounded border border-blue-200">
+        <div>
+          <label class="block font-bold text-blue-900 mb-0.5">Registered Article Number</label>
+          <input type="text" id="vfnModalArticleNo" placeholder="e.g. RT123456789IN" class="w-full border border-blue-300 p-1 rounded font-mono font-bold uppercase bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-blue-900 mb-0.5">Dispatch Date</label>
+          <input type="date" id="vfnModalDispatchDate" class="w-full border border-blue-300 p-1 rounded bg-white font-semibold">
+        </div>
+      </div>
+
+      <div id="vfnModalReplyFields" class="hidden space-y-2 bg-emerald-50/70 p-2 rounded border border-emerald-200">
+        <div>
+          <label class="block font-bold text-emerald-900 mb-0.5">Reply Received Date *</label>
+          <input type="date" id="vfnModalReplyDate" class="w-full border border-emerald-300 p-1 rounded bg-white font-semibold">
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Verification Remarks</label>
+        <textarea id="vfnModalRemarks" class="w-full border border-slate-300 p-1.5 rounded h-14 outline-none text-xs" placeholder="Balance matched / Passbook received / Discrepancy notes..."></textarea>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
+      <button type="button" onclick="closeVfnStatusModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold text-xs cursor-pointer">Cancel</button>
+      <button type="button" onclick="saveVfnStatusUpdate()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded font-bold text-xs cursor-pointer shadow-xs">Save Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SB-46 LETTER GENERATOR DIALOG -->
+<div id="sb46GeneratorModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-4 max-w-lg w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
+    <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
+      <h3 class="font-bold text-sm text-postRed-700 flex items-center gap-1.5">
+        <span>✉️</span> Generate &amp; Print SB-46 Verification Letters
+      </h3>
+      <button type="button" onclick="closeSb46GeneratorModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+    </div>
+
+    <div class="space-y-2.5 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">Print Generation Mode</label>
+        <select id="sb46PrintMode" onchange="toggleSb46ModeInputs()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white">
+          <option value="range">Bulk Mode: Serial Number Range (From Sl - To Sl)</option>
+          <option value="scheme">Bulk Mode: By Scheme / Account Type</option>
+          <option value="individual">Individual Mode: Specific Account Number</option>
+        </select>
+      </div>
+
+      <!-- Mode 1: Sl No Range -->
+      <div id="sb46RangeContainer" class="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded border border-slate-200">
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">From Sl. No.</label>
+          <input type="number" id="sb46FromSl" min="1" placeholder="1" class="w-full border p-1 rounded font-mono bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">To Sl. No.</label>
+          <input type="number" id="sb46ToSl" min="1" placeholder="100" class="w-full border p-1 rounded font-mono bg-white">
+        </div>
+      </div>
+
+      <!-- Mode 2: Scheme Select -->
+      <div id="sb46SchemeContainer" class="hidden bg-slate-50 p-2.5 rounded border border-slate-200">
+        <label class="block font-bold text-slate-700 mb-0.5">Select Scheme to Print</label>
+        <select id="sb46SchemeSelect" class="w-full border p-1 rounded font-bold bg-white">
+          <option value="SB">Savings Bank (SB)</option>
+          <option value="RD">Recurring Deposit (RD)</option>
+          <option value="TD">Time Deposit (TD)</option>
+          <option value="MIS">Monthly Income Scheme (MIS)</option>
+          <option value="SCSS">Senior Citizen Savings Scheme (SCSS)</option>
+          <option value="PPF">Public Provident Fund (PPF)</option>
+          <option value="SSA">Sukanya Samriddhi (SSA)</option>
+        </select>
+      </div>
+
+      <!-- Mode 3: Single Account No -->
+      <div id="sb46IndividualContainer" class="hidden bg-slate-50 p-2.5 rounded border border-slate-200">
+        <label class="block font-bold text-slate-700 mb-0.5">Target Account Number</label>
+        <input type="text" id="sb46TargetAccNo" placeholder="Enter full account number" class="w-full border p-1 rounded font-mono font-bold bg-white uppercase">
+      </div>
+
+      <div class="bg-amber-50 p-2 rounded border border-amber-200 text-[11px] text-amber-900 leading-snug">
+        💡 <b>Format Notice:</b> Generates formal <b>SB-46</b> passbook verification inquiries pre-populated with Divisional Office headers, depositor balances, and return address slips.
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
+      <button type="button" onclick="closeSb46GeneratorModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold text-xs cursor-pointer">Close</button>
+      <button type="button" onclick="executeSb46Print()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs flex items-center gap-1">
+        🖨️ Generate &amp; Print Notices
+      </button>
+    </div>
+  </div>
+</div>
       </div>
 <!-- USER EDIT REMARKS MODAL (FOR CLAIM CREATORS) -->
 <div id="userEditRemarksModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -1118,9 +1518,10 @@
             </div>
             <div>
               <label class="block font-bold mb-0.5">Role *</label>
-              <select id="editUserRole" required class="w-full border p-1.5 rounded text-xs bg-white font-bold text-postRed-700">
+              <select id="editUserRole" required class="w-full border p-1.5 rounded text-xs bg-white font-bold text-postRed-700 outline-none">
                 <option value="user">User</option>
                 <option value="viewer">Viewer</option>
+                <option value="centvfn">CentVfn (Cent Percent Verification)</option>
                 <option value="admin">Admin</option>
                 <option value="superadmin">Superadmin</option>
               </select>
@@ -1703,49 +2104,95 @@ function printOfficeWiseReport() {
       initApp();
     }
 
-    async function handleEmpIdRegister(e) {
-      e.preventDefault();
-      const emp_id = $('regEmpId').value.trim().toUpperCase();
-      const emp_name = $('regEmpName').value.trim();
-      const mobile_number = $('regMobile').value.trim();
-      const office_name = $('regOfficeName').value;
-      const password = $('regPassword').value;
-      const confirmPassword = $('regConfirmPassword').value;
+async function handleEmpIdRegister(e) {
+  e.preventDefault();
+  const emp_id = $('regEmpId').value.trim().toUpperCase();
+  const emp_name = $('regEmpName').value.trim();
+  const mobile_number = $('regMobile').value.trim();
+  const office_name = $('regOfficeName').value;
+  const password = $('regPassword').value;
+  const confirmPassword = $('regConfirmPassword').value;
 
-      if (!mobile_number || mobile_number.length !== 10) return alert("Enter valid 10-digit mobile number!");
-      if (password !== confirmPassword) return alert("Passwords do not match!");
+  if (!emp_id) return alert("Please enter Employee ID!");
+  if (!mobile_number || !/^\d{10}$/.test(mobile_number)) {
+    return alert("Enter a valid 10-digit mobile number!");
+  }
+  if (!password || password.length < 6) {
+    return alert("Password must be at least 6 characters!");
+  }
+  if (password !== confirmPassword) {
+    return alert("Passwords do not match!");
+  }
 
-      const shadowEmail = empIdToEmail(emp_id);
-      const { data, error } = await supabaseClient.auth.signUp({
-        email: shadowEmail, password: password,
-        options: { data: { emp_id, emp_name, mobile_number, office_name, role: 'user' } }
-      });
+  // 1. Explicit duplicate check before touching auth
+  const { data: existingProfile } = await supabaseClient
+    .from('profiles')
+    .select('id, emp_id, role')
+    .eq('emp_id', emp_id)
+    .maybeSingle();
 
-      if (error) return alert("Registration failed: " + error.message);
+  if (existingProfile) {
+    return alert(`Employee ID ${emp_id} is already registered with role "${existingProfile.role.toUpperCase()}". Please log in or ask an administrator to reset your credentials.`);
+  }
 
-      if (data?.user?.id) {
-        await supabaseClient.from('profiles').upsert([{
-          id: data.user.id, emp_id, emp_name, mobile_number, office_name, role: 'user', is_active: true
-        }], { onConflict: 'id' });
-      }
+  // 2. Generate deterministic shadow email
+  const shadowEmail = empIdToEmail(emp_id);
 
-      alert(`Account registered successfully for ${emp_id}! Please log in.`);
-      showAuthView('login');
-      $('loginEmpId').value = emp_id;
+  // 3. Supabase Auth Sign Up
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: shadowEmail,
+    password: password,
+    options: {
+      data: { emp_id, emp_name, mobile_number, office_name, role: 'user' }
     }
+  });
 
+  if (error) return alert("Registration failed: " + error.message);
+
+  // Guard against Supabase returning an existing user with empty identities
+  if (data?.user?.identities && data.user.identities.length === 0) {
+    return alert(`An account associated with Employee ID ${emp_id} already exists. Please proceed to login.`);
+  }
+
+  // 4. Insert initial user profile record
+  if (data?.user?.id) {
+    const { error: profileErr } = await supabaseClient.from('profiles').insert([{
+      id: data.user.id,
+      emp_id,
+      emp_name,
+      mobile_number,
+      office_name,
+      role: 'user',
+      is_active: true
+    }]);
+
+    if (profileErr) {
+      console.error("Profile creation error:", profileErr);
+      return alert("Account created, but failed to save profile details. Please contact admin.");
+    }
+  }
+
+  alert(`Account registered successfully for Employee ID ${emp_id}! Please log in.`);
+  if (typeof showAuthView === 'function') showAuthView('login');
+  if ($('loginEmpId')) $('loginEmpId').value = emp_id;
+}
     async function handleLogout() {
       sessionStorage.removeItem('activePortalTab');
       await supabaseClient.auth.signOut();
       window.location.reload();
     }
 
-    async function initApp() {
+async function initApp() {
   const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
   if (authError || !user) return;
   currentUser = user;
 
-  let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+  let { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
   if (!profile) {
     profile = {
       id: user.id,
@@ -1762,11 +2209,12 @@ function printOfficeWiseReport() {
   $('authSection').classList.add('hidden');
   $('navbar').classList.remove('hidden');
   $('mainDashboard').classList.remove('hidden');
- $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}]  (${(profile.role || 'user').toUpperCase()})\n ${profile.office_name || 'N/A'}`;
+  $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${(profile.role || 'user').toUpperCase()})\n ${profile.office_name || 'N/A'}`;
 
   const role = (profile.role || 'user').toLowerCase();
   const isAdmin = role === 'admin' || role === 'superadmin';
   const isSuperadmin = role === 'superadmin';
+  const canAccessCentVfn = role === 'centvfn' || isAdmin;
 
   // Toggle Admin & Restricted Tab Buttons
   if (isAdmin) {
@@ -1779,11 +2227,30 @@ function printOfficeWiseReport() {
     if ($('adminBookingDashTabBtn')) $('adminBookingDashTabBtn').classList.add('hidden');
     if ($('tabBtnConverter')) $('tabBtnConverter').classList.add('hidden');
     if ($('superadminLogoPanel')) $('superadminLogoPanel').classList.add('hidden');
+  }
 
-    // If active tab is restricted, redirect to 'track'
-    if (['converterTab', 'bookingDash', 'adminRoleMgmt'].includes(currentActiveTab)) {
-      currentActiveTab = 'track';
+  // Toggle Cent Percent Verification Tab
+  if ($('tabBtnCentVfn')) {
+    if (canAccessCentVfn) {
+      $('tabBtnCentVfn').classList.remove('hidden');
+    } else {
+      $('tabBtnCentVfn').classList.add('hidden');
     }
+  }
+  if ($('btnAdminVfnBulkDelete')) {
+    if (isAdmin) {
+      $('btnAdminVfnBulkDelete').classList.remove('hidden');
+    } else {
+      $('btnAdminVfnBulkDelete').classList.add('hidden');
+    }
+  }
+  // Tab Guardrails: redirect unauthorized active tabs back to 'track'
+  const adminOnlyTabs = ['converterTab', 'bookingDash', 'adminRoleMgmt'];
+  if (!isAdmin && adminOnlyTabs.includes(currentActiveTab)) {
+    currentActiveTab = 'track';
+  }
+  if (!canAccessCentVfn && (currentActiveTab === 'centVfnView' || currentActiveTab === 'centVfn')) {
+    currentActiveTab = 'track';
   }
 
   const mobileInput = $('claimUserMobile');
@@ -1797,10 +2264,19 @@ function printOfficeWiseReport() {
 
   await loadClaimsSummary();
   await generateMISReport('All');
+
   if (isAdmin && typeof loadAllUsers === 'function') {
     await loadAllUsers();
   }
+
+  // Initial load for Cent Percent Verification if authorized
+  if (canAccessCentVfn && typeof loadCentVfnData === 'function') {
+    await loadCentVfnData();
+  }
+  
 }
+
+
 
     function showAuthView(view) {
       if (view === 'register') {
@@ -1811,14 +2287,23 @@ function printOfficeWiseReport() {
         $('loginFormContainer').classList.remove('hidden');
       }
     }
+
+
 function showTab(tabName) {
   const role = (userProfile?.role || 'user').toLowerCase();
   const isAdmin = role === 'admin' || role === 'superadmin';
-  const restrictedTabs = ['converterTab', 'bookingDash', 'adminRoleMgmt'];
+  const canAccessCentVfn = role === 'centvfn' || isAdmin;
+  const adminOnlyTabs = ['converterTab', 'bookingDash', 'adminRoleMgmt'];
 
-  // Guard: Block regular users / viewers from accessing restricted views
-  if (!isAdmin && restrictedTabs.includes(tabName)) {
+  // Guard 1: Block non-admins from admin-restricted modules
+  if (!isAdmin && adminOnlyTabs.includes(tabName)) {
     alert("Access Restricted: You do not have permission to access this module.");
+    tabName = 'track';
+  }
+
+  // Guard 2: Block unauthorized users from Cent Percent Verification
+  if (!canAccessCentVfn && tabName === 'centVfn') {
+    alert("Access Restricted: Cent Percent Verification requires centvfn or admin privileges.");
     tabName = 'track';
   }
 
@@ -1831,7 +2316,8 @@ function showTab(tabName) {
     'converterTab': 'converterTabView',
     'reports': 'reportsView',
     'bookingDash': 'bookingDashView',
-    'adminRoleMgmt': 'adminRoleMgmtView'
+    'adminRoleMgmt': 'adminRoleMgmtView',
+    'centVfn': 'centVfnView' // Added CentVfn View
   };
 
   Object.values(viewMap).forEach(viewId => {
@@ -1846,7 +2332,8 @@ function showTab(tabName) {
     'converterTab': 'tabBtnConverter',
     'reports': 'tabBtnReports',
     'bookingDash': 'adminBookingDashTabBtn',
-    'adminRoleMgmt': 'adminTabBtn'
+    'adminRoleMgmt': 'adminTabBtn',
+    'centVfn': 'tabBtnCentVfn' // Added CentVfn Button
   };
 
   Object.values(btnMap).forEach(btnId => {
@@ -1882,7 +2369,19 @@ function showTab(tabName) {
   if (tabName === 'adminRoleMgmt' && isAdmin && typeof loadAllUsers === 'function') {
     loadAllUsers();
   }
+
+  // Trigger loader when opening Cent Percent Verification
+  if (tabName === 'centVfn' && canAccessCentVfn && typeof loadCentVfnData === 'function') {
+    loadCentVfnData();
+  }
 }
+
+// Fallback alias in case HTML elements still call switchTab
+window.switchTab = function(tabName) {
+  const clean = tabName.replace('View', '');
+  showTab(clean);
+};
+
 
    async function loadFilterDropdowns() {
   try {
@@ -1913,6 +2412,9 @@ function showTab(tabName) {
       if ($('overviewFilterOffice')) $('overviewFilterOffice').innerHTML = filterOpts;
       if ($('filterOfficeName')) $('filterOfficeName').innerHTML = filterOpts;
       if ($('bookingFilterOffice')) $('bookingFilterOffice').innerHTML = filterOpts;
+      
+      // 5. Cent Percent Verification Office Filter dropdown
+      if ($('vfnFilterOffice')) $('vfnFilterOffice').innerHTML = filterOpts;
     }
 
     // User profiles (loaded for active logged-in views)
@@ -7697,6 +8199,1192 @@ function renderDayWisePivotTable() {
   tbodyHtml += `<td class="p-2 text-center whitespace-nowrap bg-postRed-900 sticky right-0 font-extrabold text-postGold-300 text-[12px]">${grandOverallCell}</td></tr>`;
 
   tbody.innerHTML = tbodyHtml;
+}
+
+
+// =========================================================================
+// 11. CENT PERCENT VERIFICATION (CENTVFN) ENGINE
+// =========================================================================
+let cachedCentVfnRecords = [];
+let vfnSearchDebounceTimer = null;
+
+function debounceCentVfnSearch() {
+  clearTimeout(vfnSearchDebounceTimer);
+  vfnSearchDebounceTimer = setTimeout(() => {
+    loadCentVfnData();
+  }, 250);
+}
+
+async function loadCentVfnData() {
+  const tbody = $('centVfnTableBody');
+  if (!tbody) return;
+
+  let query = supabaseClient.from('cent_percent_verification').select('*');
+
+  const office = $('vfnFilterOffice')?.value;
+  const scheme = $('vfnFilterScheme')?.value;
+  const status = $('vfnFilterStatus')?.value;
+  const search = $('vfnSearchQuery')?.value.trim().toLowerCase();
+
+  if (office) query = query.eq('office_name', office);
+  if (scheme) query = query.eq('account_type', scheme);
+  if (status) query = query.eq('status', status);
+
+  const { data, error } = await query.order('sl_no', { ascending: true });
+
+  if (error) {
+    console.error("CentVfn fetch error:", error);
+    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-rose-600">Error loading data: ${error.message}</td></tr>`;
+    return;
+  }
+
+  let records = data || [];
+  if (search) {
+    records = records.filter(r => 
+      (r.account_no || '').toLowerCase().includes(search) ||
+      (r.customer_name || '').toLowerCase().includes(search) ||
+      (r.article_no || '').toLowerCase().includes(search) ||
+      (r.address || '').toLowerCase().includes(search)
+    );
+  }
+
+  cachedCentVfnRecords = records;
+
+  // 1. Update Scorecards (Always query full un-paginated counts)
+  updateCentVfnScorecards();
+
+  // 2. Populate Office Filter Dropdown if empty
+  populateCentVfnOfficeDropdown();
+
+  // 3. Render Table
+  if ($('vfnTableRecordCount')) $('vfnTableRecordCount').innerText = `Showing ${records.length.toLocaleString('en-IN')} accounts`;
+
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400 font-medium">No verification records found.</td></tr>`;
+    return;
+  }
+
+  let htmlArr = [];
+  records.forEach((r, idx) => {
+    const bal = parseFloat(r.balance) || 0;
+    
+    let statusBadge = '';
+    if (r.status === 'reply_received') {
+      statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Reply Rx'd (${r.reply_rxd_date || '✓'})</span>`;
+    } else if (r.status === 'dispatched') {
+      statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded font-bold text-[10px]">Dispatched (${r.dispatched_date || 'Sent'})</span>`;
+    } else {
+      statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Imported</span>`;
+    }
+
+    htmlArr.push(`
+      <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
+        <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
+        <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
+        <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
+        <td class="p-2">
+          <div class="font-bold text-slate-900">${r.customer_name}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[220px]" title="${r.address || ''}">${r.address || '-'}</div>
+        </td>
+        <td class="p-2 text-center font-bold text-slate-700">${r.account_type}</td>
+        <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td class="p-2 text-center text-slate-600 whitespace-nowrap">${r.date_of_last_txn || '-'}</td>
+        <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.article_no || '-'}</td>
+        <td class="p-2 text-center">${statusBadge}</td>
+        <td class="p-2 text-center">
+          <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
+            ✏️ Update / Reply
+          </button>
+        </td>
+      </tr>
+    `);
+  });
+
+  tbody.innerHTML = htmlArr.join('');
+}
+
+async function updateCentVfnScorecards() {
+  const { data: allStats, error } = await supabaseClient
+    .from('cent_percent_verification')
+    .select('status');
+
+  if (error || !allStats) return;
+
+  const total = allStats.length;
+  let dispatched = 0;
+  let replyReceived = 0;
+  let pending = 0;
+
+  allStats.forEach(item => {
+    if (item.status === 'reply_received') replyReceived++;
+    else if (item.status === 'dispatched') dispatched++;
+    else pending++;
+  });
+
+  if ($('vfnCardTotal')) $('vfnCardTotal').innerText = total.toLocaleString('en-IN');
+  if ($('vfnCardDispatched')) $('vfnCardDispatched').innerText = dispatched.toLocaleString('en-IN');
+  if ($('vfnCardReplyReceived')) $('vfnCardReplyReceived').innerText = replyReceived.toLocaleString('en-IN');
+  if ($('vfnCardPending')) $('vfnCardPending').innerText = pending.toLocaleString('en-IN');
+}
+
+async function populateCentVfnOfficeDropdown() {
+  const dropdown = $('vfnFilterOffice');
+  if (!dropdown || dropdown.options.length > 1) return;
+
+  const { data } = await supabaseClient
+    .from('cent_percent_verification')
+    .select('office_name');
+
+  if (data) {
+    const offices = [...new Set(data.map(d => d.office_name).filter(Boolean))].sort();
+    let opt = `<option value="">-- All Offices --</option>`;
+    offices.forEach(o => {
+      opt += `<option value="${o}">${o}</option>`;
+    });
+    dropdown.innerHTML = opt;
+  }
+}
+
+function resetCentVfnFilters() {
+  if ($('vfnSearchQuery')) $('vfnSearchQuery').value = '';
+  if ($('vfnFilterOffice')) $('vfnFilterOffice').value = '';
+  if ($('vfnFilterScheme')) $('vfnFilterScheme').value = '';
+  if ($('vfnFilterStatus')) $('vfnFilterStatus').value = '';
+  loadCentVfnData();
+}
+
+// -------------------------------------------------------------
+// EXCEL IMPORT HANDLER FOR ACCOUNTS
+// -------------------------------------------------------------
+async function handleCentVfnExcelUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const currentUserId = currentUser?.id || null;
+  const isCsv = file.name.toLowerCase().endsWith('.csv');
+  const yieldThread = () => new Promise(resolve => setTimeout(resolve, 0));
+
+  const processRawRows = async (rawRows) => {
+    if (!rawRows || rawRows.length === 0) {
+      alert('The selected file is empty.');
+      return;
+    }
+
+    let headerRowIndex = -1;
+    let detectedTargetCount = null;
+    let detectedSchemeFromHeader = '';
+
+    // 1. Scan top rows for metadata banner and header row
+    const scanLimit = Math.min(rawRows.length, 35);
+    for (let i = 0; i < scanLimit; i++) {
+      const row = rawRows[i];
+      if (!Array.isArray(row)) continue;
+      const rowString = row.map(c => String(c ?? '').trim()).join(' ');
+
+      const countMatch = rowString.match(/Total\s+No\s+of\s+Live\s+Accounts\s+of\s+([A-Z0-9]+)\s*-\s*([^=]+)=\s*(\d+)/i);
+      if (countMatch) {
+        detectedSchemeFromHeader = countMatch[1].trim().toUpperCase();
+        detectedTargetCount = parseInt(countMatch[3], 10);
+      } else {
+        const genericMatch = rowString.match(/Total\s+No\s+of\s+Live\s+Accounts[^\d=]*=\s*(\d+)/i);
+        if (genericMatch) detectedTargetCount = parseInt(genericMatch[1], 10);
+      }
+
+      const hasAcNo = row.some(cell => typeof cell === 'string' && /Account\s*(Number|No)/i.test(cell));
+      const hasCustName = row.some(cell => typeof cell === 'string' && /(Cust1\s*Name|Customer\s*Name|Name)/i.test(cell));
+
+      if (hasAcNo && hasCustName) {
+        headerRowIndex = i;
+        break;
+      }
+    }
+
+    if (headerRowIndex === -1) {
+      alert('Could not locate data table header ("Account Number", "Cust1 Name").');
+      return;
+    }
+
+    // 2. Map Column Positions
+    const headers = rawRows[headerRowIndex].map(h => String(h || '').trim());
+    const getColIdx = (pattern) => headers.findIndex(h => pattern.test(h));
+
+    const colIdx = {
+      acNo: getColIdx(/Account\s*(Number|No)/i),
+      cust1Name: getColIdx(/(Cust1\s*Name|Customer\s*Name|Name)/i),
+      cust2Name: getColIdx(/Cust2\s*Name/i),
+      cust3Name: getColIdx(/Cust3\s*Name/i),
+      address: getColIdx(/Address/i),
+      acType: getColIdx(/Account\s*Type/i),
+      schemeCol: getColIdx(/Scheme(\s*Code|\s*Name)?/i),
+      balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),
+      lastTxDate: getColIdx(/Date\s*of\s*Last\s*Transaction|Last\s*Txn/i),
+      officeName: getColIdx(/(BO\s*Name|Office\s*Name|SO\s*Name|Office)/i),
+      mobileNo: getColIdx(/Mobile(\s*No)?/i)
+    };
+
+    const validRecords = [];
+    const totalRows = rawRows.length;
+    const defaultOffice = userProfile?.office_name || 'Division Office';
+
+    // 3. Process Rows in Small Slices (Yielding every 100 rows)
+    for (let i = headerRowIndex + 1; i < totalRows; i++) {
+      if (i % 100 === 0) await yieldThread();
+
+      const row = rawRows[i];
+      if (!row || row.length === 0) continue;
+
+      const rawAcNo = (colIdx.acNo !== -1 && row[colIdx.acNo] !== undefined) ? String(row[colIdx.acNo]).trim() : '';
+      const cleanAcNo = rawAcNo.replace(/[^0-9]/g, '');
+      if (!cleanAcNo || cleanAcNo.length < 5) continue;
+
+      let officeName = (colIdx.officeName !== -1 && row[colIdx.officeName]) ? String(row[colIdx.officeName]).trim() : '';
+      if (!officeName || officeName.toLowerCase().includes('total')) officeName = defaultOffice;
+
+      const c1 = (colIdx.cust1Name !== -1 && row[colIdx.cust1Name]) ? String(row[colIdx.cust1Name]).trim() : '';
+      const c2 = (colIdx.cust2Name !== -1 && row[colIdx.cust2Name]) ? String(row[colIdx.cust2Name]).trim() : '';
+      const c3 = (colIdx.cust3Name !== -1 && row[colIdx.cust3Name]) ? String(row[colIdx.cust3Name]).trim() : '';
+      const customerName = [c1, c2, c3].filter(Boolean).join(' / ') || 'Depositor';
+
+      const address = (colIdx.address !== -1 && row[colIdx.address]) ? String(row[colIdx.address]).trim() : '';
+
+      let explicitScheme = (colIdx.schemeCol !== -1 && row[colIdx.schemeCol]) ? String(row[colIdx.schemeCol]).trim().toUpperCase() : '';
+      const finalScheme = explicitScheme || detectedSchemeFromHeader || 'GENERAL';
+
+      const accountType = (colIdx.acType !== -1 && row[colIdx.acType]) 
+        ? String(row[colIdx.acType]).trim().toUpperCase() 
+        : finalScheme;
+
+      const rawBal = (colIdx.balance !== -1 && row[colIdx.balance] !== undefined)
+        ? String(row[colIdx.balance]).replace(/[₹, ]/g, '').trim()
+        : '0';
+      const balance = parseFloat(rawBal) || 0.0;
+
+      let lastTxnDate = null;
+      if (colIdx.lastTxDate !== -1 && row[colIdx.lastTxDate]) {
+        const rawDate = String(row[colIdx.lastTxDate]).trim().split(' ')[0];
+        if (rawDate.includes('/') || rawDate.includes('-')) {
+          const delim = rawDate.includes('/') ? '/' : '-';
+          const parts = rawDate.split(delim);
+          if (parts.length === 3) {
+            if (parts[2].length === 4) {
+              lastTxnDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            } else if (parts[0].length === 4) {
+              lastTxnDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+            }
+          }
+        }
+      }
+
+      const mobileNo = (colIdx.mobileNo !== -1 && row[colIdx.mobileNo]) ? String(row[colIdx.mobileNo]).trim() : '';
+
+      validRecords.push({
+        account_no: cleanAcNo,
+        office_name: officeName,
+        customer_name: customerName,
+        address: address,
+        scheme: finalScheme,
+        account_type: accountType,
+        balance: balance,
+        date_of_last_txn: lastTxnDate,
+        mobile_no: mobileNo,
+        article_no: '',
+        status: 'imported',
+        dispatched_date: null,
+        reply_rxd_date: null,
+        user_id: currentUserId,
+        last_event_record: `Imported [Scheme: ${finalScheme}]`
+      });
+
+      if (detectedTargetCount && validRecords.length >= detectedTargetCount) {
+        break;
+      }
+    }
+
+    if (!validRecords.length) {
+      alert('No valid account rows found under the detected header.');
+      return;
+    }
+
+    // 4. Batch Upsert to Supabase
+    const chunkSize = 200;
+    let insertedTotal = 0;
+
+    for (let i = 0; i < validRecords.length; i += chunkSize) {
+      await yieldThread();
+      const chunk = validRecords.slice(i, i + chunkSize);
+      const { error } = await supabaseClient
+        .from('cent_percent_verification')
+        .upsert(chunk, { onConflict: 'account_no,office_name' });
+
+      if (error) throw error;
+      insertedTotal += chunk.length;
+    }
+
+    alert(`Successfully imported ${insertedTotal} accounts (Scheme: ${detectedSchemeFromHeader || 'Identified'}) with status 'Imported'!`);
+    if ($('centVfnExcelFileInput')) $('centVfnExcelFileInput').value = '';
+    
+    if (typeof loadCentVfnData === 'function') {
+      await loadCentVfnData();
+    }
+  };
+
+  // 5. High-Speed Reader with heavy features stripped
+  try {
+    if (isCsv && typeof Papa !== 'undefined') {
+      Papa.parse(file, {
+        header: false,
+        skipEmptyLines: true,
+        fastMode: true, // Speeds up CSV parsing significantly
+        complete: async function(results) {
+          await processRawRows(results.data);
+        },
+        error: (err) => alert("CSV Parsing Error: " + err.message)
+      });
+    } else {
+      const reader = new FileReader();
+      reader.onload = async function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          
+          // Disable extra parsing features to avoid blocking the main thread
+          const workbook = XLSX.read(data, { 
+            type: 'array', 
+            raw: true,
+            dense: true,
+            cellFormula: false,
+            cellHTML: false,
+            cellStyles: false,
+            cellText: false
+          });
+
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+
+          // Use raw header array generation
+          const rawSheetRows = XLSX.utils.sheet_to_json(sheet, { 
+            header: 1, 
+            defval: '',
+            blankrows: false 
+          });
+
+          await processRawRows(rawSheetRows);
+        } catch (err) {
+          alert("Excel Parsing Error: " + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  } catch (err) {
+    alert("Import failed: " + err.message);
+  }
+}
+
+//batch status upload 
+
+async function handleCentVfnBatchStatusUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async function(evt) {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+
+      if (!rows.length) return alert("The selected file contains no data rows.");
+
+      let updatedCount = 0;
+      for (const r of rows) {
+        const accNo = String(r['Account No'] || r['account_no'] || r['Account Number'] || '').trim().replace(/[^0-9]/g, '');
+        if (!accNo) continue;
+
+        const articleNo = String(r['Article No'] || r['article_no'] || r['Article Number'] || '').trim().toUpperCase();
+        const dispatchDate = r['Dispatched Date'] || r['dispatched_date'] || null;
+        const replyDate = r['Reply Received Date'] || r['reply_rxd_date'] || null;
+
+        const updates = {};
+        if (articleNo) updates.article_no = articleNo;
+
+        if (replyDate) {
+          updates.status = 'reply_received';
+          updates.reply_rxd_date = replyDate;
+          if (dispatchDate) updates.dispatched_date = dispatchDate;
+        } else if (dispatchDate || articleNo) {
+          updates.status = 'dispatched';
+          updates.dispatched_date = dispatchDate || new Date().toISOString().split('T')[0];
+        }
+
+        if (Object.keys(updates).length > 0) {
+          updates.updated_at = new Date().toISOString();
+          const { error } = await supabaseClient
+            .from('cent_percent_verification')
+            .update(updates)
+            .eq('account_no', accNo);
+
+          if (!error) updatedCount++;
+        }
+      }
+
+      alert(`Batch mapping completed: ${updatedCount} accounts updated.`);
+      $('centVfnBatchStatusInput').value = '';
+      loadCentVfnData();
+    } catch (err) {
+      alert("Batch mapping failed: " + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+//admin verification
+function openAdminVfnDeleteModal() {
+  const role = (userProfile?.role || '').toLowerCase();
+  if (!['admin', 'superadmin'].includes(role)) {
+    return alert("Access restricted: Admin privileges required.");
+  }
+  $('vfnAdminDeleteModal').classList.remove('hidden');
+}
+
+function closeAdminVfnDeleteModal() {
+  $('vfnAdminDeleteModal').classList.add('hidden');
+}
+
+function toggleVfnDeleteScopeInput() {
+  const scope = $('vfnDeleteScope').value;
+  const label = $('vfnDeleteInputLabel');
+  const input = $('vfnDeleteScopeVal');
+
+  if (scope === 'office') {
+    label.innerText = 'Office Name *';
+    input.placeholder = 'e.g. T Nagar SO';
+  } else if (scope === 'scheme') {
+    label.innerText = 'Scheme Identifier *';
+    input.placeholder = 'e.g. TDIP5 or TDA';
+  } else if (scope === 'date') {
+    label.innerText = 'Import Date (YYYY-MM-DD) *';
+    input.placeholder = 'e.g. 2026-09-02';
+  }
+}
+
+// =========================================================================
+// FINACLE DATE PARSER (HANDLES '11-JAN-21', '05-OCT-2023', DD/MM/YYYY)
+// =========================================================================
+function parseFinacleDate(dateStr) {
+  if (!dateStr) return null;
+  let s = String(dateStr).trim().toUpperCase();
+  if (['-', '--', 'NA', 'N/A', 'NULL', '0', ''].includes(s)) return null;
+
+  // Discard any trailing timestamp (e.g., "11-JAN-21 00:00:00")
+  s = s.split(' ')[0].split('T')[0];
+
+  const monthMap = {
+    'JAN': '01', 'FEB': '02', 'MAR': '03', 'APR': '04',
+    'MAY': '05', 'JUN': '06', 'JUL': '07', 'AUG': '08',
+    'SEP': '09', 'OCT': '10', 'NOV': '11', 'DEC': '12'
+  };
+
+  // 1. Format: DD-MMM-YY or DD-MMM-YYYY (e.g., 11-JAN-21 or 11-JAN-2021)
+  const finacleMatch = s.match(/^(\d{1,2})[-/ ]([A-Z]{3})[-/ ](\d{2,4})$/);
+  if (finacleMatch) {
+    const dd = finacleMatch[1].padStart(2, '0');
+    const mm = monthMap[finacleMatch[2]];
+    let yy = finacleMatch[3];
+    if (mm) {
+      if (yy.length === 2) {
+        // Expand 2-digit year (e.g., 21 -> 2021, 98 -> 1998)
+        yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
+      }
+      return `${yy}-${mm}-${dd}`;
+    }
+  }
+
+  // 2. Format: DD/MM/YYYY or DD-MM-YYYY
+  if (s.includes('/') || s.includes('-')) {
+    const delim = s.includes('/') ? '/' : '-';
+    const parts = s.split(delim);
+    if (parts.length === 3) {
+      if (parts[2].length === 4) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      if (parts[0].length === 4) {
+        return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+      }
+    }
+  }
+
+  // 3. Fallback: JavaScript Date parser (using local getters to prevent UTC drift)
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  return null;
+}
+
+// -------------------------------------------------------------
+// MODAL CONTROLS & DROPDOWN SYNC
+// -------------------------------------------------------------
+function openVfnImportModal() {
+  // Sync office dropdown from cached offices
+  const officeDropdown = $('vfnImportOfficeDropdown');
+  const globalOfficeDropdown = $('vfnFilterOffice') || $('regOfficeName');
+
+  if (officeDropdown && globalOfficeDropdown && officeDropdown.options.length <= 1) {
+    officeDropdown.innerHTML = globalOfficeDropdown.innerHTML;
+    if (officeDropdown.options[0]) officeDropdown.options[0].text = '-- Select Office --';
+  }
+
+  toggleVfnImportModeUI();
+  $('vfnImportModal').classList.remove('hidden');
+}
+
+function closeVfnImportModal() {
+  $('vfnImportModal').classList.add('hidden');
+  if ($('centVfnModalFileInput')) $('centVfnModalFileInput').value = '';
+  
+  // Reset progress elements
+  if ($('vfnImportProgressContainer')) $('vfnImportProgressContainer').classList.add('hidden');
+  if ($('vfnImportProgressBar')) $('vfnImportProgressBar').style.width = '0%';
+  if ($('vfnImportProgressStatus')) $('vfnImportProgressStatus').innerText = 'Reading file rows...';
+  if ($('vfnImportProgressCount')) $('vfnImportProgressCount').innerText = '0 / 0';
+  if ($('btnRunVfnImport')) {
+    $('btnRunVfnImport').disabled = false;
+    $('btnRunVfnImport').innerText = 'Start Import';
+  }
+}
+function toggleVfnImportModeUI() {
+  const selectedRadio = document.querySelector('input[name="vfnImportModeRadio"]:checked');
+  const mode = selectedRadio ? selectedRadio.value : 'manual';
+  
+  const manualFields = $('vfnManualModeFields');
+  const officeDropdown = $('vfnImportOfficeDropdown');
+  const schemeDropdown = $('vfnImportSchemeDropdown');
+  const modeHelpText = $('vfnImportModeHelpText');
+
+  if (mode === 'manual') {
+    // Reveal dropdown selectors
+    if (manualFields) manualFields.classList.remove('hidden');
+
+    // Make dropdown selections mandatory
+    if (officeDropdown) officeDropdown.required = true;
+    if (schemeDropdown) schemeDropdown.required = true;
+
+    // Optional dynamic guidance hint
+    if (modeHelpText) {
+      modeHelpText.innerHTML = `📌 <b>Manual Mode:</b> Selected Office and Scheme will be applied uniformly to all imported rows, overriding file header defaults.`;
+    }
+  } else {
+    // Hide dropdown selectors for automated reading
+    if (manualFields) manualFields.classList.add('hidden');
+
+    // Dropdowns not required in auto mode
+    if (officeDropdown) officeDropdown.required = false;
+    if (schemeDropdown) schemeDropdown.required = false;
+
+    if (modeHelpText) {
+      modeHelpText.innerHTML = `⚡ <b>Auto Mode:</b> Office name will be fetched row-by-row (or from Finacle header) and the Scheme code will be parsed from the <code>Total No of Live Accounts...</code> line.`;
+    }
+  }
+}
+// -------------------------------------------------------------
+// DUAL IMPORT EXECUTION ENGINE
+// -------------------------------------------------------------
+async function startCentVfnImportProcess() {
+  const fileInput = $('centVfnModalFileInput');
+  const file = fileInput?.files?.[0];
+  if (!file) return alert("Please select a CSV or Excel file to import!");
+
+  const mode = document.querySelector('input[name="vfnImportModeRadio"]:checked')?.value || 'manual';
+  const selectedOffice = $('vfnImportOfficeDropdown')?.value || '';
+  const selectedScheme = $('vfnImportSchemeDropdown')?.value || '';
+
+  if (mode === 'manual' && !selectedOffice) {
+    return alert("Please select an Office Name from the dropdown.");
+  }
+
+  const btn = $('btnRunVfnImport');
+  const progressBox = $('vfnImportProgressContainer');
+  const progressBar = $('vfnImportProgressBar');
+  const progressText = $('vfnImportProgressStatus');
+  const progressCount = $('vfnImportProgressCount');
+
+  // UI Setup: Lock controls and show initial progress state
+  btn.disabled = true;
+  if (progressBox) progressBox.classList.remove('hidden');
+  if (progressBar) progressBar.style.width = '0%';
+  if (progressText) progressText.innerText = "Parsing file data...";
+  if (progressCount) progressCount.innerText = "0 / 0";
+
+  const isCsv = file.name.toLowerCase().endsWith('.csv');
+  const yieldThread = () => new Promise(resolve => setTimeout(resolve, 0));
+
+  const processRawRows = async (rawRows) => {
+    try {
+      if (!rawRows || rawRows.length === 0) {
+        alert("The selected file is empty.");
+        return;
+      }
+
+      let headerRowIndex = -1;
+      let detectedTargetCount = null;
+      let detectedSchemeFromHeader = '';
+
+      // Scan top 35 rows for Total Live Accounts pattern & header row
+      for (let i = 0; i < Math.min(rawRows.length, 35); i++) {
+        const row = rawRows[i];
+        if (!Array.isArray(row)) continue;
+        const rowString = row.map(c => String(c ?? '').trim()).join(' ');
+
+        const countMatch = rowString.match(/Total\s+No\s+of\s+Live\s+Accounts\s+of\s+([A-Z0-9]+)\s*-\s*([^=]+)=\s*(\d+)/i);
+        if (countMatch) {
+          detectedSchemeFromHeader = countMatch[1].trim().toUpperCase();
+          detectedTargetCount = parseInt(countMatch[3], 10);
+        } else {
+          const genericMatch = rowString.match(/Total\s+No\s+of\s+Live\s+Accounts[^\d=]*=\s*(\d+)/i);
+          if (genericMatch) detectedTargetCount = parseInt(genericMatch[1], 10);
+        }
+
+        const hasAcNo = row.some(cell => typeof cell === 'string' && /Account\s*(Number|No)/i.test(cell));
+        const hasCustName = row.some(cell => typeof cell === 'string' && /(Cust1\s*Name|Customer\s*Name|Name)/i.test(cell));
+
+        if (hasAcNo && hasCustName) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+
+      if (headerRowIndex === -1) {
+        alert('Could not locate data table header ("Account Number", "Cust1 Name").');
+        return;
+      }
+
+      const headers = rawRows[headerRowIndex].map(h => String(h || '').trim());
+      const getColIdx = (pattern) => headers.findIndex(h => pattern.test(h));
+
+      const colIdx = {
+        acNo: getColIdx(/Account\s*(Number|No)/i),
+        cust1Name: getColIdx(/(Cust1\s*Name|Customer\s*Name|Name)/i),
+        cust2Name: getColIdx(/Cust2\s*Name/i),
+        cust3Name: getColIdx(/Cust3\s*Name/i),
+        address: getColIdx(/Address/i),
+        acType: getColIdx(/Account\s*Type/i),
+        schemeCol: getColIdx(/Scheme(\s*Code|\s*Name)?/i),
+        balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),
+        lastTxDate: getColIdx(/Date\s*of\s*Last\s*Transaction|Last\s*Txn/i),
+        officeName: getColIdx(/(BO\s*Name|Office\s*Name|SO\s*Name|Office)/i),
+        mobileNo: getColIdx(/Mobile(\s*No)?/i)
+      };
+
+      const validRecords = [];
+      const totalRows = rawRows.length;
+      const currentUserId = currentUser?.id || null;
+
+      if (progressText) progressText.innerText = "Extracting & sanitizing records...";
+
+      for (let i = headerRowIndex + 1; i < totalRows; i++) {
+        if (i % 250 === 0) await yieldThread();
+
+        const row = rawRows[i];
+        if (!row || row.length === 0) continue;
+
+        const rawAcNo = (colIdx.acNo !== -1 && row[colIdx.acNo] !== undefined) ? String(row[colIdx.acNo]).trim() : '';
+        const cleanAcNo = rawAcNo.replace(/[^0-9]/g, '');
+        if (!cleanAcNo || cleanAcNo.length < 5) continue;
+
+        let officeName = '';
+        if (mode === 'manual') {
+          officeName = selectedOffice;
+        } else {
+          officeName = (colIdx.officeName !== -1 && row[colIdx.officeName]) ? String(row[colIdx.officeName]).trim() : '';
+          if (!officeName || officeName.toLowerCase().includes('total')) {
+            officeName = userProfile?.office_name || 'Division Office';
+          }
+        }
+
+        let finalScheme = '';
+        if (mode === 'manual') {
+          finalScheme = selectedScheme;
+        } else {
+          const explicitScheme = (colIdx.schemeCol !== -1 && row[colIdx.schemeCol]) ? String(row[colIdx.schemeCol]).trim().toUpperCase() : '';
+          finalScheme = explicitScheme || detectedSchemeFromHeader || 'GENERAL';
+        }
+
+        const accountType = (colIdx.acType !== -1 && row[colIdx.acType])
+          ? String(row[colIdx.acType]).trim().toUpperCase()
+          : finalScheme;
+
+        const c1 = (colIdx.cust1Name !== -1 && row[colIdx.cust1Name]) ? String(row[colIdx.cust1Name]).trim() : '';
+        const c2 = (colIdx.cust2Name !== -1 && row[colIdx.cust2Name]) ? String(row[colIdx.cust2Name]).trim() : '';
+        const c3 = (colIdx.cust3Name !== -1 && row[colIdx.cust3Name]) ? String(row[colIdx.cust3Name]).trim() : '';
+        const customerName = [c1, c2, c3].filter(Boolean).join(' / ') || 'Depositor';
+
+        const address = (colIdx.address !== -1 && row[colIdx.address]) ? String(row[colIdx.address]).trim() : '';
+
+        const rawBal = (colIdx.balance !== -1 && row[colIdx.balance] !== undefined)
+          ? String(row[colIdx.balance]).replace(/[₹, ]/g, '').trim()
+          : '0';
+        const balance = parseFloat(rawBal) || 0.0;
+
+        const rawDateVal = (colIdx.lastTxDate !== -1 && row[colIdx.lastTxDate] !== undefined) ? row[colIdx.lastTxDate] : null;
+        const lastTxnDate = parseFinacleDate(rawDateVal);
+
+        const mobileNo = (colIdx.mobileNo !== -1 && row[colIdx.mobileNo]) ? String(row[colIdx.mobileNo]).trim() : '';
+
+        validRecords.push({
+          account_no: cleanAcNo,
+          office_name: officeName,
+          customer_name: customerName,
+          address: address,
+          scheme: finalScheme,
+          account_type: accountType,
+          balance: balance,
+          date_of_last_txn: lastTxnDate,
+          mobile_no: mobileNo,
+          article_no: '',
+          status: 'imported',
+          dispatched_date: null,
+          reply_rxd_date: null,
+          user_id: currentUserId,
+          last_event_record: `Imported [Mode: ${mode.toUpperCase()}, Scheme: ${finalScheme}]`
+        });
+
+        if (mode === 'auto' && detectedTargetCount && validRecords.length >= detectedTargetCount) {
+          break;
+        }
+      }
+
+      const totalValid = validRecords.length;
+      if (!totalValid) {
+        alert("No valid account rows found under the detected header.");
+        return;
+      }
+
+      // Step 4: Batch Upsert with Live Progress Bar Updates
+      const chunkSize = 200;
+      let insertedTotal = 0;
+
+      for (let i = 0; i < totalValid; i += chunkSize) {
+        await yieldThread();
+        const chunk = validRecords.slice(i, i + chunkSize);
+        
+        const { error } = await supabaseClient
+          .from('cent_percent_verification')
+          .upsert(chunk, { onConflict: 'account_no,office_name' });
+
+        if (error) throw error;
+        
+        insertedTotal += chunk.length;
+
+        // Update progress bar UI
+        const pct = Math.min(100, Math.round((insertedTotal / totalValid) * 100));
+        if (progressBar) progressBar.style.width = `${pct}%`;
+        if (progressText) progressText.innerText = `Importing records (${pct}%)...`;
+        if (progressCount) progressCount.innerText = `Process ${insertedTotal.toLocaleString('en-IN')} of ${totalValid.toLocaleString('en-IN')}`;
+      }
+
+      if (progressText) progressText.innerText = "Re-indexing serial numbers...";
+      await supabaseClient.rpc('reset_cent_vfn_sl_no');
+
+      if (progressBar) progressBar.style.width = '100%';
+      if (progressText) progressText.innerText = "Complete!";
+
+      alert(`Successfully imported ${insertedTotal} accounts (${mode === 'manual' ? `Office: ${selectedOffice}, Scheme: ${selectedScheme}` : `Auto Scheme: ${detectedSchemeFromHeader || 'Detected'}`})!`);
+      closeVfnImportModal();
+      loadCentVfnData();
+    } catch (err) {
+      alert("Import processing error: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Start Import";
+      if (progressBox) progressBox.classList.add('hidden');
+    }
+  };
+
+  // Parser Router
+  try {
+    if (isCsv && typeof Papa !== 'undefined') {
+      Papa.parse(file, {
+        header: false,
+        skipEmptyLines: true,
+        fastMode: true,
+        complete: async function(results) {
+          await processRawRows(results.data);
+        },
+        error: (err) => {
+          btn.disabled = false;
+          btn.innerText = "Start Import";
+          if (progressBox) progressBox.classList.add('hidden');
+          alert("CSV Parsing Error: " + err.message);
+        }
+      });
+    } else {
+      const reader = new FileReader();
+      reader.onload = async function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { 
+            type: 'array', 
+            raw: true, 
+            dense: true, 
+            cellFormula: false, 
+            cellHTML: false, 
+            cellStyles: false 
+          });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const rawSheetRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false });
+          await processRawRows(rawSheetRows);
+        } catch (err) {
+          btn.disabled = false;
+          btn.innerText = "Start Import";
+          if (progressBox) progressBox.classList.add('hidden');
+          alert("Excel Parsing Error: " + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerText = "Start Import";
+    if (progressBox) progressBox.classList.add('hidden');
+    alert("Import failed: " + err.message);
+  }
+}
+
+// -------------------------------------------------------------
+// ADMIN BULK DELETION WITH INSTANT SL_NO RESET
+// -------------------------------------------------------------
+async function executeAdminVfnBulkDelete() {
+  const scope = $('vfnDeleteScope').value;
+  const val = $('vfnDeleteScopeVal').value.trim();
+
+  if (!val) return alert("Please specify the target value for deletion.");
+
+  const confirmMsg = `WARNING: Are you sure you want to permanently delete all CentVfn accounts matching ${scope.toUpperCase()} = "${val}"?\n\nSerial numbers (Sl. No.) will be continuously re-indexed.`;
+  if (!confirm(confirmMsg)) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc('delete_cent_vfn_bulk', {
+      p_filter_type: scope,
+      p_filter_val: val
+    });
+
+    if (error) throw error;
+
+    alert(`Successfully deleted ${data.deleted_count} records. Serial numbers (Sl. No.) have been reset sequentially.`);
+    closeAdminVfnDeleteModal();
+    $('vfnDeleteScopeVal').value = '';
+    loadCentVfnData();
+  } catch (err) {
+    alert("Deletion failed: " + err.message);
+  }
+}
+
+// -------------------------------------------------------------
+// STATUS / REPLY RECEIVED UPDATE MODAL
+// -------------------------------------------------------------
+function openVfnStatusModal(recordId) {
+  const r = cachedCentVfnRecords.find(item => String(item.id) === String(recordId));
+  if (!r) return alert("Record not found!");
+
+  $('vfnModalRecordId').value = r.id;
+  $('vfnModalAccNo').innerText = r.account_no;
+  $('vfnModalCustName').innerText = r.customer_name;
+  $('vfnModalStatusSelect').value = r.status || 'imported';
+  $('vfnModalArticleNo').value = r.article_no || '';
+  $('vfnModalDispatchDate').value = r.dispatched_date || new Date().toISOString().split('T')[0];
+  $('vfnModalReplyDate').value = r.reply_rxd_date || new Date().toISOString().split('T')[0];
+  $('vfnModalRemarks').value = r.remarks || '';
+
+  toggleVfnModalFields();
+  $('vfnStatusModal').classList.remove('hidden');
+}
+
+function closeVfnStatusModal() {
+  $('vfnStatusModal').classList.add('hidden');
+}
+
+function toggleVfnModalFields() {
+  const st = $('vfnModalStatusSelect').value;
+  const dispatchBox = $('vfnModalDispatchFields');
+  const replyBox = $('vfnModalReplyFields');
+
+  if (st === 'dispatched') {
+    dispatchBox.classList.remove('hidden');
+    replyBox.classList.add('hidden');
+  } else if (st === 'reply_received') {
+    dispatchBox.classList.remove('hidden');
+    replyBox.classList.remove('hidden');
+  } else {
+    dispatchBox.classList.add('hidden');
+    replyBox.classList.add('hidden');
+  }
+}
+
+async function saveVfnStatusUpdate() {
+  const recordId = $('vfnModalRecordId').value;
+  const status = $('vfnModalStatusSelect').value;
+  const article_no = $('vfnModalArticleNo').value.trim().toUpperCase();
+  const dispatched_date = $('vfnModalDispatchDate').value || null;
+  const reply_rxd_date = $('vfnModalReplyDate').value || null;
+  const remarks = $('vfnModalRemarks').value.trim();
+
+  if (status === 'reply_received' && !reply_rxd_date) {
+    return alert("Please enter the Date of Reply Received.");
+  }
+
+  const updates = {
+    status,
+    article_no,
+    dispatched_date: (status !== 'imported') ? dispatched_date : null,
+    reply_rxd_date: (status === 'reply_received') ? reply_rxd_date : null,
+    remark_entry_date: new Date().toISOString().split('T')[0],
+    remarks,
+    updated_at: new Date().toISOString(),
+    last_event_record: `Status updated to ${status}`
+  };
+
+  const { error } = await supabaseClient
+    .from('cent_percent_verification')
+    .update(updates)
+    .eq('id', recordId);
+
+  if (error) {
+    alert("Update failed: " + error.message);
+  } else {
+    closeVfnStatusModal();
+    loadCentVfnData();
+  }
+}
+
+// -------------------------------------------------------------
+// SB-46 LETTER GENERATOR (PRINT ENGINE)
+// -------------------------------------------------------------
+function openSb46GeneratorModal() {
+  $('sb46GeneratorModal').classList.remove('hidden');
+}
+
+function closeSb46GeneratorModal() {
+  $('sb46GeneratorModal').classList.add('hidden');
+}
+
+function toggleSb46ModeInputs() {
+  const mode = $('sb46PrintMode').value;
+  $('sb46RangeContainer').classList.toggle('hidden', mode !== 'range');
+  $('sb46SchemeContainer').classList.toggle('hidden', mode !== 'scheme');
+  $('sb46IndividualContainer').classList.toggle('hidden', mode !== 'individual');
+}
+
+async function executeSb46Print() {
+  const mode = $('sb46PrintMode').value;
+  let targetAccounts = [];
+
+  if (mode === 'range') {
+    const fromSl = parseInt($('sb46FromSl').value) || 1;
+    const toSl = parseInt($('sb46ToSl').value) || 999999;
+    
+    const { data } = await supabaseClient
+      .from('cent_percent_verification')
+      .select('*')
+      .gte('sl_no', fromSl)
+      .lte('sl_no', toSl)
+      .order('sl_no', { ascending: true });
+      
+    targetAccounts = data || [];
+  } else if (mode === 'scheme') {
+    const scheme = $('sb46SchemeSelect').value;
+    const { data } = await supabaseClient
+      .from('cent_percent_verification')
+      .select('*')
+      .eq('account_type', scheme)
+      .order('sl_no', { ascending: true });
+      
+    targetAccounts = data || [];
+  } else if (mode === 'individual') {
+    const acc = $('sb46TargetAccNo').value.trim();
+    if (!acc) return alert("Please enter Account Number!");
+    
+    const { data } = await supabaseClient
+      .from('cent_percent_verification')
+      .select('*')
+      .eq('account_no', acc);
+      
+    targetAccounts = data || [];
+  }
+
+  if (!targetAccounts.length) {
+    return alert("No account records found matching your selection criteria.");
+  }
+
+  renderSb46PrintWindow(targetAccounts);
+  closeSb46GeneratorModal();
+}
+
+function renderSb46PrintWindow(accounts) {
+  const printWindow = window.open('', '_blank', 'width=900,height=800');
+  if (!printWindow) return alert("Popup blocked! Allow popups to print letters.");
+
+  let lettersHtml = '';
+
+  accounts.forEach((acc, i) => {
+    const balStr = (parseFloat(acc.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+    
+    lettersHtml += `
+      <div class="page-letter">
+        <div class="header">
+          <h3>DEPARTMENT OF POSTS, INDIA</h3>
+          <h4>OFFICE OF THE SENIOR SUPERINTENDENT OF POST OFFICES</h4>
+          <p class="division-sub">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</p>
+        </div>
+
+        <div class="ref-bar">
+          <div><b>Sl. No:</b> ${acc.sl_no}</div>
+          <div><b>Form:</b> SB-46 / Verification</div>
+          <div><b>Date:</b> ${new Date().toLocaleDateString('en-IN')}</div>
+        </div>
+
+        <div class="to-address">
+          <b>To:</b><br>
+          ${acc.customer_name}<br>
+          ${acc.address || 'Address on record'}<br>
+          <b>Post Office:</b> ${acc.office_name}<br>
+          ${acc.mobile_no ? `<b>Contact:</b> ${acc.mobile_no}` : ''}
+        </div>
+
+        <div class="subject-line">
+          <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.account_type})
+        </div>
+
+        <div class="body-content">
+          <p>Dear Customer,</p>
+          <p>In accordance with the statutory requirements of Post Office Savings Bank General Rules, your <b>${acc.account_type}</b> account standing at <b>${acc.office_name}</b> has been selected for Cent Percent Passbook / Balance Verification.</p>
+          
+          <table class="data-table">
+            <tr>
+              <th width="35%">Account Number</th>
+              <td><b>${acc.account_no}</b></td>
+            </tr>
+            <tr>
+              <th>Account Type / Scheme</th>
+              <td>${acc.account_type}</td>
+            </tr>
+            <tr>
+              <th>Balance as per Office Ledger</th>
+              <td><b style="font-size: 13px;">₹ ${balStr}</b></td>
+            </tr>
+            <tr>
+              <th>Date of Last Transaction</th>
+              <td>${acc.date_of_last_txn || 'N/A'}</td>
+            </tr>
+          </table>
+
+          <p>You are requested to kindly inspect the balance mentioned above and verify whether it tallies with your passbook. Please send your confirmation by returning the signed acknowledgment slip below, or by presenting your passbook at the Post Office for verification within 15 days.</p>
+        </div>
+
+        <div class="sign-block">
+          <p>Yours faithfully,</p>
+          <br><br>
+          <p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division</p>
+        </div>
+
+        <div class="tear-strip">
+          ✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂
+        </div>
+
+        <div class="reply-slip">
+          <div style="text-align: center; font-weight: bold; font-size: 11px;">ACKNOWLEDGMENT / CONFIRMATION SLIP (SB-46)</div>
+          <p style="margin: 4px 0 8px 0;">To: The Senior Superintendent of Post Offices, Chennai City Central Division, Chennai - 600017</p>
+          <p>I hereby confirm that the balance of <b>₹ ${balStr}</b> in my <b>${acc.account_type}</b> Account No: <b>${acc.account_no}</b> at <b>${acc.office_name}</b>:</p>
+          <p style="margin-left: 15px;">[ &nbsp; ] Tallies with my passbook balance.</p>
+          <p style="margin-left: 15px;">[ &nbsp; ] Does NOT tally with my passbook. Difference explanation attached.</p>
+          <br>
+          <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+            <div>Date: ______________</div>
+            <div>Signature / LTI of Depositor: __________________________</div>
+          </div>
+        </div>
+      </div>
+      ${i < accounts.length - 1 ? '<div class="page-break"></div>' : ''}
+    `;
+  });
+
+  printWindow.document.open();
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>SB-46 Verification Notices</title>
+      <style>
+        @page { size: A4 portrait; margin: 12mm 15mm; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px; color: #1e293b; margin: 0; padding: 0; }
+        .page-letter { padding: 10px; min-height: 980px; position: relative; }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; }
+        .header h3 { margin: 0; font-size: 14px; font-weight: 800; letter-spacing: 0.5px; }
+        .header h4 { margin: 3px 0 0 0; font-size: 12px; font-weight: 700; }
+        .header .division-sub { margin: 2px 0 0 0; font-size: 10px; font-weight: 600; color: #475569; }
+        .ref-bar { display: flex; justify-content: space-between; font-size: 10.5px; margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; }
+        .to-address { margin-bottom: 12px; line-height: 1.45; font-size: 11.5px; }
+        .subject-line { font-size: 12px; margin: 12px 0; padding: 4px 0; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; }
+        .body-content { line-height: 1.6; text-align: justify; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        .data-table th, .data-table td { border: 1px solid #64748b; padding: 5px 8px; font-size: 11.5px; }
+        .data-table th { background: #f8fafc; text-align: left; }
+        .sign-block { margin-top: 25px; text-align: right; }
+        .tear-strip { margin: 25px 0 15px 0; text-align: center; font-size: 10px; color: #64748b; }
+        .reply-slip { border: 1.5px dashed #475569; padding: 10px 14px; background: #fafafa; border-radius: 4px; }
+        .page-break { page-break-after: always; }
+        @media print { .no-print { display: none !important; } }
+      </style>
+    </head>
+    <body>
+      <div class="no-print" style="background: #f1f5f9; padding: 8px; text-align: right; border-bottom: 1px solid #cbd5e1;">
+        <button onclick="window.print()" style="background: #A80F28; color: white; border: none; padding: 6px 14px; font-weight: bold; border-radius: 4px; cursor: pointer;">🖨️ Print Notices (${accounts.length})</button>
+        <button onclick="window.close()" style="margin-left: 6px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">Close</button>
+      </div>
+      ${lettersHtml}
+      <script>
+        window.onload = function() {
+          setTimeout(function() { window.print(); }, 400);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+
+// -------------------------------------------------------------
+// EXPORT CENT PERCENT DATA TO EXCEL
+// -------------------------------------------------------------
+function exportCentVfnExcel() {
+  if (!cachedCentVfnRecords.length) return alert("No verification records to export!");
+
+  const rows = cachedCentVfnRecords.map(r => ({
+    "Sl. No": r.sl_no,
+    "Office Name": r.office_name,
+    "Account No": r.account_no,
+    "Customer Name": r.customer_name,
+    "Address": r.address || '',
+    "Account Type": r.account_type,
+    "Balance (₹)": parseFloat(r.balance) || 0,
+    "Date of Last Txn": r.date_of_last_txn || '',
+    "Mobile No": r.mobile_no || '',
+    "Article No": r.article_no || '',
+    "Status": r.status,
+    "Dispatched Date": r.dispatched_date || '',
+    "Reply Received Date": r.reply_rxd_date || '',
+    "Remarks": r.remarks || '',
+    "Last Event": r.last_event_record || ''
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Cent_Percent_Verification");
+  XLSX.writeFile(wb, `Cent_Percent_Verification_${Date.now()}.xlsx`);
 }
 
 // =========================================================================
