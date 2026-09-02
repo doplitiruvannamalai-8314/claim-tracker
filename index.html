@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -129,7 +130,7 @@
           <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📊MIS &amp; Pendency Reports</button>
           <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📈  Digital vs Cash Performance</button>
           <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">👥 User Management</button>
-          <button type="button" id="tabBtnCentVfn" onclick="showTab('centVfn')" class="nav-tab-btn hidden px-3 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 cursor-pointer text-slate-700 hover:bg-amber-100">  <span>🔍</span> <span>Cent Percent Verification</span></button>
+          <button type="button" id="tabBtnCentVfn" onclick="showTab('centVfn')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer"> 🔍Cent Percent Verification</button>
         </div>
 
 
@@ -932,22 +933,50 @@
       <button type="button" onclick="openSb46GeneratorModal()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         ✉️ Prepare SB-46 Notices
       </button>
+       <!-- PRINT CONFIRMATION MODAL -->
+        <div id="vfnPrintConfirmModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+          <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-3 shadow-2xl border-t-8 border-purple-600">
+            <div class="border-b pb-2 border-purple-200">
+              <h3 class="font-bold text-sm text-purple-900 flex items-center gap-1.5">
+                <span>🖨️</span> Confirm SB-46 Printing
+              </h3>
+            </div>
+
+            <p class="text-xs text-slate-700 leading-relaxed">
+              Did the <b id="vfnPrintConfirmCount" class="text-purple-700">0</b> SB-46 notice(s) print out successfully?
+            </p>
+
+            <div class="bg-purple-50 p-2.5 rounded-lg border border-purple-200 text-[11px] text-purple-950 space-y-1">
+              <div>• Clicking <b>Yes</b> updates their status to <span class="font-bold text-purple-700">PRINTED</span> with today's date.</div>
+              <div>• Clicking <b>No</b> leaves their current status unchanged.</div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-purple-100">
+              <button type="button" onclick="handlePrintConfirmationResponse(false)" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">
+                No, Keep As Is
+              </button>
+              <button type="button" id="btnConfirmPrintYes" onclick="handlePrintConfirmationResponse(true)" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">
+                Yes, Mark as Printed
+              </button>
+            </div>
+          </div>
+        </div>
       <button type="button" onclick="exportCentVfnExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         📊 Export Data (XLSX)
       </button>
-   
-      <!-- ADDITIONAL ACTION BUTTONS (Add to your Header Button Bar in CentVfn) -->
+      <button type="button" onclick="downloadCentVfnBatchTemplate()" class="bg-slate-700 hover:bg-slate-500 text-white border border-slate-300 px-3 py-1.5 rounded font-bold text-xs shadow-2xs cursor-pointer flex items-center gap-1 transition">
+      📥Download Batch Template
+       </button>
       <input type="file" id="centVfnBatchStatusInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCentVfnBatchStatusUpload(event)">
       <button type="button" onclick="$('centVfnBatchStatusInput').click()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
-        📮 Map Dispatch / Reply (Excel)
+        📮Bulk Update Dispatch / Reply (Excel)
       </button>
 
       <!-- ADMIN ONLY BULK DELETE BUTTON -->
       <button type="button" id="btnAdminVfnBulkDelete" onclick="openAdminVfnDeleteModal()" class="hidden bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         🗑️ Delete Records
       </button>
-
-      <!-- MODAL: ADMIN BULK DELETE -->
+             <!-- MODAL: ADMIN BULK DELETE -->
       <div id="vfnAdminDeleteModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-rose-600">
           <div class="border-b pb-2 border-rose-200 flex justify-between items-center">
@@ -1067,30 +1096,34 @@
   </div>
 </div>
 
-  <!-- KPI SUMMARY SCORECARDS -->
-  <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-    <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
-      <p class="text-[10px] text-slate-500 font-bold uppercase">Total Accounts Imported</p>
-      <p id="vfnCardTotal" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
-    </div>
-    <div class="bg-white border-2 border-blue-600 p-3 rounded-xl shadow-2xs">
-      <p class="text-[10px] text-blue-700 font-bold uppercase">Dispatched (SB-46 Sent)</p>
-      <p id="vfnCardDispatched" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
-    </div>
-    <div class="bg-white border-2 border-emerald-600 p-3 rounded-xl shadow-2xs">
-      <p class="text-[10px] text-emerald-700 font-bold uppercase">Reply Received</p>
-      <p id="vfnCardReplyReceived" class="text-base font-extrabold text-emerald-800 mt-0.5">0</p>
-    </div>
-    <div class="bg-white border-2 border-amber-500 p-3 rounded-xl shadow-2xs">
-      <p class="text-[10px] text-amber-700 font-bold uppercase">Pending for Reply / Notice</p>
-      <p id="vfnCardPending" class="text-base font-extrabold text-amber-800 mt-0.5">0</p>
-    </div>
+  <!-- KPI SUMMARY SCORECARDS (Updated to 5 Cards) -->
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+  <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
+    <p class="text-[10px] text-slate-500 font-bold uppercase">Total Accounts</p>
+    <p id="vfnCardTotal" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
   </div>
+  <div class="bg-white border-2 border-purple-600 p-3 rounded-xl shadow-2xs">
+    <p class="text-[10px] text-purple-700 font-bold uppercase">Printed (SB-46 Ready)</p>
+    <p id="vfnCardPrinted" class="text-base font-extrabold text-purple-900 mt-0.5">0</p>
+  </div>
+  <div class="bg-white border-2 border-blue-600 p-3 rounded-xl shadow-2xs">
+    <p class="text-[10px] text-blue-700 font-bold uppercase">Dispatched (Sent)</p>
+    <p id="vfnCardDispatched" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
+  </div>
+  <div class="bg-white border-2 border-emerald-600 p-3 rounded-xl shadow-2xs">
+    <p class="text-[10px] text-emerald-700 font-bold uppercase">Reply Received</p>
+    <p id="vfnCardReplyReceived" class="text-base font-extrabold text-emerald-800 mt-0.5">0</p>
+  </div>
+  <div class="bg-white border-2 border-amber-500 p-3 rounded-xl shadow-2xs">
+    <p class="text-[10px] text-amber-700 font-bold uppercase">Pending for Notice</p>
+    <p id="vfnCardPending" class="text-base font-extrabold text-amber-800 mt-0.5">0</p>
+  </div>
+</div>
 
   <!-- FILTER & SEARCH CONTROL BAR -->
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
     <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name / Article</label>
+      <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name </label>
       <input type="text" id="vfnSearchQuery" oninput="debounceCentVfnSearch()" placeholder="Search..." class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium outline-none focus:border-postRed-600">
     </div>
     <div>
@@ -1100,7 +1133,7 @@
       </select>
     </div>
     <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Scheme / Account Type</label>
+      <label class="block font-bold text-slate-700 mb-0.5">Scheme</label>
       <select id="vfnFilterScheme" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
         <option value="">-- All Schemes --</option>
         <option value="SB">Savings Bank (SB)</option>
@@ -1118,6 +1151,7 @@
       <select id="vfnFilterStatus" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
         <option value="">-- All Statuses --</option>
         <option value="imported">Imported (Notice Pending)</option>
+        <option value="printed">Notice Printed</option>
         <option value="dispatched">Notice Dispatched</option>
         <option value="reply_received">Reply Received</option>
       </select>
@@ -1164,7 +1198,8 @@
 </div>
 
 <!-- MODAL: UPDATE ACCOUNT STATUS / REPLY RECEIVED -->
-<div id="vfnStatusModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+<!-- MODAL: UPDATE ACCOUNT STATUS / REPLY RECEIVED -->
+<div id="vfnStatusModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
   <div class="bg-white rounded-2xl p-4 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
     <div class="border-b pb-2 border-amber-200 flex justify-between items-center">
       <h3 class="font-bold text-sm text-postRed-700">Update Verification Status</h3>
@@ -1185,43 +1220,62 @@
 
     <input type="hidden" id="vfnModalRecordId">
 
-    <div class="space-y-2 text-xs">
+    <div class="space-y-2.5 text-xs">
+      <!-- Status Selection -->
       <div>
         <label class="block font-bold text-slate-700 mb-0.5">Verification Status *</label>
         <select id="vfnModalStatusSelect" onchange="toggleVfnModalFields()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white outline-none">
           <option value="imported">Imported (Notice Pending)</option>
+          <option value="printed">Printed (Notice Generated)</option>
           <option value="dispatched">Dispatched (SB-46 Sent)</option>
           <option value="reply_received">Reply Received (Verified)</option>
         </select>
       </div>
 
-      <div id="vfnModalDispatchFields" class="hidden space-y-2 bg-blue-50/70 p-2 rounded border border-blue-200">
-        <div>
-          <label class="block font-bold text-blue-900 mb-0.5">Registered Article Number</label>
-          <input type="text" id="vfnModalArticleNo" placeholder="e.g. RT123456789IN" class="w-full border border-blue-300 p-1 rounded font-mono font-bold uppercase bg-white">
+      <!-- DISPATCHED DETAILS CONTAINER -->
+      <div id="vfnModalDispatchFields" class="space-y-2 bg-blue-50/70 p-2.5 rounded-lg border border-blue-200">
+        <div class="flex justify-between items-center">
+          <span class="font-bold text-blue-900 text-[11px] uppercase tracking-wide">Postal Dispatch Details</span>
+          <span id="vfnModalDispatchBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-200 text-blue-800 hidden">Auto-Populated</span>
         </div>
-        <div>
-          <label class="block font-bold text-blue-900 mb-0.5">Dispatch Date</label>
-          <input type="date" id="vfnModalDispatchDate" class="w-full border border-blue-300 p-1 rounded bg-white font-semibold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-blue-900 mb-0.5">Registered Article No</label>
+            <input type="text" id="vfnModalArticleNo" placeholder="e.g. RT123456789IN" class="w-full border border-blue-300 p-1.5 rounded font-mono font-bold uppercase bg-white outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-blue-900 mb-0.5">Dispatch Date</label>
+            <input type="date" id="vfnModalDispatchDate" class="w-full border border-blue-300 p-1.5 rounded bg-white font-semibold outline-none">
+          </div>
         </div>
       </div>
 
-      <div id="vfnModalReplyFields" class="hidden space-y-2 bg-emerald-50/70 p-2 rounded border border-emerald-200">
+      <!-- COUNTER RECEIPT CHECKBOX (Appears when not dispatched or on reply_received) -->
+      <div id="vfnModalCounterCheckboxContainer" class="hidden bg-amber-50 p-2 rounded-lg border border-amber-200">
+        <label class="inline-flex items-center gap-2 font-bold text-amber-950 cursor-pointer">
+          <input type="checkbox" id="vfnModalReceivedAtCounter" onchange="toggleVfnCounterReceivedState()" class="accent-postRed-600 rounded">
+          <span>Received directly at counter (No postal dispatch)</span>
+        </label>
+      </div>
+
+      <!-- REPLY RECEIVED DETAILS CONTAINER -->
+      <div id="vfnModalReplyFields" class="hidden space-y-2 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-200">
         <div>
           <label class="block font-bold text-emerald-900 mb-0.5">Reply Received Date *</label>
-          <input type="date" id="vfnModalReplyDate" class="w-full border border-emerald-300 p-1 rounded bg-white font-semibold">
+          <input type="date" id="vfnModalReplyDate" class="w-full border border-emerald-300 p-1.5 rounded bg-white font-semibold outline-none">
         </div>
       </div>
 
+      <!-- REMARKS -->
       <div>
         <label class="block font-bold text-slate-700 mb-0.5">Verification Remarks</label>
-        <textarea id="vfnModalRemarks" class="w-full border border-slate-300 p-1.5 rounded h-14 outline-none text-xs" placeholder="Balance matched / Passbook received / Discrepancy notes..."></textarea>
+        <textarea id="vfnModalRemarks" class="w-full border border-slate-300 p-1.5 rounded h-14 outline-none text-xs" placeholder="Passbook verified, balance tallies / Discrepancy observed..."></textarea>
       </div>
     </div>
 
     <div class="flex justify-end gap-2 pt-2 border-t border-amber-200">
-      <button type="button" onclick="closeVfnStatusModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold text-xs cursor-pointer">Cancel</button>
-      <button type="button" onclick="saveVfnStatusUpdate()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded font-bold text-xs cursor-pointer shadow-xs">Save Update</button>
+      <button type="button" onclick="closeVfnStatusModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Cancel</button>
+      <button type="button" id="btnSaveVfnStatus" onclick="saveVfnStatusUpdate()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">Save Update</button>
     </div>
   </div>
 </div>
@@ -8249,14 +8303,17 @@ async function loadCentVfnData() {
   records.forEach((r, idx) => {
     const bal = parseFloat(r.balance) || 0;
     
-    let statusBadge = '';
-    if (r.status === 'reply_received') {
-      statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Reply Rx'd (${r.reply_rxd_date || '✓'})</span>`;
-    } else if (r.status === 'dispatched') {
-      statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded font-bold text-[10px]">Dispatched (${r.dispatched_date || 'Sent'})</span>`;
-    } else {
-      statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Imported</span>`;
-    }
+    // Inside loadCentVfnData() loop:
+let statusBadge = '';
+if (r.status === 'reply_received') {
+  statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Reply Rx'd (${r.reply_rxd_date || '✓'})</span>`;
+} else if (r.status === 'dispatched') {
+  statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded font-bold text-[10px]">Dispatched (${r.dispatched_date || 'Sent'})</span>`;
+} else if (r.status === 'printed') {
+  statusBadge = `<span class="bg-purple-100 text-purple-900 border border-purple-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Printed (${r.printed_date || 'Ready'})</span>`;
+} else {
+  statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Imported</span>`;
+}
 
     // Inside loadCentVfnData() when rendering rows:
 htmlArr.push(`
@@ -8304,22 +8361,25 @@ async function updateCentVfnScorecards() {
   if (error || !allStats) return;
 
   const total = allStats.length;
+  let printed = 0;
   let dispatched = 0;
   let replyReceived = 0;
   let pending = 0;
 
   allStats.forEach(item => {
-    if (item.status === 'reply_received') replyReceived++;
-    else if (item.status === 'dispatched') dispatched++;
-    else pending++;
+    const st = item.status;
+    if (st === 'reply_received') replyReceived++;
+    else if (st === 'dispatched') dispatched++;
+    else if (st === 'printed') printed++;
+    else pending++; // 'imported' / unprinted
   });
 
   if ($('vfnCardTotal')) $('vfnCardTotal').innerText = total.toLocaleString('en-IN');
+  if ($('vfnCardPrinted')) $('vfnCardPrinted').innerText = printed.toLocaleString('en-IN');
   if ($('vfnCardDispatched')) $('vfnCardDispatched').innerText = dispatched.toLocaleString('en-IN');
   if ($('vfnCardReplyReceived')) $('vfnCardReplyReceived').innerText = replyReceived.toLocaleString('en-IN');
   if ($('vfnCardPending')) $('vfnCardPending').innerText = pending.toLocaleString('en-IN');
 }
-
 async function populateCentVfnOfficeDropdown() {
   const dropdown = $('vfnFilterOffice');
   if (!dropdown || dropdown.options.length > 1) return;
@@ -8574,60 +8634,158 @@ async function handleCentVfnExcelUpload(e) {
 
 //batch status upload 
 
+// -------------------------------------------------------------
+// 1. GENERATE & DOWNLOAD SAMPLE EXCEL TEMPLATE (.XLSX)
+// -------------------------------------------------------------
+function downloadCentVfnBatchTemplate() {
+  const sampleData = [
+    {
+      "Account Number": "100234567891",
+      "Article Number": "RT123456789IN",
+      "Dispatched Date": "2026-09-02",
+      "Reply Received Date": "",
+      "Remarks": "Dispatched via Speed Post"
+    },
+    {
+      "Account Number": "100234567892",
+      "Article Number": "RT123456790IN",
+      "Dispatched Date": "2026-08-25",
+      "Reply Received Date": "2026-09-02",
+      "Remarks": "Passbook verified, balance tallies"
+    },
+    {
+      "Account Number": "100234567893",
+      "Article Number": "",
+      "Dispatched Date": "",
+      "Reply Received Date": "2026-09-02",
+      "Remarks": "Verified at counter directly"
+    }
+  ];
+
+  const worksheet = XLSX.utils.json_to_sheet(sampleData);
+  
+  // Set explicit column widths for usability
+  worksheet['!cols'] = [
+    { wch: 18 }, // Account Number
+    { wch: 16 }, // Article Number
+    { wch: 16 }, // Dispatched Date
+    { wch: 20 }, // Reply Received Date
+    { wch: 35 }  // Remarks
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Batch_Status_Template");
+  XLSX.writeFile(workbook, "CentVfn_Batch_Status_Template.xlsx");
+}
+
+// -------------------------------------------------------------
+// 2. HARDENED BATCH STATUS UPLOAD ENGINE
+// -------------------------------------------------------------
 async function handleCentVfnBatchStatusUpload(e) {
   const file = e.target.files?.[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = async function(evt) {
-    try {
-      const data = new Uint8Array(evt.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+  const yieldThread = () => new Promise(resolve => setTimeout(resolve, 0));
+  const isCsv = file.name.toLowerCase().endsWith('.csv');
 
-      if (!rows.length) return alert("The selected file contains no data rows.");
+  const processBatchRows = async (rows) => {
+    if (!rows || !rows.length) {
+      alert("The selected file contains no data rows.");
+      return;
+    }
 
-      let updatedCount = 0;
-      for (const r of rows) {
-        const accNo = String(r['Account No'] || r['account_no'] || r['Account Number'] || '').trim().replace(/[^0-9]/g, '');
-        if (!accNo) continue;
+    let updatedCount = 0;
+    const todayStr = new Date().toISOString().split('T')[0];
 
-        const articleNo = String(r['Article No'] || r['article_no'] || r['Article Number'] || '').trim().toUpperCase();
-        const dispatchDate = r['Dispatched Date'] || r['dispatched_date'] || null;
-        const replyDate = r['Reply Received Date'] || r['reply_rxd_date'] || null;
+    for (let i = 0; i < rows.length; i++) {
+      if (i % 100 === 0) await yieldThread();
 
-        const updates = {};
-        if (articleNo) updates.article_no = articleNo;
+      const r = rows[i];
+      // Match flexible account number keys
+      const rawAccNo = String(
+        r['Account Number'] || r['account_no'] || r['Account No'] || r['ACCOUNT NO'] || ''
+      ).trim();
+      const accNo = rawAccNo.replace(/[^0-9]/g, '');
+      if (!accNo || accNo.length < 5) continue;
 
-        if (replyDate) {
-          updates.status = 'reply_received';
-          updates.reply_rxd_date = replyDate;
-          if (dispatchDate) updates.dispatched_date = dispatchDate;
-        } else if (dispatchDate || articleNo) {
-          updates.status = 'dispatched';
-          updates.dispatched_date = dispatchDate || new Date().toISOString().split('T')[0];
-        }
+      const articleNo = String(
+        r['Article Number'] || r['article_no'] || r['Article No'] || r['ARTICLE NO'] || ''
+      ).trim().toUpperCase();
 
-        if (Object.keys(updates).length > 0) {
-          updates.updated_at = new Date().toISOString();
-          const { error } = await supabaseClient
-            .from('cent_percent_verification')
-            .update(updates)
-            .eq('account_no', accNo);
+      const rawDispatchDate = r['Dispatched Date'] || r['dispatched_date'] || r['Dispatch Date'] || null;
+      const rawReplyDate = r['Reply Received Date'] || r['reply_rxd_date'] || r['Reply Date'] || null;
+      const remarks = String(r['Remarks'] || r['remarks'] || '').trim();
 
-          if (!error) updatedCount++;
-        }
+      const dispatchDate = typeof parseFinacleDate === 'function' ? parseFinacleDate(rawDispatchDate) : rawDispatchDate;
+      const replyDate = typeof parseFinacleDate === 'function' ? parseFinacleDate(rawReplyDate) : rawReplyDate;
+
+      const updates = {};
+      if (articleNo) updates.article_no = articleNo;
+      if (remarks) updates.remarks = remarks;
+
+      if (replyDate) {
+        updates.status = 'reply_received';
+        updates.reply_rxd_date = replyDate;
+        if (dispatchDate) updates.dispatched_date = dispatchDate;
+        updates.last_event_record = `Batch updated: Reply Received on ${replyDate}`;
+      } else if (dispatchDate || articleNo) {
+        updates.status = 'dispatched';
+        updates.dispatched_date = dispatchDate || todayStr;
+        updates.last_event_record = `Batch updated: Dispatched (${articleNo || 'No barcode'})`;
       }
 
-      alert(`Batch mapping completed: ${updatedCount} accounts updated.`);
-      $('centVfnBatchStatusInput').value = '';
+      if (Object.keys(updates).length > 0) {
+        updates.updated_at = new Date().toISOString();
+        const { error } = await supabaseClient
+          .from('cent_percent_verification')
+          .update(updates)
+          .eq('account_no', accNo);
+
+        if (!error) updatedCount++;
+      }
+    }
+
+    alert(`Batch mapping completed: ${updatedCount.toLocaleString('en-IN')} accounts updated.`);
+    $('centVfnBatchStatusInput').value = '';
+    if (typeof loadCentVfnData === 'function') {
       loadCentVfnData();
-    } catch (err) {
-      alert("Batch mapping failed: " + err.message);
     }
   };
-  reader.readAsArrayBuffer(file);
+
+  try {
+    if (isCsv && typeof Papa !== 'undefined') {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: async (results) => {
+          await processBatchRows(results.data);
+        },
+        error: (err) => alert("CSV Parsing Error: " + err.message)
+      });
+    } else {
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { 
+            type: 'array', 
+            dense: true, 
+            cellDates: true,
+            cellFormula: false,
+            cellStyles: false 
+          });
+          const sheetName = workbook.SheetNames[0];
+          const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+          await processBatchRows(rows);
+        } catch (err) {
+          alert("Excel Parsing Error: " + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  } catch (err) {
+    alert("Import failed: " + err.message);
+  }
 }
 //admin verification
 function openAdminVfnDeleteModal() {
@@ -9136,71 +9294,188 @@ async function executeAdminVfnBulkDelete() {
 // -------------------------------------------------------------
 // STATUS / REPLY RECEIVED UPDATE MODAL
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// OPEN VERIFICATION UPDATE MODAL
+// -------------------------------------------------------------
 function openVfnStatusModal(recordId) {
   const r = cachedCentVfnRecords.find(item => String(item.id) === String(recordId));
   if (!r) return alert("Record not found!");
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   $('vfnModalRecordId').value = r.id;
   $('vfnModalAccNo').innerText = r.account_no;
   $('vfnModalCustName').innerText = r.customer_name;
   $('vfnModalStatusSelect').value = r.status || 'imported';
+
+  // 1. Auto-populate Article & Dispatch Date if already available
+  const hasPriorDispatch = Boolean(r.article_no || r.dispatched_date);
   $('vfnModalArticleNo').value = r.article_no || '';
-  $('vfnModalDispatchDate').value = r.dispatched_date || new Date().toISOString().split('T')[0];
-  $('vfnModalReplyDate').value = r.reply_rxd_date || new Date().toISOString().split('T')[0];
+  $('vfnModalDispatchDate').value = r.dispatched_date || (r.status === 'dispatched' ? todayStr : '');
+
+  // Auto-populated indicator badge
+  const badge = $('vfnModalDispatchBadge');
+  if (badge) {
+    if (hasPriorDispatch) badge.classList.remove('hidden');
+    else badge.classList.add('hidden');
+  }
+
+  // 2. Reply Date & Remarks
+  $('vfnModalReplyDate').value = r.reply_rxd_date || todayStr;
   $('vfnModalRemarks').value = r.remarks || '';
+
+  // 3. Counter Checkbox initial state
+  const isCounterReceived = (r.remarks || '').toLowerCase().includes('counter') && !r.article_no;
+  $('vfnModalReceivedAtCounter').checked = isCounterReceived;
 
   toggleVfnModalFields();
   $('vfnStatusModal').classList.remove('hidden');
 }
 
-function closeVfnStatusModal() {
-  $('vfnStatusModal').classList.add('hidden');
-}
-
+// -------------------------------------------------------------
+// TOGGLE VISIBILITY OF DISPATCH, REPLY & COUNTER CONTROLS
+// -------------------------------------------------------------
 function toggleVfnModalFields() {
-  const st = $('vfnModalStatusSelect').value;
+  const status = $('vfnModalStatusSelect').value;
   const dispatchBox = $('vfnModalDispatchFields');
   const replyBox = $('vfnModalReplyFields');
+  const counterBox = $('vfnModalCounterCheckboxContainer');
+  const articleNo = $('vfnModalArticleNo').value.trim();
+  const dispatchDate = $('vfnModalDispatchDate').value;
+  const isCounterChecked = $('vfnModalReceivedAtCounter').checked;
 
-  if (st === 'dispatched') {
-    dispatchBox.classList.remove('hidden');
-    replyBox.classList.add('hidden');
-  } else if (st === 'reply_received') {
-    dispatchBox.classList.remove('hidden');
-    replyBox.classList.remove('hidden');
-  } else {
+  const hasPriorDispatch = Boolean(articleNo || dispatchDate);
+
+  if (status === 'imported') {
     dispatchBox.classList.add('hidden');
     replyBox.classList.add('hidden');
+    counterBox.classList.add('hidden');
+  } else if (status === 'dispatched') {
+    dispatchBox.classList.remove('hidden');
+    replyBox.classList.add('hidden');
+    counterBox.classList.add('hidden');
+    $('vfnModalReceivedAtCounter').checked = false;
+  } else if (status === 'reply_received') {
+    replyBox.classList.remove('hidden');
+
+    if (hasPriorDispatch && !isCounterChecked) {
+      // Prior dispatch exists: show auto-populated dispatch fields
+      dispatchBox.classList.remove('hidden');
+      counterBox.classList.remove('hidden');
+    } else {
+      // No prior dispatch: offer counter checkbox
+      counterBox.classList.remove('hidden');
+      if (isCounterChecked) {
+        dispatchBox.classList.add('hidden');
+      } else {
+        dispatchBox.classList.remove('hidden');
+      }
+    }
+  }
+}
+// -------------------------------------------------------------
+// CLOSE VERIFICATION STATUS UPDATE MODAL
+// -------------------------------------------------------------
+function closeVfnStatusModal() {
+  const modal = $('vfnStatusModal') || document.getElementById('vfnStatusModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+
+  // Reset modal input fields
+  if ($('vfnModalRecordId')) $('vfnModalRecordId').value = '';
+  if ($('vfnModalAccNo')) $('vfnModalAccNo').innerText = '-';
+  if ($('vfnModalCustName')) $('vfnModalCustName').innerText = '-';
+  if ($('vfnModalArticleNo')) $('vfnModalArticleNo').value = '';
+  if ($('vfnModalDispatchDate')) $('vfnModalDispatchDate').value = '';
+  if ($('vfnModalReplyDate')) $('vfnModalReplyDate').value = '';
+  if ($('vfnModalRemarks')) $('vfnModalRemarks').value = '';
+  if ($('vfnModalReceivedAtCounter')) $('vfnModalReceivedAtCounter').checked = false;
+
+  const badge = $('vfnModalDispatchBadge');
+  if (badge) badge.classList.add('hidden');
+}
+
+// Explicitly bind to global window to safeguard against inline onclick lookup failures
+window.closeVfnStatusModal = closeVfnStatusModal;
+// -------------------------------------------------------------
+// HANDLE "RECEIVED AT COUNTER" CHECKBOX TOGGLE
+// -------------------------------------------------------------
+function toggleVfnCounterReceivedState() {
+  const isChecked = $('vfnModalReceivedAtCounter').checked;
+  const dispatchBox = $('vfnModalDispatchFields');
+  const remarksInput = $('vfnModalRemarks');
+
+  if (isChecked) {
+    // Hide dispatch box and auto-append counter note to remarks if empty
+    dispatchBox.classList.add('hidden');
+    if (!remarksInput.value.trim()) {
+      remarksInput.value = 'Passbook verified directly at counter';
+    }
+  } else {
+    dispatchBox.classList.remove('hidden');
+    if (remarksInput.value === 'Passbook verified directly at counter') {
+      remarksInput.value = '';
+    }
   }
 }
 
+// -------------------------------------------------------------
+// SAVE STATUS UPDATE
+// -------------------------------------------------------------
 async function saveVfnStatusUpdate() {
   const recordId = $('vfnModalRecordId').value;
   const status = $('vfnModalStatusSelect').value;
-  const article_no = $('vfnModalArticleNo').value.trim().toUpperCase();
-  const dispatched_date = $('vfnModalDispatchDate').value || null;
+  const isCounterChecked = $('vfnModalReceivedAtCounter').checked;
+  
+  let article_no = $('vfnModalArticleNo').value.trim().toUpperCase();
+  let dispatched_date = $('vfnModalDispatchDate').value || null;
   const reply_rxd_date = $('vfnModalReplyDate').value || null;
-  const remarks = $('vfnModalRemarks').value.trim();
+  let remarks = $('vfnModalRemarks').value.trim();
 
+  // Validate reply date
   if (status === 'reply_received' && !reply_rxd_date) {
     return alert("Please enter the Date of Reply Received.");
   }
 
-  const updates = {
-    status,
-    article_no,
-    dispatched_date: (status !== 'imported') ? dispatched_date : null,
-    reply_rxd_date: (status === 'reply_received') ? reply_rxd_date : null,
-    remark_entry_date: new Date().toISOString().split('T')[0],
-    remarks,
-    updated_at: new Date().toISOString(),
-    last_event_record: `Status updated to ${status}`
-  };
+  // If counter receipt was checked, clear postal dispatch fields
+  if (status === 'reply_received' && isCounterChecked) {
+    article_no = '';
+    dispatched_date = null;
+    if (!remarks.toLowerCase().includes('counter')) {
+      remarks = remarks ? `${remarks} (Received at Counter)` : 'Received directly at counter';
+    }
+  }
+// Inside saveVfnStatusUpdate():
+const todayStr = new Date().toISOString().split('T')[0];
+
+const updates = {
+  status,
+  article_no,
+  dispatched_date: (status !== 'imported' && status !== 'printed') ? dispatched_date : null,
+  reply_rxd_date: (status === 'reply_received') ? reply_rxd_date : null,
+  printed_date: (status === 'printed') ? (r.printed_date || todayStr) : (status === 'imported' ? null : r.printed_date),
+  remark_entry_date: todayStr,
+  remarks,
+  updated_at: new Date().toISOString(),
+  last_event_record: status === 'printed' ? `Marked as Printed on ${todayStr}` : `Status updated to ${status}`
+};
+
+  const btn = $('btnSaveVfnStatus');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+  }
 
   const { error } = await supabaseClient
     .from('cent_percent_verification')
     .update(updates)
     .eq('id', recordId);
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerText = "Save Update";
+  }
 
   if (error) {
     alert("Update failed: " + error.message);
@@ -9228,50 +9503,200 @@ function toggleSb46ModeInputs() {
   $('sb46IndividualContainer').classList.toggle('hidden', mode !== 'individual');
 }
 
-async function executeSb46Print() {
-  const mode = $('sb46PrintMode').value;
-  let targetAccounts = [];
+// -------------------------------------------------------------
+// EXECUTE SB-46 PRINT ENGINE WITH STRICT STATUS VALIDATION
+// -------------------------------------------------------------
 
+// Global array holding accounts waiting for print confirmation
+let pendingPrintedRecords = [];
+
+async function executeSb46Print() {
+  const mode = $('sb46PrintMode')?.value || 'range';
+  let rawAccounts = [];
+
+  // Step 1: Query selected records
   if (mode === 'range') {
-    const fromSl = parseInt($('sb46FromSl').value) || 1;
-    const toSl = parseInt($('sb46ToSl').value) || 999999;
-    
-    const { data } = await supabaseClient
+    const fromSl = parseInt($('sb46FromSl')?.value, 10) || 1;
+    const toSl = parseInt($('sb46ToSl')?.value, 10) || 999999;
+
+    const { data, error } = await supabaseClient
       .from('cent_percent_verification')
       .select('*')
       .gte('sl_no', fromSl)
       .lte('sl_no', toSl)
       .order('sl_no', { ascending: true });
-      
-    targetAccounts = data || [];
+
+    if (error) return alert("Fetch error: " + error.message);
+    rawAccounts = data || [];
   } else if (mode === 'scheme') {
-    const scheme = $('sb46SchemeSelect').value;
-    const { data } = await supabaseClient
+    const scheme = $('sb46SchemeSelect')?.value;
+    const { data, error } = await supabaseClient
       .from('cent_percent_verification')
       .select('*')
-      .eq('account_type', scheme)
+      .eq('scheme', scheme)
       .order('sl_no', { ascending: true });
-      
-    targetAccounts = data || [];
+
+    if (error) return alert("Fetch error: " + error.message);
+    rawAccounts = data || [];
   } else if (mode === 'individual') {
-    const acc = $('sb46TargetAccNo').value.trim();
-    if (!acc) return alert("Please enter Account Number!");
-    
-    const { data } = await supabaseClient
+    const acc = $('sb46TargetAccNo')?.value.trim().replace(/[^0-9]/g, '');
+    if (!acc) return alert("Please enter a valid Account Number!");
+
+    const { data, error } = await supabaseClient
       .from('cent_percent_verification')
       .select('*')
       .eq('account_no', acc);
-      
-    targetAccounts = data || [];
+
+    if (error) return alert("Fetch error: " + error.message);
+    rawAccounts = data || [];
   }
 
-  if (!targetAccounts.length) {
+  if (!rawAccounts.length) {
     return alert("No account records found matching your selection criteria.");
   }
 
-  renderSb46PrintWindow(targetAccounts);
-  closeSb46GeneratorModal();
+  // Step 2: Validate Status Rules
+  let eligibleAccounts = [];
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  if (mode === 'individual') {
+    eligibleAccounts = rawAccounts;
+    const acc = rawAccounts[0];
+    if (['dispatched', 'reply_received'].includes(acc.status)) {
+      if (!confirm(`Notice: Account ${acc.account_no} is already in status '${acc.status.toUpperCase()}'. Do you still want to generate an SB-46 duplicate notice?`)) {
+        return;
+      }
+    }
+  } else {
+    const skipped = [];
+    rawAccounts.forEach(acc => {
+      const st = (acc.status || 'imported').toLowerCase();
+      if (st === 'imported' || st === 'printed') {
+        eligibleAccounts.push(acc);
+      } else {
+        skipped.push({ sl: acc.sl_no, accNo: acc.account_no, status: st });
+      }
+    });
+
+    if (skipped.length > 0) {
+      if (eligibleAccounts.length === 0) {
+        return alert(`Cannot generate bulk SB-46 notices!\n\nAll ${skipped.length} accounts in this range are already 'Dispatched' or 'Reply Received'.\nBulk re-generation is blocked for dispatched accounts.\n\nUse Individual Mode if a duplicate copy is required.`);
+      } else {
+        alert(`Notice: ${skipped.length} account(s) were skipped because they are already 'Dispatched' or 'Reply Received'.\n\nOnly ${eligibleAccounts.length} account(s) in 'Imported' or 'Printed' status will be generated.`);
+      }
+    }
+  }
+
+  // Step 3: Resolve Notice Date (preserve existing printed_date if available)
+  const printReadyAccounts = eligibleAccounts.map(acc => ({
+    ...acc,
+    resolvedPrintDate: acc.printed_date || todayStr
+  }));
+
+  // Store for confirmation modal
+  pendingPrintedRecords = printReadyAccounts;
+
+  // Close the setup modal
+  if (typeof closeSb46GeneratorModal === 'function') {
+    closeSb46GeneratorModal();
+  } else if ($('sb46GeneratorModal')) {
+    $('sb46GeneratorModal').classList.add('hidden');
+  }
+
+  // Launch print layout
+  renderSb46PrintWindow(printReadyAccounts);
 }
+
+// -------------------------------------------------------------
+// SHOW PRINT CONFIRMATION MODAL
+// -------------------------------------------------------------
+function promptPrintConfirmation() {
+  if (!pendingPrintedRecords || !pendingPrintedRecords.length) return;
+
+  const countEl = $('vfnPrintConfirmCount');
+  if (countEl) countEl.innerText = pendingPrintedRecords.length;
+
+  const modal = $('vfnPrintConfirmModal');
+  if (modal) modal.classList.remove('hidden');
+}
+window.promptPrintConfirmation = promptPrintConfirmation;
+
+// -------------------------------------------------------------
+// PROCESS YES / NO RESPONSE FROM USER
+// -------------------------------------------------------------
+async function handlePrintConfirmationResponse(confirmed) {
+  const modal = $('vfnPrintConfirmModal');
+  if (modal) modal.classList.add('hidden');
+
+  if (!confirmed) {
+    pendingPrintedRecords = [];
+    return;
+  }
+
+  const btn = $('btnConfirmPrintYes');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Updating...";
+  }
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  // Only update records currently in 'imported' or 'printed' status
+  const targetIds = pendingPrintedRecords
+    .filter(a => ['imported', 'printed'].includes(a.status))
+    .map(a => a.id);
+
+  if (!targetIds.length) {
+    alert("No eligible records found to update (accounts may already be Dispatched).");
+    pendingPrintedRecords = [];
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Yes, Mark as Printed";
+    }
+    return;
+  }
+
+  const yieldThread = () => new Promise(res => setTimeout(res, 0));
+  const chunkSize = 200;
+  let updatedCount = 0;
+
+  try {
+    for (let i = 0; i < targetIds.length; i += chunkSize) {
+      await yieldThread();
+      const chunk = targetIds.slice(i, i + chunkSize);
+
+      const { error } = await supabaseClient
+        .from('cent_percent_verification')
+        .update({
+          status: 'printed',
+          printed_date: todayStr,
+          updated_at: new Date().toISOString(),
+          last_event_record: `SB-46 Notice Printed on ${todayStr}`
+        })
+        .in('id', chunk);
+
+      if (error) throw error;
+      updatedCount += chunk.length;
+    }
+
+    alert(`✅ Successfully updated ${updatedCount} account(s) to 'PRINTED' with Notice Date ${todayStr}.`);
+    
+    // Refresh main table and dashboard scorecards
+    if (typeof loadCentVfnData === 'function') {
+      await loadCentVfnData();
+    }
+  } catch (err) {
+    alert("Failed to update printed status: " + err.message);
+  } finally {
+    pendingPrintedRecords = [];
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Yes, Mark as Printed";
+    }
+  }
+}
+window.handlePrintConfirmationResponse = handlePrintConfirmationResponse;
+
 
 function renderSb46PrintWindow(accounts) {
   const printWindow = window.open('', '_blank', 'width=900,height=800');
@@ -9282,6 +9707,10 @@ function renderSb46PrintWindow(accounts) {
   accounts.forEach((acc, i) => {
     const balStr = (parseFloat(acc.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
     
+    // Resolve notice date: use existing printed_date if available, else current date
+    const rawDate = acc.resolvedPrintDate || acc.printed_date || new Date().toISOString().split('T')[0];
+    const noticeDateFormatted = typeof formatDate === 'function' ? formatDate(rawDate) : rawDate;
+
     lettersHtml += `
       <div class="page-letter">
         <div class="header">
@@ -9289,37 +9718,43 @@ function renderSb46PrintWindow(accounts) {
           <h4>OFFICE OF THE SENIOR SUPERINTENDENT OF POST OFFICES</h4>
           <p class="division-sub">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</p>
         </div>
-
+        
         <div class="ref-bar">
-          <div><b>Sl. No:</b> ${acc.sl_no}</div>
-          <div><b>Form:</b> SB-46 / Verification</div>
-          <div><b>Date:</b> ${new Date().toLocaleDateString('en-IN')}</div>
+          <div><b>SB-46</b></div>
+          <div style="text-align: center;"><b>Intimation to the depositor of the balance at credit of the account and his acknowledgement</b></div>
+          <div></div>
+        </div>
+        
+        <div class="ref-bar">
+          <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
+          <div></div>
+          <div><b>Date:</b> ${noticeDateFormatted}</div>
         </div>
 
         <div class="to-address">
-          <b>To:</b><br>
+          <br><b>To:</b><br>
           ${acc.customer_name}<br>
-          ${acc.address || 'Address on record'}<br>
-          <b>Post Office:</b> ${acc.office_name}<br>
+          ${acc.address || 'Address on record'}<br>          
           ${acc.mobile_no ? `<b>Contact:</b> ${acc.mobile_no}` : ''}
+          <br>
         </div>
 
         <div class="subject-line">
-          <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme})
+          <b>Subject:</b> Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme})-reg
         </div>
 
         <div class="body-content">
-          <p>Dear Customer,</p>
-          <p>In accordance with the statutory requirements of Post Office Savings Bank General Rules, your <b>${acc.scheme}</b> account standing at <b>${acc.office_name}</b> has been selected for Cent Percent Passbook / Balance Verification.</p>
+          <p style="margin: 4px 0;"><br>Dear Customer,</p><br>
+          <p style="margin: 4px 0;">The balance at credit of your Account No. <b>${acc.account_no}</b> standing open at <b>${acc.office_name}</b> (Post Office) as shown in the Post Office records is:</p>
           
           <table class="data-table">
             <tr>
               <th width="35%">Account Number</th>
-              <td><b>${acc.account_no}</b></td>
+              <td><b style="font-family: monospace; font-size: 12px;">${acc.account_no}</b></td>
             </tr>
             <tr>
-              <th> Scheme - Account Type</th>
-              <td>${acc.scheme} - ${acc.account_type}</td>
+              <th>Scheme - Account Type</th>
+              <td>${acc.scheme} - ${acc.account_type || 'SELF'}</td>
             </tr>
             <tr>
               <th>Balance as per Office Ledger</th>
@@ -9327,64 +9762,74 @@ function renderSb46PrintWindow(accounts) {
             </tr>
             <tr>
               <th>Date of Last Transaction</th>
-              <td>${acc.date_of_last_txn || 'N/A'}</td>
+              <td>${typeof formatDate === 'function' ? formatDate(acc.date_of_last_txn) : (acc.date_of_last_txn || 'N/A')}</td>
             </tr>
           </table>
-
-          <p>You are requested to kindly inspect the balance mentioned above and verify whether it tallies with your passbook. Please send your confirmation by returning the signed acknowledgment slip below, or by presenting your passbook at the Post Office for verification within 15 days.</p>
+          <br>
+          <p style="margin: 6px 0 0 0; text-align: justify; font-size: 11px; line-height: 1.45;">
+            Kindly examine your Passbook and see if this is correct. In any case, the correct balance as shown in your Passbook may please be noted in the form below which should be signed, dated and then enclosed in the attached addressed service cover to be posted by you at a very early date. The procedure is being followed for the detection of any mistake which might have occurred in the maintenance of your Savings Bank Account.
+          </p>
         </div>
 
-        <div class="sign-block">
-          <p>Yours faithfully,</p>
-          <br><br>
-          <p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division</p>
+        <div class="sign-block">   
+          <br><br><p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division</p>
         </div>
-
-        <div class="tear-strip" style="margin: 18px 0 10px 0; text-align: center; font-size: 10px; color: #475569; letter-spacing: 1px; user-select: none;">
+        
+        <div style="font-size: 10px; font-style: italic; color: #475569; margin-top: 4px;">Note – No postage stamp is required on the cover</div>
+        
+        <div class="tear-strip">
           ✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂
         </div>
 
-        <div class="reply-slip" style="border: 1.5px dashed #334155; padding: 14px 18px; background: #fafafa; border-radius: 6px; font-size: 11.5px; line-height: 1.6;">
-          <div style="text-align: center; font-weight: 800; font-size: 12.5px; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 8px;">
-            REPLY FORM (SB-46)
+        <div class="reply-slip">
+          <div style="text-align: center; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 4px;">
+            REPLY FORM (SB-46)            
           </div>
-
-          <div style="margin-bottom: 10px; font-size: 11px; line-height: 1.4;">
+          
+          <div class="ref-bar" style="margin-bottom: 6px; padding-bottom: 2px;">
+            <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
+            <div></div>
+            <div><b>Date:</b> ${noticeDateFormatted}</div>
+          </div>
+          
+          <div style="margin-bottom: 6px; font-size: 10.5px; line-height: 1.35;">
             <b>To:</b><br>
             The Senior Superintendent of Post Offices,<br>
             Chennai City Central Division, Chennai - 600017
           </div>
 
-          <p style="margin: 0 0 12px 0; text-align: justify; line-height: 1.8;">
-            I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace; font-size: 12px;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
-          <!-- LINE 1: Figures & As On Date -->
-          <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 16px;">
-            <span style="white-space: nowrap; font-weight: 600;">In Figures: <b>₹</b></span>
-            <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 24px;"></div>
-            <span style="white-space: nowrap; font-weight: 600; margin-left: 12px;">as on (Date):</span>
-            <div style="width: 140px; border-bottom: 1px dotted #000; min-height: 24px;"></div>
-          </div></p>
+          <p style="margin: 0 0 6px 0; text-align: justify; line-height: 1.5; font-size: 11px;">
+           <br> I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace; font-size: 11.5px;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
+          </p>
 
-          <!-- LINE 2 & 3: Words (Two Full Lines with Generous Handwriting Space) -->
-          <div style="margin-bottom: 8px;">
-            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 14px;">
+          <!-- LINE 1: Figures & As On Date -->
+          <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px;">
+            <span style="white-space: nowrap; font-weight: 600;">In Figures: <b>₹</b></span>
+            <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 18px;"></div>
+            <span style="white-space: nowrap; font-weight: 600; margin-left: 8px;">as on (Date):</span>
+            <div style="width: 140px; border-bottom: 1px dotted #000; min-height: 18px;"></div>
+          </div>
+
+          <!-- LINE 2 & 3: Words -->
+          <div style="margin-bottom: 4px;">
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 8px;">
               <span style="white-space: nowrap; font-weight: 600;">In Words: Rupees</span>
-              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 24px;"></div>
+              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 18px;"></div>
             </div>
-            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px;">
-              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 24px;"></div>
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 4px;">
+              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 18px;"></div>
               <span style="white-space: nowrap; font-weight: 600;">only.</span>
             </div>
           </div>
-
+          <br><br>
           <!-- SIGNATURE & DATE BLOCK -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 36px; padding-top: 10px;">
-            <div style="font-size: 11px;">
-              <div style="margin-bottom: 6px;"><b>Date:</b> ____________________</div>
-              <div><b>Contact / Mobile No:</b> ____________________</div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; padding-top: 6px;">
+            <div style="font-size: 10.5px;">
+              <div style="margin-bottom: 4px;"><b>Date:</b> ____________________</div>
+              <div><b>Mobile No:</b> ____________________</div>
             </div>
-            <div style="text-align: center; font-size: 11px;">
-              <div style="width: 220px; border-bottom: 1px solid #000; margin-bottom: 4px;"></div>
+            <div style="text-align: center; font-size: 10.5px;">
+              <div style="width: 200px; border-bottom: 1px solid #000; margin-bottom: 4px;"></div>
               <b>Signature / LTI of Depositor</b>
             </div>
           </div>
@@ -9399,45 +9844,83 @@ function renderSb46PrintWindow(accounts) {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>SB-46 Verification Notices</title>
+      <title>SB-46 Intimation to the depositor</title>
       <style>
-        @page { size: A4 portrait; margin: 12mm 15mm; }
+        @page { size: A4 portrait; margin: 8mm 12mm; }
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px; color: #1e293b; margin: 0; padding: 0; }
-        .page-letter { padding: 10px; min-height: 980px; position: relative; }
-        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; }
-        .header h3 { margin: 0; font-size: 14px; font-weight: 800; letter-spacing: 0.5px; }
-        .header h4 { margin: 3px 0 0 0; font-size: 12px; font-weight: 700; }
-        .header .division-sub { margin: 2px 0 0 0; font-size: 10px; font-weight: 600; color: #475569; }
-        .ref-bar { display: flex; justify-content: space-between; font-size: 10.5px; margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; }
-        .to-address { margin-bottom: 12px; line-height: 1.45; font-size: 11.5px; }
-        .subject-line { font-size: 12px; margin: 12px 0; padding: 4px 0; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; }
-        .body-content { line-height: 1.6; text-align: justify; }
-        .data-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-        .data-table th, .data-table td { border: 1px solid #64748b; padding: 5px 8px; font-size: 11.5px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11.5px; color: #1e293b; margin: 0; padding: 0; }
+        .page-letter { padding: 4px 6px; min-height: 980px; position: relative; }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 8px; }
+        .header h3 { margin: 0; font-size: 13.5px; font-weight: 800; letter-spacing: 0.5px; }
+        .header h4 { margin: 2px 0 0 0; font-size: 11.5px; font-weight: 700; }
+        .header .division-sub { margin: 2px 0 0 0; font-size: 9.5px; font-weight: 600; color: #475569; }
+        .ref-bar { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 3px; }
+        .to-address { margin-bottom: 8px; line-height: 1.35; font-size: 11px; }
+        .subject-line { font-size: 11px; margin: 6px 0; padding: 3px 0; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; }
+        .body-content { line-height: 1.45; text-align: justify; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+        .data-table th, .data-table td { border: 1px solid #64748b; padding: 4px 6px; font-size: 11px; }
         .data-table th { background: #f8fafc; text-align: left; }
-        .sign-block { margin-top: 25px; text-align: right; }
-        .tear-strip { margin: 25px 0 15px 0; text-align: center; font-size: 10px; color: #64748b; }
-        .reply-slip { border: 1.5px dashed #475569; padding: 10px 14px; background: #fafafa; border-radius: 4px; }
+        .sign-block { margin-top: 10px; text-align: right; font-size: 11px; }
+        .tear-strip { margin: 10px 0 6px 0; text-align: center; font-size: 9.5px; color: #64748b; user-select: none; }
+        .reply-slip { border: 1.5px dashed #475569; padding: 8px 12px; background: #fafafa; border-radius: 4px; }
         .page-break { page-break-after: always; }
         @media print { .no-print { display: none !important; } }
       </style>
     </head>
-    <body>
-      <div class="no-print" style="background: #f1f5f9; padding: 8px; text-align: right; border-bottom: 1px solid #cbd5e1;">
-        <button onclick="window.print()" style="background: #A80F28; color: white; border: none; padding: 6px 14px; font-weight: bold; border-radius: 4px; cursor: pointer;">🖨️ Print Notices (${accounts.length})</button>
-        <button onclick="window.close()" style="margin-left: 6px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">Close</button>
-      </div>
-      ${lettersHtml}
-      <script>
-        window.onload = function() {
-          setTimeout(function() { window.print(); }, 400);
-        };
-      <\/script>
-    </body>
+  <body>
+  <div class="no-print" style="background: #f1f5f9; padding: 8px; text-align: right; border-bottom: 1px solid #cbd5e1;">
+    <button onclick="handleManualPrint()" style="background: #A80F28; color: white; border: none; padding: 6px 14px; font-weight: bold; border-radius: 4px; cursor: pointer;">🖨️ Print Notices (${accounts.length})</button>
+    <button onclick="handleManualClose()" style="margin-left: 6px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">Close &amp; Return</button>
+  </div>
+  ${lettersHtml}
+  <script>
+    function notifyParent() {
+      if (window.opener && !window.opener.closed && typeof window.opener.promptPrintConfirmation === 'function') {
+        window.opener.promptPrintConfirmation();
+      }
+    }
+
+    function handleManualPrint() {
+      window.print();
+      notifyParent();
+    }
+
+    function handleManualClose() {
+      notifyParent();
+      window.close();
+    }
+
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+        notifyParent();
+      }, 500);
+    };
+  <\/script>
+</body>
     </html>
   `);
   printWindow.document.close();
+  const checkWindowClosed = setInterval(() => {
+  if (printWindow.closed) {
+    clearInterval(checkWindowClosed);
+    promptPrintConfirmation();
+  }
+}, 800);
+}
+
+
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  if (isNaN(date)) return 'Invalid Date';
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
 }
 
 // -------------------------------------------------------------
