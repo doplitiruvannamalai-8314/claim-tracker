@@ -992,15 +992,6 @@
       <h3 class="font-bold text-sm text-emerald-800 flex items-center gap-1.5">
         <span>📥</span> Import Accounts for Cent Percent Verification
       </h3>
-      <div id="vfnImportProgressContainer" class="hidden space-y-1.5 bg-emerald-50/90 border border-emerald-300 p-2.5 rounded-xl text-xs">
-  <div class="flex justify-between items-center text-emerald-900 font-bold">
-    <span id="vfnImportProgressStatus">Reading file rows...</span>
-    <span id="vfnImportProgressCount" class="font-mono text-emerald-700">0 / 0</span>
-  </div>
-  <div class="w-full bg-emerald-200/80 rounded-full h-2.5 overflow-hidden">
-    <div id="vfnImportProgressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
-  </div>
-</div>
       <button type="button" onclick="closeVfnImportModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
     </div>
 
@@ -1048,6 +1039,7 @@
       </div>
     </div>
 
+
     <!-- FILE UPLOAD INPUT -->
     <div class="space-y-1 text-xs">
       <label class="block font-bold text-slate-700">Select Finacle Report File (CSV or Excel) *</label>
@@ -1061,6 +1053,17 @@
         Start Import
       </button>
     </div>
+
+          <div id="vfnImportProgressContainer" class="hidden space-y-1.5 bg-emerald-50/90 border border-emerald-300 p-2.5 rounded-xl text-xs">
+  <div class="flex justify-between items-center text-emerald-900 font-bold">
+    <span id="vfnImportProgressStatus">Reading file rows...</span>
+    <span id="vfnImportProgressCount" class="font-mono text-emerald-700">0 / 0</span>
+  </div>
+  <div class="w-full bg-emerald-200/80 rounded-full h-2.5 overflow-hidden">
+    <div id="vfnImportProgressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -1144,11 +1147,12 @@
             <th class="p-2">Account No</th>
             <th class="p-2">Customer Name &amp; Address</th>
             <th class="p-2 text-center">Scheme</th>
+            <th class="p-2 text-center">Account Type (Mode)</th>
             <th class="p-2 text-right">Balance (₹)</th>
             <th class="p-2 text-center">Last Txn</th>
             <th class="p-2 text-center">Article No</th>
             <th class="p-2 text-center">Status</th>
-            <th class="p-2 text-center">Action / Update</th>
+            <th class="p-2 text-center">Action</th>
           </tr>
         </thead>
         <tbody id="centVfnTableBody" class="divide-y divide-slate-100">
@@ -8200,9 +8204,11 @@ async function loadCentVfnData() {
   const scheme = $('vfnFilterScheme')?.value;
   const status = $('vfnFilterStatus')?.value;
   const search = $('vfnSearchQuery')?.value.trim().toLowerCase();
+  const accountType = $('vfnFilterAccountType')?.value;
 
-  if (office) query = query.eq('office_name', office);
-  if (scheme) query = query.eq('account_type', scheme);
+  if (scheme) query = query.eq('scheme', scheme);
+  if (accountType) query = query.eq('account_type', accountType);
+  if (office) query = query.eq('office_name', office);  
   if (status) query = query.eq('status', status);
 
   const { data, error } = await query.order('sl_no', { ascending: true });
@@ -8252,27 +8258,39 @@ async function loadCentVfnData() {
       statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Imported</span>`;
     }
 
-    htmlArr.push(`
-      <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
-        <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
-        <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
-        <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
-        <td class="p-2">
-          <div class="font-bold text-slate-900">${r.customer_name}</div>
-          <div class="text-[10px] text-slate-500 truncate max-w-[220px]" title="${r.address || ''}">${r.address || '-'}</div>
-        </td>
-        <td class="p-2 text-center font-bold text-slate-700">${r.account_type}</td>
-        <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-        <td class="p-2 text-center text-slate-600 whitespace-nowrap">${r.date_of_last_txn || '-'}</td>
-        <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.article_no || '-'}</td>
-        <td class="p-2 text-center">${statusBadge}</td>
-        <td class="p-2 text-center">
-          <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
-            ✏️ Update / Reply
-          </button>
-        </td>
-      </tr>
-    `);
+    // Inside loadCentVfnData() when rendering rows:
+htmlArr.push(`
+  <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
+    <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
+    <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
+    <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
+    <td class="p-2">
+      <div class="font-bold text-slate-900">${r.customer_name}</div>
+      <div class="text-[10px] text-slate-500 truncate max-w-[200px]" title="${r.address || ''}">${r.address || '-'}</div>
+    </td>
+    <!-- SCHEME (e.g., TDIP5, SBGEN, SSA) -->
+    <td class="p-2 text-center">
+      <span class="bg-purple-100 text-purple-900 font-extrabold text-[10px] px-1.5 py-0.5 rounded border border-purple-200">
+        ${r.scheme || '-'}
+      </span>
+    </td>
+    <!-- ACCOUNT TYPE / MODE OF OPERATION (e.g., SELF, JOINT-A, JOINT-B) -->
+    <td class="p-2 text-center">
+      <span class="bg-slate-100 text-slate-800 font-bold text-[10.5px] px-2 py-0.5 rounded border border-slate-300 whitespace-nowrap">
+        ${r.account_type || 'SELF'}
+      </span>
+    </td>
+    <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+    <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${r.date_of_last_txn || '-'}</td>
+    <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.article_no || '-'}</td>
+    <td class="p-2 text-center">${statusBadge}</td>
+    <td class="p-2 text-center">
+      <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
+        ✏️ Update
+      </button>
+    </td>
+  </tr>
+`);
   });
 
   tbody.innerHTML = htmlArr.join('');
@@ -8644,50 +8662,71 @@ function toggleVfnDeleteScopeInput() {
 // =========================================================================
 // FINACLE DATE PARSER (HANDLES '11-JAN-21', '05-OCT-2023', DD/MM/YYYY)
 // =========================================================================
-function parseFinacleDate(dateStr) {
-  if (!dateStr) return null;
-  let s = String(dateStr).trim().toUpperCase();
+function parseFinacleDate(dateVal) {
+  if (dateVal === null || dateVal === undefined) return null;
+
+  // 1. Handle Excel Serial Date numbers (e.g. 44207 -> 2021-01-11)
+  if (typeof dateVal === 'number' || (!isNaN(dateVal) && !isNaN(parseFloat(dateVal)) && String(dateVal).trim().length <= 6)) {
+    const num = parseFloat(dateVal);
+    if (num > 20000 && num < 70000) { // Valid Excel date serial range (1954 to 2091)
+      const excelEpoch = new Date(Math.round((num - 25569) * 86400 * 1000));
+      const yyyy = excelEpoch.getUTCFullYear();
+      const mm = String(excelEpoch.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(excelEpoch.getUTCDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  }
+
+  let s = String(dateVal).trim().toUpperCase();
+  // Strip quotes and carriage returns
+  s = s.replace(/["'\r\n]/g, '').trim();
+
   if (['-', '--', 'NA', 'N/A', 'NULL', '0', ''].includes(s)) return null;
 
-  // Discard any trailing timestamp (e.g., "11-JAN-21 00:00:00")
+  // Strip timestamp portion if present (e.g., "11-JAN-21 00:00:00" -> "11-JAN-21")
   s = s.split(' ')[0].split('T')[0];
 
   const monthMap = {
     'JAN': '01', 'FEB': '02', 'MAR': '03', 'APR': '04',
     'MAY': '05', 'JUN': '06', 'JUL': '07', 'AUG': '08',
-    'SEP': '09', 'OCT': '10', 'NOV': '11', 'DEC': '12'
+    'SEP': '09', 'SEPT': '09', 'OCT': '10', 'NOV': '11', 'DEC': '12'
   };
 
-  // 1. Format: DD-MMM-YY or DD-MMM-YYYY (e.g., 11-JAN-21 or 11-JAN-2021)
-  const finacleMatch = s.match(/^(\d{1,2})[-/ ]([A-Z]{3})[-/ ](\d{2,4})$/);
+  // 2. Match Finacle standard: DD-MMM-YY or DD-MMM-YYYY (e.g., 11-JAN-21, 5-OCT-2023, 11/JAN/21)
+  const finacleMatch = s.match(/^(\d{1,2})[-/ ]([A-Z]{3,4})[-/ ](\d{2,4})$/);
   if (finacleMatch) {
     const dd = finacleMatch[1].padStart(2, '0');
     const mm = monthMap[finacleMatch[2]];
     let yy = finacleMatch[3];
     if (mm) {
       if (yy.length === 2) {
-        // Expand 2-digit year (e.g., 21 -> 2021, 98 -> 1998)
         yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
       }
       return `${yy}-${mm}-${dd}`;
     }
   }
 
-  // 2. Format: DD/MM/YYYY or DD-MM-YYYY
+  // 3. Match numeric: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD
   if (s.includes('/') || s.includes('-')) {
     const delim = s.includes('/') ? '/' : '-';
     const parts = s.split(delim);
     if (parts.length === 3) {
-      if (parts[2].length === 4) {
-        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-      }
+      // YYYY-MM-DD
       if (parts[0].length === 4) {
         return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+      }
+      // DD-MM-YYYY or DD-MM-YY
+      if (parts[2].length === 4 || parts[2].length === 2) {
+        let yy = parts[2];
+        if (yy.length === 2) {
+          yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
+        }
+        return `${yy}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
       }
     }
   }
 
-  // 3. Fallback: JavaScript Date parser (using local getters to prevent UTC drift)
+  // 4. Fallback: JavaScript Date object
   const d = new Date(s);
   if (!isNaN(d.getTime())) {
     const yyyy = d.getFullYear();
@@ -8787,7 +8826,7 @@ async function startCentVfnImportProcess() {
   const progressCount = $('vfnImportProgressCount');
 
   // UI Setup: Lock controls and show initial progress state
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
   if (progressBox) progressBox.classList.remove('hidden');
   if (progressBar) progressBar.style.width = '0%';
   if (progressText) progressText.innerText = "Parsing file data...";
@@ -8807,7 +8846,7 @@ async function startCentVfnImportProcess() {
       let detectedTargetCount = null;
       let detectedSchemeFromHeader = '';
 
-      // Scan top 35 rows for Total Live Accounts pattern & header row
+      // Step 1: Scan top 35 rows for Total Live Accounts banner & table headers
       for (let i = 0; i < Math.min(rawRows.length, 35); i++) {
         const row = rawRows[i];
         if (!Array.isArray(row)) continue;
@@ -8836,6 +8875,7 @@ async function startCentVfnImportProcess() {
         return;
       }
 
+      // Step 2: Map Column Indices
       const headers = rawRows[headerRowIndex].map(h => String(h || '').trim());
       const getColIdx = (pattern) => headers.findIndex(h => pattern.test(h));
 
@@ -8845,8 +8885,8 @@ async function startCentVfnImportProcess() {
         cust2Name: getColIdx(/Cust2\s*Name/i),
         cust3Name: getColIdx(/Cust3\s*Name/i),
         address: getColIdx(/Address/i),
-        acType: getColIdx(/Account\s*Type/i),
-        schemeCol: getColIdx(/Scheme(\s*Code|\s*Name)?/i),
+        schemeCol: getColIdx(/(^Scheme(\s*Code|\s*Name)?$)|Product/i),
+        acType: getColIdx(/(Account\s*Type|Mode\s*of\s*Operation|Account\s*Ownership|Acct\s*Type)/i),
         balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),
         lastTxDate: getColIdx(/Date\s*of\s*Last\s*Transaction|Last\s*Txn/i),
         officeName: getColIdx(/(BO\s*Name|Office\s*Name|SO\s*Name|Office)/i),
@@ -8859,6 +8899,7 @@ async function startCentVfnImportProcess() {
 
       if (progressText) progressText.innerText = "Extracting & sanitizing records...";
 
+      // Step 3: Loop Through Data Rows
       for (let i = headerRowIndex + 1; i < totalRows; i++) {
         if (i % 250 === 0) await yieldThread();
 
@@ -8869,6 +8910,7 @@ async function startCentVfnImportProcess() {
         const cleanAcNo = rawAcNo.replace(/[^0-9]/g, '');
         if (!cleanAcNo || cleanAcNo.length < 5) continue;
 
+        // Determine Office Name
         let officeName = '';
         if (mode === 'manual') {
           officeName = selectedOffice;
@@ -8879,18 +8921,40 @@ async function startCentVfnImportProcess() {
           }
         }
 
+        // 1. SCHEME: Product/Denomination Code (e.g. TDIP5, SBGEN, SSA)
         let finalScheme = '';
         if (mode === 'manual') {
           finalScheme = selectedScheme;
         } else {
-          const explicitScheme = (colIdx.schemeCol !== -1 && row[colIdx.schemeCol]) ? String(row[colIdx.schemeCol]).trim().toUpperCase() : '';
-          finalScheme = explicitScheme || detectedSchemeFromHeader || 'GENERAL';
+          const fileScheme = (colIdx.schemeCol !== -1 && row[colIdx.schemeCol]) 
+            ? String(row[colIdx.schemeCol]).trim().toUpperCase() 
+            : '';
+          finalScheme = fileScheme || detectedSchemeFromHeader || 'GENERAL';
         }
 
-        const accountType = (colIdx.acType !== -1 && row[colIdx.acType])
-          ? String(row[colIdx.acType]).trim().toUpperCase()
-          : finalScheme;
+        // 2. ACCOUNT TYPE: Mode of Operation (SELF, JOINT-A, JOINT-B, MINOR)
+        let finalAccountType = 'SELF';
+        if (colIdx.acType !== -1 && row[colIdx.acType]) {
+          const rawType = String(row[colIdx.acType]).trim().toUpperCase();
+          if (rawType.includes('JOINT-A') || rawType.includes('JOINT A') || rawType === 'JA') {
+            finalAccountType = 'JOINT-A';
+          } else if (rawType.includes('JOINT-B') || rawType.includes('JOINT B') || rawType === 'JB') {
+            finalAccountType = 'JOINT-B';
+          } else if (rawType.includes('MINOR') || rawType.includes('MTHG')) {
+            finalAccountType = 'MINOR';
+          } else if (rawType.includes('LUNATIC')) {
+            finalAccountType = 'LUNATIC';
+          } else if (rawType.includes('SELF') || rawType.includes('SINGLE') || rawType === 'S') {
+            finalAccountType = 'SELF';
+          } else {
+            finalAccountType = rawType;
+          }
+        } else {
+          const c2 = (colIdx.cust2Name !== -1 && row[colIdx.cust2Name]) ? String(row[colIdx.cust2Name]).trim() : '';
+          if (c2) finalAccountType = 'JOINT-A';
+        }
 
+        // Customer Details & Address
         const c1 = (colIdx.cust1Name !== -1 && row[colIdx.cust1Name]) ? String(row[colIdx.cust1Name]).trim() : '';
         const c2 = (colIdx.cust2Name !== -1 && row[colIdx.cust2Name]) ? String(row[colIdx.cust2Name]).trim() : '';
         const c3 = (colIdx.cust3Name !== -1 && row[colIdx.cust3Name]) ? String(row[colIdx.cust3Name]).trim() : '';
@@ -8898,14 +8962,17 @@ async function startCentVfnImportProcess() {
 
         const address = (colIdx.address !== -1 && row[colIdx.address]) ? String(row[colIdx.address]).trim() : '';
 
+        // Balance
         const rawBal = (colIdx.balance !== -1 && row[colIdx.balance] !== undefined)
           ? String(row[colIdx.balance]).replace(/[₹, ]/g, '').trim()
           : '0';
         const balance = parseFloat(rawBal) || 0.0;
 
+        // Date of Last Transaction
         const rawDateVal = (colIdx.lastTxDate !== -1 && row[colIdx.lastTxDate] !== undefined) ? row[colIdx.lastTxDate] : null;
-        const lastTxnDate = parseFinacleDate(rawDateVal);
+        const lastTxnDate = typeof parseFinacleDate === 'function' ? parseFinacleDate(rawDateVal) : rawDateVal;
 
+        // Mobile Number
         const mobileNo = (colIdx.mobileNo !== -1 && row[colIdx.mobileNo]) ? String(row[colIdx.mobileNo]).trim() : '';
 
         validRecords.push({
@@ -8914,7 +8981,7 @@ async function startCentVfnImportProcess() {
           customer_name: customerName,
           address: address,
           scheme: finalScheme,
-          account_type: accountType,
+          account_type: finalAccountType,
           balance: balance,
           date_of_last_txn: lastTxnDate,
           mobile_no: mobileNo,
@@ -8923,7 +8990,7 @@ async function startCentVfnImportProcess() {
           dispatched_date: null,
           reply_rxd_date: null,
           user_id: currentUserId,
-          last_event_record: `Imported [Mode: ${mode.toUpperCase()}, Scheme: ${finalScheme}]`
+          last_event_record: `Imported [Scheme: ${finalScheme} | Mode: ${finalAccountType}]`
         });
 
         if (mode === 'auto' && detectedTargetCount && validRecords.length >= detectedTargetCount) {
@@ -8953,7 +9020,6 @@ async function startCentVfnImportProcess() {
         
         insertedTotal += chunk.length;
 
-        // Update progress bar UI
         const pct = Math.min(100, Math.round((insertedTotal / totalValid) * 100));
         if (progressBar) progressBar.style.width = `${pct}%`;
         if (progressText) progressText.innerText = `Importing records (${pct}%)...`;
@@ -8972,8 +9038,10 @@ async function startCentVfnImportProcess() {
     } catch (err) {
       alert("Import processing error: " + err.message);
     } finally {
-      btn.disabled = false;
-      btn.innerText = "Start Import";
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = "Start Import";
+      }
       if (progressBox) progressBox.classList.add('hidden');
     }
   };
@@ -8989,8 +9057,10 @@ async function startCentVfnImportProcess() {
           await processRawRows(results.data);
         },
         error: (err) => {
-          btn.disabled = false;
-          btn.innerText = "Start Import";
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Start Import";
+          }
           if (progressBox) progressBox.classList.add('hidden');
           alert("CSV Parsing Error: " + err.message);
         }
@@ -9002,19 +9072,23 @@ async function startCentVfnImportProcess() {
           const data = new Uint8Array(evt.target.result);
           const workbook = XLSX.read(data, { 
             type: 'array', 
-            raw: true, 
             dense: true, 
-            cellFormula: false, 
-            cellHTML: false, 
-            cellStyles: false 
+            cellDates: true,        // Parse Excel numeric dates into JavaScript Date objects
+            cellFormula: false,     // Skip formulas for fast processing
+            cellHTML: false,        // Skip HTML formatting
+            cellStyles: false,      // Skip cell styles to prevent high memory usage
+            dateNF: 'yyyy-mm-dd'    // Formatted date string mask
           });
+          
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
           const rawSheetRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false });
           await processRawRows(rawSheetRows);
         } catch (err) {
-          btn.disabled = false;
-          btn.innerText = "Start Import";
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Start Import";
+          }
           if (progressBox) progressBox.classList.add('hidden');
           alert("Excel Parsing Error: " + err.message);
         }
@@ -9022,13 +9096,14 @@ async function startCentVfnImportProcess() {
       reader.readAsArrayBuffer(file);
     }
   } catch (err) {
-    btn.disabled = false;
-    btn.innerText = "Start Import";
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Start Import";
+    }
     if (progressBox) progressBox.classList.add('hidden');
     alert("Import failed: " + err.message);
   }
 }
-
 // -------------------------------------------------------------
 // ADMIN BULK DELETION WITH INSTANT SL_NO RESET
 // -------------------------------------------------------------
