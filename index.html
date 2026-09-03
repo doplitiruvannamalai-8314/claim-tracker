@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1084,7 +1082,7 @@
       </button>
     </div>
 
-          <div id="vfnImportProgressContainer" class="hidden space-y-1.5 bg-emerald-50/90 border border-emerald-300 p-2.5 rounded-xl text-xs">
+  <div id="vfnImportProgressContainer" class="hidden space-y-1.5 bg-emerald-50/90 border border-emerald-300 p-2.5 rounded-xl text-xs">
   <div class="flex justify-between items-center text-emerald-900 font-bold">
     <span id="vfnImportProgressStatus">Reading file rows...</span>
     <span id="vfnImportProgressCount" class="font-mono text-emerald-700">0 / 0</span>
@@ -1120,7 +1118,41 @@
     <p id="vfnCardPending" class="text-base font-extrabold text-amber-800 mt-0.5">0</p>
   </div>
 </div>
+<!-- SCHEME-WISE BREAKDOWN SUMMARY CARD -->
+<div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 mb-4">
+  <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
+    <div class="flex items-center gap-2">
+      <span class="text-base">📊</span>
+      <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
+    </div>
+    <button type="button" onclick="loadCentVfnSchemeBreakdown()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded cursor-pointer transition flex items-center gap-1">
+      🔄 Refresh
+    </button>
+  </div>
 
+  <div class="overflow-x-auto">
+    <table class="w-full text-xs text-left border-collapse">
+      <thead>
+        <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
+          <th class="p-2.5">Scheme</th>
+          <th class="p-2.5 text-right">Total Accounts</th>
+          <th class="p-2.5 text-right text-purple-700">Printed</th>
+          <th class="p-2.5 text-right text-blue-700">Despatched</th>
+          <th class="p-2.5 text-right text-emerald-700">Reply Received</th>
+          <th class="p-2.5 text-right text-amber-700">Pending</th>
+        </tr>
+      </thead>
+      <tbody id="vfnSchemeBreakdownBody">
+        <tr>
+          <td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td>
+        </tr>
+      </tbody>
+      <tfoot id="vfnSchemeBreakdownFoot" class="bg-slate-50 font-extrabold text-slate-900 border-t-2 border-slate-300">
+        <!-- Totals Row Injected Here -->
+      </tfoot>
+    </table>
+  </div>
+</div>
   <!-- FILTER & SEARCH CONTROL BAR -->
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
     <div>
@@ -1167,12 +1199,46 @@
     </div>
   </div>
 
+<!-- TABLE CONTROLS BAR: EXPORT, PAGE SIZE & PAGINATION -->
+<div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200 mb-2 text-xs">
+  <div class="flex items-center gap-2">
+    <span id="vfnTableRecordCount" class="font-bold text-slate-700">Showing 0 accounts</span>
+    <span class="text-slate-300">|</span>
+    <label class="font-semibold text-slate-600">Rows per page:</label>
+    <select id="vfnPageSizeSelect" onchange="changeVfnPageSize(this.value)" class="border border-slate-300 rounded px-2 py-1 bg-white font-bold text-slate-800 outline-none">
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="500">500</option>
+      <option value="all">Show All (Slow)</option>
+    </select>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <!-- Export full active dataset -->
+    <button type="button" onclick="exportCentVfnToExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded cursor-pointer transition flex items-center gap-1 shadow-2xs">
+      📊 Export to Excel (All Filtered)
+    </button>
+    
+    <!-- Pager buttons -->
+    <div class="flex items-center gap-1 bg-white border border-slate-300 rounded-lg p-0.5 shadow-2xs">
+      <button type="button" id="btnVfnPrevPage" onclick="changeVfnPage(-1)" class="px-2 py-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-bold">
+        ◀ Prev
+      </button>
+      <span id="vfnPageIndicator" class="px-2 font-mono font-bold text-slate-700">Page 1 / 1</span>
+      <button type="button" id="btnVfnNextPage" onclick="changeVfnPage(1)" class="px-2 py-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-bold">
+        Next ▶
+      </button>
+    </div>
+  </div>
+</div>
+
   <!-- ACCOUNTS DATA TABLE -->
   <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
     <div class="bg-slate-100 p-2.5 font-bold text-slate-700 text-xs flex justify-between items-center border-b border-slate-200">
       <span>📋 Registered Accounts for Cent Percent Verification</span>
-      <span id="vfnTableRecordCount" class="text-slate-500 font-semibold text-[11px]">Showing 0 records</span>
-    </div>
+         </div>
     <div class="max-h-[480px] overflow-x-auto overflow-y-auto">
       <table class="w-full text-left text-xs border-collapse">
         <thead class="bg-postRed-700 text-white font-bold sticky top-0 z-10 whitespace-nowrap">
@@ -1198,7 +1264,6 @@
   </div>
 </div>
 
-<!-- MODAL: UPDATE ACCOUNT STATUS / REPLY RECEIVED -->
 <!-- MODAL: UPDATE ACCOUNT STATUS / REPLY RECEIVED -->
 <div id="vfnStatusModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
   <div class="bg-white rounded-2xl p-4 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
@@ -8239,7 +8304,6 @@ function renderDayWisePivotTable() {
 // =========================================================================
 // 11. CENT PERCENT VERIFICATION (CENTVFN) ENGINE
 // =========================================================================
-let cachedCentVfnRecords = [];
 let vfnSearchDebounceTimer = null;
 
 function debounceCentVfnSearch() {
@@ -8249,11 +8313,22 @@ function debounceCentVfnSearch() {
   }, 250);
 }
 
+// Global states for CentVfn table management
+let cachedCentVfnRecords = [];       // Holds all loaded records matching search/filters
+let vfnCurrentPage = 1;              // Active page index
+let vfnPageSize = 10;                // Default token view: 10 rows
+
 async function loadCentVfnData() {
   const tbody = $('centVfnTableBody');
   if (!tbody) return;
 
-  let query = supabaseClient.from('cent_percent_verification').select('*');
+  tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-slate-500 font-semibold">Loading verification accounts...</td></tr>`;
+
+  // Start query without .limit(0)
+  let query = supabaseClient
+    .from('cent_percent_verification')
+    .select('*')
+    .order('sl_no', { ascending: true });
 
   const office = $('vfnFilterOffice')?.value;
   const scheme = $('vfnFilterScheme')?.value;
@@ -8266,93 +8341,192 @@ async function loadCentVfnData() {
   if (office) query = query.eq('office_name', office);  
   if (status) query = query.eq('status', status);
 
-  const { data, error } = await query.order('sl_no', { ascending: true });
+  const { data, error } = await query;
 
   if (error) {
     console.error("CentVfn fetch error:", error);
-    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-rose-600">Error loading data: ${error.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="p-4 text-center text-rose-600">Error loading data: ${error.message}</td></tr>`;
     return;
   }
 
   let records = data || [];
+
+  // Multi-field search across the full dataset
   if (search) {
     records = records.filter(r => 
       (r.account_no || '').toLowerCase().includes(search) ||
       (r.customer_name || '').toLowerCase().includes(search) ||
       (r.article_no || '').toLowerCase().includes(search) ||
-      (r.address || '').toLowerCase().includes(search)
+      (r.address || '').toLowerCase().includes(search) ||
+      (r.office_name || '').toLowerCase().includes(search) ||
+      (r.scheme || '').toLowerCase().includes(search)
     );
   }
 
+  // Cache complete filtered records for export and pagination
   cachedCentVfnRecords = records;
+  vfnCurrentPage = 1; // Reset to first page whenever filters or searches change
 
-  // 1. Update Scorecards (Always query full un-paginated counts)
-  updateCentVfnScorecards();
+  // 1. Update Scorecards (unpaginated exact counts)
+  if (typeof updateCentVfnScorecards === 'function') {
+    updateCentVfnScorecards();
+  }
 
   // 2. Populate Office Filter Dropdown if empty
-  populateCentVfnOfficeDropdown();
+  if (typeof populateCentVfnOfficeDropdown === 'function') {
+    populateCentVfnOfficeDropdown();
+  }
 
-  // 3. Render Table
-  if ($('vfnTableRecordCount')) $('vfnTableRecordCount').innerText = `Showing ${records.length.toLocaleString('en-IN')} accounts`;
+  // 3. Update Scheme Breakdown Card
+  if (typeof loadCentVfnSchemeBreakdown === 'function') {
+    loadCentVfnSchemeBreakdown();
+  }
 
-  if (!records.length) {
-    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400 font-medium">No verification records found.</td></tr>`;
+  // 4. Render Table (10 items by default)
+  renderCentVfnTablePage();
+}
+
+// -------------------------------------------------------------
+// RENDER ONLY THE ACTIVE SLICE (PREVENTS DOM CRASHES ON 30k ROWS)
+// -------------------------------------------------------------
+function renderCentVfnTablePage() {
+  const tbody = $('centVfnTableBody');
+  if (!tbody) return;
+
+  const total = cachedCentVfnRecords.length;
+
+  if (!total) {
+    tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-slate-400 font-medium">No verification records found.</td></tr>`;
+    if ($('vfnTableRecordCount')) $('vfnTableRecordCount').innerText = "Showing 0 accounts";
+    if ($('vfnPageIndicator')) $('vfnPageIndicator').innerText = "Page 0 / 0";
+    if ($('btnVfnPrevPage')) $('btnVfnPrevPage').disabled = true;
+    if ($('btnVfnNextPage')) $('btnVfnNextPage').disabled = true;
     return;
   }
 
-  let htmlArr = [];
-  records.forEach((r, idx) => {
-    const bal = parseFloat(r.balance) || 0;
-    
-    // Inside loadCentVfnData() loop:
-let statusBadge = '';
-if (r.status === 'reply_received') {
-  statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Reply Rx'd (${r.reply_rxd_date || '✓'})</span>`;
-} else if (r.status === 'dispatched') {
-  statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded font-bold text-[10px]">Dispatched (${r.dispatched_date || 'Sent'})</span>`;
-} else if (r.status === 'printed') {
-  statusBadge = `<span class="bg-purple-100 text-purple-900 border border-purple-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Printed (${r.printed_date || 'Ready'})</span>`;
-} else {
-  statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Imported</span>`;
-}
+  // Calculate slice range based on selected page size
+  const effectivePageSize = (vfnPageSize === 'all') ? total : parseInt(vfnPageSize, 10);
+  const totalPages = Math.ceil(total / effectivePageSize);
 
-    // Inside loadCentVfnData() when rendering rows:
-htmlArr.push(`
-  <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
-    <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
-    <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
-    <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
-    <td class="p-2">
-      <div class="font-bold text-slate-900">${r.customer_name}</div>
-      <div class="text-[10px] text-slate-500 truncate max-w-[200px]" title="${r.address || ''}">${r.address || '-'}</div>
-    </td>
-    <!-- SCHEME (e.g., TDIP5, SBGEN, SSA) -->
-    <td class="p-2 text-center">
-      <span class="bg-purple-100 text-purple-900 font-extrabold text-[10px] px-1.5 py-0.5 rounded border border-purple-200">
-        ${r.scheme || '-'}
-      </span>
-    </td>
-    <!-- ACCOUNT TYPE / MODE OF OPERATION (e.g., SELF, JOINT-A, JOINT-B) -->
-    <td class="p-2 text-center">
-      <span class="bg-slate-100 text-slate-800 font-bold text-[10.5px] px-2 py-0.5 rounded border border-slate-300 whitespace-nowrap">
-        ${r.account_type || 'SELF'}
-      </span>
-    </td>
-    <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-    <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${r.date_of_last_txn || '-'}</td>
-    <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.article_no || '-'}</td>
-    <td class="p-2 text-center">${statusBadge}</td>
-    <td class="p-2 text-center">
-      <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
-        ✏️ Update
-      </button>
-    </td>
-  </tr>
-`);
+  if (vfnCurrentPage > totalPages) vfnCurrentPage = totalPages;
+  if (vfnCurrentPage < 1) vfnCurrentPage = 1;
+
+  const startIndex = (vfnCurrentPage - 1) * effectivePageSize;
+  const endIndex = Math.min(startIndex + effectivePageSize, total);
+  const pageRecords = cachedCentVfnRecords.slice(startIndex, endIndex);
+
+  // Update counter and page indicators
+  if ($('vfnTableRecordCount')) {
+    $('vfnTableRecordCount').innerText = `Showing ${startIndex + 1} - ${endIndex} of ${total.toLocaleString('en-IN')} accounts`;
+  }
+  if ($('vfnPageIndicator')) {
+    $('vfnPageIndicator').innerText = `Page ${vfnCurrentPage} / ${totalPages}`;
+  }
+  if ($('btnVfnPrevPage')) $('btnVfnPrevPage').disabled = (vfnCurrentPage <= 1);
+  if ($('btnVfnNextPage')) $('btnVfnNextPage').disabled = (vfnCurrentPage >= totalPages);
+
+  // Render rows only for the current slice
+  const htmlArr = pageRecords.map(r => {
+    const bal = parseFloat(r.balance) || 0;
+
+    let statusBadge = '';
+    if (r.status === 'reply_received') {
+      statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Reply Rx'd (${r.reply_rxd_date || '✓'})</span>`;
+    } else if (r.status === 'dispatched') {
+      statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded font-bold text-[10px]">Dispatched (${r.dispatched_date || 'Sent'})</span>`;
+    } else if (r.status === 'printed') {
+      statusBadge = `<span class="bg-purple-100 text-purple-900 border border-purple-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Printed (${r.printed_date || 'Ready'})</span>`;
+    } else {
+      statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Imported</span>`;
+    }
+
+    const displayLastTxn = r.date_of_last_txn 
+      ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn) 
+      : '-';
+
+    return `
+      <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
+        <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
+        <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
+        <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
+        <td class="p-2">
+          <div class="font-bold text-slate-900">${r.customer_name}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[200px]" title="${r.address || ''}">${r.address || '-'}</div>
+        </td>
+        <td class="p-2 text-center">
+          <span class="bg-purple-100 text-purple-900 font-extrabold text-[10px] px-1.5 py-0.5 rounded border border-purple-200">
+            ${r.scheme || '-'}
+          </span>
+        </td>
+        <td class="p-2 text-center">
+          <span class="bg-slate-100 text-slate-800 font-bold text-[10.5px] px-2 py-0.5 rounded border border-slate-300 whitespace-nowrap">
+            ${r.account_type || 'SELF'}
+          </span>
+        </td>
+        <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${displayLastTxn}</td>
+        <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.article_no || '-'}</td>
+        <td class="p-2 text-center">${statusBadge}</td>
+        <td class="p-2 text-center">
+          <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
+            ✏️ Update
+          </button>
+        </td>
+      </tr>
+    `;
   });
 
   tbody.innerHTML = htmlArr.join('');
 }
+
+// -------------------------------------------------------------
+// PAGINATION CONTROLS
+// -------------------------------------------------------------
+function changeVfnPage(delta) {
+  vfnCurrentPage += delta;
+  renderCentVfnTablePage();
+}
+
+function changeVfnPageSize(newSize) {
+  vfnPageSize = newSize;
+  vfnCurrentPage = 1;
+  renderCentVfnTablePage();
+}
+
+// -------------------------------------------------------------
+// EXPORT ALL FILTERED RECORDS TO EXCEL (FULL DATASET, NOT JUST 10)
+// -------------------------------------------------------------
+function exportCentVfnToExcel() {
+  if (!cachedCentVfnRecords || !cachedCentVfnRecords.length) {
+    return alert("No records available to export.");
+  }
+
+  const exportData = cachedCentVfnRecords.map(r => ({
+    "Sl No": r.sl_no,
+    "Office Name": r.office_name,
+    "Account Number": r.account_no,
+    "Customer Name": r.customer_name,
+    "Address": r.address || '',
+    "Scheme": r.scheme,
+    "Account Type (Mode)": r.account_type,
+    "Balance (Rs)": parseFloat(r.balance) || 0,
+    "Date of Last Txn": r.date_of_last_txn || '',
+    "Article Number": r.article_no || '',
+    "Status": r.status,
+    "Printed Date": r.printed_date || '',
+    "Dispatched Date": r.dispatched_date || '',
+    "Reply Received Date": r.reply_rxd_date || '',
+    "Remarks": r.remarks || ''
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "CentVfn_Accounts");
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(workbook, `CentVfn_Accounts_Export_${dateStr}.xlsx`);
+}
+
 
 async function updateCentVfnScorecards() {
   try {
@@ -8822,7 +8996,7 @@ function toggleVfnDeleteScopeInput() {
 function parseFinacleDate(dateVal) {
   if (dateVal === null || dateVal === undefined) return null;
 
-  // 1. Handle Excel numeric serial dates (e.g., 44481 -> 2021-10-12)
+  // 1. Handle Excel numeric serial dates (e.g. 44481 -> 2021-10-12)
   if (typeof dateVal === 'number' || (!isNaN(dateVal) && !isNaN(parseFloat(dateVal)) && String(dateVal).trim().length <= 6)) {
     const num = parseFloat(dateVal);
     if (num > 20000 && num < 70000) {
@@ -8834,14 +9008,13 @@ function parseFinacleDate(dateVal) {
     }
   }
 
-  // 2. Clean and uppercase the string
+  // 2. Strip quotes, spaces, tabs, and carriage returns
   let s = String(dateVal).trim().toUpperCase();
-  // Strip hidden carriage returns, quotes, and non-breaking spaces
   s = s.replace(/[\r\n\t"'\u00A0]/g, '').trim();
 
-  if (!s || ['-', '--', 'NA', 'N/A', 'NULL', '0', 'NIL'].includes(s)) return null;
+  if (!s || ['-', '--', 'NA', 'N/A', 'NULL', '0', 'NIL', 'NONE'].includes(s)) return null;
 
-  // Discard trailing timestamp if attached (e.g., "12-OCT-21 00:00:00")
+  // Strip trailing time (e.g., "12-OCT-21 00:00:00")
   s = s.split(' ')[0].split('T')[0];
 
   const monthMap = {
@@ -8850,34 +9023,30 @@ function parseFinacleDate(dateVal) {
     'SEP': '09', 'SEPT': '09', 'OCT': '10', 'NOV': '11', 'DEC': '12'
   };
 
-  // 3. Match Finacle standard: DD-MMM-YY or DD-MMM-YYYY (e.g., 12-Oct-21, 12-OCT-2021, 05-NOV-23)
+  // 3. Match: DD-MMM-YY or DD-MMM-YYYY (e.g. 12-Oct-21, 12-OCT-2021)
   const finacleMatch = s.match(/^(\d{1,2})[-/ ]([A-Z]{3,4})[-/ ](\d{2,4})$/);
   if (finacleMatch) {
     const dd = finacleMatch[1].padStart(2, '0');
-    const mStr = finacleMatch[2].substring(0, 3); // Take first 3 letters (OCT from OCT or OCTO)
+    const mStr = finacleMatch[2].substring(0, 3);
     const mm = monthMap[mStr];
     let yy = finacleMatch[3];
-
     if (mm) {
       if (yy.length === 2) {
-        // Expand 2-digit century: > 40 becomes 19xx, <= 40 becomes 20xx (21 -> 2021)
         yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
       }
       return `${yy}-${mm}-${dd}`;
     }
   }
 
-  // 4. Match numeric: DD/MM/YYYY, DD-MM-YYYY, or DD-MM-YY
+  // 4. Match: DD/MM/YYYY, DD-MM-YYYY, or YYYY-MM-DD
   if (s.includes('/') || s.includes('-')) {
     const delim = s.includes('/') ? '/' : '-';
     const parts = s.split(delim);
     if (parts.length === 3) {
-      // Format: YYYY-MM-DD
-      if (parts[0].length === 4) {
+      if (parts[0].length === 4) { // YYYY-MM-DD
         return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
       }
-      // Format: DD-MM-YYYY or DD-MM-YY
-      if (parts[2].length === 4 || parts[2].length === 2) {
+      if (parts[2].length === 4 || parts[2].length === 2) { // DD-MM-YYYY
         let yy = parts[2];
         if (yy.length === 2) {
           yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
@@ -8887,7 +9056,7 @@ function parseFinacleDate(dateVal) {
     }
   }
 
-  // 5. Native JS Date Parser fallback
+  // 5. Standard JS Date fallback
   const d = new Date(s);
   if (!isNaN(d.getTime())) {
     const yyyy = d.getFullYear();
@@ -9021,7 +9190,7 @@ async function startCentVfnImportProcess() {
         }
 
         const hasAcNo = row.some(cell => typeof cell === 'string' && /Account\s*(Number|No)/i.test(cell));
-        const hasCustName = row.some(cell => typeof cell === 'string' && /(Cust1\s*Name|Customer\s*Name|Name)/i.test(cell));
+        const hasCustName = row.some(cell => typeof cell === 'string' && /(Cust1\s*Name|Customer\s*Name|^Name$)/i.test(cell));
 
         if (hasAcNo && hasCustName) {
           headerRowIndex = i;
@@ -9034,8 +9203,10 @@ async function startCentVfnImportProcess() {
         return;
       }
 
-      // Map Column Headers
-      const headers = rawRows[headerRowIndex].map(h => String(h || '').trim().replace(/["\r\n]/g, ''));
+      // Sanitize headers: remove extra whitespace, quotes, line breaks
+      const headers = rawRows[headerRowIndex].map(h => 
+        String(h || '').replace(/[\r\n\t"']/g, ' ').replace(/\s+/g, ' ').trim()
+      );
       const getColIdx = (pattern) => headers.findIndex(h => pattern.test(h));
 
       const colIdx = {
@@ -9046,11 +9217,28 @@ async function startCentVfnImportProcess() {
         address: getColIdx(/Address/i),
         schemeCol: getColIdx(/(^Scheme(\s*Code|\s*Name)?$)|Product/i),
         acType: getColIdx(/(Account\s*Type|Mode\s*of\s*Operation|Account\s*Ownership|Acct\s*Type)/i),
-        balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),        
-        lastTxDate: getColIdx(/(Date\s*of\s*Last\s*Trans?(action)?|Last\s*Trans?(action)?\s*Date|Last\s*Txn(\s*Date)?|Dt\s*of\s*Last\s*Txn)/i),
+        balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),
+        lastTxDate: getColIdx(/(Date\s*of\s*Last\s*(Trans?(action)?|Txn)|Last\s*(Trans?(action)?|Txn)\s*(Date|Dt)|Dt\s*of\s*Last\s*Txn|TRAN_DATE|LAST_DT)/i),
         officeName: getColIdx(/(BO\s*Name|Office\s*Name|SO\s*Name|^Office$)/i),
         mobileNo: getColIdx(/Mobile(\s*No)?/i)
       };
+
+      // FAILSAFE: If header regex missed the date column, scan data rows for Finacle date patterns
+      if (colIdx.lastTxDate === -1) {
+        for (let r = headerRowIndex + 1; r < Math.min(rawRows.length, headerRowIndex + 15); r++) {
+          const sampleRow = rawRows[r];
+          if (!sampleRow) continue;
+          for (let c = 0; c < sampleRow.length; c++) {
+            const cellVal = String(sampleRow[c] || '').replace(/[\r\n\t"']/g, '').trim();
+            // Match Finacle signatures like '12-Oct-21', '12-OCT-2021', '12/10/2021'
+            if (/^\d{1,2}[-/ ][A-Za-z]{3,4}[-/ ]\d{2,4}$/.test(cellVal) || /^\d{1,2}[-/]\d{1,2}[-/]\d{2,4}$/.test(cellVal)) {
+              colIdx.lastTxDate = c;
+              break;
+            }
+          }
+          if (colIdx.lastTxDate !== -1) break;
+        }
+      }
 
       const validRecords = [];
       const totalRows = rawRows.length;
@@ -9068,7 +9256,7 @@ async function startCentVfnImportProcess() {
         const cleanAcNo = rawAcNo.replace(/[^0-9]/g, '');
         if (!cleanAcNo || cleanAcNo.length < 5) continue;
 
-        // Office Name
+        // 1. Office Name
         let officeName = '';
         if (mode === 'manual') {
           officeName = selectedOffice;
@@ -9079,7 +9267,7 @@ async function startCentVfnImportProcess() {
           }
         }
 
-        // Scheme
+        // 2. Scheme (Product Code)
         let finalScheme = '';
         if (mode === 'manual') {
           finalScheme = selectedScheme;
@@ -9090,7 +9278,7 @@ async function startCentVfnImportProcess() {
           finalScheme = fileScheme || detectedSchemeFromHeader || 'GENERAL';
         }
 
-        // Account Type (Mode of Operation)
+        // 3. Account Type (Mode of Operation: SELF, JOINT-A, JOINT-B, MINOR)
         let finalAccountType = 'SELF';
         if (colIdx.acType !== -1 && row[colIdx.acType]) {
           const rawType = String(row[colIdx.acType]).trim().toUpperCase();
@@ -9112,7 +9300,7 @@ async function startCentVfnImportProcess() {
           if (c2) finalAccountType = 'JOINT-A';
         }
 
-        // Customer Name
+        // 4. Customer Name
         const c1 = (colIdx.cust1Name !== -1 && row[colIdx.cust1Name]) ? String(row[colIdx.cust1Name]).trim() : '';
         const c2 = (colIdx.cust2Name !== -1 && row[colIdx.cust2Name]) ? String(row[colIdx.cust2Name]).trim() : '';
         const c3 = (colIdx.cust3Name !== -1 && row[colIdx.cust3Name]) ? String(row[colIdx.cust3Name]).trim() : '';
@@ -9120,18 +9308,20 @@ async function startCentVfnImportProcess() {
 
         const address = (colIdx.address !== -1 && row[colIdx.address]) ? String(row[colIdx.address]).trim() : '';
 
-        // Balance
+        // 5. Balance
         const rawBal = (colIdx.balance !== -1 && row[colIdx.balance] !== undefined)
           ? String(row[colIdx.balance]).replace(/[₹, ]/g, '').trim()
           : '0';
         const balance = parseFloat(rawBal) || 0.0;
 
+        // 6. Date of Last Transaction
         const rawDateVal = (colIdx.lastTxDate !== -1 && row[colIdx.lastTxDate] !== undefined) 
           ? row[colIdx.lastTxDate] 
           : null;
         
         const lastTxnDate = parseFinacleDate(rawDateVal);
 
+        // 7. Mobile Number
         const mobileNo = (colIdx.mobileNo !== -1 && row[colIdx.mobileNo]) ? String(row[colIdx.mobileNo]).trim() : '';
 
         validRecords.push({
@@ -9152,7 +9342,6 @@ async function startCentVfnImportProcess() {
           last_event_record: `Imported [Scheme: ${finalScheme} | Mode: ${finalAccountType}]`
         });
 
-        // Only enforce header count in auto mode
         if (mode === 'auto' && detectedTargetCount && validRecords.length >= detectedTargetCount) {
           break;
         }
@@ -9164,7 +9353,7 @@ async function startCentVfnImportProcess() {
         return;
       }
 
-      // Batch Upsert (Chunks of 500 for high-volume 10k+ rows)
+      // Batch Upsert into Supabase (500 records per chunk)
       const chunkSize = 500;
       let insertedTotal = 0;
 
@@ -9206,13 +9395,13 @@ async function startCentVfnImportProcess() {
     }
   };
 
-  // Parser Execution
+  // Parser Router
   try {
     if (isCsv && typeof Papa !== 'undefined') {
       Papa.parse(file, {
         header: false,
         skipEmptyLines: true,
-        fastMode: false, // Ensure full quoting & multiline support
+        fastMode: false,
         complete: async function(results) {
           await processRawRows(results.data);
         },
@@ -9799,9 +9988,9 @@ function renderSb46PrintWindow(accounts) {
         <div style="font-size: 10px; font-style: italic; color: #475569; margin-top: 4px;">Note – No postage stamp is required on the service cover .</div>
         
         <div class="tear-strip">
-          ✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂
+          <br><br>✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂<br><br>
         </div>
-        <br><br>
+        
         <div class="reply-slip">
           <div style="text-align: center; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 4px;">
             REPLY FORM (SB-46)            
@@ -10073,6 +10262,78 @@ function exportCentVfnExcel() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Cent_Percent_Verification");
   XLSX.writeFile(wb, `Cent_Percent_Verification_${Date.now()}.xlsx`);
+}
+
+async function loadCentVfnSchemeBreakdown() {
+  const tbody = $('vfnSchemeBreakdownBody');
+  const tfoot = $('vfnSchemeBreakdownFoot');
+  if (!tbody) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">No records found.</td></tr>`;
+      if (tfoot) tfoot.innerHTML = '';
+      return;
+    }
+
+    let totAll = 0;
+    let totPrinted = 0;
+    let totDespatched = 0;
+    let totReply = 0;
+    let totPending = 0;
+
+    const rowsHtml = data.map(r => {
+      const total = Number(r.total_count) || 0;
+      const printed = Number(r.printed_count) || 0;
+      const despatched = Number(r.despatched_count) || 0;
+      const reply = Number(r.reply_count) || 0;
+      const pending = Number(r.pending_count) || 0;
+
+      totAll += total;
+      totPrinted += printed;
+      totDespatched += despatched;
+      totReply += reply;
+      totPending += pending;
+
+      return `
+        <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
+          <td class="p-2.5 font-bold text-slate-800">
+            <span class="bg-purple-100 text-purple-900 border border-purple-200 px-2 py-0.5 rounded font-extrabold text-[11px]">
+              ${r.scheme}
+            </span>
+          </td>
+          <td class="p-2.5 text-right font-mono font-bold text-slate-800">${total.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono font-bold text-purple-700">${printed.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono font-bold text-blue-700">${despatched.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono font-bold text-emerald-700">${reply.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono font-bold text-amber-700">${pending.toLocaleString('en-IN')}</td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = rowsHtml;
+
+    // Render Summary / Total Row
+    if (tfoot) {
+      tfoot.innerHTML = `
+        <tr class="whitespace-nowrap">
+          <td class="p-2.5 text-slate-900 uppercase">Total</td>
+          <td class="p-2.5 text-right font-mono text-slate-900">${totAll.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono text-purple-800">${totPrinted.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono text-blue-800">${totDespatched.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono text-emerald-800">${totReply.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-mono text-amber-800">${totPending.toLocaleString('en-IN')}</td>
+        </tr>
+      `;
+    }
+  } catch (err) {
+    console.error("Failed to load scheme breakdown:", err);
+    tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-rose-600 font-semibold">Failed to load breakdown: ${err.message}</td></tr>`;
+  }
 }
 
 // =========================================================================
