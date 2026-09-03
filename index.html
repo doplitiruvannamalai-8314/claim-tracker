@@ -8,6 +8,7 @@
   <!-- Supabase JS v2 & Tailwind CSS via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -916,7 +917,7 @@
 <!-- TAB 6: CENT PERCENT VERIFICATION -->
 <div id="centVfnView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
   
-  <!-- HEADER & PRIMARY ACTIONS -->
+  <!-- HEADER & PRIMARY ACTION TOOLBAR -->
   <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-3 border-amber-200">
     <div>
       <h3 class="text-sm font-bold text-postRed-700 uppercase flex items-center gap-1.5">
@@ -926,238 +927,105 @@
     </div>
     
     <div class="flex items-center gap-2 flex-wrap">
-      <input type="file" id="centVfnExcelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCentVfnExcelUpload(event)">
+      <!-- 1. Import Accounts -->
       <button type="button" onclick="openVfnImportModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         📥 Import Accounts (CSV/Excel)
       </button>
+
+      <!-- 2. Barcode Allotment (Added Trigger Button) -->
+      <button type="button" onclick="openVfnBarcodeGenModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        🏷️ Allot UPU Barcodes
+      </button>
+
+      <!-- 3. Prepare Notices -->
       <button type="button" onclick="openSb46GeneratorModal()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         ✉️ Prepare SB-46 Notices
       </button>
-       <!-- PRINT CONFIRMATION MODAL -->
-        <div id="vfnPrintConfirmModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-          <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-3 shadow-2xl border-t-8 border-purple-600">
-            <div class="border-b pb-2 border-purple-200">
-              <h3 class="font-bold text-sm text-purple-900 flex items-center gap-1.5">
-                <span>🖨️</span> Confirm SB-46 Printing
-              </h3>
-            </div>
 
-            <p class="text-xs text-slate-700 leading-relaxed">
-              Did the <b id="vfnPrintConfirmCount" class="text-purple-700">0</b> SB-46 notice(s) print out successfully?
-            </p>
-
-            <div class="bg-purple-50 p-2.5 rounded-lg border border-purple-200 text-[11px] text-purple-950 space-y-1">
-              <div>• Clicking <b>Yes</b> updates their status to <span class="font-bold text-purple-700">PRINTED</span> with today's date.</div>
-              <div>• Clicking <b>No</b> leaves their current status unchanged.</div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2 border-t border-purple-100">
-              <button type="button" onclick="handlePrintConfirmationResponse(false)" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">
-                No, Keep As Is
-              </button>
-              <button type="button" id="btnConfirmPrintYes" onclick="handlePrintConfirmationResponse(true)" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">
-                Yes, Mark as Printed
-              </button>
-            </div>
-          </div>
-        </div>
+      <!-- 4. Excel Exports -->
       <button type="button" onclick="exportCentVfnExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         📊 Export Data (XLSX)
       </button>
-      <button type="button" onclick="downloadCentVfnBatchTemplate()" class="bg-slate-700 hover:bg-slate-500 text-white border border-slate-300 px-3 py-1.5 rounded font-bold text-xs shadow-2xs cursor-pointer flex items-center gap-1 transition">
-      📥Download Batch Template
-       </button>
+
+      <!-- 5. Batch Status Update -->
+      <button type="button" onclick="downloadCentVfnBatchTemplate()" class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-300 px-3 py-1.5 rounded font-bold text-xs shadow-2xs cursor-pointer flex items-center gap-1 transition">
+        📥 Batch Template
+      </button>
       <input type="file" id="centVfnBatchStatusInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCentVfnBatchStatusUpload(event)">
       <button type="button" onclick="$('centVfnBatchStatusInput').click()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
-        📮Bulk Update Dispatch / Reply (Excel)
+        📮 Bulk Update Status
       </button>
 
-      <!-- ADMIN ONLY BULK DELETE BUTTON -->
-      <button type="button" id="btnAdminVfnBulkDelete" onclick="openAdminVfnDeleteModal()" class="hidden bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+      <!-- 6. Admin Delete -->
+      <button type="button" id="btnAdminVfnBulkDelete" onclick="openAdminVfnDeleteModal()" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         🗑️ Delete Records
       </button>
-             <!-- MODAL: ADMIN BULK DELETE -->
-      <div id="vfnAdminDeleteModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-rose-600">
-          <div class="border-b pb-2 border-rose-200 flex justify-between items-center">
-            <h3 class="font-bold text-sm text-rose-700 flex items-center gap-1.5">
-              <span>⚠️</span> Admin Bulk Deletion (CentVfn)
-            </h3>
-            <button type="button" onclick="closeAdminVfnDeleteModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
-          </div>
-
-          <p class="text-xs text-slate-600">This action permanently deletes verification accounts from the database. Please select the deletion scope carefully.</p>
-
-          <div class="space-y-2 text-xs">
-            <div>
-              <label class="block font-bold text-slate-700 mb-0.5">Delete Scope</label>
-              <select id="vfnDeleteScope" onchange="toggleVfnDeleteScopeInput()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white outline-none">
-                <option value="office">By Office Name</option>
-                <option value="scheme">By Scheme Identifier</option>
-                <option value="date">By Import Date (YYYY-MM-DD)</option>
-              </select>
-            </div>
-
-            <div id="vfnDeleteInputContainer">
-              <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Office Name *</label>
-              <input type="text" id="vfnDeleteScopeVal" placeholder="Enter target office name exactly" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold">
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-2 pt-2 border-t border-rose-100">
-            <button type="button" onclick="closeAdminVfnDeleteModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold text-xs cursor-pointer">Cancel</button>
-            <button type="button" onclick="executeAdminVfnBulkDelete()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 rounded font-bold text-xs cursor-pointer shadow-xs">
-              Permanently Delete
-            </button>
-          </div>
-        </div>
-      </div>
-       </div>
-  </div>
-  <!-- MODAL: CENT VFN IMPORT CONFIGURATION -->
-<div id="vfnImportModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-  <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-emerald-600">
-    <div class="border-b pb-2 border-emerald-200 flex justify-between items-center">
-      <h3 class="font-bold text-sm text-emerald-800 flex items-center gap-1.5">
-        <span>📥</span> Import Accounts for Cent Percent Verification
-      </h3>
-      <button type="button" onclick="closeVfnImportModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
     </div>
-
-    <!-- MODE SELECTOR RADIO BUTTONS -->
-<div class="bg-emerald-50/80 p-3 rounded-xl border border-emerald-200 space-y-2 text-xs">
-  <label class="block font-bold text-emerald-950">Select Import Mode:</label>
-  
-  <div class="flex flex-col sm:flex-row gap-3">
-    <label class="inline-flex items-center gap-2 cursor-pointer">
-      <input type="radio" name="vfnImportModeRadio" value="manual" checked onchange="toggleVfnImportModeUI()" class="accent-emerald-700">
-      <span class="font-semibold text-slate-800">1. Select Office &amp; Scheme via Dropdown</span>
-    </label>
-    
-    <label class="inline-flex items-center gap-2 cursor-pointer">
-      <input type="radio" name="vfnImportModeRadio" value="auto" onchange="toggleVfnImportModeUI()" class="accent-emerald-700">
-      <span class="font-semibold text-slate-800">2. Auto-Detect from File Header</span>
-    </label>
   </div>
 
-  <p id="vfnImportModeHelpText" class="text-[11px] text-emerald-900 mt-1"></p>
-</div>
-
-    <!-- MANUAL SELECTION DROPDOWNS (Mode 1) -->
-    <div id="vfnManualModeFields" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-      <div>
-        <label class="block font-bold text-slate-700 mb-0.5">Select Office Name *</label>
-        <select id="vfnImportOfficeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
-          <option value="">-- Select Office --</option>
-        </select>
-      </div>
-      <div>
-        <label class="block font-bold text-slate-700 mb-0.5">Select Scheme Name *</label>
-        <select id="vfnImportSchemeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
-          <option value="TDIP5">TDIP5 - 5 Year TD</option>
-          <option value="TDIP1">TDIP1 - 1 Year TD</option>
-          <option value="TDIP2">TDIP2 - 2 Year TD</option>
-          <option value="TDIP3">TDIP3 - 3 Year TD</option>
-          <option value="SBGEN">SBGEN - Savings Bank</option>
-          <option value="RD">RD - Recurring Deposit</option>
-          <option value="MIS">MIS - Monthly Income Scheme</option>
-          <option value="SCSS">SCSS - Senior Citizen</option>
-          <option value="PPF">PPF - Public Provident Fund</option>
-          <option value="SSA">SSA - Sukanya Samriddhi</option>
-        </select>
-      </div>
+  <!-- KPI SUMMARY SCORECARDS (5 CARDS) -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+    <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-slate-500 font-bold uppercase">Total Accounts</p>
+      <p id="vfnCardTotal" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
     </div>
-
-
-    <!-- FILE UPLOAD INPUT -->
-    <div class="space-y-1 text-xs">
-      <label class="block font-bold text-slate-700">Select Finacle Report File (CSV or Excel) *</label>
-      <input type="file" id="centVfnModalFileInput" accept=".csv, .xlsx, .xls" class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium">
-      <p class="text-[10px] text-slate-500">Supported date formats: <code>11-JAN-21</code>, <code>11-JAN-2021</code>, <code>DD/MM/YYYY</code>, <code>YYYY-MM-DD</code></p>
+    <div class="bg-white border-2 border-purple-600 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-purple-700 font-bold uppercase">Printed (SB-46 Ready)</p>
+      <p id="vfnCardPrinted" class="text-base font-extrabold text-purple-900 mt-0.5">0</p>
     </div>
+    <div class="bg-white border-2 border-blue-600 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-blue-700 font-bold uppercase">Dispatched (Sent)</p>
+      <p id="vfnCardDispatched" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
+    </div>
+    <div class="bg-white border-2 border-emerald-600 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-emerald-700 font-bold uppercase">Reply Received</p>
+      <p id="vfnCardReplyReceived" class="text-base font-extrabold text-emerald-800 mt-0.5">0</p>
+    </div>
+    <div class="bg-white border-2 border-amber-500 p-3 rounded-xl shadow-2xs">
+      <p class="text-[10px] text-amber-700 font-bold uppercase">Pending for Notice</p>
+      <p id="vfnCardPending" class="text-base font-extrabold text-amber-800 mt-0.5">0</p>
+    </div>
+  </div>
 
-    <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-      <button type="button" onclick="closeVfnImportModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Cancel</button>
-      <button type="button" id="btnRunVfnImport" onclick="startCentVfnImportProcess()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">
-        Start Import
+  <!-- SCHEME-WISE BREAKDOWN SUMMARY CARD -->
+  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 mb-4">
+    <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-base">📊</span>
+        <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
+      </div>
+      <button type="button" onclick="loadCentVfnSchemeBreakdown()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded cursor-pointer transition flex items-center gap-1">
+        🔄 Refresh
       </button>
     </div>
 
-  <div id="vfnImportProgressContainer" class="hidden space-y-1.5 bg-emerald-50/90 border border-emerald-300 p-2.5 rounded-xl text-xs">
-  <div class="flex justify-between items-center text-emerald-900 font-bold">
-    <span id="vfnImportProgressStatus">Reading file rows...</span>
-    <span id="vfnImportProgressCount" class="font-mono text-emerald-700">0 / 0</span>
-  </div>
-  <div class="w-full bg-emerald-200/80 rounded-full h-2.5 overflow-hidden">
-    <div id="vfnImportProgressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
-  </div>
-</div>
-
-  </div>
-</div>
-
-  <!-- KPI SUMMARY SCORECARDS (Updated to 5 Cards) -->
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
-  <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
-    <p class="text-[10px] text-slate-500 font-bold uppercase">Total Accounts</p>
-    <p id="vfnCardTotal" class="text-base font-extrabold text-slate-900 mt-0.5">0</p>
-  </div>
-  <div class="bg-white border-2 border-purple-600 p-3 rounded-xl shadow-2xs">
-    <p class="text-[10px] text-purple-700 font-bold uppercase">Printed (SB-46 Ready)</p>
-    <p id="vfnCardPrinted" class="text-base font-extrabold text-purple-900 mt-0.5">0</p>
-  </div>
-  <div class="bg-white border-2 border-blue-600 p-3 rounded-xl shadow-2xs">
-    <p class="text-[10px] text-blue-700 font-bold uppercase">Dispatched (Sent)</p>
-    <p id="vfnCardDispatched" class="text-base font-extrabold text-blue-900 mt-0.5">0</p>
-  </div>
-  <div class="bg-white border-2 border-emerald-600 p-3 rounded-xl shadow-2xs">
-    <p class="text-[10px] text-emerald-700 font-bold uppercase">Reply Received</p>
-    <p id="vfnCardReplyReceived" class="text-base font-extrabold text-emerald-800 mt-0.5">0</p>
-  </div>
-  <div class="bg-white border-2 border-amber-500 p-3 rounded-xl shadow-2xs">
-    <p class="text-[10px] text-amber-700 font-bold uppercase">Pending for Notice</p>
-    <p id="vfnCardPending" class="text-base font-extrabold text-amber-800 mt-0.5">0</p>
-  </div>
-</div>
-<!-- SCHEME-WISE BREAKDOWN SUMMARY CARD -->
-<div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 mb-4">
-  <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
-    <div class="flex items-center gap-2">
-      <span class="text-base">📊</span>
-      <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
+            <th class="p-2.5">Scheme</th>
+            <th class="p-2.5 text-right">Total Accounts</th>
+            <th class="p-2.5 text-right text-purple-700">Printed</th>
+            <th class="p-2.5 text-right text-blue-700">Despatched</th>
+            <th class="p-2.5 text-right text-emerald-700">Reply Received</th>
+            <th class="p-2.5 text-right text-amber-700">Pending</th>
+          </tr>
+        </thead>
+        <tbody id="vfnSchemeBreakdownBody">
+          <tr>
+            <td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td>
+          </tr>
+        </tbody>
+        <tfoot id="vfnSchemeBreakdownFoot" class="bg-slate-50 font-extrabold text-slate-900 border-t-2 border-slate-300">
+        </tfoot>
+      </table>
     </div>
-    <button type="button" onclick="loadCentVfnSchemeBreakdown()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded cursor-pointer transition flex items-center gap-1">
-      🔄 Refresh
-    </button>
   </div>
 
-  <div class="overflow-x-auto">
-    <table class="w-full text-xs text-left border-collapse">
-      <thead>
-        <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
-          <th class="p-2.5">Scheme</th>
-          <th class="p-2.5 text-right">Total Accounts</th>
-          <th class="p-2.5 text-right text-purple-700">Printed</th>
-          <th class="p-2.5 text-right text-blue-700">Despatched</th>
-          <th class="p-2.5 text-right text-emerald-700">Reply Received</th>
-          <th class="p-2.5 text-right text-amber-700">Pending</th>
-        </tr>
-      </thead>
-      <tbody id="vfnSchemeBreakdownBody">
-        <tr>
-          <td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td>
-        </tr>
-      </tbody>
-      <tfoot id="vfnSchemeBreakdownFoot" class="bg-slate-50 font-extrabold text-slate-900 border-t-2 border-slate-300">
-        <!-- Totals Row Injected Here -->
-      </tfoot>
-    </table>
-  </div>
-</div>
-  <!-- FILTER & SEARCH CONTROL BAR -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
+  <!-- FILTER & SEARCH CONTROL BAR (INCLUDES ACCOUNT TYPE) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
     <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name </label>
+      <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name</label>
       <input type="text" id="vfnSearchQuery" oninput="debounceCentVfnSearch()" placeholder="Search..." class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium outline-none focus:border-postRed-600">
     </div>
     <div>
@@ -1170,18 +1038,30 @@
       <label class="block font-bold text-slate-700 mb-0.5">Scheme</label>
       <select id="vfnFilterScheme" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
         <option value="">-- All Schemes --</option>
-        <option value="SB">Savings Bank (SB)</option>
+        <option value="SBGEN">Savings Bank (SBGEN)</option>
         <option value="RD">Recurring Deposit (RD)</option>
-        <option value="TD">Time Deposit (TD)</option>
+        <option value="TDIP1">1 Year TD (TDIP1)</option>
+        <option value="TDIP2">2 Year TD (TDIP2)</option>
+        <option value="TDIP3">3 Year TD (TDIP3)</option>
+        <option value="TDIP5">5 Year TD (TDIP5)</option>
         <option value="MIS">Monthly Income Scheme (MIS)</option>
-        <option value="SCSS">Senior Citizens Scheme (SCSS)</option>
+        <option value="SCSS">Senior Citizens (SCSS)</option>
         <option value="PPF">Public Provident Fund (PPF)</option>
         <option value="SSA">Sukanya Samriddhi (SSA)</option>
-        <option value="KVP">KVP / NSC</option>
       </select>
     </div>
     <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Verification Status</label>
+      <label class="block font-bold text-slate-700 mb-0.5">Account Type (Mode)</label>
+      <select id="vfnFilterAccountType" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+        <option value="">-- All Types --</option>
+        <option value="SELF">SELF (Single)</option>
+        <option value="JOINT-A">JOINT-A</option>
+        <option value="JOINT-B">JOINT-B</option>
+        <option value="MINOR">MINOR</option>
+      </select>
+    </div>
+    <div>
+      <label class="block font-bold text-slate-700 mb-0.5">Status</label>
       <select id="vfnFilterStatus" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
         <option value="">-- All Statuses --</option>
         <option value="imported">Imported (Notice Pending)</option>
@@ -1200,46 +1080,43 @@
     </div>
   </div>
 
-<!-- TABLE CONTROLS BAR: EXPORT, PAGE SIZE & PAGINATION -->
-<div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200 mb-2 text-xs">
-  <div class="flex items-center gap-2">
-    <span id="vfnTableRecordCount" class="font-bold text-slate-700">Showing 0 accounts</span>
-    <span class="text-slate-300">|</span>
-    <label class="font-semibold text-slate-600">Rows per page:</label>
-    <select id="vfnPageSizeSelect" onchange="changeVfnPageSize(this.value)" class="border border-slate-300 rounded px-2 py-1 bg-white font-bold text-slate-800 outline-none">
-      <option value="10" selected>10</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-      <option value="500">500</option>
-      <option value="all">Show All (Slow)</option>
-    </select>
-  </div>
+  <!-- TABLE CONTROLS BAR: EXPORT, PAGE SIZE & PAGINATION -->
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200 mb-2 text-xs">
+    <div class="flex items-center gap-2">
+      <span id="vfnTableRecordCount" class="font-bold text-slate-700">Showing 0 accounts</span>
+      <span class="text-slate-300">|</span>
+      <label class="font-semibold text-slate-600">Rows per page:</label>
+      <select id="vfnPageSizeSelect" onchange="changeVfnPageSize(this.value)" class="border border-slate-300 rounded px-2 py-1 bg-white font-bold text-slate-800 outline-none">
+        <option value="10" selected>10 (Token View)</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="500">500</option>
+        <option value="all">Show All</option>
+      </select>
+    </div>
 
-  <div class="flex items-center gap-2">
-    <!-- Export full active dataset -->
-    <button type="button" onclick="exportCentVfnToExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded cursor-pointer transition flex items-center gap-1 shadow-2xs">
-      📊 Export to Excel (All Filtered)
-    </button>
-    
-    <!-- Pager buttons -->
-    <div class="flex items-center gap-1 bg-white border border-slate-300 rounded-lg p-0.5 shadow-2xs">
-      <button type="button" id="btnVfnPrevPage" onclick="changeVfnPage(-1)" class="px-2 py-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-bold">
-        ◀ Prev
+    <div class="flex items-center gap-2">
+      <button type="button" onclick="exportCentVfnToExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded cursor-pointer transition flex items-center gap-1 shadow-2xs">
+        📊 Export Filtered (Excel)
       </button>
-      <span id="vfnPageIndicator" class="px-2 font-mono font-bold text-slate-700">Page 1 / 1</span>
-      <button type="button" id="btnVfnNextPage" onclick="changeVfnPage(1)" class="px-2 py-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-bold">
-        Next ▶
-      </button>
+      <div class="flex items-center gap-1 bg-white border border-slate-300 rounded-lg p-0.5 shadow-2xs">
+        <button type="button" id="btnVfnPrevPage" onclick="changeVfnPage(-1)" class="px-2 py-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-bold">
+          ◀ Prev
+        </button>
+        <span id="vfnPageIndicator" class="px-2 font-mono font-bold text-slate-700">Page 1 / 1</span>
+        <button type="button" id="btnVfnNextPage" onclick="changeVfnPage(1)" class="px-2 py-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed font-bold">
+          Next ▶
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-  <!-- ACCOUNTS DATA TABLE -->
+  <!-- ACCOUNTS DATA TABLE (11 COLUMNS) -->
   <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
     <div class="bg-slate-100 p-2.5 font-bold text-slate-700 text-xs flex justify-between items-center border-b border-slate-200">
       <span>📋 Registered Accounts for Cent Percent Verification</span>
-         </div>
+    </div>
     <div class="max-h-[480px] overflow-x-auto overflow-y-auto">
       <table class="w-full text-left text-xs border-collapse">
         <thead class="bg-postRed-700 text-white font-bold sticky top-0 z-10 whitespace-nowrap">
@@ -1258,13 +1135,200 @@
           </tr>
         </thead>
         <tbody id="centVfnTableBody" class="divide-y divide-slate-100">
-          <tr><td colspan="10" class="p-4 text-center text-slate-400">Loading accounts...</td></tr>
+          <tr><td colspan="11" class="p-4 text-center text-slate-400">Loading accounts...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
-</div>
 
+  <!-- ================================================================= -->
+  <!-- MODAL SECTION (PLACED AT BOTTOM TO PREVENT Z-INDEX / FLEX CLIPPING)-->
+  <!-- ================================================================= -->
+
+  <!-- 1. MODAL: IMPORT CONFIGURATION -->
+  <div id="vfnImportModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-emerald-600">
+      <div class="border-b pb-2 border-emerald-200 flex justify-between items-center">
+        <h3 class="font-bold text-sm text-emerald-800 flex items-center gap-1.5">
+          <span>📥</span> Import Accounts for Cent Percent Verification
+        </h3>
+        <button type="button" onclick="closeVfnImportModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+      </div>
+
+      <div class="bg-emerald-50/80 p-3 rounded-xl border border-emerald-200 space-y-2 text-xs">
+        <label class="block font-bold text-emerald-950">Select Import Mode:</label>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <label class="inline-flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="vfnImportModeRadio" value="manual" checked onchange="toggleVfnImportModeUI()" class="accent-emerald-700">
+            <span class="font-semibold text-slate-800">1. Select Office &amp; Scheme via Dropdown</span>
+          </label>
+          <label class="inline-flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="vfnImportModeRadio" value="auto" onchange="toggleVfnImportModeUI()" class="accent-emerald-700">
+            <span class="font-semibold text-slate-800">2. Auto-Detect from File Header</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="vfnManualModeFields" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">Select Office Name *</label>
+          <select id="vfnImportOfficeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
+            <option value="">-- Select Office --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">Select Scheme Name *</label>
+          <select id="vfnImportSchemeDropdown" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none focus:border-emerald-600">
+            <option value="TDIP5">TDIP5 - 5 Year TD</option>
+            <option value="TDIP1">TDIP1 - 1 Year TD</option>
+            <option value="TDIP2">TDIP2 - 2 Year TD</option>
+            <option value="TDIP3">TDIP3 - 3 Year TD</option>
+            <option value="SBGEN">SBGEN - Savings Bank</option>
+            <option value="RD">RD - Recurring Deposit</option>
+            <option value="MIS">MIS - Monthly Income Scheme</option>
+            <option value="SCSS">SCSS - Senior Citizen</option>
+            <option value="PPF">PPF - Public Provident Fund</option>
+            <option value="SSA">SSA - Sukanya Samriddhi</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="space-y-1 text-xs">
+        <label class="block font-bold text-slate-700">Select Finacle Report File (CSV or Excel) *</label>
+        <input type="file" id="centVfnModalFileInput" accept=".csv, .xlsx, .xls" class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium">
+        <p class="text-[10px] text-slate-500">Auto-detects Finacle dates (e.g. <code>12-Oct-21</code>, <code>11-JAN-2021</code>, <code>DD/MM/YYYY</code>)</p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+        <button type="button" onclick="closeVfnImportModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Cancel</button>
+        <button type="button" id="btnRunVfnImport" onclick="startCentVfnImportProcess()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">
+          Start Import
+        </button>
+      </div>
+
+      <div id="vfnImportProgressContainer" class="hidden space-y-1.5 bg-emerald-50/90 border border-emerald-300 p-2.5 rounded-xl text-xs">
+        <div class="flex justify-between items-center text-emerald-900 font-bold">
+          <span id="vfnImportProgressStatus">Reading file rows...</span>
+          <span id="vfnImportProgressCount" class="font-mono text-emerald-700">0 / 0</span>
+        </div>
+        <div class="w-full bg-emerald-200/80 rounded-full h-2.5 overflow-hidden">
+          <div id="vfnImportProgressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MODAL: CONFIRM PRINT STATUS -->
+  <div id="vfnPrintConfirmModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-3 shadow-2xl border-t-8 border-purple-600">
+      <div class="border-b pb-2 border-purple-200">
+        <h3 class="font-bold text-sm text-purple-900 flex items-center gap-1.5">
+          <span>🖨️</span> Confirm SB-46 Printing
+        </h3>
+      </div>
+      <p class="text-xs text-slate-700 leading-relaxed">
+        Did the <b id="vfnPrintConfirmCount" class="text-purple-700">0</b> SB-46 notice(s) print out successfully?
+      </p>
+      <div class="bg-purple-50 p-2.5 rounded-lg border border-purple-200 text-[11px] text-purple-950 space-y-1">
+        <div>• Clicking <b>Yes</b> updates their status to <span class="font-bold text-purple-700">PRINTED</span> with today's date.</div>
+        <div>• Clicking <b>No</b> leaves their current status unchanged.</div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-purple-100">
+        <button type="button" onclick="handlePrintConfirmationResponse(false)" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">
+          No, Keep As Is
+        </button>
+        <button type="button" id="btnConfirmPrintYes" onclick="handlePrintConfirmationResponse(true)" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow-xs">
+          Yes, Mark as Printed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MODAL: BARCODE GENERATOR & ALLOTMENT -->
+  <div id="vfnBarcodeGenModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-5 max-w-lg w-full space-y-4 shadow-2xl border-t-8 border-postRed-600 text-xs">
+      <div class="border-b pb-2 flex justify-between items-center">
+        <div>
+          <h3 class="font-bold text-sm text-postRed-700">Allot UPU S10 Barcodes (Cent Verification)</h3>
+          <p class="text-[10px] text-slate-500">Allocates strictly to pending accounts (Reply not received)</p>
+        </div>
+        <button type="button" onclick="closeVfnBarcodeGenModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 bg-amber-50/60 p-3 rounded-xl border border-amber-200">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Outward Prefix (SSPO &rarr; Dep)</label>
+          <input type="text" id="vfnBarPrefixOutward" value="RT" maxlength="2" class="w-full border p-1.5 rounded font-mono font-bold uppercase bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Inward Prefix (Reply Slip)</label>
+          <input type="text" id="vfnBarPrefixInward" value="RM" maxlength="2" class="w-full border p-1.5 rounded font-mono font-bold uppercase bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Start Serial (8 Digits)</label>
+          <input type="text" id="vfnBarStartSerial" value="00100001" maxlength="8" class="w-full border p-1.5 rounded font-mono font-bold bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Target Scheme / Filter</label>
+          <select id="vfnBarTargetScheme" class="w-full border p-1.5 rounded font-bold bg-white">
+            <option value="ALL">All Schemes (Pending Only)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 leading-relaxed text-[11px]">
+        <b>Rule:</b> Accounts already marked as <b>Printed</b> or having assigned barcodes will <b>NOT</b> be overwritten. Accounts in <i>Reply Received</i> status are completely excluded.
+      </div>
+
+      <div class="flex justify-between items-center pt-2 border-t">
+        <span id="vfnBarEligibleCount" class="font-bold text-slate-600">Calculating eligible accounts...</span>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeVfnBarcodeGenModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold">Cancel</button>
+          <button type="button" id="btnRunBarcodeAllotment" onclick="executeBarcodeAllotment()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded font-bold shadow-xs">Assign Barcodes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL: ADMIN BULK DELETE -->
+  <div id="vfnAdminDeleteModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-rose-600">
+      <div class="border-b pb-2 border-rose-200 flex justify-between items-center">
+        <h3 class="font-bold text-sm text-rose-700 flex items-center gap-1.5">
+          <span>⚠️</span> Admin Bulk Deletion (CentVfn)
+        </h3>
+        <button type="button" onclick="closeAdminVfnDeleteModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-600">This action permanently deletes verification accounts and re-indexes serial numbers. Type <b>CONFIRM</b> to delete the entire table.</p>
+
+      <div class="space-y-2 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">Delete Scope</label>
+          <select id="vfnDeleteScope" onchange="toggleVfnDeleteScopeInput()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white outline-none">
+            <option value="office">By Office Name</option>
+            <option value="scheme">By Scheme Identifier</option>
+            <option value="status">By Status</option>
+            <option value="all">Entire Database (Type CONFIRM)</option>
+          </select>
+        </div>
+
+        <div id="vfnDeleteInputContainer">
+          <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Target Value *</label>
+          <input type="text" id="vfnDeleteScopeVal" placeholder="Enter target value or CONFIRM" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-rose-100">
+        <button type="button" onclick="closeAdminVfnDeleteModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold text-xs cursor-pointer">Cancel</button>
+        <button type="button" id="btnRunVfnBulkDelete" onclick="executeAdminVfnBulkDelete()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 rounded font-bold text-xs cursor-pointer shadow-xs">
+          Permanently Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
 <!-- MODAL: UPDATE ACCOUNT STATUS / REPLY RECEIVED -->
 <div id="vfnStatusModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
   <div class="bg-white rounded-2xl p-4 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
@@ -9498,6 +9562,21 @@ function openVfnStatusModal(recordId) {
   $('vfnModalAccNo').innerText = r.account_no;
   $('vfnModalCustName').innerText = r.customer_name;
   $('vfnModalStatusSelect').value = r.status || 'imported';
+  $('vfnModalArticleNo').value = r.outward_article_no || r.article_no || '';
+  if ($('vfnModalReplyArticleNo')) {
+    $('vfnModalReplyArticleNo').value = r.reply_article_no || '';
+  }
+  const updatedOutward = $('vfnModalArticleNo').value.trim().toUpperCase();
+const updatedReply = $('vfnModalReplyArticleNo') ? $('vfnModalReplyArticleNo').value.trim().toUpperCase() : r.reply_article_no;
+
+const updates = {
+  status,
+  outward_article_no: updatedOutward,
+  reply_article_no: updatedReply,
+  article_no: updatedOutward, // Keep in sync
+  remarks,
+  updated_at: new Date().toISOString()
+};
 
   // 1. Auto-populate Article & Dispatch Date if already available
   const hasPriorDispatch = Boolean(r.article_no || r.dispatched_date);
@@ -9908,30 +9987,55 @@ async function handlePrintConfirmationResponse(confirmed) {
 }
 window.handlePrintConfirmationResponse = handlePrintConfirmationResponse;
 
-
 function renderSb46PrintWindow(accounts) {
   const printWindow = window.open('', '_blank', 'width=950,height=850');
   if (!printWindow) return alert("Popup blocked! Allow popups to print letters.");
 
+  // Helper: Generates Base64 Code 39 Barcode (Used only on Page 2 Mailers)
+  const getBarcodeDataUrl = (code) => {
+    if (!code) return '';
+    try {
+      if (typeof JsBarcode !== 'undefined') {
+        const canvas = document.createElement('canvas');
+        JsBarcode(canvas, code.trim().toUpperCase(), {
+          format: "CODE39",
+          width: 1.4,
+          height: 32,
+          displayValue: false,
+          margin: 0
+        });
+        return canvas.toDataURL("image/png");
+      }
+    } catch (e) {
+      console.error("Barcode generation error for " + code, e);
+    }
+    return '';
+  };
+
+  // Helper: Format human-readable text e.g. "RT 00100001 5 IN"
+ const formatReadable = (code) => {
+    if (!code) return '';
+    // This removes all whitespace characters anywhere inside the string
+    return String(code).replace(/\s+/g, '').toUpperCase();
+};
+
+
   let pagesHtml = '';
-
-  // India Post Red Wings SVG Emblem
-  const indiaPostLogoSvg = `
-    <svg viewBox="0 0 160 90" width="70" height="40" xmlns="http://www.w3.org/2000/svg" style="display: block;">
-      <!-- Triangular Envelope Wing Shapes -->
-      <polygon points="10,80 150,15 150,45 10,80" fill="#C4161C" />
-      <polygon points="10,80 130,5 130,28 10,80" fill="#E31E24" />
-      <polygon points="10,80 100,0 100,18 10,80" fill="#FFC20E" />
-    </svg>
-  `;
-
   accounts.forEach((acc, i) => {
     const balStr = (parseFloat(acc.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
     const rawDate = acc.resolvedPrintDate || acc.printed_date || new Date().toISOString().split('T')[0];
     const noticeDateFormatted = typeof formatDate === 'function' ? formatDate(rawDate) : rawDate;
 
+    // Resolve outward and reply barcodes
+    const outwardCode = acc.outward_article_no || acc.article_no || `RT${String(acc.sl_no).padStart(8, '0')}5IN`;
+    const replyCode = acc.reply_article_no || `RM${String(acc.sl_no).padStart(8, '0')}5IN`;
+
+    // Only needed for Page 2
+    const outwardBarcodeImg = getBarcodeDataUrl(outwardCode);
+    const replyBarcodeImg = getBarcodeDataUrl(replyCode);
+
     // -------------------------------------------------------------
-    // PAGE 1: SB-46 NOTICE WITH BOTTOM-ALIGNED REPLY SLIP
+    // PAGE 1: SB-46 NOTICE WITH TEXT ARTICLE NO ONLY (NO BARCODE)
     // -------------------------------------------------------------
     pagesHtml += `
       <div class="page-sheet page-notice">
@@ -9944,8 +10048,7 @@ function renderSb46PrintWindow(accounts) {
               <p class="division-sub">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</p>
             </div>
             <div class="header-logo-block">
-              ${indiaPostLogoSvg}
-              <span class="logo-caption">भारतीय डाक<br>India Post</span>
+            ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 62px; width: 84px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
             </div>
           </div>
           
@@ -9957,7 +10060,9 @@ function renderSb46PrintWindow(accounts) {
           
           <div class="ref-bar">
             <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
-            <div></div>
+            <div style="font-family: Consolas, monospace; font-weight: bold; font-size: 11px; color: #000;">
+              <b>Article No:</b> ${formatReadable(outwardCode)}
+            </div>
             <div><b>Date:</b> ${noticeDateFormatted}</div>
           </div>
 
@@ -9969,7 +10074,7 @@ function renderSb46PrintWindow(accounts) {
           </div>
 
           <div class="subject-line">
-            <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme}) - reg.
+            <b>Subject:</b> Balance Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme}) - reg.
           </div>
 
           <div class="body-content">
@@ -9996,67 +10101,72 @@ function renderSb46PrintWindow(accounts) {
             </table>
 
             <p style="margin: 4px 0 0 0; text-align: justify; font-size: 10.5px; line-height: 1.4;">
-              Kindly examine your Passbook and verify whether this balance is correct. In any case, the balance shown in your Passbook may please be entered in the reply form below, which should be signed, dated, and enclosed in the attached service envelope (or folded along the score lines) and posted back at an early date. This procedure is statutory for detecting any clerical or accounting discrepancy.
-            </p>
+              <br>Kindly examine your Passbook and verify whether this balance is correct. In any case, the balance shown in your Passbook may please be entered in the reply form below, which should be signed, dated, and enclosed in the attached service envelope (or folded along the score lines) and to be posted by you at a very early date. This procedure is being followed for the detection of any mistake which might have
+              occurred in the maintenance of your Savings Bank Account.
+            </p><br>
           </div>
 
           <div class="sign-block">   
-            <p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division, Chennai - 600017</p>
+            <p><b>Assistant Superintendent of Posts [BD & Addl]</b><br>Chennai City Central Division, Chennai - 600017</p>
           </div>
           
           <div style="font-size: 9.5px; font-style: italic; color: #475569; margin-top: 2px;">Note – No postage stamp is required on the service cover / reply card.</div>
         </div>
 
         <!-- BOTTOM SECTION: TEAR STRIP + REPLY FORM -->
-        <div class="notice-bottom-container">
-          <div class="tear-strip">
-            ✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂
-          </div>
-          
-          <div class="reply-slip">
-            <div style="text-align: center; font-weight: 800; font-size: 11.5px; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 3px;">
-              REPLY FORM (SB-46)            
-            </div>
-            
-            <div class="ref-bar" style="margin-bottom: 4px; padding-bottom: 1px;">
+        <div class="notice-bottom-container" style="box-sizing: border-box; width: 210mm; height: 148.5mm; padding: 0 20mm 20mm 0mm; display: flex; flex-direction: column; justify-content: flex-end; font-family: Arial, sans-serif; margin-left: auto; margin-right: auto;">
+                    
+         <div class="reply-slip" style="box-sizing: border-box; width: 100%; border: 1px dashed #000; padding: 15px; background: #fff;">
+              <div style="text-align: center; font-weight: 800; font-size: 13.5px; letter-spacing: 1.5px; text-decoration: underline; margin-bottom: 8px;">
+                REPLY FORM (SB-46)            
+              </div>
+              <div style="display: flex; justify-content: space-between; font-family: Consolas, monospace; font-size: 10.5px; font-weight: bold; color: #1e293b; margin-bottom: 12px; width: 100%;">
+                <div>
+                  <b>Despatch Article No:</b> ${formatReadable(outwardCode).replace(/\s+/g, '')}
+                </div>
+                <div>
+                  <b>Reply Article No:</b> ${formatReadable(replyCode).replace(/\s+/g, '')}
+                </div>
+              </div>           
+
+            <div class="ref-bar" style="display: flex; justify-content: space-between; margin-top: 8px; margin-bottom: 8px; font-size: 12px;">
               <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
-              <div></div>
               <div><b>Date:</b> ${noticeDateFormatted}</div>
             </div>
-            
-            <div style="margin-bottom: 4px; font-size: 10px; line-height: 1.3;">
+
+            <div style="margin-bottom: 8px; font-size: 12px; line-height: 1.5;">
               <b>To:</b> The Senior Superintendent of Post Offices, Chennai City Central Division, Chennai - 600017
             </div>
 
-            <p style="margin: 0 0 4px 0; text-align: justify; line-height: 1.4; font-size: 10.5px;">
+            <p style="margin: 0 0 10px 0; text-align: justify; line-height: 1.5; font-size: 12px;">
               I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
             </p>
 
-            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 6px;">
-              <span style="white-space: nowrap; font-weight: 600; font-size: 10.5px;">In Figures: <b>₹</b></span>
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px;">
+              <span style="white-space: nowrap; font-weight: 600; font-size: 12px;">In Figures: <b>₹</b></span>
               <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 16px;"></div>
-              <span style="white-space: nowrap; font-weight: 600; margin-left: 8px; font-size: 10.5px;">as on (Date):</span>
+              <span style="white-space: nowrap; font-weight: 600; margin-left: 8px; font-size: 12px;">as on (Date):</span>
               <div style="width: 140px; border-bottom: 1px dotted #000; min-height: 16px;"></div>
             </div>
 
-            <div style="margin-bottom: 2px;">
-              <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 6px;">
-                <span style="white-space: nowrap; font-weight: 600; font-size: 10.5px;">In Words: Rupees</span>
+            <div style="margin-bottom: 8px;">
+              <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px;">
+                <span style="white-space: nowrap; font-weight: 600; font-size: 12px;">In Words: Rupees</span>
                 <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 16px;"></div>
               </div>
               <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 4px;">
                 <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 16px;"></div>
-                <span style="white-space: nowrap; font-weight: 600; font-size: 10.5px;">only.</span>
+                <span style="white-space: nowrap; font-weight: 600; font-size: 12px;">only.</span>
               </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; padding-top: 4px;">
-              <div style="font-size: 10px;">
-                <div style="margin-bottom: 2px;"><b>Date:</b> ____________________</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 25px; padding-top: 4px;">
+              <div style="font-size: 12px; line-height: 1.8;">
+                <div><b>Date:</b> ____________________</div>
                 <div><b>Mobile No:</b> ____________________</div>
               </div>
-              <div style="text-align: center; font-size: 10px;">
-                <div style="width: 190px; border-bottom: 1px solid #000; margin-bottom: 2px;"></div>
+              <div style="text-align: center; font-size: 11px;">
+                <div style="width: 210px; border-bottom: 1px solid #000; margin-bottom: 6px;"></div>
                 <b>Signature / LTI of Depositor</b>
               </div>
             </div>
@@ -10067,7 +10177,7 @@ function renderSb46PrintWindow(accounts) {
       <div class="page-break"></div>
 
       <!-- ------------------------------------------------------- -->
-      <!-- PAGE 2: FOLDABLE MAILER (EXACT 4/4 ZERO-MARGIN SHEET)  -->
+      <!-- PAGE 2: FOLDABLE MAILER (WITH BARCODES PRESERVED)       -->
       <!-- ------------------------------------------------------- -->
       <div class="page-sheet page-mailer">
         <!-- TOP 1/2 OF SHEET (OUTWARD DISPATCH IN TOP 1/4) -->
@@ -10075,7 +10185,12 @@ function renderSb46PrintWindow(accounts) {
           <div class="address-card outward-card">
             <div class="card-header-badge">
               <span>ON POSTAL SERVICE</span>
-              <span class="postal-tag">SPEED POST</span>
+              <!-- OUTWARD BARCODE IN CARD BADGE -->
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                ${outwardBarcodeImg ? `<img src="${outwardBarcodeImg}" style="height: 20px;" />` : ''}
+                <span style="font-family: Consolas, monospace; font-size: 8px; font-weight: bold; color: #000;">${formatReadable(outwardCode)}</span>
+              </div>
+              <span class="postage-free-tag">BY SPEED POST</span>
             </div>
 
             <div class="address-grid">
@@ -10094,7 +10209,6 @@ function renderSb46PrintWindow(accounts) {
                 <p class="addr-main">
                   <b style="font-size: 12.5px;">${acc.customer_name}</b><br>
                   ${acc.address || 'Address on record'}<br>                  
-                  <b>Post Office:</b> ${acc.office_name}<br>
                   ${acc.mobile_no ? `<b>Mob:</b> ${acc.mobile_no}` : ''}
                 </p>
               </div>
@@ -10106,7 +10220,7 @@ function renderSb46PrintWindow(accounts) {
 
         <!-- CENTER SCORE & FOLD LINE GUIDE -->
         <div class="center-score-strip">
-          <div class="score-line">------------------------------------ ✂ HORIZONTAL FOLD / TEAR LINE (A4 CENTER 148.5mm) ✂ ------------------------------------</div>
+          <div class="score-line">------------------------------------ ✂ HORIZONTAL FOLD / TEAR LINE  ✂ ------------------------------------</div>
         </div>
 
         <!-- BOTTOM 1/2 OF SHEET (INWARD REPLY IN BOTTOM 1/4) -->
@@ -10115,7 +10229,12 @@ function renderSb46PrintWindow(accounts) {
 
           <div class="address-card return-card">
             <div class="card-header-badge return-badge">
-              <span>ON POSTAL SERVICE — SB-46 VERIFICATION REPLY</span>
+              <span>ON POSTAL SERVICE — BY SPEED POST</span>
+              <!-- INWARD REPLY BARCODE IN RETURN BADGE -->
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                ${replyBarcodeImg ? `<img src="${replyBarcodeImg}" style="height: 20px;" />` : ''}
+                <span style="font-family: Consolas, monospace; font-size: 8px; font-weight: bold; color: #000;">${formatReadable(replyCode)}</span>
+              </div>
               <span class="postage-free-tag">NO POSTAGE STAMP REQUIRED</span>
             </div>
 
@@ -10125,8 +10244,7 @@ function renderSb46PrintWindow(accounts) {
                 <p class="addr-text">
                   <b>${acc.customer_name}</b><br>
                   ${acc.address || 'Address on record'}<br>   
-                  <b>A/C No:</b> <span style="font-family: monospace;">${acc.account_no}</span> (${acc.scheme})<br>
-                  <b>SO/BO:</b> ${acc.office_name}
+                  ${acc.mobile_no ? `<b>Mob:</b> ${acc.mobile_no}` : ''}
                 </p>
                 <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>               
               </div>
@@ -10137,7 +10255,6 @@ function renderSb46PrintWindow(accounts) {
                   <b>The Senior Superintendent of Post Offices</b><br>
                   Chennai City Central Division<br>
                   <b>CHENNAI - 600017</b><br>
-                  <span style="font-size: 9.5px; color: #475569; font-weight: normal;">(Cent Percent Verification Cell)</span>
                 </p>
               </div>
             </div>
@@ -10266,13 +10383,14 @@ function renderSb46PrintWindow(accounts) {
         .card-header-badge {
           display: flex;
           justify-content: space-between;
+          align-items: center;
           font-size: 9px;
           font-weight: 800;
           border-bottom: 1.5px solid #0f172a;
           padding-bottom: 3px;
           margin-bottom: 6px;
         }
-        .postal-tag { background: #0f172a; color: #fff; padding: 1px 5px; border-radius: 2px; font-size: 8.5px; }
+        .postal-tag { background: #0f172a; color: #fff; padding: 1px 5px; border-radius: 2px; font-size: 8px; }
         .return-badge { border-bottom-color: #065f46; color: #065f46; }
         .postage-free-tag { border: 1px solid #065f46; color: #065f46; padding: 1px 5px; border-radius: 2px; font-size: 8px; font-weight: 800; }
 
@@ -10282,7 +10400,7 @@ function renderSb46PrintWindow(accounts) {
         .lbl { font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 2px; }
         .addr-text { margin: 0; line-height: 1.35; color: #334155; font-size: 10px; }
         .addr-main { margin: 0; line-height: 1.35; color: #0f172a; }
-        .ref-sub { margin-top: 6px; font-size: 9px; font-weight: bold; color: #475569; }
+        .ref-sub { margin-top: 4px; font-size: 9px; font-weight: bold; color: #475569; }
         .highlight-to { background: #f8fafc; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
 
         .page-break { page-break-after: always; }
@@ -10294,32 +10412,16 @@ function renderSb46PrintWindow(accounts) {
         <button onclick="handleManualPrint()" style="background: #A80F28; color: white; border: none; padding: 6px 16px; font-weight: bold; border-radius: 4px; cursor: pointer;">🖨️ Print All Notices &amp; Mailers (${accounts.length * 2} Pages)</button>
         <button onclick="handleManualClose()" style="margin-left: 8px; padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1; cursor: pointer;">Close &amp; Return</button>
       </div>
-      
       ${pagesHtml}
-
       <script>
         function notifyParent() {
           if (window.opener && !window.opener.closed && typeof window.opener.promptPrintConfirmation === 'function') {
             window.opener.promptPrintConfirmation();
           }
         }
-
-        function handleManualPrint() {
-          window.print();
-          notifyParent();
-        }
-
-        function handleManualClose() {
-          notifyParent();
-          window.close();
-        }
-
-        window.onload = function() {
-          setTimeout(function() {
-            window.print();
-            notifyParent();
-          }, 500);
-        };
+        function handleManualPrint() { window.print(); notifyParent(); }
+        function handleManualClose() { notifyParent(); window.close(); }
+        window.onload = function() { setTimeout(function() { window.print(); notifyParent(); }, 500); };
       <\/script>
     </body>
     </html>
@@ -10450,6 +10552,168 @@ async function loadCentVfnSchemeBreakdown() {
   }
 }
 
+// ----------------------------------------------------------------------
+// OPEN BARCODE ALLOTMENT MODAL
+// ----------------------------------------------------------------------
+async function openVfnBarcodeGenModal() {
+  const modal = $('vfnBarcodeGenModal');
+  if (!modal) return;
+
+  // Populate Scheme Dropdown
+  const schemeSelect = $('vfnBarTargetScheme');
+  if (schemeSelect) {
+    const { data: schemes } = await supabaseClient
+      .from('cent_percent_verification')
+      .select('scheme')
+      .neq('status', 'reply_received');
+    
+    const uniqueSchemes = [...new Set((schemes || []).map(s => s.scheme).filter(Boolean))];
+    schemeSelect.innerHTML = `<option value="ALL">All Schemes (Pending Only)</option>` + 
+      uniqueSchemes.map(s => `<option value="${s}">${s}</option>`).join('');
+  }
+
+  // Count accounts with no reply received that still need barcodes
+  const { count, error } = await supabaseClient
+    .from('cent_percent_verification')
+    .select('*', { count: 'exact', head: true })
+    .neq('status', 'reply_received')
+    .is('outward_article_no', null);
+
+  $('vfnBarEligibleCount').innerText = `${count || 0} accounts currently need barcodes.`;
+  modal.classList.remove('hidden');
+}
+
+function closeVfnBarcodeGenModal() {
+  $('vfnBarcodeGenModal')?.classList.add('hidden');
+}
+
+// ----------------------------------------------------------------------
+// EXECUTE BARCODE ALLOTMENT
+// ----------------------------------------------------------------------
+async function executeBarcodeAllotment() {
+  const prefixOut = $('vfnBarPrefixOutward').value.trim().toUpperCase() || 'RT';
+  const prefixIn = $('vfnBarPrefixInward').value.trim().toUpperCase() || 'RM';
+  let startSerial = parseInt($('vfnBarStartSerial').value.trim(), 10);
+  const targetScheme = $('vfnBarTargetScheme').value;
+
+  if (isNaN(startSerial)) return alert("Please specify an 8-digit numeric starting serial.");
+
+  let query = supabaseClient
+    .from('cent_percent_verification')
+    .select('id, sl_no, status, outward_article_no, reply_article_no')
+    .neq('status', 'reply_received') // EXCLUDE accounts where reply is already received
+    .order('sl_no', { ascending: true });
+
+  if (targetScheme !== 'ALL') {
+    query = query.eq('scheme', targetScheme);
+  }
+
+  const { data: records, error } = await query;
+  if (error) return alert("Failed to fetch accounts: " + error.message);
+
+  // Filter accounts: Only assign if no barcode exists or if not already marked 'printed'
+  const accountsToAssign = records.filter(r => !r.outward_article_no || r.status === 'imported');
+
+  if (!accountsToAssign.length) {
+    return alert("No eligible accounts found requiring barcodes. (Accounts already printed or verified were preserved).");
+  }
+
+  if (!confirm(`Assign barcodes to ${accountsToAssign.length} pending accounts starting from serial ${startSerial}?`)) {
+    return;
+  }
+
+  const btn = $('btnRunBarcodeAllotment');
+  btn.disabled = true;
+  btn.innerText = "Allotting...";
+
+  let currentSerial = startSerial;
+  const updates = [];
+
+  for (const acc of accountsToAssign) {
+    // 1. Generate unique Outward Article Number
+    const outSerialStr = currentSerial.toString().padStart(8, '0');
+    const outwardCode = buildUPUS10Barcode(prefixOut, outSerialStr, 'IN');
+    currentSerial++;
+
+    // 2. Generate unique Inward Reply Article Number
+    const inSerialStr = currentSerial.toString().padStart(8, '0');
+    const replyCode = buildUPUS10Barcode(prefixIn, inSerialStr, 'IN');
+    currentSerial++;
+
+    updates.push({
+      id: acc.id,
+      outward_article_no: outwardCode,
+      reply_article_no: replyCode,
+      article_no: outwardCode // Kept in sync with outward
+    });
+  }
+
+  // Update in chunks
+  for (let i = 0; i < updates.length; i += 200) {
+    const chunk = updates.slice(i, i + 200);
+    for (const item of chunk) {
+      await supabaseClient
+        .from('cent_percent_verification')
+        .update({
+          outward_article_no: item.outward_article_no,
+          reply_article_no: item.reply_article_no,
+          article_no: item.article_no
+        })
+        .eq('id', item.id);
+    }
+  }
+
+  alert(`✅ Successfully allotted unique Outward & Reply barcodes to ${updates.length} accounts!`);
+  btn.disabled = false;
+  btn.innerText = "Assign Barcodes";
+  closeVfnBarcodeGenModal();
+  loadCentVfnData();
+}
+// ----------------------------------------------------------------------
+// UPU S10 CHECK DIGIT COMPUTATION 
+// ----------------------------------------------------------------------
+function calculateUPUS10CheckDigit(serial8Digits) {
+  const serialStr = String(serial8Digits).trim();
+  if (serialStr.length !== 8 || isNaN(serialStr)) {
+    throw new Error("Serial must be exactly 8 digits.");
+  }
+
+  const weights = [8, 6, 4, 2, 3, 5, 9, 7];
+  let weightedSum = 0;
+
+  for (let i = 0; i < 8; i++) {
+    weightedSum += parseInt(serialStr[i], 10) * weights[i];
+  }
+
+  const remainder = weightedSum % 11;
+  if (remainder === 0) return 5;
+  if (remainder === 1) return 0;
+  return 11 - remainder;
+}
+
+function buildUPUS10Barcode(prefix, serial8Digits, countryCode = 'IN') {
+  const serialStr = String(serial8Digits).padStart(8, '0');
+  const cd = calculateUPUS10CheckDigit(serialStr);
+  return `${prefix.trim().toUpperCase()}${serialStr}${cd}${countryCode.trim().toUpperCase()}`;
+}
+
+// Generates an SVG/Canvas base64 string for embedding into print windows
+function generateBarcodeBase64(barcodeNumber) {
+  try {
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, barcodeNumber, {
+      format: "CODE39",
+      width: 1.5,
+      height: 38,
+      displayValue: false, // We render custom formatted human-readable text below
+      margin: 2
+    });
+    return canvas.toDataURL("image/png");
+  } catch (err) {
+    console.error("Barcode generation error:", err);
+    return null;
+  }
+}
 // =========================================================================
 // FETCH TRUE REPO LAST-COMMIT DATE & TIME FROM GITHUB API
 // =========================================================================
