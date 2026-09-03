@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8354,31 +8355,29 @@ htmlArr.push(`
 }
 
 async function updateCentVfnScorecards() {
-  const { data: allStats, error } = await supabaseClient
-    .from('cent_percent_verification')
-    .select('status');
+  try {
+    // Run exact counts in parallel without loading 10k rows into browser memory
+    const [totalRes, printedRes, dispatchedRes, replyRes] = await Promise.all([
+      supabaseClient.from('cent_percent_verification').select('*', { count: 'exact', head: true }),
+      supabaseClient.from('cent_percent_verification').select('*', { count: 'exact', head: true }).eq('status', 'printed'),
+      supabaseClient.from('cent_percent_verification').select('*', { count: 'exact', head: true }).eq('status', 'dispatched'),
+      supabaseClient.from('cent_percent_verification').select('*', { count: 'exact', head: true }).eq('status', 'reply_received')
+    ]);
 
-  if (error || !allStats) return;
+    const total = totalRes.count || 0;
+    const printed = printedRes.count || 0;
+    const dispatched = dispatchedRes.count || 0;
+    const replyReceived = replyRes.count || 0;
+    const pending = Math.max(0, total - (printed + dispatched + replyReceived));
 
-  const total = allStats.length;
-  let printed = 0;
-  let dispatched = 0;
-  let replyReceived = 0;
-  let pending = 0;
-
-  allStats.forEach(item => {
-    const st = item.status;
-    if (st === 'reply_received') replyReceived++;
-    else if (st === 'dispatched') dispatched++;
-    else if (st === 'printed') printed++;
-    else pending++; // 'imported' / unprinted
-  });
-
-  if ($('vfnCardTotal')) $('vfnCardTotal').innerText = total.toLocaleString('en-IN');
-  if ($('vfnCardPrinted')) $('vfnCardPrinted').innerText = printed.toLocaleString('en-IN');
-  if ($('vfnCardDispatched')) $('vfnCardDispatched').innerText = dispatched.toLocaleString('en-IN');
-  if ($('vfnCardReplyReceived')) $('vfnCardReplyReceived').innerText = replyReceived.toLocaleString('en-IN');
-  if ($('vfnCardPending')) $('vfnCardPending').innerText = pending.toLocaleString('en-IN');
+    if ($('vfnCardTotal')) $('vfnCardTotal').innerText = total.toLocaleString('en-IN');
+    if ($('vfnCardPrinted')) $('vfnCardPrinted').innerText = printed.toLocaleString('en-IN');
+    if ($('vfnCardDispatched')) $('vfnCardDispatched').innerText = dispatched.toLocaleString('en-IN');
+    if ($('vfnCardReplyReceived')) $('vfnCardReplyReceived').innerText = replyReceived.toLocaleString('en-IN');
+    if ($('vfnCardPending')) $('vfnCardPending').innerText = pending.toLocaleString('en-IN');
+  } catch (err) {
+    console.error("Scorecard count error:", err);
+  }
 }
 async function populateCentVfnOfficeDropdown() {
   const dropdown = $('vfnFilterOffice');
@@ -8823,10 +8822,10 @@ function toggleVfnDeleteScopeInput() {
 function parseFinacleDate(dateVal) {
   if (dateVal === null || dateVal === undefined) return null;
 
-  // 1. Handle Excel Serial Date numbers (e.g. 44207 -> 2021-01-11)
+  // 1. Handle Excel Serial Numbers (if passed as numeric or string number)
   if (typeof dateVal === 'number' || (!isNaN(dateVal) && !isNaN(parseFloat(dateVal)) && String(dateVal).trim().length <= 6)) {
     const num = parseFloat(dateVal);
-    if (num > 20000 && num < 70000) { // Valid Excel date serial range (1954 to 2091)
+    if (num > 20000 && num < 70000) {
       const excelEpoch = new Date(Math.round((num - 25569) * 86400 * 1000));
       const yyyy = excelEpoch.getUTCFullYear();
       const mm = String(excelEpoch.getUTCMonth() + 1).padStart(2, '0');
@@ -8836,12 +8835,11 @@ function parseFinacleDate(dateVal) {
   }
 
   let s = String(dateVal).trim().toUpperCase();
-  // Strip quotes and carriage returns
-  s = s.replace(/["'\r\n]/g, '').trim();
+  s = s.replace(/["'\r\n\t]/g, '').trim();
 
-  if (['-', '--', 'NA', 'N/A', 'NULL', '0', ''].includes(s)) return null;
+  if (['', '-', '--', 'NA', 'N/A', 'NULL', '0', 'NIL'].includes(s)) return null;
 
-  // Strip timestamp portion if present (e.g., "11-JAN-21 00:00:00" -> "11-JAN-21")
+  // Discard trailing timestamp if attached (e.g., "11-JAN-2021 00:00:00")
   s = s.split(' ')[0].split('T')[0];
 
   const monthMap = {
@@ -8850,7 +8848,7 @@ function parseFinacleDate(dateVal) {
     'SEP': '09', 'SEPT': '09', 'OCT': '10', 'NOV': '11', 'DEC': '12'
   };
 
-  // 2. Match Finacle standard: DD-MMM-YY or DD-MMM-YYYY (e.g., 11-JAN-21, 5-OCT-2023, 11/JAN/21)
+  // Match: DD-MMM-YYYY or DD-MMM-YY (e.g., 11-JAN-2021, 11-JAN-21, 5-OCT-2023)
   const finacleMatch = s.match(/^(\d{1,2})[-/ ]([A-Z]{3,4})[-/ ](\d{2,4})$/);
   if (finacleMatch) {
     const dd = finacleMatch[1].padStart(2, '0');
@@ -8864,17 +8862,15 @@ function parseFinacleDate(dateVal) {
     }
   }
 
-  // 3. Match numeric: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD
+  // Match: DD/MM/YYYY or DD-MM-YYYY
   if (s.includes('/') || s.includes('-')) {
     const delim = s.includes('/') ? '/' : '-';
     const parts = s.split(delim);
     if (parts.length === 3) {
-      // YYYY-MM-DD
-      if (parts[0].length === 4) {
+      if (parts[0].length === 4) { // YYYY-MM-DD
         return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
       }
-      // DD-MM-YYYY or DD-MM-YY
-      if (parts[2].length === 4 || parts[2].length === 2) {
+      if (parts[2].length === 4 || parts[2].length === 2) { // DD-MM-YYYY
         let yy = parts[2];
         if (yy.length === 2) {
           yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
@@ -8884,7 +8880,7 @@ function parseFinacleDate(dateVal) {
     }
   }
 
-  // 4. Fallback: JavaScript Date object
+  // Fallback: Standard Date Object
   const d = new Date(s);
   if (!isNaN(d.getTime())) {
     const yyyy = d.getFullYear();
@@ -8895,7 +8891,6 @@ function parseFinacleDate(dateVal) {
 
   return null;
 }
-
 // -------------------------------------------------------------
 // MODAL CONTROLS & DROPDOWN SYNC
 // -------------------------------------------------------------
@@ -8983,7 +8978,6 @@ async function startCentVfnImportProcess() {
   const progressText = $('vfnImportProgressStatus');
   const progressCount = $('vfnImportProgressCount');
 
-  // UI Setup: Lock controls and show initial progress state
   if (btn) btn.disabled = true;
   if (progressBox) progressBox.classList.remove('hidden');
   if (progressBar) progressBar.style.width = '0%';
@@ -9004,8 +8998,8 @@ async function startCentVfnImportProcess() {
       let detectedTargetCount = null;
       let detectedSchemeFromHeader = '';
 
-      // Step 1: Scan top 35 rows for Total Live Accounts banner & table headers
-      for (let i = 0; i < Math.min(rawRows.length, 35); i++) {
+      // Scan top 50 rows for banner and headers
+      for (let i = 0; i < Math.min(rawRows.length, 50); i++) {
         const row = rawRows[i];
         if (!Array.isArray(row)) continue;
         const rowString = row.map(c => String(c ?? '').trim()).join(' ');
@@ -9033,21 +9027,22 @@ async function startCentVfnImportProcess() {
         return;
       }
 
-      // Step 2: Map Column Indices
-      const headers = rawRows[headerRowIndex].map(h => String(h || '').trim());
+      // Map Column Headers
+      const headers = rawRows[headerRowIndex].map(h => String(h || '').trim().replace(/["\r\n]/g, ''));
       const getColIdx = (pattern) => headers.findIndex(h => pattern.test(h));
 
       const colIdx = {
         acNo: getColIdx(/Account\s*(Number|No)/i),
-        cust1Name: getColIdx(/(Cust1\s*Name|Customer\s*Name|Name)/i),
+        cust1Name: getColIdx(/(Cust1\s*Name|Customer\s*Name|^Name$)/i),
         cust2Name: getColIdx(/Cust2\s*Name/i),
         cust3Name: getColIdx(/Cust3\s*Name/i),
         address: getColIdx(/Address/i),
         schemeCol: getColIdx(/(^Scheme(\s*Code|\s*Name)?$)|Product/i),
         acType: getColIdx(/(Account\s*Type|Mode\s*of\s*Operation|Account\s*Ownership|Acct\s*Type)/i),
         balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),
-        lastTxDate: getColIdx(/Date\s*of\s*Last\s*Transaction|Last\s*Txn/i),
-        officeName: getColIdx(/(BO\s*Name|Office\s*Name|SO\s*Name|Office)/i),
+        // Comprehensive Date Matcher
+        lastTxDate: getColIdx(/(Date\s*of\s*Last\s*Trans?(action)?|Last\s*Trans?(action)?\s*Date|Last\s*Txn(\s*Date)?|Dt\s*of\s*Last\s*Txn)/i),
+        officeName: getColIdx(/(BO\s*Name|Office\s*Name|SO\s*Name|^Office$)/i),
         mobileNo: getColIdx(/Mobile(\s*No)?/i)
       };
 
@@ -9055,11 +9050,10 @@ async function startCentVfnImportProcess() {
       const totalRows = rawRows.length;
       const currentUserId = currentUser?.id || null;
 
-      if (progressText) progressText.innerText = "Extracting & sanitizing records...";
+      if (progressText) progressText.innerText = "Extracting records from file...";
 
-      // Step 3: Loop Through Data Rows
       for (let i = headerRowIndex + 1; i < totalRows; i++) {
-        if (i % 250 === 0) await yieldThread();
+        if (i % 500 === 0) await yieldThread();
 
         const row = rawRows[i];
         if (!row || row.length === 0) continue;
@@ -9068,7 +9062,7 @@ async function startCentVfnImportProcess() {
         const cleanAcNo = rawAcNo.replace(/[^0-9]/g, '');
         if (!cleanAcNo || cleanAcNo.length < 5) continue;
 
-        // Determine Office Name
+        // Office Name
         let officeName = '';
         if (mode === 'manual') {
           officeName = selectedOffice;
@@ -9079,7 +9073,7 @@ async function startCentVfnImportProcess() {
           }
         }
 
-        // 1. SCHEME: Product/Denomination Code (e.g. TDIP5, SBGEN, SSA)
+        // Scheme
         let finalScheme = '';
         if (mode === 'manual') {
           finalScheme = selectedScheme;
@@ -9090,7 +9084,7 @@ async function startCentVfnImportProcess() {
           finalScheme = fileScheme || detectedSchemeFromHeader || 'GENERAL';
         }
 
-        // 2. ACCOUNT TYPE: Mode of Operation (SELF, JOINT-A, JOINT-B, MINOR)
+        // Account Type (Mode of Operation)
         let finalAccountType = 'SELF';
         if (colIdx.acType !== -1 && row[colIdx.acType]) {
           const rawType = String(row[colIdx.acType]).trim().toUpperCase();
@@ -9112,7 +9106,7 @@ async function startCentVfnImportProcess() {
           if (c2) finalAccountType = 'JOINT-A';
         }
 
-        // Customer Details & Address
+        // Customer Name
         const c1 = (colIdx.cust1Name !== -1 && row[colIdx.cust1Name]) ? String(row[colIdx.cust1Name]).trim() : '';
         const c2 = (colIdx.cust2Name !== -1 && row[colIdx.cust2Name]) ? String(row[colIdx.cust2Name]).trim() : '';
         const c3 = (colIdx.cust3Name !== -1 && row[colIdx.cust3Name]) ? String(row[colIdx.cust3Name]).trim() : '';
@@ -9128,9 +9122,8 @@ async function startCentVfnImportProcess() {
 
         // Date of Last Transaction
         const rawDateVal = (colIdx.lastTxDate !== -1 && row[colIdx.lastTxDate] !== undefined) ? row[colIdx.lastTxDate] : null;
-        const lastTxnDate = typeof parseFinacleDate === 'function' ? parseFinacleDate(rawDateVal) : rawDateVal;
+        const lastTxnDate = parseFinacleDate(rawDateVal);
 
-        // Mobile Number
         const mobileNo = (colIdx.mobileNo !== -1 && row[colIdx.mobileNo]) ? String(row[colIdx.mobileNo]).trim() : '';
 
         validRecords.push({
@@ -9151,6 +9144,7 @@ async function startCentVfnImportProcess() {
           last_event_record: `Imported [Scheme: ${finalScheme} | Mode: ${finalAccountType}]`
         });
 
+        // Only enforce header count in auto mode
         if (mode === 'auto' && detectedTargetCount && validRecords.length >= detectedTargetCount) {
           break;
         }
@@ -9162,8 +9156,8 @@ async function startCentVfnImportProcess() {
         return;
       }
 
-      // Step 4: Batch Upsert with Live Progress Bar Updates
-      const chunkSize = 200;
+      // Batch Upsert (Chunks of 500 for high-volume 10k+ rows)
+      const chunkSize = 500;
       let insertedTotal = 0;
 
       for (let i = 0; i < totalValid; i += chunkSize) {
@@ -9180,7 +9174,7 @@ async function startCentVfnImportProcess() {
 
         const pct = Math.min(100, Math.round((insertedTotal / totalValid) * 100));
         if (progressBar) progressBar.style.width = `${pct}%`;
-        if (progressText) progressText.innerText = `Importing records (${pct}%)...`;
+        if (progressText) progressText.innerText = `Uploading records (${pct}%)...`;
         if (progressCount) progressCount.innerText = `Process ${insertedTotal.toLocaleString('en-IN')} of ${totalValid.toLocaleString('en-IN')}`;
       }
 
@@ -9190,7 +9184,7 @@ async function startCentVfnImportProcess() {
       if (progressBar) progressBar.style.width = '100%';
       if (progressText) progressText.innerText = "Complete!";
 
-      alert(`Successfully imported ${insertedTotal} accounts (${mode === 'manual' ? `Office: ${selectedOffice}, Scheme: ${selectedScheme}` : `Auto Scheme: ${detectedSchemeFromHeader || 'Detected'}`})!`);
+      alert(`✅ Successfully imported all ${insertedTotal.toLocaleString('en-IN')} accounts!`);
       closeVfnImportModal();
       loadCentVfnData();
     } catch (err) {
@@ -9204,13 +9198,13 @@ async function startCentVfnImportProcess() {
     }
   };
 
-  // Parser Router
+  // Parser Execution
   try {
     if (isCsv && typeof Papa !== 'undefined') {
       Papa.parse(file, {
         header: false,
         skipEmptyLines: true,
-        fastMode: true,
+        fastMode: false, // Ensure full quoting & multiline support
         complete: async function(results) {
           await processRawRows(results.data);
         },
@@ -9231,13 +9225,12 @@ async function startCentVfnImportProcess() {
           const workbook = XLSX.read(data, { 
             type: 'array', 
             dense: true, 
-            cellDates: true,        // Parse Excel numeric dates into JavaScript Date objects
-            cellFormula: false,     // Skip formulas for fast processing
-            cellHTML: false,        // Skip HTML formatting
-            cellStyles: false,      // Skip cell styles to prevent high memory usage
-            dateNF: 'yyyy-mm-dd'    // Formatted date string mask
+            cellDates: true, 
+            cellFormula: false, 
+            cellHTML: false, 
+            cellStyles: false,
+            dateNF: 'yyyy-mm-dd'
           });
-          
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
           const rawSheetRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false });
@@ -9424,42 +9417,57 @@ function toggleVfnCounterReceivedState() {
 // SAVE STATUS UPDATE
 // -------------------------------------------------------------
 async function saveVfnStatusUpdate() {
-  const recordId = $('vfnModalRecordId').value;
-  const status = $('vfnModalStatusSelect').value;
-  const isCounterChecked = $('vfnModalReceivedAtCounter').checked;
-  
-  let article_no = $('vfnModalArticleNo').value.trim().toUpperCase();
-  let dispatched_date = $('vfnModalDispatchDate').value || null;
-  const reply_rxd_date = $('vfnModalReplyDate').value || null;
-  let remarks = $('vfnModalRemarks').value.trim();
+  const recordId = $('vfnModalRecordId')?.value;
+  if (!recordId) return alert("Record ID missing.");
 
-  // Validate reply date
+  // Locate the cached record safely
+  const existingRecord = (typeof cachedCentVfnRecords !== 'undefined')
+    ? cachedCentVfnRecords.find(item => String(item.id) === String(recordId))
+    : null;
+
+  const status = $('vfnModalStatusSelect')?.value || 'imported';
+  const isCounterChecked = $('vfnModalReceivedAtCounter')?.checked || false;
+  
+  let article_no = $('vfnModalArticleNo')?.value.trim().toUpperCase() || '';
+  let dispatched_date = $('vfnModalDispatchDate')?.value || null;
+  const reply_rxd_date = $('vfnModalReplyDate')?.value || null;
+  let remarks = $('vfnModalRemarks')?.value.trim() || '';
+
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  // Validation
   if (status === 'reply_received' && !reply_rxd_date) {
     return alert("Please enter the Date of Reply Received.");
   }
 
-  // If counter receipt was checked, clear postal dispatch fields
+  // Handle counter receipts without postal dispatch
   if (status === 'reply_received' && isCounterChecked) {
     article_no = '';
     dispatched_date = null;
     if (!remarks.toLowerCase().includes('counter')) {
-      remarks = remarks ? `${remarks} (Received at Counter)` : 'Received directly at counter';
+      remarks = remarks ? `${remarks} (Received at Counter)` : 'Received directly at counter without postal dispatch.';
     }
   }
-// Inside saveVfnStatusUpdate():
-const todayStr = new Date().toISOString().split('T')[0];
 
-const updates = {
-  status,
-  article_no,
-  dispatched_date: (status !== 'imported' && status !== 'printed') ? dispatched_date : null,
-  reply_rxd_date: (status === 'reply_received') ? reply_rxd_date : null,
-  printed_date: (status === 'printed') ? (r.printed_date || todayStr) : (status === 'imported' ? null : r.printed_date),
-  remark_entry_date: todayStr,
-  remarks,
-  updated_at: new Date().toISOString(),
-  last_event_record: status === 'printed' ? `Marked as Printed on ${todayStr}` : `Status updated to ${status}`
-};
+  // Safely resolve printed_date
+  let printed_date = existingRecord?.printed_date || null;
+  if (status === 'printed' && !printed_date) {
+    printed_date = todayStr;
+  }
+
+  const updates = {
+    status,
+    article_no,
+    dispatched_date: (status !== 'imported' && status !== 'printed') ? dispatched_date : null,
+    reply_rxd_date: (status === 'reply_received') ? reply_rxd_date : null,
+    printed_date,
+    remark_entry_date: todayStr,
+    remarks,
+    updated_at: new Date().toISOString(),
+    last_event_record: status === 'reply_received'
+      ? (isCounterChecked ? 'Verified at Counter' : `Reply Received on ${reply_rxd_date}`)
+      : `Status updated to ${status}`
+  };
 
   const btn = $('btnSaveVfnStatus');
   if (btn) {
@@ -9467,23 +9475,28 @@ const updates = {
     btn.innerText = "Saving...";
   }
 
-  const { error } = await supabaseClient
-    .from('cent_percent_verification')
-    .update(updates)
-    .eq('id', recordId);
+  try {
+    const { error } = await supabaseClient
+      .from('cent_percent_verification')
+      .update(updates)
+      .eq('id', recordId);
 
-  if (btn) {
-    btn.disabled = false;
-    btn.innerText = "Save Update";
-  }
+    if (error) throw error;
 
-  if (error) {
-    alert("Update failed: " + error.message);
-  } else {
     closeVfnStatusModal();
-    loadCentVfnData();
+    if (typeof loadCentVfnData === 'function') {
+      await loadCentVfnData();
+    }
+  } catch (err) {
+    alert("Save Update Failed: " + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Save Update";
+    }
   }
 }
+window.saveVfnStatusUpdate = saveVfnStatusUpdate;
 
 // -------------------------------------------------------------
 // SB-46 LETTER GENERATOR (PRINT ENGINE)
@@ -9699,19 +9712,20 @@ window.handlePrintConfirmationResponse = handlePrintConfirmationResponse;
 
 
 function renderSb46PrintWindow(accounts) {
-  const printWindow = window.open('', '_blank', 'width=900,height=800');
+  const printWindow = window.open('', '_blank', 'width=950,height=850');
   if (!printWindow) return alert("Popup blocked! Allow popups to print letters.");
 
-  let lettersHtml = '';
+  let pagesHtml = '';
 
   accounts.forEach((acc, i) => {
     const balStr = (parseFloat(acc.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
-    
-    // Resolve notice date: use existing printed_date if available, else current date
     const rawDate = acc.resolvedPrintDate || acc.printed_date || new Date().toISOString().split('T')[0];
     const noticeDateFormatted = typeof formatDate === 'function' ? formatDate(rawDate) : rawDate;
 
-    lettersHtml += `
+    // -------------------------------------------------------------
+    // PAGE 1: SB-46 INTIMATION LETTER & LOWER TEAR REPLY FORM
+    // -------------------------------------------------------------
+    pagesHtml += `
       <div class="page-letter">
         <div class="header">
           <h3>DEPARTMENT OF POSTS, INDIA</h3>
@@ -9721,7 +9735,7 @@ function renderSb46PrintWindow(accounts) {
         
         <div class="ref-bar">
           <div><b>SB-46</b></div>
-          <div style="text-align: center;"><b>Intimation to the depositor of the balance at credit of the account and his acknowledgement</b></div>
+          <div style="text-align: center;"><b>Intimation to the depositor of the balance at credit of the account and acknowledgement</b></div>
           <div></div>
         </div>
         
@@ -9732,20 +9746,19 @@ function renderSb46PrintWindow(accounts) {
         </div>
 
         <div class="to-address">
-          <br><b>To:</b><br>
-          ${acc.customer_name}<br>
+          <b>To:</b><br>
+          <b>${acc.customer_name}</b><br>
           ${acc.address || 'Address on record'}<br>          
           ${acc.mobile_no ? `<b>Contact:</b> ${acc.mobile_no}` : ''}
-          <br>
         </div>
 
         <div class="subject-line">
-          <b>Subject:</b> Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme})-reg
+          <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme}) - reg.
         </div>
 
         <div class="body-content">
-          <p style="margin: 4px 0;"><br>Dear Customer,</p><br>
-          <p style="margin: 4px 0;">The balance at credit of your Account No. <b>${acc.account_no}</b> standing open at <b>${acc.office_name}</b> (Post Office) as shown in the Post Office records is:</p>
+          <p style="margin: 4px 0;">Dear Customer,</p>
+          <p style="margin: 4px 0;">The balance at credit of your Account No. <b>${acc.account_no}</b> standing open at <b>${acc.office_name}</b> as shown in the Post Office records is:</p>
           
           <table class="data-table">
             <tr>
@@ -9754,7 +9767,7 @@ function renderSb46PrintWindow(accounts) {
             </tr>
             <tr>
               <th>Scheme - Account Type</th>
-              <td>${acc.scheme} - ${acc.account_type || 'SELF'}</td>
+              <td><b>${acc.scheme}</b> - ${acc.account_type || 'SELF'}</td>
             </tr>
             <tr>
               <th>Balance as per Office Ledger</th>
@@ -9765,17 +9778,17 @@ function renderSb46PrintWindow(accounts) {
               <td>${typeof formatDate === 'function' ? formatDate(acc.date_of_last_txn) : (acc.date_of_last_txn || 'N/A')}</td>
             </tr>
           </table>
-          <br>
+
           <p style="margin: 6px 0 0 0; text-align: justify; font-size: 11px; line-height: 1.45;">
-            Kindly examine your Passbook and see if this is correct. In any case, the correct balance as shown in your Passbook may please be noted in the form below which should be signed, dated and then enclosed in the attached addressed service cover to be posted by you at a very early date. The procedure is being followed for the detection of any mistake which might have occurred in the maintenance of your Savings Bank Account.
+            Kindly examine your Passbook and see if this balance is correct. In any case, the correct balance as shown in your Passbook may please be noted in the reply form below, which should be signed, dated, and enclosed in the attached service envelope (or folded along the score lines) to be posted back at an early date. This procedure is prescribed for statutory detection of any clerical or accounting discrepancy.
           </p>
         </div>
 
         <div class="sign-block">   
-          <br><br><p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division</p>
+          <p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division, Chennai - 600017</p>
         </div>
         
-        <div style="font-size: 10px; font-style: italic; color: #475569; margin-top: 4px;">Note – No postage stamp is required on the cover</div>
+        <div style="font-size: 10px; font-style: italic; color: #475569; margin-top: 4px;">Note – No postage stamp is required on the service cover / card.</div>
         
         <div class="tear-strip">
           ✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂
@@ -9793,16 +9806,13 @@ function renderSb46PrintWindow(accounts) {
           </div>
           
           <div style="margin-bottom: 6px; font-size: 10.5px; line-height: 1.35;">
-            <b>To:</b><br>
-            The Senior Superintendent of Post Offices,<br>
-            Chennai City Central Division, Chennai - 600017
+            <b>To:</b> The Senior Superintendent of Post Offices, Chennai City Central Division, Chennai - 600017
           </div>
 
           <p style="margin: 0 0 6px 0; text-align: justify; line-height: 1.5; font-size: 11px;">
-           <br> I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace; font-size: 11.5px;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
+            I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace; font-size: 11.5px;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
           </p>
 
-          <!-- LINE 1: Figures & As On Date -->
           <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px;">
             <span style="white-space: nowrap; font-weight: 600;">In Figures: <b>₹</b></span>
             <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 18px;"></div>
@@ -9810,7 +9820,6 @@ function renderSb46PrintWindow(accounts) {
             <div style="width: 140px; border-bottom: 1px dotted #000; min-height: 18px;"></div>
           </div>
 
-          <!-- LINE 2 & 3: Words -->
           <div style="margin-bottom: 4px;">
             <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 8px;">
               <span style="white-space: nowrap; font-weight: 600;">In Words: Rupees</span>
@@ -9821,8 +9830,7 @@ function renderSb46PrintWindow(accounts) {
               <span style="white-space: nowrap; font-weight: 600;">only.</span>
             </div>
           </div>
-          <br><br>
-          <!-- SIGNATURE & DATE BLOCK -->
+
           <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; padding-top: 6px;">
             <div style="font-size: 10.5px;">
               <div style="margin-bottom: 4px;"><b>Date:</b> ____________________</div>
@@ -9835,21 +9843,98 @@ function renderSb46PrintWindow(accounts) {
           </div>
         </div>
       </div>
+      
+      <div class="page-break"></div>
+
+      <!-- ------------------------------------------------------- -->
+      <!-- PAGE 2: TWO-WAY DISPATCH & RETURN FOLDABLE MAILER SLIP  -->
+      <!-- ------------------------------------------------------- -->
+      <div class="page-letter mailer-page">
+        <!-- TOP SECTION: OUTWARD DISPATCH TO DEPOSITOR -->
+        <div class="address-card outward-card">
+          <div class="card-header-badge">
+            <span>ON INDIA GOVERNMENT SERVICE</span>
+            <span class="postal-tag">SPEED POST / REGISTERED POST</span>
+          </div>
+
+          <div class="address-grid">
+            <div class="from-sub-box">
+              <span class="lbl">From (Sender):</span>
+              <p class="addr-text">
+                <b>The Senior Superintendent of Post Offices</b><br>
+                Chennai City Central Division<br>
+                Chennai - 600017
+              </p>
+              <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>
+            </div>
+
+            <div class="to-sub-box">
+              <span class="lbl">To (Recipient / Depositor):</span>
+              <p class="addr-main">
+                <b style="font-size: 13px;">${acc.customer_name}</b><br>
+                ${acc.address || 'Address on record'}<br>
+                <b>Post Office:</b> ${acc.office_name}<br>
+                ${acc.mobile_no ? `<b>Mob:</b> ${acc.mobile_no}` : ''}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER SCORE & FOLDING GUIDE -->
+        <div class="fold-guide-zone">
+          <div class="fold-line">----------------------------- ✂ FOLD HERE FOR RETURN COVER / TEAR SLIP ✂ -----------------------------</div>
+          <div class="fold-instructions">
+            Instructions: Fold inward along the horizontal dashed lines to align inside a standard 2-window envelope or fold as a self-mailer cover.
+          </div>
+        </div>
+
+        <!-- BOTTOM SECTION: INWARD RETURN TO SSPO (REPLY SLIP COVER) -->
+        <div class="address-card return-card">
+          <div class="card-header-badge return-badge">
+            <span>ON POSTAL SERVICE — SB-46 VERIFICATION REPLY</span>
+            <span class="postage-free-tag">NO POSTAGE STAMP REQUIRED</span>
+          </div>
+
+          <div class="address-grid">
+            <div class="from-sub-box">
+              <span class="lbl">From (Depositor / Sender):</span>
+              <p class="addr-text">
+                <b>${acc.customer_name}</b><br>
+                ${acc.address || 'Address on record'}<br>
+                <b>A/C No:</b> <span style="font-family: monospace;">${acc.account_no}</span> (${acc.scheme})<br>
+                <b>SO/BO:</b> ${acc.office_name}
+              </p>
+            </div>
+
+            <div class="to-sub-box highlight-to">
+              <span class="lbl">To (Official Addressee):</span>
+              <p class="addr-main" style="font-size: 13px; line-height: 1.45;">
+                <b>The Senior Superintendent of Post Offices</b><br>
+                Chennai City Central Division<br>
+                <b>CHENNAI - 600017</b><br>
+                <span style="font-size: 10px; font-weight: normal; color: #334155;">(Cent Percent Passbook Verification Cell)</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
       ${i < accounts.length - 1 ? '<div class="page-break"></div>' : ''}
     `;
   });
 
+  // Step 2: Open and format child print window
   printWindow.document.open();
   printWindow.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>SB-46 Intimation to the depositor</title>
+      <title>SB-46 Notices &amp; Dispatch Mailers</title>
       <style>
         @page { size: A4 portrait; margin: 8mm 12mm; }
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11.5px; color: #1e293b; margin: 0; padding: 0; }
-        .page-letter { padding: 4px 6px; min-height: 980px; position: relative; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11.5px; color: #1e293b; margin: 0; padding: 0; background: #fff; }
+        
+        .page-letter { padding: 6px 10px; min-height: 980px; position: relative; }
         .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 8px; }
         .header h3 { margin: 0; font-size: 13.5px; font-weight: 800; letter-spacing: 0.5px; }
         .header h4 { margin: 2px 0 0 0; font-size: 11.5px; font-weight: 700; }
@@ -9864,50 +9949,79 @@ function renderSb46PrintWindow(accounts) {
         .sign-block { margin-top: 10px; text-align: right; font-size: 11px; }
         .tear-strip { margin: 10px 0 6px 0; text-align: center; font-size: 9.5px; color: #64748b; user-select: none; }
         .reply-slip { border: 1.5px dashed #475569; padding: 8px 12px; background: #fafafa; border-radius: 4px; }
+        
+        /* PAGE 2 MAILER & WINDOW SLIP STYLING */
+        .mailer-page { display: flex; flex-direction: column; justify-content: space-between; min-height: 980px; padding: 14px 10px; }
+        .address-card { border: 2px solid #0f172a; border-radius: 6px; padding: 12px 14px; background: #ffffff; min-height: 240px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-header-badge { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; border-bottom: 1.5px solid #0f172a; padding-bottom: 4px; margin-bottom: 10px; letter-spacing: 0.5px; }
+        .postal-tag { background: #0f172a; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 9px; }
+        .return-badge { border-bottom-color: #065f46; color: #065f46; }
+        .postage-free-tag { border: 1px solid #065f46; color: #065f46; padding: 2px 6px; border-radius: 3px; font-size: 8.5px; font-weight: 800; }
+        
+        .address-grid { display: grid; grid-template-columns: 42% 58%; gap: 14px; align-items: start; }
+        .from-sub-box { border-right: 1px dashed #cbd5e1; padding-right: 12px; font-size: 11px; }
+        .to-sub-box { padding-left: 4px; font-size: 11.5px; }
+        .lbl { font-size: 9.5px; font-weight: 800; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 3px; }
+        .addr-text { margin: 0; line-height: 1.4; color: #334155; }
+        .addr-main { margin: 0; line-height: 1.45; color: #0f172a; }
+        .ref-sub { margin-top: 10px; font-size: 9.5px; font-weight: bold; color: #475569; }
+        .highlight-to { background: #f8fafc; padding: 8px 10px; border-radius: 4px; border: 1px solid #e2e8f0; }
+
+        /* FOLDING SCORELINE */
+        .fold-guide-zone { text-align: center; margin: 30px 0; border-top: 1.5px dashed #94a3b8; border-bottom: 1.5px dashed #94a3b8; padding: 10px 0; background: #fcfcfd; }
+        .fold-line { font-size: 10px; font-weight: bold; color: #64748b; letter-spacing: 0.5px; }
+        .fold-instructions { font-size: 9px; color: #94a3b8; margin-top: 4px; font-style: italic; }
+
         .page-break { page-break-after: always; }
         @media print { .no-print { display: none !important; } }
       </style>
     </head>
-  <body>
-  <div class="no-print" style="background: #f1f5f9; padding: 8px; text-align: right; border-bottom: 1px solid #cbd5e1;">
-    <button onclick="handleManualPrint()" style="background: #A80F28; color: white; border: none; padding: 6px 14px; font-weight: bold; border-radius: 4px; cursor: pointer;">🖨️ Print Notices (${accounts.length})</button>
-    <button onclick="handleManualClose()" style="margin-left: 6px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">Close &amp; Return</button>
-  </div>
-  ${lettersHtml}
-  <script>
-    function notifyParent() {
-      if (window.opener && !window.opener.closed && typeof window.opener.promptPrintConfirmation === 'function') {
-        window.opener.promptPrintConfirmation();
-      }
-    }
+    <body>
+      <div class="no-print" style="background: #f1f5f9; padding: 8px 14px; text-align: right; border-bottom: 1px solid #cbd5e1; position: sticky; top: 0; z-index: 50;">
+        <button onclick="handleManualPrint()" style="background: #A80F28; color: white; border: none; padding: 6px 16px; font-weight: bold; border-radius: 4px; cursor: pointer;">🖨️ Print All Notices &amp; Mailers (${accounts.length * 2} Pages)</button>
+        <button onclick="handleManualClose()" style="margin-left: 8px; padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1; cursor: pointer;">Close &amp; Return</button>
+      </div>
+      
+      ${pagesHtml}
 
-    function handleManualPrint() {
-      window.print();
-      notifyParent();
-    }
+      <script>
+        function notifyParent() {
+          if (window.opener && !window.opener.closed && typeof window.opener.promptPrintConfirmation === 'function') {
+            window.opener.promptPrintConfirmation();
+          }
+        }
 
-    function handleManualClose() {
-      notifyParent();
-      window.close();
-    }
+        function handleManualPrint() {
+          window.print();
+          notifyParent();
+        }
 
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-        notifyParent();
-      }, 500);
-    };
-  <\/script>
-</body>
+        function handleManualClose() {
+          notifyParent();
+          window.close();
+        }
+
+        window.onload = function() {
+          setTimeout(function() {
+            window.print();
+            notifyParent();
+          }, 500);
+        };
+      <\/script>
+    </body>
     </html>
   `);
   printWindow.document.close();
+
+  // Watchdog timer to notify the parent app when the print window closes
   const checkWindowClosed = setInterval(() => {
-  if (printWindow.closed) {
-    clearInterval(checkWindowClosed);
-    promptPrintConfirmation();
-  }
-}, 800);
+    if (printWindow.closed) {
+      clearInterval(checkWindowClosed);
+      if (typeof promptPrintConfirmation === 'function') {
+        promptPrintConfirmation();
+      }
+    }
+  }, 800);
 }
 
 
