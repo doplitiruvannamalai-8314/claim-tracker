@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9914,128 +9915,150 @@ function renderSb46PrintWindow(accounts) {
 
   let pagesHtml = '';
 
+  // India Post Red Wings SVG Emblem
+  const indiaPostLogoSvg = `
+    <svg viewBox="0 0 160 90" width="70" height="40" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+      <!-- Triangular Envelope Wing Shapes -->
+      <polygon points="10,80 150,15 150,45 10,80" fill="#C4161C" />
+      <polygon points="10,80 130,5 130,28 10,80" fill="#E31E24" />
+      <polygon points="10,80 100,0 100,18 10,80" fill="#FFC20E" />
+    </svg>
+  `;
+
   accounts.forEach((acc, i) => {
     const balStr = (parseFloat(acc.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
     const rawDate = acc.resolvedPrintDate || acc.printed_date || new Date().toISOString().split('T')[0];
     const noticeDateFormatted = typeof formatDate === 'function' ? formatDate(rawDate) : rawDate;
 
     // -------------------------------------------------------------
-    // PAGE 1: SB-46 INTIMATION LETTER & LOWER TEAR REPLY FORM
+    // PAGE 1: SB-46 NOTICE WITH BOTTOM-ALIGNED REPLY SLIP
     // -------------------------------------------------------------
     pagesHtml += `
-      <div class="page-letter">
-        <div class="header">
-          <h3>DEPARTMENT OF POSTS, INDIA</h3>
-          <h4>OFFICE OF THE SENIOR SUPERINTENDENT OF POST OFFICES</h4>
-          <p class="division-sub">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</p>
-        </div>
-        
-        <div class="ref-bar">
-          <div><b>SB-46</b></div>
-          <div style="text-align: center;"><b>Intimation to the depositor of the balance at credit of the account and acknowledgement</b></div>
-          <div></div>
-        </div>
-        
-        <div class="ref-bar">
-          <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
-          <div></div>
-          <div><b>Date:</b> ${noticeDateFormatted}</div>
-        </div>
-
-        <div class="to-address">
-          <b>To:</b><br>
-          <b>${acc.customer_name}</b><br>
-          ${acc.address || 'Address on record'}<br>          
-          ${acc.mobile_no ? `<b>Contact:</b> ${acc.mobile_no}` : ''}
-        </div>
-
-        <div class="subject-line">
-          <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme}) - reg.
-        </div>
-
-        <div class="body-content">
-          <p style="margin: 4px 0;">Dear Customer,</p>
-          <p style="margin: 4px 0;">The balance at credit of your Account No. <b>${acc.account_no}</b> standing open at <b>${acc.office_name}</b> as shown in the Post Office records is:</p>
-          
-          <table class="data-table">
-            <tr>
-              <th width="35%">Account Number</th>
-              <td><b style="font-family: monospace; font-size: 12px;">${acc.account_no}</b></td>
-            </tr>
-            <tr>
-              <th>Scheme - Account Type</th>
-              <td><b>${acc.scheme}</b> - ${acc.account_type || 'SELF'}</td>
-            </tr>
-            <tr>
-              <th>Balance as per Office Ledger</th>
-              <td><b style="font-size: 13px;">₹ ${balStr}</b></td>
-            </tr>
-            <tr>
-              <th>Date of Last Transaction</th>
-              <td>${typeof formatDate === 'function' ? formatDate(acc.date_of_last_txn) : (acc.date_of_last_txn || 'N/A')}</td>
-            </tr>
-          </table>
-
-          <p style="margin: 6px 0 0 0; text-align: justify; font-size: 11px; line-height: 1.45;">
-            Kindly examine your Passbook and see if this balance is correct. In any case, the correct balance as shown in your Passbook may please be noted in the reply form below, which should be signed, dated, and enclosed in the attached service envelope (or folded along the score lines) to be posted back at an early date. This procedure is prescribed for statutory detection of any clerical or accounting discrepancy.
-          </p>
-        </div>
-
-        <div class="sign-block">   
-          <br><br><p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division, Chennai - 600017</p>
-        </div>
-        
-        <div style="font-size: 10px; font-style: italic; color: #475569; margin-top: 4px;">Note – No postage stamp is required on the service cover .</div>
-        
-        <div class="tear-strip">
-          <br><br>✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂<br><br>
-        </div>
-        
-        <div class="reply-slip">
-          <div style="text-align: center; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 4px;">
-            REPLY FORM (SB-46)            
+      <div class="page-sheet page-notice">
+        <!-- TOP SECTION: HEADER + NOTICE BODY -->
+        <div class="notice-top-container">
+          <div class="header-banner">
+            <div class="header-text-block">
+              <h3>DEPARTMENT OF POSTS, INDIA</h3>
+              <h4>OFFICE OF THE SENIOR SUPERINTENDENT OF POST OFFICES</h4>
+              <p class="division-sub">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</p>
+            </div>
+            <div class="header-logo-block">
+              ${indiaPostLogoSvg}
+              <span class="logo-caption">भारतीय डाक<br>India Post</span>
+            </div>
           </div>
           
-          <div class="ref-bar" style="margin-bottom: 6px; padding-bottom: 2px;">
+          <div class="ref-bar">
+            <div><b>SB-46</b></div>
+            <div style="text-align: center;"><b>Intimation to the depositor of the balance at credit of the account and acknowledgement</b></div>
+            <div></div>
+          </div>
+          
+          <div class="ref-bar">
             <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
             <div></div>
             <div><b>Date:</b> ${noticeDateFormatted}</div>
           </div>
+
+          <div class="to-address">
+            <b>To:</b><br>
+            <b style="font-size: 12px;">${acc.customer_name}</b><br>
+            ${acc.address || 'Address on record'}<br>          
+            ${acc.mobile_no ? `<b>Contact:</b> ${acc.mobile_no}` : ''}
+          </div>
+
+          <div class="subject-line">
+            <b>Subject:</b> Cent Percent Verification of Post Office Savings Bank / Certificate Account No: <u>${acc.account_no}</u> (${acc.scheme}) - reg.
+          </div>
+
+          <div class="body-content">
+            <p style="margin: 3px 0;">Dear Customer,</p>
+            <p style="margin: 3px 0;">The balance at credit of your Account No. <b>${acc.account_no}</b> standing open at <b>${acc.office_name}</b> as shown in the Post Office records is:</p>
+            
+            <table class="data-table">
+              <tr>
+                <th width="35%">Account Number</th>
+                <td><b style="font-family: monospace; font-size: 12px;">${acc.account_no}</b></td>
+              </tr>
+              <tr>
+                <th>Scheme - Account Type</th>
+                <td><b>${acc.scheme}</b> - ${acc.account_type || 'SELF'}</td>
+              </tr>
+              <tr>
+                <th>Balance as per Office Ledger</th>
+                <td><b style="font-size: 12.5px;">₹ ${balStr}</b></td>
+              </tr>
+              <tr>
+                <th>Date of Last Transaction</th>
+                <td>${typeof formatDate === 'function' ? formatDate(acc.date_of_last_txn) : (acc.date_of_last_txn || 'N/A')}</td>
+              </tr>
+            </table>
+
+            <p style="margin: 4px 0 0 0; text-align: justify; font-size: 10.5px; line-height: 1.4;">
+              Kindly examine your Passbook and verify whether this balance is correct. In any case, the balance shown in your Passbook may please be entered in the reply form below, which should be signed, dated, and enclosed in the attached service envelope (or folded along the score lines) and posted back at an early date. This procedure is statutory for detecting any clerical or accounting discrepancy.
+            </p>
+          </div>
+
+          <div class="sign-block">   
+            <p><b>Assistant Superintendent / Inspector Posts</b><br>Chennai City Central Division, Chennai - 600017</p>
+          </div>
           
-          <div style="margin-bottom: 6px; font-size: 10.5px; line-height: 1.35;">
-            <b>To:</b> The Senior Superintendent of Post Offices, Chennai City Central Division, Chennai - 600017
+          <div style="font-size: 9.5px; font-style: italic; color: #475569; margin-top: 2px;">Note – No postage stamp is required on the service cover / reply card.</div>
+        </div>
+
+        <!-- BOTTOM SECTION: TEAR STRIP + REPLY FORM -->
+        <div class="notice-bottom-container">
+          <div class="tear-strip">
+            ✂ ------------------------------------------------ TEAR HERE &amp; RETURN ------------------------------------------------ ✂
           </div>
-
-          <p style="margin: 0 0 6px 0; text-align: justify; line-height: 1.5; font-size: 11px;">
-            I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace; font-size: 11.5px;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
-          </p>
-
-          <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px;">
-            <span style="white-space: nowrap; font-weight: 600;">In Figures: <b>₹</b></span>
-            <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 18px;"></div>
-            <span style="white-space: nowrap; font-weight: 600; margin-left: 8px;">as on (Date):</span>
-            <div style="width: 140px; border-bottom: 1px dotted #000; min-height: 18px;"></div>
-          </div>
-
-          <div style="margin-bottom: 4px;">
-            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 8px;">
-              <span style="white-space: nowrap; font-weight: 600;">In Words: Rupees</span>
-              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 18px;"></div>
+          
+          <div class="reply-slip">
+            <div style="text-align: center; font-weight: 800; font-size: 11.5px; letter-spacing: 0.5px; text-decoration: underline; margin-bottom: 3px;">
+              REPLY FORM (SB-46)            
             </div>
-            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 4px;">
-              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 18px;"></div>
-              <span style="white-space: nowrap; font-weight: 600;">only.</span>
+            
+            <div class="ref-bar" style="margin-bottom: 4px; padding-bottom: 1px;">
+              <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
+              <div></div>
+              <div><b>Date:</b> ${noticeDateFormatted}</div>
             </div>
-          </div>
+            
+            <div style="margin-bottom: 4px; font-size: 10px; line-height: 1.3;">
+              <b>To:</b> The Senior Superintendent of Post Offices, Chennai City Central Division, Chennai - 600017
+            </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; padding-top: 6px;">
-            <div style="font-size: 10.5px;">
-              <div style="margin-bottom: 4px;"><b>Date:</b> ____________________</div>
-              <div><b>Mobile No:</b> ____________________</div>
+            <p style="margin: 0 0 4px 0; text-align: justify; line-height: 1.4; font-size: 10.5px;">
+              I hereby confirm that the balance at credit of my <b>${acc.scheme}</b> Account No: <b style="font-family: monospace;">${acc.account_no}</b> standing open at <b>${acc.office_name}</b>, as shown in my passbook is:
+            </p>
+
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 6px;">
+              <span style="white-space: nowrap; font-weight: 600; font-size: 10.5px;">In Figures: <b>₹</b></span>
+              <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 16px;"></div>
+              <span style="white-space: nowrap; font-weight: 600; margin-left: 8px; font-size: 10.5px;">as on (Date):</span>
+              <div style="width: 140px; border-bottom: 1px dotted #000; min-height: 16px;"></div>
             </div>
-            <div style="text-align: center; font-size: 10.5px;">
-              <div style="width: 200px; border-bottom: 1px solid #000; margin-bottom: 4px;"></div>
-              <b>Signature / LTI of Depositor</b>
+
+            <div style="margin-bottom: 2px;">
+              <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 6px;">
+                <span style="white-space: nowrap; font-weight: 600; font-size: 10.5px;">In Words: Rupees</span>
+                <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 16px;"></div>
+              </div>
+              <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 4px;">
+                <div style="flex: 1; border-bottom: 1px dotted #000; min-height: 16px;"></div>
+                <span style="white-space: nowrap; font-weight: 600; font-size: 10.5px;">only.</span>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; padding-top: 4px;">
+              <div style="font-size: 10px;">
+                <div style="margin-bottom: 2px;"><b>Date:</b> ____________________</div>
+                <div><b>Mobile No:</b> ____________________</div>
+              </div>
+              <div style="text-align: center; font-size: 10px;">
+                <div style="width: 190px; border-bottom: 1px solid #000; margin-bottom: 2px;"></div>
+                <b>Signature / LTI of Depositor</b>
+              </div>
             </div>
           </div>
         </div>
@@ -10044,73 +10067,79 @@ function renderSb46PrintWindow(accounts) {
       <div class="page-break"></div>
 
       <!-- ------------------------------------------------------- -->
-      <!-- PAGE 2: TWO-WAY DISPATCH & RETURN FOLDABLE MAILER SLIP  -->
+      <!-- PAGE 2: FOLDABLE MAILER (EXACT 4/4 ZERO-MARGIN SHEET)  -->
       <!-- ------------------------------------------------------- -->
-      <div class="page-letter mailer-page">
-        <!-- TOP SECTION: OUTWARD DISPATCH TO DEPOSITOR -->
-        <div class="address-card outward-card">
-          <div class="card-header-badge">
-            <span>ON INDIA GOVERNMENT SERVICE</span>
-            <span class="postal-tag">SPEED POST / REGISTERED POST</span>
-          </div>
-
-          <div class="address-grid">
-            <div class="from-sub-box">
-              <span class="lbl">From (Sender):</span>
-              <p class="addr-text">
-                <b>The Senior Superintendent of Post Offices</b><br>
-                Chennai City Central Division<br>
-                Chennai - 600017
-              </p>
-              <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>
+      <div class="page-sheet page-mailer">
+        <!-- TOP 1/2 OF SHEET (OUTWARD DISPATCH IN TOP 1/4) -->
+        <div class="mailer-half top-half">
+          <div class="address-card outward-card">
+            <div class="card-header-badge">
+              <span>ON POSTAL SERVICE</span>
+              <span class="postal-tag">SPEED POST</span>
             </div>
 
-            <div class="to-sub-box">
-              <span class="lbl">To (Recipient / Depositor):</span>
-              <p class="addr-main">
-                <b style="font-size: 13px;">${acc.customer_name}</b><br>
-                ${acc.address || 'Address on record'}<br>
-                <b>Post Office:</b> ${acc.office_name}<br>
-                ${acc.mobile_no ? `<b>Mob:</b> ${acc.mobile_no}` : ''}
-              </p>
+            <div class="address-grid">
+              <div class="from-sub-box">
+                <span class="lbl">From:</span>
+                <p class="addr-text">
+                  <b>The Senior Superintendent of Post Offices</b><br>
+                  Chennai City Central Division<br>
+                  Chennai - 600017
+                </p>
+                <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>
+              </div>
+
+              <div class="to-sub-box">
+                <span class="lbl">To:</span>
+                <p class="addr-main">
+                  <b style="font-size: 12.5px;">${acc.customer_name}</b><br>
+                  ${acc.address || 'Address on record'}<br>                  
+                  <b>Post Office:</b> ${acc.office_name}<br>
+                  ${acc.mobile_no ? `<b>Mob:</b> ${acc.mobile_no}` : ''}
+                </p>
+              </div>
             </div>
           </div>
+
+          <div class="half-spacer"></div>
         </div>
 
-        <!-- CENTER SCORE & FOLDING GUIDE -->
-        <div class="fold-guide-zone">
-          <div class="fold-line">----------------------------- ✂ FOLD HERE FOR RETURN COVER / TEAR SLIP ✂ -----------------------------</div>
-          <div class="fold-instructions">
-            Instructions: Fold inward along the horizontal dashed lines to align inside a standard 2-window envelope or fold as a self-mailer cover.
-          </div>
+        <!-- CENTER SCORE & FOLD LINE GUIDE -->
+        <div class="center-score-strip">
+          <div class="score-line">------------------------------------ ✂ HORIZONTAL FOLD / TEAR LINE (A4 CENTER 148.5mm) ✂ ------------------------------------</div>
         </div>
 
-        <!-- BOTTOM SECTION: INWARD RETURN TO SSPO (REPLY SLIP COVER) -->
-        <div class="address-card return-card">
-          <div class="card-header-badge return-badge">
-            <span>ON POSTAL SERVICE — SB-46 VERIFICATION REPLY</span>
-            <span class="postage-free-tag">NO POSTAGE STAMP REQUIRED</span>
-          </div>
+        <!-- BOTTOM 1/2 OF SHEET (INWARD REPLY IN BOTTOM 1/4) -->
+        <div class="mailer-half bottom-half">
+          <div class="half-spacer"></div>
 
-          <div class="address-grid">
-            <div class="from-sub-box">
-              <span class="lbl">From (Depositor / Sender):</span>
-              <p class="addr-text">
-                <b>${acc.customer_name}</b><br>
-                ${acc.address || 'Address on record'}<br>
-                <b>A/C No:</b> <span style="font-family: monospace;">${acc.account_no}</span> (${acc.scheme})<br>
-                <b>SO/BO:</b> ${acc.office_name}
-              </p>
+          <div class="address-card return-card">
+            <div class="card-header-badge return-badge">
+              <span>ON POSTAL SERVICE — SB-46 VERIFICATION REPLY</span>
+              <span class="postage-free-tag">NO POSTAGE STAMP REQUIRED</span>
             </div>
 
-            <div class="to-sub-box highlight-to">
-              <span class="lbl">To (Official Addressee):</span>
-              <p class="addr-main" style="font-size: 13px; line-height: 1.45;">
-                <b>The Senior Superintendent of Post Offices</b><br>
-                Chennai City Central Division<br>
-                <b>CHENNAI - 600017</b><br>
-                <span style="font-size: 10px; font-weight: normal; color: #334155;">(Cent Percent Passbook Verification Cell)</span>
-              </p>
+            <div class="address-grid">
+              <div class="from-sub-box">
+                <span class="lbl">From:</span>
+                <p class="addr-text">
+                  <b>${acc.customer_name}</b><br>
+                  ${acc.address || 'Address on record'}<br>   
+                  <b>A/C No:</b> <span style="font-family: monospace;">${acc.account_no}</span> (${acc.scheme})<br>
+                  <b>SO/BO:</b> ${acc.office_name}
+                </p>
+                <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>               
+              </div>
+
+              <div class="to-sub-box highlight-to">
+                <span class="lbl">To:</span>
+                <p class="addr-main" style="font-size: 12.5px; line-height: 1.4;">
+                  <b>The Senior Superintendent of Post Offices</b><br>
+                  Chennai City Central Division<br>
+                  <b>CHENNAI - 600017</b><br>
+                  <span style="font-size: 9.5px; color: #475569; font-weight: normal;">(Cent Percent Verification Cell)</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -10119,7 +10148,6 @@ function renderSb46PrintWindow(accounts) {
     `;
   });
 
-  // Step 2: Open and format child print window
   printWindow.document.open();
   printWindow.document.write(`
     <!DOCTYPE html>
@@ -10127,47 +10155,135 @@ function renderSb46PrintWindow(accounts) {
     <head>
       <title>SB-46 Notices &amp; Dispatch Mailers</title>
       <style>
-        @page { size: A4 portrait; margin: 8mm 12mm; }
+        /* Exact A4 sheet with 0 margin to make folding geometry 100% precise */
+        @page { size: A4 portrait; margin: 0; }
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11.5px; color: #1e293b; margin: 0; padding: 0; background: #fff; }
-        
-        .page-letter { padding: 6px 10px; min-height: 980px; position: relative; }
-        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 8px; }
-        .header h3 { margin: 0; font-size: 13.5px; font-weight: 800; letter-spacing: 0.5px; }
-        .header h4 { margin: 2px 0 0 0; font-size: 11.5px; font-weight: 700; }
-        .header .division-sub { margin: 2px 0 0 0; font-size: 9.5px; font-weight: 600; color: #475569; }
-        .ref-bar { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 3px; }
-        .to-address { margin-bottom: 8px; line-height: 1.35; font-size: 11px; }
-        .subject-line { font-size: 11px; margin: 6px 0; padding: 3px 0; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; }
-        .body-content { line-height: 1.45; text-align: justify; }
-        .data-table { width: 100%; border-collapse: collapse; margin: 6px 0; }
-        .data-table th, .data-table td { border: 1px solid #64748b; padding: 4px 6px; font-size: 11px; }
-        .data-table th { background: #f8fafc; text-align: left; }
-        .sign-block { margin-top: 10px; text-align: right; font-size: 11px; }
-        .tear-strip { margin: 10px 0 6px 0; text-align: center; font-size: 9.5px; color: #64748b; user-select: none; }
-        .reply-slip { border: 1.5px dashed #475569; padding: 8px 12px; background: #fafafa; border-radius: 4px; }
-        
-        /* PAGE 2 MAILER & WINDOW SLIP STYLING */
-        .mailer-page { display: flex; flex-direction: column; justify-content: space-between; min-height: 980px; padding: 14px 10px; }
-        .address-card { border: 2px solid #0f172a; border-radius: 6px; padding: 12px 14px; background: #ffffff; min-height: 240px; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-header-badge { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; border-bottom: 1.5px solid #0f172a; padding-bottom: 4px; margin-bottom: 10px; letter-spacing: 0.5px; }
-        .postal-tag { background: #0f172a; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 9px; }
-        .return-badge { border-bottom-color: #065f46; color: #065f46; }
-        .postage-free-tag { border: 1px solid #065f46; color: #065f46; padding: 2px 6px; border-radius: 3px; font-size: 8.5px; font-weight: 800; }
-        
-        .address-grid { display: grid; grid-template-columns: 42% 58%; gap: 14px; align-items: start; }
-        .from-sub-box { border-right: 1px dashed #cbd5e1; padding-right: 12px; font-size: 11px; }
-        .to-sub-box { padding-left: 4px; font-size: 11.5px; }
-        .lbl { font-size: 9.5px; font-weight: 800; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 3px; }
-        .addr-text { margin: 0; line-height: 1.4; color: #334155; }
-        .addr-main { margin: 0; line-height: 1.45; color: #0f172a; }
-        .ref-sub { margin-top: 10px; font-size: 9.5px; font-weight: bold; color: #475569; }
-        .highlight-to { background: #f8fafc; padding: 8px 10px; border-radius: 4px; border: 1px solid #e2e8f0; }
+        body { 
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+          font-size: 11px; 
+          color: #1e293b; 
+          margin: 0; 
+          padding: 0; 
+          background: #fff; 
+        }
 
-        /* FOLDING SCORELINE */
-        .fold-guide-zone { text-align: center; margin: 30px 0; border-top: 1.5px dashed #94a3b8; border-bottom: 1.5px dashed #94a3b8; padding: 10px 0; background: #fcfcfd; }
-        .fold-line { font-size: 10px; font-weight: bold; color: #64748b; letter-spacing: 0.5px; }
-        .fold-instructions { font-size: 9px; color: #94a3b8; margin-top: 4px; font-style: italic; }
+        /* ---------------- PAGE 1 STYLING ---------------- */
+        .page-sheet {
+          width: 210mm;
+          height: 297mm;
+          max-height: 297mm;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .page-notice {
+          padding: 10mm 12mm 8mm 12mm;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between; /* Pushes reply form firmly to bottom */
+        }
+
+        .header-banner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #000;
+          padding-bottom: 4px;
+          margin-bottom: 6px;
+        }
+
+        .header-text-block { flex: 1; text-align: center; }
+        .header-text-block h3 { margin: 0; font-size: 13.5px; font-weight: 800; letter-spacing: 0.5px; }
+        .header-text-block h4 { margin: 2px 0 0 0; font-size: 11px; font-weight: 700; }
+        .header-text-block .division-sub { margin: 1px 0 0 0; font-size: 9px; font-weight: 600; color: #475569; }
+
+        .header-logo-block {
+          width: 80px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .logo-caption { font-size: 7.5px; font-weight: 800; color: #C4161C; line-height: 1; margin-top: 1px; }
+
+        .ref-bar { display: flex; justify-content: space-between; font-size: 10.5px; margin-bottom: 5px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 2px; }
+        .to-address { margin-bottom: 6px; line-height: 1.3; font-size: 10.5px; }
+        .subject-line { font-size: 10.5px; margin: 5px 0; padding: 3px 0; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; }
+        .body-content { line-height: 1.4; text-align: justify; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 5px 0; }
+        .data-table th, .data-table td { border: 1px solid #64748b; padding: 3px 6px; font-size: 10.5px; }
+        .data-table th { background: #f8fafc; text-align: left; }
+        .sign-block { margin-top: 6px; text-align: right; font-size: 10.5px; }
+        
+        .tear-strip { text-align: center; font-size: 9px; color: #64748b; margin: 4px 0 3px 0; user-select: none; }
+        .reply-slip { border: 1.5px dashed #475569; padding: 6px 10px; background: #fafafa; border-radius: 4px; }
+
+        /* ---------------- PAGE 2 STYLING (EXACT 4/4 SPLIT) ---------------- */
+        .page-mailer {
+          display: flex;
+          flex-direction: column;
+          height: 297mm;
+          padding: 0;
+        }
+
+        .mailer-half {
+          height: 147mm; /* Exactly half of A4 minus center border */
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 10mm 14mm;
+        }
+
+        /* Top half: Outward card is in the top quarter */
+        .top-half .address-card { margin-top: 0; }
+        .half-spacer { flex: 1; }
+
+        /* Bottom half: Return card is placed in the bottom quarter */
+        .bottom-half .address-card { margin-bottom: 0; }
+
+        .center-score-strip {
+          height: 3mm;
+          border-top: 1.5px dashed #94a3b8;
+          border-bottom: 1.5px dashed #94a3b8;
+          background: #f8fafc;
+          text-align: center;
+          line-height: 2.8mm;
+        }
+        .score-line { font-size: 8px; font-weight: bold; color: #64748b; letter-spacing: 0.5px; }
+
+        .address-card {
+          border: 2px solid #0f172a;
+          border-radius: 6px;
+          padding: 10px 12px;
+          background: #ffffff;
+          height: 62mm; /* Fits neatly inside the 74mm quadrant */
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .card-header-badge {
+          display: flex;
+          justify-content: space-between;
+          font-size: 9px;
+          font-weight: 800;
+          border-bottom: 1.5px solid #0f172a;
+          padding-bottom: 3px;
+          margin-bottom: 6px;
+        }
+        .postal-tag { background: #0f172a; color: #fff; padding: 1px 5px; border-radius: 2px; font-size: 8.5px; }
+        .return-badge { border-bottom-color: #065f46; color: #065f46; }
+        .postage-free-tag { border: 1px solid #065f46; color: #065f46; padding: 1px 5px; border-radius: 2px; font-size: 8px; font-weight: 800; }
+
+        .address-grid { display: grid; grid-template-columns: 44% 56%; gap: 10px; align-items: start; }
+        .from-sub-box { border-right: 1px dashed #cbd5e1; padding-right: 10px; font-size: 10px; }
+        .to-sub-box { padding-left: 2px; font-size: 10.5px; }
+        .lbl { font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 2px; }
+        .addr-text { margin: 0; line-height: 1.35; color: #334155; font-size: 10px; }
+        .addr-main { margin: 0; line-height: 1.35; color: #0f172a; }
+        .ref-sub { margin-top: 6px; font-size: 9px; font-weight: bold; color: #475569; }
+        .highlight-to { background: #f8fafc; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
 
         .page-break { page-break-after: always; }
         @media print { .no-print { display: none !important; } }
@@ -10210,7 +10326,7 @@ function renderSb46PrintWindow(accounts) {
   `);
   printWindow.document.close();
 
-  // Watchdog timer to notify the parent app when the print window closes
+  // Watchdog timer in case user closes the print window via the browser's top-right 'X'
   const checkWindowClosed = setInterval(() => {
     if (printWindow.closed) {
       clearInterval(checkWindowClosed);
@@ -10220,8 +10336,6 @@ function renderSb46PrintWindow(accounts) {
     }
   }, 800);
 }
-
-
 function formatDate(dateString) {
   if (!dateString) return 'N/A';
   const date = new Date(dateString);
