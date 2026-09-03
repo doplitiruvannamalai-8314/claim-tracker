@@ -8822,7 +8822,7 @@ function toggleVfnDeleteScopeInput() {
 function parseFinacleDate(dateVal) {
   if (dateVal === null || dateVal === undefined) return null;
 
-  // 1. Handle Excel Serial Numbers (if passed as numeric or string number)
+  // 1. Handle Excel numeric serial dates (e.g., 44481 -> 2021-10-12)
   if (typeof dateVal === 'number' || (!isNaN(dateVal) && !isNaN(parseFloat(dateVal)) && String(dateVal).trim().length <= 6)) {
     const num = parseFloat(dateVal);
     if (num > 20000 && num < 70000) {
@@ -8834,12 +8834,14 @@ function parseFinacleDate(dateVal) {
     }
   }
 
+  // 2. Clean and uppercase the string
   let s = String(dateVal).trim().toUpperCase();
-  s = s.replace(/["'\r\n\t]/g, '').trim();
+  // Strip hidden carriage returns, quotes, and non-breaking spaces
+  s = s.replace(/[\r\n\t"'\u00A0]/g, '').trim();
 
-  if (['', '-', '--', 'NA', 'N/A', 'NULL', '0', 'NIL'].includes(s)) return null;
+  if (!s || ['-', '--', 'NA', 'N/A', 'NULL', '0', 'NIL'].includes(s)) return null;
 
-  // Discard trailing timestamp if attached (e.g., "11-JAN-2021 00:00:00")
+  // Discard trailing timestamp if attached (e.g., "12-OCT-21 00:00:00")
   s = s.split(' ')[0].split('T')[0];
 
   const monthMap = {
@@ -8848,29 +8850,34 @@ function parseFinacleDate(dateVal) {
     'SEP': '09', 'SEPT': '09', 'OCT': '10', 'NOV': '11', 'DEC': '12'
   };
 
-  // Match: DD-MMM-YYYY or DD-MMM-YY (e.g., 11-JAN-2021, 11-JAN-21, 5-OCT-2023)
+  // 3. Match Finacle standard: DD-MMM-YY or DD-MMM-YYYY (e.g., 12-Oct-21, 12-OCT-2021, 05-NOV-23)
   const finacleMatch = s.match(/^(\d{1,2})[-/ ]([A-Z]{3,4})[-/ ](\d{2,4})$/);
   if (finacleMatch) {
     const dd = finacleMatch[1].padStart(2, '0');
-    const mm = monthMap[finacleMatch[2]];
+    const mStr = finacleMatch[2].substring(0, 3); // Take first 3 letters (OCT from OCT or OCTO)
+    const mm = monthMap[mStr];
     let yy = finacleMatch[3];
+
     if (mm) {
       if (yy.length === 2) {
+        // Expand 2-digit century: > 40 becomes 19xx, <= 40 becomes 20xx (21 -> 2021)
         yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
       }
       return `${yy}-${mm}-${dd}`;
     }
   }
 
-  // Match: DD/MM/YYYY or DD-MM-YYYY
+  // 4. Match numeric: DD/MM/YYYY, DD-MM-YYYY, or DD-MM-YY
   if (s.includes('/') || s.includes('-')) {
     const delim = s.includes('/') ? '/' : '-';
     const parts = s.split(delim);
     if (parts.length === 3) {
-      if (parts[0].length === 4) { // YYYY-MM-DD
+      // Format: YYYY-MM-DD
+      if (parts[0].length === 4) {
         return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
       }
-      if (parts[2].length === 4 || parts[2].length === 2) { // DD-MM-YYYY
+      // Format: DD-MM-YYYY or DD-MM-YY
+      if (parts[2].length === 4 || parts[2].length === 2) {
         let yy = parts[2];
         if (yy.length === 2) {
           yy = (parseInt(yy, 10) > 40) ? `19${yy}` : `20${yy}`;
@@ -8880,7 +8887,7 @@ function parseFinacleDate(dateVal) {
     }
   }
 
-  // Fallback: Standard Date Object
+  // 5. Native JS Date Parser fallback
   const d = new Date(s);
   if (!isNaN(d.getTime())) {
     const yyyy = d.getFullYear();
@@ -8891,7 +8898,7 @@ function parseFinacleDate(dateVal) {
 
   return null;
 }
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
 // MODAL CONTROLS & DROPDOWN SYNC
 // -------------------------------------------------------------
 function openVfnImportModal() {
@@ -9039,8 +9046,7 @@ async function startCentVfnImportProcess() {
         address: getColIdx(/Address/i),
         schemeCol: getColIdx(/(^Scheme(\s*Code|\s*Name)?$)|Product/i),
         acType: getColIdx(/(Account\s*Type|Mode\s*of\s*Operation|Account\s*Ownership|Acct\s*Type)/i),
-        balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),
-        // Comprehensive Date Matcher
+        balance: getColIdx(/Balance(\s*After\s*Transaction)?/i),        
         lastTxDate: getColIdx(/(Date\s*of\s*Last\s*Trans?(action)?|Last\s*Trans?(action)?\s*Date|Last\s*Txn(\s*Date)?|Dt\s*of\s*Last\s*Txn)/i),
         officeName: getColIdx(/(BO\s*Name|Office\s*Name|SO\s*Name|^Office$)/i),
         mobileNo: getColIdx(/Mobile(\s*No)?/i)
@@ -9120,8 +9126,10 @@ async function startCentVfnImportProcess() {
           : '0';
         const balance = parseFloat(rawBal) || 0.0;
 
-        // Date of Last Transaction
-        const rawDateVal = (colIdx.lastTxDate !== -1 && row[colIdx.lastTxDate] !== undefined) ? row[colIdx.lastTxDate] : null;
+        const rawDateVal = (colIdx.lastTxDate !== -1 && row[colIdx.lastTxDate] !== undefined) 
+          ? row[colIdx.lastTxDate] 
+          : null;
+        
         const lastTxnDate = parseFinacleDate(rawDateVal);
 
         const mobileNo = (colIdx.mobileNo !== -1 && row[colIdx.mobileNo]) ? String(row[colIdx.mobileNo]).trim() : '';
