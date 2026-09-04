@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9211,24 +9209,153 @@ async function loadCentVfnDatewiseReport() {
   }
 }
 let masterSchemesList = [];
+window.masterSchemesList = window.masterSchemesList || [];
+// Shared global cache for master schemes
+window.masterSchemesList = window.masterSchemesList || [];
 
+// -------------------------------------------------------------
+// 1. LOAD SCHEMES & POPULATE ALL DROPDOWNS DYNAMICALLY
+// -------------------------------------------------------------
 async function loadSchemeMaster() {
-  const { data, error } = await supabaseClient
-    .from('cent_vfn_schemes')
-    .select('*')
-    .order('product_group', { ascending: true })
-    .order('scheme_code', { ascending: true });
+  try {
+    const { data, error } = await supabaseClient
+      .from('cent_vfn_schemes')
+      .select('*')
+      .order('product_group', { ascending: true })
+      .order('scheme_code', { ascending: true });
 
-  if (error) {
-    console.error("Failed to load scheme master:", error);
+    if (error) throw error;
+
+    // Fallback self-seed if table is returned empty
+    if (!data || data.length === 0) {
+      console.warn("cent_vfn_schemes empty, attempting client auto-seed...");
+      await autoSeedMasterSchemes();
+      return;
+    }
+
+    masterSchemesList = data;
+
+    // Render Master Management Modal Table
+    renderSchemeMasterTable();
+
+    // Dynamically Populate Dropdowns:
+    // A. Main View Filter: Product Group & Scheme
+    populateCascadingFilterDropdowns();
+
+    // B. Import Accounts Modal: Select Scheme Name Dropdown
+    populateVfnImportSchemeDropdown();
+
+    // C. Barcode Generator Modal: Scheme Target Dropdown (if present)
+    populateVfnBarcodeSchemeDropdown();
+
+  } catch (err) {
+    console.error("loadSchemeMaster error:", err);
+    const tbody = $('vfnSchemeMasterTableBody');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-rose-600">Failed to load: ${err.message}</td></tr>`;
+  }
+}
+
+// -------------------------------------------------------------
+// 2. POPULATE IMPORT ACCOUNTS MODAL SCHEME DROPDOWN
+// -------------------------------------------------------------
+function populateVfnImportSchemeDropdown() {
+  const select = $('vfnImportSchemeDropdown');
+  if (!select) return;
+
+  if (!masterSchemesList.length) {
+    select.innerHTML = `<option value="">-- No Schemes Configured --</option>`;
     return;
   }
 
-  masterSchemesList = data || [];
-  renderSchemeMasterTable();
-  populateCascadingFilterDropdowns();
+  // Group options by Product Group in optgroups
+  const grouped = {};
+  masterSchemesList.forEach(s => {
+    const grpKey = `${s.product_group} - ${s.product_group_name}`;
+    if (!grouped[grpKey]) grouped[grpKey] = [];
+    grouped[grpKey].push(s);
+  });
+
+  let optionsHtml = '';
+  for (const [groupTitle, schemes] of Object.entries(grouped)) {
+    optionsHtml += `<optgroup label="${groupTitle}">`;
+    schemes.forEach(s => {
+      optionsHtml += `<option value="${s.scheme_code}">${s.scheme_code} - ${s.scheme_description}</option>`;
+    });
+    optionsHtml += `</optgroup>`;
+  }
+
+  select.innerHTML = optionsHtml;
 }
 
+// -------------------------------------------------------------
+// 3. POPULATE CASCADING FILTERS (PRODUCT GROUP -> SCHEME)
+// -------------------------------------------------------------
+function populateCascadingFilterDropdowns() {
+  const groupSelect = $('vfnFilterProductGroup');
+  const schemeSelect = $('vfnFilterScheme');
+  if (!groupSelect || !schemeSelect) return;
+
+  // Build unique product groups
+  const groupsMap = new Map();
+  masterSchemesList.forEach(s => {
+    if (!groupsMap.has(s.product_group)) {
+      groupsMap.set(s.product_group, s.product_group_name);
+    }
+  });
+
+  let groupHtml = `<option value="">-- All Product Groups --</option>`;
+  groupsMap.forEach((name, code) => {
+    groupHtml += `<option value="${code}">${code} - ${name}</option>`;
+  });
+  groupSelect.innerHTML = groupHtml;
+
+  // Initial population of schemes
+  onProductGroupFilterChange(false);
+}
+
+function onProductGroupFilterChange(triggerFetch = true) {
+  const selectedGroup = $('vfnFilterProductGroup')?.value || '';
+  const schemeSelect = $('vfnFilterScheme');
+  if (!schemeSelect) return;
+
+  const currentSelectedScheme = schemeSelect.value;
+
+  let filteredSchemes = masterSchemesList;
+  if (selectedGroup) {
+    filteredSchemes = masterSchemesList.filter(s => s.product_group === selectedGroup);
+  }
+
+  let schemeHtml = `<option value="">-- All Schemes --</option>`;
+  filteredSchemes.forEach(s => {
+    schemeHtml += `<option value="${s.scheme_code}">${s.scheme_code} (${s.scheme_description})</option>`;
+  });
+  schemeSelect.innerHTML = schemeHtml;
+
+  // Preserve previous choice if it still exists
+  if (currentSelectedScheme && filteredSchemes.some(s => s.scheme_code === currentSelectedScheme)) {
+    schemeSelect.value = currentSelectedScheme;
+  }
+
+  if (triggerFetch && typeof loadCentVfnData === 'function') {
+    loadCentVfnData();
+  }
+}
+
+// Optional helper for Barcode Modal target scheme
+function populateVfnBarcodeSchemeDropdown() {
+  const select = $('vfnBarTargetScheme');
+  if (!select) return;
+
+  let html = `<option value="ALL">All Schemes (Pending Only)</option>`;
+  masterSchemesList.forEach(s => {
+    html += `<option value="${s.scheme_code}">${s.scheme_code} (${s.scheme_description})</option>`;
+  });
+  select.innerHTML = html;
+}
+
+// -------------------------------------------------------------
+// 4. SCHEME MASTER MODAL CONTROLS & CRUD
+// -------------------------------------------------------------
 function openSchemeMasterModal() {
   $('vfnSchemeMasterModal')?.classList.remove('hidden');
   loadSchemeMaster();
@@ -9243,19 +9370,19 @@ function renderSchemeMasterTable() {
   if (!tbody) return;
 
   if (!masterSchemesList.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No schemes defined.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No master schemes found. Use the form above to add schemes.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = masterSchemesList.map(s => `
-    <tr class="hover:bg-amber-50/40 transition">
+    <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
       <td class="p-2 font-bold font-mono text-purple-900">${s.scheme_code}</td>
       <td class="p-2 font-bold text-slate-700">${s.product_group}</td>
       <td class="p-2 text-slate-800">${s.product_group_name}</td>
       <td class="p-2 text-slate-600">${s.scheme_description}</td>
       <td class="p-2 text-center">
-        <button type="button" onclick="deleteSchemeMasterRecord('${s.scheme_code}')" class="text-rose-600 hover:text-rose-800 font-bold text-[10px]">
-          Delete
+        <button type="button" onclick="deleteSchemeMasterRecord('${s.scheme_code}')" class="text-rose-600 hover:text-rose-800 font-bold text-[11px] px-1.5 py-0.5 rounded hover:bg-rose-50 cursor-pointer">
+          🗑️ Delete
         </button>
       </td>
     </tr>
@@ -9263,71 +9390,80 @@ function renderSchemeMasterTable() {
 }
 
 async function saveSchemeMasterRecord() {
-  const scheme_code = $('smSchemeCode').value.trim().toUpperCase();
-  const product_group = $('smProductGroup').value.trim().toUpperCase();
-  const product_group_name = $('smGroupName').value.trim();
-  const scheme_description = $('smDescription').value.trim();
+  const scheme_code = $('smSchemeCode')?.value.trim().toUpperCase();
+  const product_group = $('smProductGroup')?.value.trim().toUpperCase();
+  const product_group_name = $('smGroupName')?.value.trim();
+  const scheme_description = $('smDescription')?.value.trim();
 
   if (!scheme_code || !product_group || !product_group_name || !scheme_description) {
-    return alert("Please fill all scheme fields.");
+    return alert("Please fill in Scheme ID, Product Group, Group Name, and Description.");
   }
 
   const { error } = await supabaseClient
     .from('cent_vfn_schemes')
-    .upsert({ scheme_code, product_group, product_group_name, scheme_description });
+    .upsert({
+      scheme_code,
+      product_group,
+      product_group_name,
+      scheme_description,
+      created_at: new Date().toISOString()
+    });
 
-  if (error) return alert("Save failed: " + error.message);
+  if (error) {
+    return alert("Error saving scheme: " + error.message);
+  }
 
-  $('smSchemeCode').value = '';
-  $('smProductGroup').value = '';
-  $('smGroupName').value = '';
-  $('smDescription').value = '';
+  // Reset form inputs
+  if ($('smSchemeCode')) $('smSchemeCode').value = '';
+  if ($('smProductGroup')) $('smProductGroup').value = '';
+  if ($('smGroupName')) $('smGroupName').value = '';
+  if ($('smDescription')) $('smDescription').value = '';
 
   await loadSchemeMaster();
-  alert("✅ Scheme saved successfully.");
+  alert(`✅ Scheme '${scheme_code}' saved successfully! All dropdowns have been updated.`);
 }
 
 async function deleteSchemeMasterRecord(code) {
-  if (!confirm(`Delete scheme '${code}'? Existing verification records will retain their scheme text.`)) return;
+  if (!confirm(`Are you sure you want to delete scheme '${code}' from the master list?\n\n(Existing verification records with this scheme identifier will not be affected).`)) {
+    return;
+  }
 
-  const { error } = await supabaseClient.from('cent_vfn_schemes').delete().eq('scheme_code', code);
-  if (error) return alert("Deletion failed: " + error.message);
+  const { error } = await supabaseClient
+    .from('cent_vfn_schemes')
+    .delete()
+    .eq('scheme_code', code);
+
+  if (error) {
+    return alert("Delete failed: " + error.message);
+  }
+
   await loadSchemeMaster();
 }
 
-function populateCascadingFilterDropdowns() {
-  const groupSelect = $('vfnFilterProductGroup');
-  const schemeSelect = $('vfnFilterScheme');
-  if (!groupSelect || !schemeSelect) return;
+// Client fallback auto-seeder
+async function autoSeedMasterSchemes() {
+  const initialSchemes = [
+    { scheme_code: 'SBGEN', product_group: 'SB', product_group_name: 'Savings Bank', scheme_description: 'Standard Savings Account' },
+    { scheme_code: 'RD', product_group: 'RD', product_group_name: 'Recurring Deposit', scheme_description: '5-Year Recurring Deposit' },
+    { scheme_code: 'TDIP1', product_group: 'TD', product_group_name: 'Time Deposit', scheme_description: 'TD - 1 Year' },
+    { scheme_code: 'TDIP2', product_group: 'TD', product_group_name: 'Time Deposit', scheme_description: 'TD - 2 Year' },
+    { scheme_code: 'TDIP3', product_group: 'TD', product_group_name: 'Time Deposit', scheme_description: 'TD - 3 Year' },
+    { scheme_code: 'TDIP5', product_group: 'TD', product_group_name: 'Time Deposit', scheme_description: 'TD - 5 Year' },
+    { scheme_code: 'MIS', product_group: 'MIS', product_group_name: 'Monthly Income Scheme', scheme_description: 'Monthly Income Scheme' },
+    { scheme_code: 'SCSS', product_group: 'SCSS', product_group_name: 'Senior Citizens Scheme', scheme_description: 'Senior Citizens Savings Scheme' },
+    { scheme_code: 'PPF', product_group: 'PPF', product_group_name: 'Public Provident Fund', scheme_description: '15-Year PPF Account' },
+    { scheme_code: 'SSA', product_group: 'SSA', product_group_name: 'Sukanya Samriddhi', scheme_description: 'Sukanya Samriddhi Account' },
+    { scheme_code: 'KVP', product_group: 'KVP', product_group_name: 'Kisan Vikas Patra', scheme_description: 'Kisan Vikas Patra Certificate' },
+    { scheme_code: 'NSC', product_group: 'NSC', product_group_name: 'National Savings Cert', scheme_description: 'National Savings Certificate VIII Issue' }
+  ];
 
-  // Extract distinct product groups
-  const groups = [...new Set(masterSchemesList.map(s => s.product_group))].sort();
-
-  groupSelect.innerHTML = `<option value="">-- All Product Groups --</option>` +
-    groups.map(g => {
-      const match = masterSchemesList.find(s => s.product_group === g);
-      return `<option value="${g}">${g} - ${match?.product_group_name || g}</option>`;
-    }).join('');
-
-  onProductGroupFilterChange();
+  await supabaseClient.from('cent_vfn_schemes').upsert(initialSchemes, { onConflict: 'scheme_code' });
+  const { data } = await supabaseClient.from('cent_vfn_schemes').select('*').order('scheme_code', { ascending: true });
+  masterSchemesList = data || [];
+  renderSchemeMasterTable();
+  populateCascadingFilterDropdowns();
+  populateVfnImportSchemeDropdown();
 }
-
-function onProductGroupFilterChange() {
-  const selectedGroup = $('vfnFilterProductGroup')?.value;
-  const schemeSelect = $('vfnFilterScheme');
-  if (!schemeSelect) return;
-
-  let schemes = masterSchemesList;
-  if (selectedGroup) {
-    schemes = masterSchemesList.filter(s => s.product_group === selectedGroup);
-  }
-
-  schemeSelect.innerHTML = `<option value="">-- All Schemes --</option>` +
-    schemes.map(s => `<option value="${s.scheme_code}">${s.scheme_code} (${s.scheme_description})</option>`).join('');
-
-  loadCentVfnData();
-}
-
 // =========================================================================
 // FINACLE DATE PARSER (HANDLES '11-JAN-21', '05-OCT-2023', DD/MM/YYYY)
 // =========================================================================
@@ -11030,7 +11166,7 @@ async function loadGitHubLastUpdatedDate(username, repoName) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Load office options for registration form immediately on page boot
+    
   loadFilterDropdowns();
 
   if (typeof loadLogoFromDatabase === 'function') {
@@ -11045,7 +11181,15 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn("Session check error:", err);
   });
 });
-
+// Add inside your DOMContentLoaded or when opening the CentVfn tab:
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof loadSchemeMaster === 'function') {
+    loadSchemeMaster();
+  }
+  if (typeof loadCentVfnDatewiseReport === 'function') {
+    loadCentVfnDatewiseReport();
+  }
+});
     // 14. INITIALIZATION LISTENER
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof loadLogoFromDatabase === 'function') {
