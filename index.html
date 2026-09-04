@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -927,27 +928,32 @@
     </div>
     
     <div class="flex items-center gap-2 flex-wrap">
-      <!-- 1. Import Accounts -->
+      <!-- 1. Manage Schemes -->
+      <button type="button" onclick="openSchemeMasterModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        ⚙️ Manage Schemes
+      </button>
+
+      <!-- 2. Import Accounts -->
       <button type="button" onclick="openVfnImportModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         📥 Import Accounts (CSV/Excel)
       </button>
 
-      <!-- 2. Barcode Allotment (Added Trigger Button) -->
+      <!-- 3. Barcode Allotment -->
       <button type="button" onclick="openVfnBarcodeGenModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         🏷️ Allot UPU Barcodes
       </button>
 
-      <!-- 3. Prepare Notices -->
+      <!-- 4. Prepare Notices -->
       <button type="button" onclick="openSb46GeneratorModal()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         ✉️ Prepare SB-46 Notices
       </button>
 
-      <!-- 4. Excel Exports -->
+      <!-- 5. Excel Exports -->
       <button type="button" onclick="exportCentVfnExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         📊 Export Data (XLSX)
       </button>
 
-      <!-- 5. Batch Status Update -->
+      <!-- 6. Batch Status Update -->
       <button type="button" onclick="downloadCentVfnBatchTemplate()" class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-300 px-3 py-1.5 rounded font-bold text-xs shadow-2xs cursor-pointer flex items-center gap-1 transition">
         📥 Batch Template
       </button>
@@ -956,7 +962,7 @@
         📮 Bulk Update Status
       </button>
 
-      <!-- 6. Admin Delete -->
+      <!-- 7. Admin Delete -->
       <button type="button" id="btnAdminVfnBulkDelete" onclick="openAdminVfnDeleteModal()" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         🗑️ Delete Records
       </button>
@@ -987,6 +993,37 @@
     </div>
   </div>
 
+  <!-- DATE-WISE VERIFICATION MONITORING CARD -->
+  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 mb-2">
+    <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-base">📅</span>
+        <h3 class="font-bold text-sm text-slate-800 tracking-tight">Date-wise Verification Progress Monitoring</h3>
+      </div>
+      <button type="button" onclick="loadCentVfnDatewiseReport()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded cursor-pointer transition flex items-center gap-1">
+        🔄 Refresh Dates
+      </button>
+    </div>
+
+    <div class="overflow-x-auto max-h-[220px]">
+      <table class="w-full text-xs text-left border-collapse">
+        <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 z-10 border-b border-slate-200">
+          <tr>
+            <th class="p-2">Event Date</th>
+            <th class="p-2 text-right">Imported</th>
+            <th class="p-2 text-right text-purple-700">Printed</th>
+            <th class="p-2 text-right text-blue-700">Despatched</th>
+            <th class="p-2 text-right text-emerald-700">Reply Received</th>
+            <th class="p-2 text-right text-amber-700">Pending Cumulative</th>
+          </tr>
+        </thead>
+        <tbody id="vfnDatewiseReportBody">
+          <tr><td colspan="6" class="p-3 text-center text-slate-400">Loading date records...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- SCHEME-WISE BREAKDOWN SUMMARY CARD -->
   <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 mb-4">
     <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
@@ -995,7 +1032,7 @@
         <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
       </div>
       <button type="button" onclick="loadCentVfnSchemeBreakdown()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded cursor-pointer transition flex items-center gap-1">
-        🔄 Refresh
+        🔄 Refresh Schemes
       </button>
     </div>
 
@@ -1022,11 +1059,11 @@
     </div>
   </div>
 
-  <!-- FILTER & SEARCH CONTROL BAR (INCLUDES ACCOUNT TYPE) -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
+  <!-- FILTER & SEARCH CONTROL BAR (CASCADING PRODUCT GROUP & SCHEME) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
     <div>
       <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name</label>
-      <input type="text" id="vfnSearchQuery" oninput="debounceCentVfnSearch()" placeholder="Search..." class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium outline-none focus:border-postRed-600">
+      <input type="text" id="vfnSearchQuery" oninput="debounceCentVfnSearch()" placeholder="Search accounts, names, barcodes..." class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium outline-none focus:border-postRed-600">
     </div>
     <div>
       <label class="block font-bold text-slate-700 mb-0.5">Filter by Office</label>
@@ -1035,29 +1072,15 @@
       </select>
     </div>
     <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Scheme</label>
-      <select id="vfnFilterScheme" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
-        <option value="">-- All Schemes --</option>
-        <option value="SBGEN">Savings Bank (SBGEN)</option>
-        <option value="RD">Recurring Deposit (RD)</option>
-        <option value="TDIP1">1 Year TD (TDIP1)</option>
-        <option value="TDIP2">2 Year TD (TDIP2)</option>
-        <option value="TDIP3">3 Year TD (TDIP3)</option>
-        <option value="TDIP5">5 Year TD (TDIP5)</option>
-        <option value="MIS">Monthly Income Scheme (MIS)</option>
-        <option value="SCSS">Senior Citizens (SCSS)</option>
-        <option value="PPF">Public Provident Fund (PPF)</option>
-        <option value="SSA">Sukanya Samriddhi (SSA)</option>
+      <label class="block font-bold text-slate-700 mb-0.5">Product Group</label>
+      <select id="vfnFilterProductGroup" onchange="onProductGroupFilterChange()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+        <option value="">-- All Product Groups --</option>
       </select>
     </div>
     <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Account Type (Mode)</label>
-      <select id="vfnFilterAccountType" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
-        <option value="">-- All Types --</option>
-        <option value="SELF">SELF (Single)</option>
-        <option value="JOINT-A">JOINT-A</option>
-        <option value="JOINT-B">JOINT-B</option>
-        <option value="MINOR">MINOR</option>
+      <label class="block font-bold text-slate-700 mb-0.5">Scheme Identifier</label>
+      <select id="vfnFilterScheme" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+        <option value="">-- All Schemes --</option>
       </select>
     </div>
     <div>
@@ -1069,14 +1092,6 @@
         <option value="dispatched">Notice Dispatched</option>
         <option value="reply_received">Reply Received</option>
       </select>
-    </div>
-    <div class="flex gap-1.5">
-      <button type="button" onclick="loadCentVfnData()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white p-1.5 rounded font-bold text-xs cursor-pointer transition shadow-2xs">
-        Filter
-      </button>
-      <button type="button" onclick="resetCentVfnFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer transition">
-        Reset
-      </button>
     </div>
   </div>
 
@@ -1112,7 +1127,7 @@
     </div>
   </div>
 
-  <!-- ACCOUNTS DATA TABLE (11 COLUMNS) -->
+  <!-- ACCOUNTS DATA TABLE (10 COLUMNS) -->
   <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
     <div class="bg-slate-100 p-2.5 font-bold text-slate-700 text-xs flex justify-between items-center border-b border-slate-200">
       <span>📋 Registered Accounts for Cent Percent Verification</span>
@@ -1126,7 +1141,6 @@
             <th class="p-2">Account No</th>
             <th class="p-2">Customer Name &amp; Address</th>
             <th class="p-2 text-center">Scheme</th>
-            <th class="p-2 text-center">Account Type (Mode)</th>
             <th class="p-2 text-right">Balance (₹)</th>
             <th class="p-2 text-center">Last Txn</th>
             <th class="p-2 text-center">Article No</th>
@@ -1135,7 +1149,7 @@
           </tr>
         </thead>
         <tbody id="centVfnTableBody" class="divide-y divide-slate-100">
-          <tr><td colspan="11" class="p-4 text-center text-slate-400">Loading accounts...</td></tr>
+          <tr><td colspan="10" class="p-4 text-center text-slate-400">Loading accounts...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1290,9 +1304,69 @@
     </div>
   </div>
 
-  <!-- 4. MODAL: ADMIN BULK DELETE -->
+  <!-- 4. MODAL: SCHEME MASTER MANAGEMENT -->
+  <div id="vfnSchemeMasterModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-5 max-w-2xl w-full space-y-4 shadow-2xl border-t-8 border-amber-600 text-xs">
+      <div class="border-b pb-2 flex justify-between items-center border-amber-200">
+        <div>
+          <h3 class="font-bold text-sm text-amber-900 flex items-center gap-1.5">
+            <span>⚙️</span> POSB Scheme Master Management
+          </h3>
+          <p class="text-[10px] text-slate-500">Configure scheme identifiers, product groups, and descriptions</p>
+        </div>
+        <button type="button" onclick="closeSchemeMasterModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
+      </div>
+
+      <div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200 grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">Scheme ID *</label>
+          <input type="text" id="smSchemeCode" placeholder="e.g. TDIP1" maxlength="10" class="w-full border p-1.5 rounded uppercase font-bold bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">Product Group *</label>
+          <input type="text" id="smProductGroup" placeholder="e.g. TD" maxlength="10" class="w-full border p-1.5 rounded uppercase font-bold bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">Group Name *</label>
+          <input type="text" id="smGroupName" placeholder="e.g. Time Deposit" class="w-full border p-1.5 rounded font-medium bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-0.5">Description *</label>
+          <input type="text" id="smDescription" placeholder="e.g. TD-1 Year" class="w-full border p-1.5 rounded font-medium bg-white">
+        </div>
+        <div class="sm:col-span-4 flex justify-end">
+          <button type="button" onclick="saveSchemeMasterRecord()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold px-4 py-1.5 rounded shadow-xs cursor-pointer">
+            ➕ Save Scheme
+          </button>
+        </div>
+      </div>
+
+      <div class="max-h-60 overflow-y-auto border border-slate-200 rounded-lg">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-slate-100 font-bold text-slate-700 sticky top-0">
+            <tr>
+              <th class="p-2">Scheme Code</th>
+              <th class="p-2">Group</th>
+              <th class="p-2">Group Name</th>
+              <th class="p-2">Description</th>
+              <th class="p-2 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="vfnSchemeMasterTableBody" class="divide-y divide-slate-100">
+            <tr><td colspan="5" class="p-3 text-center text-slate-400">Loading master schemes...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-200">
+        <button type="button" onclick="closeSchemeMasterModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-1.5 rounded font-bold cursor-pointer">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. MODAL: ADMIN BULK DELETE -->
   <div id="vfnAdminDeleteModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-rose-600">
+    <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-rose-600 text-xs">
       <div class="border-b pb-2 border-rose-200 flex justify-between items-center">
         <h3 class="font-bold text-sm text-rose-700 flex items-center gap-1.5">
           <span>⚠️</span> Admin Bulk Deletion (CentVfn)
@@ -1300,33 +1374,35 @@
         <button type="button" onclick="closeAdminVfnDeleteModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none cursor-pointer">&times;</button>
       </div>
 
-      <p class="text-xs text-slate-600">This action permanently deletes verification accounts and re-indexes serial numbers. Type <b>CONFIRM</b> to delete the entire table.</p>
+      <p class="text-slate-600">Select deletion scope. Serial numbers will be re-indexed sequentially.</p>
 
-      <div class="space-y-2 text-xs">
+      <div class="space-y-2">
         <div>
           <label class="block font-bold text-slate-700 mb-0.5">Delete Scope</label>
           <select id="vfnDeleteScope" onchange="toggleVfnDeleteScopeInput()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white outline-none">
             <option value="office">By Office Name</option>
             <option value="scheme">By Scheme Identifier</option>
-            <option value="status">By Status</option>
-            <option value="all">Entire Database (Type CONFIRM)</option>
+            <option value="date">By Import Date (YYYY-MM-DD)</option>
+            <option value="all">Entire Database (Superadmin Only)</option>
           </select>
         </div>
 
         <div id="vfnDeleteInputContainer">
-          <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Target Value *</label>
-          <input type="text" id="vfnDeleteScopeVal" placeholder="Enter target value or CONFIRM" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold">
+          <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Office Name *</label>
+          <input type="text" id="vfnDeleteScopeVal" placeholder="Enter office name exactly" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold">
         </div>
       </div>
 
       <div class="flex justify-end gap-2 pt-2 border-t border-rose-100">
-        <button type="button" onclick="closeAdminVfnDeleteModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold text-xs cursor-pointer">Cancel</button>
-        <button type="button" id="btnRunVfnBulkDelete" onclick="executeAdminVfnBulkDelete()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 rounded font-bold text-xs cursor-pointer shadow-xs">
+        <button type="button" onclick="closeAdminVfnDeleteModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded font-bold cursor-pointer">Cancel</button>
+        <button type="button" id="btnRunVfnBulkDelete" onclick="executeAdminVfnBulkDelete()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-1.5 rounded font-bold shadow-xs cursor-pointer">
           Permanently Delete
         </button>
       </div>
     </div>
   </div>
+
+</div>
 
 </div>
 <!-- MODAL: UPDATE ACCOUNT STATUS / REPLY RECEIVED -->
@@ -2540,12 +2616,13 @@ function showTab(tabName) {
   }
 }
 
-// Fallback alias in case HTML elements still call switchTab
-window.switchTab = function(tabName) {
-  const clean = tabName.replace('View', '');
-  showTab(clean);
-};
-
+  // Fallback alias in case HTML elements still call switchTab
+  window.switchTab = function(tabName) {
+    const clean = tabName.replace('View', '');
+    showTab(clean);
+  };
+  loadSchemeMaster();
+  loadCentVfnDatewiseReport();
 
    async function loadFilterDropdowns() {
   try {
@@ -8508,37 +8585,32 @@ function renderCentVfnTablePage() {
     const displayLastTxn = r.date_of_last_txn 
       ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn) 
       : '-';
-
-    return `
-      <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
-        <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
-        <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
-        <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
-        <td class="p-2">
-          <div class="font-bold text-slate-900">${r.customer_name}</div>
-          <div class="text-[10px] text-slate-500 truncate max-w-[200px]" title="${r.address || ''}">${r.address || '-'}</div>
-        </td>
-        <td class="p-2 text-center">
-          <span class="bg-purple-100 text-purple-900 font-extrabold text-[10px] px-1.5 py-0.5 rounded border border-purple-200">
-            ${r.scheme || '-'}
-          </span>
-        </td>
-        <td class="p-2 text-center">
-          <span class="bg-slate-100 text-slate-800 font-bold text-[10.5px] px-2 py-0.5 rounded border border-slate-300 whitespace-nowrap">
-            ${r.account_type || 'SELF'}
-          </span>
-        </td>
-        <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-        <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${displayLastTxn}</td>
-        <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.article_no || '-'}</td>
-        <td class="p-2 text-center">${statusBadge}</td>
-        <td class="p-2 text-center">
-          <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
-            ✏️ Update
-          </button>
-        </td>
-      </tr>
-    `;
+    
+      return `
+        <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
+          <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
+          <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
+          <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
+          <td class="p-2">
+            <div class="font-bold text-slate-900">${r.customer_name}</div>
+            <div class="text-[10px] text-slate-500 truncate max-w-[220px]" title="${r.address || ''}">${r.address || '-'}</div>
+          </td>
+          <td class="p-2 text-center">
+            <span class="bg-purple-100 text-purple-900 font-extrabold text-[10px] px-1.5 py-0.5 rounded border border-purple-200">
+              ${r.scheme || '-'}
+            </span>
+          </td>
+          <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${displayLastTxn}</td>
+          <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.outward_article_no || r.article_no || '-'}</td>
+          <td class="p-2 text-center">${statusBadge}</td>
+          <td class="p-2 text-center">
+            <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
+              ✏️ Update
+            </button>
+          </td>
+        </tr>
+      `;
   });
 
   tbody.innerHTML = htmlArr.join('');
@@ -9039,20 +9111,221 @@ function closeAdminVfnDeleteModal() {
 }
 
 function toggleVfnDeleteScopeInput() {
-  const scope = $('vfnDeleteScope').value;
+  const scope = $('vfnDeleteScope')?.value;
   const label = $('vfnDeleteInputLabel');
   const input = $('vfnDeleteScopeVal');
+  if (!label || !input) return;
 
   if (scope === 'office') {
     label.innerText = 'Office Name *';
-    input.placeholder = 'e.g. T Nagar SO';
+    input.placeholder = 'Enter office name exactly (e.g. Mylapore HO)';
+    input.type = 'text';
   } else if (scope === 'scheme') {
     label.innerText = 'Scheme Identifier *';
-    input.placeholder = 'e.g. TDIP5 or TDA';
+    input.placeholder = 'Enter scheme code exactly (e.g. TDIP1, SBGEN)';
+    input.type = 'text';
   } else if (scope === 'date') {
     label.innerText = 'Import Date (YYYY-MM-DD) *';
-    input.placeholder = 'e.g. 2026-09-02';
+    input.placeholder = 'YYYY-MM-DD';
+    input.type = 'date';
+  } else if (scope === 'all') {
+    label.innerText = 'Confirm Full Deletion (Superadmin Only) *';
+    input.placeholder = 'Type CONFIRM exactly';
+    input.type = 'text';
   }
+}
+
+async function executeAdminVfnBulkDelete() {
+  const scope = $('vfnDeleteScope')?.value || 'office';
+  const val = $('vfnDeleteScopeVal')?.value.trim();
+
+  if (!val) return alert("Please specify the target value for deletion.");
+
+  // Check superadmin status if deleting all
+  const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : (currentUser?.role || userProfile?.role || 'user')).toLowerCase();
+
+  if (scope === 'all' && userRole !== 'superadmin') {
+    return alert("ACCESS DENIED: Only Superadmin accounts can delete the entire verification database!");
+  }
+
+  if (scope === 'all' && val.toUpperCase() !== 'CONFIRM') {
+    return alert("You must type 'CONFIRM' to verify deletion of the entire table.");
+  }
+
+  if (!confirm(`WARNING: Are you sure you want to delete records matching ${scope.toUpperCase()} = "${val}"?\n\nThis cannot be undone.`)) {
+    return;
+  }
+
+  const btn = $('btnRunVfnBulkDelete');
+  if (btn) { btn.disabled = true; btn.innerText = "Deleting..."; }
+
+  try {
+    const { data, error } = await supabaseClient.rpc('delete_cent_vfn_bulk', {
+      p_filter_type: scope,
+      p_filter_val: val,
+      p_user_role: userRole
+    });
+
+    if (error) throw error;
+
+    alert(`✅ Successfully deleted ${data.deleted_count} accounts. Serial numbers re-indexed.`);
+    closeAdminVfnDeleteModal();
+    loadCentVfnData();
+    loadCentVfnDatewiseReport();
+  } catch (err) {
+    alert("Deletion failed: " + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerText = "Permanently Delete"; }
+  }
+}
+
+async function loadCentVfnDatewiseReport() {
+  const tbody = $('vfnDatewiseReportBody');
+  if (!tbody) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc('get_cent_vfn_datewise_report');
+    if (error) throw error;
+
+    if (!data || !data.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400">No date-wise events found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(r => {
+      const dt = typeof formatDate === 'function' ? formatDate(r.report_date) : r.report_date;
+      return `
+        <tr class="hover:bg-slate-50 border-b border-slate-100">
+          <td class="p-2 font-bold font-mono text-slate-800">${dt}</td>
+          <td class="p-2 text-right font-mono">${Number(r.total_imported).toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-purple-700">${Number(r.printed_count).toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-blue-700">${Number(r.dispatched_count).toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-emerald-700">${Number(r.reply_count).toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-amber-700">${Number(r.pending_count).toLocaleString('en-IN')}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error("Datewise monitor error:", err);
+    tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-rose-600">Failed to load: ${err.message}</td></tr>`;
+  }
+}
+let masterSchemesList = [];
+
+async function loadSchemeMaster() {
+  const { data, error } = await supabaseClient
+    .from('cent_vfn_schemes')
+    .select('*')
+    .order('product_group', { ascending: true })
+    .order('scheme_code', { ascending: true });
+
+  if (error) {
+    console.error("Failed to load scheme master:", error);
+    return;
+  }
+
+  masterSchemesList = data || [];
+  renderSchemeMasterTable();
+  populateCascadingFilterDropdowns();
+}
+
+function openSchemeMasterModal() {
+  $('vfnSchemeMasterModal')?.classList.remove('hidden');
+  loadSchemeMaster();
+}
+
+function closeSchemeMasterModal() {
+  $('vfnSchemeMasterModal')?.classList.add('hidden');
+}
+
+function renderSchemeMasterTable() {
+  const tbody = $('vfnSchemeMasterTableBody');
+  if (!tbody) return;
+
+  if (!masterSchemesList.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No schemes defined.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = masterSchemesList.map(s => `
+    <tr class="hover:bg-amber-50/40 transition">
+      <td class="p-2 font-bold font-mono text-purple-900">${s.scheme_code}</td>
+      <td class="p-2 font-bold text-slate-700">${s.product_group}</td>
+      <td class="p-2 text-slate-800">${s.product_group_name}</td>
+      <td class="p-2 text-slate-600">${s.scheme_description}</td>
+      <td class="p-2 text-center">
+        <button type="button" onclick="deleteSchemeMasterRecord('${s.scheme_code}')" class="text-rose-600 hover:text-rose-800 font-bold text-[10px]">
+          Delete
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function saveSchemeMasterRecord() {
+  const scheme_code = $('smSchemeCode').value.trim().toUpperCase();
+  const product_group = $('smProductGroup').value.trim().toUpperCase();
+  const product_group_name = $('smGroupName').value.trim();
+  const scheme_description = $('smDescription').value.trim();
+
+  if (!scheme_code || !product_group || !product_group_name || !scheme_description) {
+    return alert("Please fill all scheme fields.");
+  }
+
+  const { error } = await supabaseClient
+    .from('cent_vfn_schemes')
+    .upsert({ scheme_code, product_group, product_group_name, scheme_description });
+
+  if (error) return alert("Save failed: " + error.message);
+
+  $('smSchemeCode').value = '';
+  $('smProductGroup').value = '';
+  $('smGroupName').value = '';
+  $('smDescription').value = '';
+
+  await loadSchemeMaster();
+  alert("✅ Scheme saved successfully.");
+}
+
+async function deleteSchemeMasterRecord(code) {
+  if (!confirm(`Delete scheme '${code}'? Existing verification records will retain their scheme text.`)) return;
+
+  const { error } = await supabaseClient.from('cent_vfn_schemes').delete().eq('scheme_code', code);
+  if (error) return alert("Deletion failed: " + error.message);
+  await loadSchemeMaster();
+}
+
+function populateCascadingFilterDropdowns() {
+  const groupSelect = $('vfnFilterProductGroup');
+  const schemeSelect = $('vfnFilterScheme');
+  if (!groupSelect || !schemeSelect) return;
+
+  // Extract distinct product groups
+  const groups = [...new Set(masterSchemesList.map(s => s.product_group))].sort();
+
+  groupSelect.innerHTML = `<option value="">-- All Product Groups --</option>` +
+    groups.map(g => {
+      const match = masterSchemesList.find(s => s.product_group === g);
+      return `<option value="${g}">${g} - ${match?.product_group_name || g}</option>`;
+    }).join('');
+
+  onProductGroupFilterChange();
+}
+
+function onProductGroupFilterChange() {
+  const selectedGroup = $('vfnFilterProductGroup')?.value;
+  const schemeSelect = $('vfnFilterScheme');
+  if (!schemeSelect) return;
+
+  let schemes = masterSchemesList;
+  if (selectedGroup) {
+    schemes = masterSchemesList.filter(s => s.product_group === selectedGroup);
+  }
+
+  schemeSelect.innerHTML = `<option value="">-- All Schemes --</option>` +
+    schemes.map(s => `<option value="${s.scheme_code}">${s.scheme_code} (${s.scheme_description})</option>`).join('');
+
+  loadCentVfnData();
 }
 
 // =========================================================================
@@ -9574,7 +9847,7 @@ const updates = {
   outward_article_no: updatedOutward,
   reply_article_no: updatedReply,
   article_no: updatedOutward, // Keep in sync
-  remarks,
+  //remarks,
   updated_at: new Date().toISOString()
 };
 
@@ -9592,7 +9865,7 @@ const updates = {
 
   // 2. Reply Date & Remarks
   $('vfnModalReplyDate').value = r.reply_rxd_date || todayStr;
-  $('vfnModalRemarks').value = r.remarks || '';
+ // $('vfnModalRemarks').value = r.remarks || '';
 
   // 3. Counter Checkbox initial state
   const isCounterReceived = (r.remarks || '').toLowerCase().includes('counter') && !r.article_no;
