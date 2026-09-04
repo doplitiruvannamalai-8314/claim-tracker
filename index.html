@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -991,71 +993,89 @@
     </div>
   </div>
 
-  <!-- DATE-WISE VERIFICATION MONITORING CARD -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 mb-2">
-    <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
-      <div class="flex items-center gap-2">
-        <span class="text-base">📅</span>
-        <h3 class="font-bold text-sm text-slate-800 tracking-tight">Date-wise Verification Progress Monitoring</h3>
+  <!-- DUAL METRIC PANELS: DATE-WISE MONITORING (LEFT) & SCHEME-WISE BREAKDOWN (RIGHT) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+  
+  <!-- LEFT HALF: DATE-WISE VERIFICATION PROGRESS MONITORING -->
+  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 flex flex-col justify-between">
+    <div>
+      <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-base">📅</span>
+          <h3 class="font-bold text-sm text-slate-800 tracking-tight">Date-wise Verification Progress</h3>
+        </div>
+        <button type="button" onclick="loadCentVfnDatewiseReport()" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded cursor-pointer transition flex items-center gap-1">
+          🔄 Refresh
+        </button>
       </div>
-      <button type="button" onclick="loadCentVfnDatewiseReport()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded cursor-pointer transition flex items-center gap-1">
-        🔄 Refresh Dates
-      </button>
-    </div>
 
-    <div class="overflow-x-auto max-h-[220px]">
-      <table class="w-full text-xs text-left border-collapse">
-        <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 z-10 border-b border-slate-200">
-          <tr>
-            <th class="p-2">Event Date</th>
-            <th class="p-2 text-right">Imported</th>
-            <th class="p-2 text-right text-purple-700">Printed</th>
-            <th class="p-2 text-right text-blue-700">Despatched</th>
-            <th class="p-2 text-right text-emerald-700">Reply Received</th>
-            <th class="p-2 text-right text-amber-700">Pending Cumulative</th>
-          </tr>
-        </thead>
-        <tbody id="vfnDatewiseReportBody">
-          <tr><td colspan="6" class="p-3 text-center text-slate-400">Loading date records...</td></tr>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto max-h-[300px] overflow-y-auto border border-slate-100 rounded-lg">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 z-10 border-b border-slate-200 whitespace-nowrap">
+            <tr>
+              <th class="p-2">Event Date</th>
+              <th class="p-2 text-right">Imported</th>
+              <th class="p-2 text-right text-purple-700">Printed</th>
+              <th class="p-2 text-right text-blue-700">Despatched</th>
+              <th class="p-2 text-right text-emerald-700">Reply Rx'd</th>
+              <th class="p-2 text-right text-amber-700">Pending</th>
+            </tr>
+          </thead>
+          <tbody id="vfnDatewiseReportBody" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading date records...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="text-[10px] text-slate-400 pt-2 italic text-right">
+      * Cumulative pending count as on date
     </div>
   </div>
 
-  <!-- SCHEME-WISE BREAKDOWN SUMMARY CARD -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 mb-4">
-    <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
-      <div class="flex items-center gap-2">
-        <span class="text-base">📊</span>
-        <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
+  <!-- RIGHT HALF: SCHEME-WISE VERIFICATION BREAKDOWN -->
+  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 flex flex-col justify-between">
+    <div>
+      <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-base">📊</span>
+          <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
+        </div>
+        <button type="button" onclick="loadCentVfnSchemeBreakdown()" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded cursor-pointer transition flex items-center gap-1">
+          🔄 Refresh
+        </button>
       </div>
-      <button type="button" onclick="loadCentVfnSchemeBreakdown()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded cursor-pointer transition flex items-center gap-1">
-        🔄 Refresh Schemes
-      </button>
-    </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-xs text-left border-collapse">
-        <thead>
-          <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
-            <th class="p-2.5">Scheme</th>
-            <th class="p-2.5 text-right">Total Accounts</th>
-            <th class="p-2.5 text-right text-purple-700">Printed</th>
-            <th class="p-2.5 text-right text-blue-700">Despatched</th>
-            <th class="p-2.5 text-right text-emerald-700">Reply Received</th>
-            <th class="p-2.5 text-right text-amber-700">Pending</th>
-          </tr>
-        </thead>
-        <tbody id="vfnSchemeBreakdownBody">
-          <tr>
-            <td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td>
-          </tr>
-        </tbody>
-        <tfoot id="vfnSchemeBreakdownFoot" class="bg-slate-50 font-extrabold text-slate-900 border-t-2 border-slate-300">
-        </tfoot>
-      </table>
+      <div class="overflow-x-auto max-h-[300px] overflow-y-auto border border-slate-100 rounded-lg">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 z-10 border-b border-slate-200 whitespace-nowrap">
+            <tr>
+              <th class="p-2">Scheme</th>
+              <th class="p-2 text-right">Total</th>
+              <th class="p-2 text-right text-purple-700">Printed</th>
+              <th class="p-2 text-right text-blue-700">Despatched</th>
+              <th class="p-2 text-right text-emerald-700">Reply Rx'd</th>
+              <th class="p-2 text-right text-amber-700">Pending</th>
+            </tr>
+          </thead>
+          <tbody id="vfnSchemeBreakdownBody" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td>
+            </tr>
+          </tbody>
+          <tfoot id="vfnSchemeBreakdownFoot" class="bg-slate-50 font-extrabold text-slate-900 border-t-2 border-slate-300 sticky bottom-0 z-10">
+            <!-- Summary Totals Row Injected Here -->
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="text-[10px] text-slate-400 pt-2 italic text-right">
+      * All live verified accounts by scheme
     </div>
   </div>
+
+</div>
 
   <!-- FILTER & SEARCH CONTROL BAR (CASCADING PRODUCT GROUP & SCHEME) -->
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
