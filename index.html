@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  
   <script>
     tailwind.config = {
       theme: {
@@ -1034,46 +1036,78 @@
     </div>
   </div>
 
-  <!-- RIGHT HALF: SCHEME-WISE VERIFICATION BREAKDOWN -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 flex flex-col justify-between">
-    <div>
-      <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
-        <div class="flex items-center gap-2">
-          <span class="text-base">📊</span>
-          <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
-        </div>
-        <button type="button" onclick="loadCentVfnSchemeBreakdown()" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded cursor-pointer transition flex items-center gap-1">
+<!-- RIGHT HALF: SCHEME-WISE VERIFICATION BREAKDOWN -->
+<div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 flex flex-col justify-between">
+  <div>
+    <!-- CARD HEADER WITH ACTION TOOLBAR -->
+    <div class="flex justify-between items-center flex-wrap gap-2 border-b border-slate-200 pb-2 mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-base">📊</span>
+        <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
+      </div>
+
+      <!-- EXPORT & REFRESH ACTIONS -->
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <button type="button" onclick="exportSchemeBreakdownToExcel()" title="Export as Excel" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-2 py-1 rounded text-[11px] cursor-pointer transition flex items-center gap-1 shadow-2xs">
+          📗 Excel
+        </button>
+        <button type="button" onclick="exportSchemeBreakdownToPdf()" title="Export as PDF" class="bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 font-bold px-2 py-1 rounded text-[11px] cursor-pointer transition flex items-center gap-1 shadow-2xs">
+          📕 PDF
+        </button>
+        <button type="button" onclick="exportSchemeBreakdownToImage()" title="Export as Image (PNG)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-300 font-bold px-2 py-1 rounded text-[11px] cursor-pointer transition flex items-center gap-1 shadow-2xs">
+          🖼️ Image
+        </button>
+        <button type="button" onclick="loadCentVfnSchemeBreakdown()" title="Refresh Data" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded text-[11px] cursor-pointer transition flex items-center gap-1">
           🔄 Refresh
         </button>
       </div>
+    </div>
 
-      <div class="overflow-x-auto max-h-[300px] overflow-y-auto border border-slate-100 rounded-lg">
-        <table class="w-full text-xs text-left border-collapse">
-          <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 z-10 border-b border-slate-200 whitespace-nowrap">
-            <tr>
-              <th class="p-2">Scheme</th>
-              <th class="p-2 text-right">Total</th>
-              <th class="p-2 text-right text-purple-700">Printed</th>
-              <th class="p-2 text-right text-blue-700">Despatched</th>
-              <th class="p-2 text-right text-emerald-700">Reply Rx'd</th>
-              <th class="p-2 text-right text-amber-700">Pending</th>
-            </tr>
-          </thead>
-          <tbody id="vfnSchemeBreakdownBody" class="divide-y divide-slate-100">
-            <tr>
-              <td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td>
-            </tr>
-          </tbody>
-          <tfoot id="vfnSchemeBreakdownFoot" class="bg-slate-50 font-extrabold text-slate-900 border-t-2 border-slate-300 sticky bottom-0 z-10">
-            <!-- Summary Totals Row Injected Here -->
-          </tfoot>
-        </table>
+    <!-- WRAPPER CAPTURED FOR IMAGE EXPORT -->
+    <div id="vfnSchemePrintableCard" class="bg-white p-2 rounded-lg">
+      <!-- REPORT HEADER (Visible in print/image exports) -->
+          
+          <div id="vfnSchemeReportHeader" class="hidden mb-3 border-b-2 border-slate-800 pb-2 text-center">
+            <h3 class="font-extrabold text-sm uppercase text-slate-900 tracking-wider">DEPARTMENT OF POSTS, INDIA</h3>
+            <h4 class="font-bold text-xs text-slate-700">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</h4>
+            <div id="vfnSchemeOfficeScopeHeader" class="text-xs font-bold text-slate-800 uppercase mt-0.5"></div>
+            <div class="text-[11px] font-semibold text-postRed-700 mt-0.5">Cent Percent Verification: Scheme-wise Breakdown Report</div>
+            <div class="text-[10px] text-slate-500 mt-0.5" id="vfnSchemeGenDateHeader"></div>
+          </div>
+
+          <div class="overflow-x-auto max-h-[300px] overflow-y-auto border border-slate-100 rounded-lg">
+            <table id="vfnSchemeBreakdownTable" class="w-full text-xs text-left border-collapse">
+              <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 z-10 border-b border-slate-200 whitespace-nowrap">
+                <tr>
+                  <th class="p-2">Scheme</th>
+                  <th class="p-2 text-right">Total</th>
+                  <th class="p-2 text-right text-purple-700">Printed</th>
+                  <th class="p-2 text-right text-blue-700">Despatched</th>
+                  <th class="p-2 text-right text-emerald-700">Reply Rx'd</th>
+                  <th class="p-2 text-right text-amber-700">Pending</th>
+                  <th class="p-2 text-right text-rose-700">% Pending</th>
+                </tr>
+              </thead>
+              <tbody id="vfnSchemeBreakdownBody" class="divide-y divide-slate-100">
+                <tr>
+                  <td colspan="7" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td>
+                </tr>
+              </tbody>
+              <tfoot id="vfnSchemeBreakdownFoot" class="bg-slate-50 font-extrabold text-slate-900 border-t-2 border-slate-300 sticky bottom-0 z-10">
+              </tfoot>
+            </table>
+          </div>
+
+      <!-- REPORT FOOTER -->
+      <div id="vfnSchemeReportFooter" class="hidden pt-2 border-t border-slate-200 text-center text-[10px] font-bold text-slate-500 tracking-wider uppercase mt-2">
+        *** END OF REPORT — CENT PERCENT VERIFICATION PORTAL ***
       </div>
     </div>
-    <div class="text-[10px] text-slate-400 pt-2 italic text-right">
-      * All live verified accounts by scheme
-    </div>
   </div>
+  <div class="text-[10px] text-slate-400 pt-2 italic text-right">
+    * All live verified accounts by scheme
+  </div>
+</div>
 
 </div>
 
@@ -1352,8 +1386,11 @@
           <label class="block font-bold text-slate-700 mb-0.5">Description *</label>
           <input type="text" id="smDescription" placeholder="e.g. TD-1 Year" class="w-full border p-1.5 rounded font-medium bg-white">
         </div>
-        <div class="sm:col-span-4 flex justify-end">
-          <button type="button" onclick="saveSchemeMasterRecord()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold px-4 py-1.5 rounded shadow-xs cursor-pointer">
+        <div class="sm:col-span-4 flex justify-end items-center gap-2">
+          <button type="button" id="btnCancelSchemeEdit" onclick="cancelSchemeMasterEdit()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-3 py-1.5 rounded text-xs cursor-pointer">
+            Cancel Edit
+          </button>
+          <button type="button" id="btnSaveSchemeMaster" onclick="saveSchemeMasterRecord()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold px-4 py-1.5 rounded shadow-xs text-xs cursor-pointer">
             ➕ Save Scheme
           </button>
         </div>
@@ -2332,7 +2369,7 @@ function printOfficeWiseReport() {
 
     async function resetDefaultLogo() {
       if (!confirm("Reset database logo to default?")) return;
-      const defaultUrl = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyE5GVmnBOyQiy0AveMpnPmeiJhLjLZld_-aEpgH9KpT_YSedoqnMagbtR3uP0KZvo0iiGqgESWSetBUgwwL1z-frzblwInOhqxyrcGUztjB4cB5k0dHbR_0pcj4JCX3Gzzs26LOfMFdyG1nuI7sWt4UbLCrVEhXvwX5uStq1r2PaofAqlM0a4tZ-aPhI/s1600/India%20Post%20Dak%20Sewa%20Jan%20Sewa%20New%20Logo%20Final.png";
+      const defaultUrl = "https://indiapost.gov.in/images/home/logo/indiapostlogo.svg";
       await supabaseClient.from('configurationmaster').upsert([{
         id: 'app_logo', config_key: 'APP_LOGO_BASE64', config_value: defaultUrl
       }], { onConflict: 'config_key' });
@@ -4946,14 +4983,19 @@ async function exportBookingReportImage() {
     return b.pct - a.pct;
   });
 
+  // Dedicated off-screen container with 25mm (2.5cm) lateral margins
   const container = document.createElement('div');
   container.style.position = 'absolute';
   container.style.top = '-9999px';
   container.style.left = '-9999px';
-  container.style.width = '850px';
+  container.style.width = '1000px';
+  container.style.boxSizing = 'border-box';
   container.style.backgroundColor = '#FFFFFF';
-  container.style.padding = '20px';
-  container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  container.style.paddingTop = '20px';
+  container.style.paddingBottom = '20px';
+  container.style.paddingLeft = '25mm';   // 2.5cm Left Margin
+  container.style.paddingRight = '25mm';  // 2.5cm Right Margin
+  container.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
   let rowsHtml = '';
   sortedOffices.forEach((o, i) => {
@@ -4971,54 +5013,53 @@ async function exportBookingReportImage() {
     }
 
     rowsHtml += `
-      <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-size: 11px;">
-        <td style="padding: 7px; text-align: center; font-weight: bold; font-family: monospace; color: #64748b;">#${i + 1}</td>
-        <td style="padding: 7px; font-weight: bold; color: ${o.isZero ? '#64748b' : '#0f172a'};">${o.name}</td>
-        <td style="padding: 7px; text-align: center; font-weight: 600; color: #334155;">${o.cash_cnt.toLocaleString('en-IN')}</td>
-        <td style="padding: 7px; text-align: center; font-weight: bold; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
-        <td style="padding: 7px; text-align: center; font-weight: 800; color: ${fontColor};">${pctValText}</td>
+      <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#FFFFFF' : '#f8fafc'}; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; font-weight: 800;">
+        <td style="padding: 10px 8px; text-align: center; font-family: monospace; color: #64748b;">#${i + 1}</td>
+        <td style="padding: 10px 8px; color: ${o.isZero ? '#64748b' : '#0f172a'};">${o.name}</td>
+        <td style="padding: 10px 8px; text-align: center; color: #334155;">${o.cash_cnt.toLocaleString('en-IN')}</td>
+        <td style="padding: 10px 8px; text-align: center; color: #1e40af;">${o.dig_cnt.toLocaleString('en-IN')}</td>
+        <td style="padding: 10px 8px; text-align: center; color: ${fontColor};">${pctValText}</td>
       </tr>
     `;
   });
 
- const grandTotalPctText = totalBookings === 0 
+  const grandTotalPctText = totalBookings === 0 
     ? '-' 
     : `${totalDigShare}%`;
 
   container.innerHTML = `
     <div style="border: 2px solid #A80F28; border-radius: 8px; overflow: hidden; background: #fff;">
-      <div style="background: #A80F28; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="background: #A80F28; color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800;">Digital vs Cash Transaction Performance Report</h2>
-          <p style="margin: 2px 0 0 0; font-size: 14px; color: #FEF9C3; font-weight: 600;">Chennai City Central Division &bull; Divisional Performance Leaderboard</p>
+          <h2 style="margin: 0; font-size: 17px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Digital vs Cash Transaction Performance Report</h2>
+          <p style="margin: 2px 0 0 0; font-size: 14px; color: #FEF9C3; font-weight: 700;">Chennai City Central Division &bull; Divisional Performance Leaderboard</p>
           <p style="margin: 4px 0 0 0; font-size: 12px; color: #fecdd3;">Period: <strong>${fromVal}</strong> to <strong>${toVal}</strong> | Total Offices: <strong>${sortedOffices.length}</strong> | Generated: ${new Date().toLocaleString('en-IN')}</p>
         </div>
-        ${currentAppLogo ? `<img src="${currentAppLogo}" style="height: 42px; width: 63px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
+        ${typeof currentAppLogo !== 'undefined' && currentAppLogo ? `<img src="${currentAppLogo}" style="height: 46px; width: 68px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
       </div>
 
       <table style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
-          <tr style="background: #8A0C21; color: #ffffff; font-size: 11px; font-weight: bold;">
-            <th style="padding: 8px; text-align: center; width: 8%;">#</th>
-            <th style="padding: 8px; width: 44%;">Office Name</th>
-            <th style="padding: 8px; text-align: center; width: 16%;">Cash Txn (Cnt)</th>
-            <th style="padding: 8px; text-align: center; width: 16%;">Digital Txn (Cnt)</th>
-            <th style="padding: 8px; text-align: center; width: 16%;">Digital % Share</th>
+          <tr style="background: #8A0C21; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase;">
+            <th style="padding: 10px 8px; text-align: center; width: 8%;">#</th>
+            <th style="padding: 10px 8px; width: 44%;">Office Name</th>
+            <th style="padding: 10px 8px; text-align: center; width: 16%;">Cash Txn (Cnt)</th>
+            <th style="padding: 10px 8px; text-align: center; width: 16%;">Digital Txn (Cnt)</th>
+            <th style="padding: 10px 8px; text-align: center; width: 16%;">Digital % Share</th>
           </tr>
         </thead>
         <tbody>
           ${rowsHtml}
-          <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 11.5px; border-top: 2px solid #6E081A;">
-            <td style="padding: 9px 8px; text-align: center; font-family: monospace;">Σ</td>
-            <td style="padding: 9px 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
-            <td style="padding: 9px 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
-            <td style="padding: 9px 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
-            <td style="padding: 9px 8px; text-align: center; color: #FEF08A; font-size: 12px; font-weight: 900;">${grandTotalPctText}</td>
+          <tr style="background: #A80F28; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 800; font-size: 14px; border-top: 2px solid #6E081A;">
+            <td style="padding: 11px 8px; text-align: center; font-family: monospace;">Σ</td>
+            <td style="padding: 11px 8px; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total (${sortedOffices.length} Offices)</td>
+            <td style="padding: 11px 8px; text-align: center;">${totalCashCnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 11px 8px; text-align: center;">${totalDigCnt.toLocaleString('en-IN')}</td>
+            <td style="padding: 11px 8px; text-align: center; color: #FEF08A; font-size: 15px; font-weight: 900;">${grandTotalPctText}</td>
           </tr>
         </tbody>
       </table>
     </div>
-  
   `;
 
   document.body.appendChild(container);
@@ -5034,6 +5075,7 @@ async function exportBookingReportImage() {
     document.body.removeChild(container);
   }
 }
+
 
    async function exportBookingReportPDF() {
   if (!bookingImportedRecords.length) return alert("No performance data to export!");
@@ -8464,174 +8506,191 @@ function renderDayWisePivotTable() {
 // =========================================================================
 // 11. CENT PERCENT VERIFICATION (CENTVFN) ENGINE
 // =========================================================================
-let vfnSearchDebounceTimer = null;
+let vfnSearchTimer = null;
 
 function debounceCentVfnSearch() {
-  clearTimeout(vfnSearchDebounceTimer);
-  vfnSearchDebounceTimer = setTimeout(() => {
-    loadCentVfnData();
-  }, 250);
+  clearTimeout(vfnSearchTimer);
+  vfnSearchTimer = setTimeout(() => {
+    // Reset to page 1 whenever search terms change
+    loadCentVfnData(1);
+  }, 300);
+}
+
+function changeVfnPage(delta) {
+  const pageSizeVal = $('vfnPageSizeSelect')?.value || '10';
+  if (pageSizeVal === 'all') return;
+  
+  const limit = parseInt(pageSizeVal, 10);
+  const totalPages = Math.ceil(vfnTotalCount / limit) || 1;
+  const newPage = vfnCurrentPage + delta;
+
+  if (newPage >= 1 && newPage <= totalPages) {
+    loadCentVfnData(newPage);
+  }
+}
+
+function changeVfnPageSize(val) {
+  loadCentVfnData(1);
+}
+
+function resetCentVfnFilters() {
+  if ($('vfnSearchQuery')) $('vfnSearchQuery').value = '';
+  if ($('vfnFilterOffice')) $('vfnFilterOffice').value = '';
+  if ($('vfnFilterProductGroup')) $('vfnFilterProductGroup').value = '';
+  if ($('vfnFilterScheme')) $('vfnFilterScheme').value = '';
+  if ($('vfnFilterStatus')) $('vfnFilterStatus').value = '';
+  loadCentVfnData(1);
 }
 
 // Global states for CentVfn table management
-let cachedCentVfnRecords = [];       // Holds all loaded records matching search/filters
-let vfnCurrentPage = 1;              // Active page index
-let vfnPageSize = 10;                // Default token view: 10 rows
+let vfnCurrentPage = 1;
+let vfnPageSize = 10; // Default page size
+let vfnTotalCount = 0;
 
-async function loadCentVfnData() {
+async function loadCentVfnData(page = 1) {
+  vfnCurrentPage = page;
   const tbody = $('centVfnTableBody');
-  if (!tbody) return;
+  const countEl = $('vfnTableRecordCount');
+  const indicator = $('vfnPageIndicator');
+  const btnPrev = $('btnVfnPrevPage');
+  const btnNext = $('btnVfnNextPage');
 
-  tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-slate-500 font-semibold">Loading verification accounts...</td></tr>`;
-
-  // Start query without .limit(0)
-  let query = supabaseClient
-    .from('cent_percent_verification')
-    .select('*')
-    .order('sl_no', { ascending: true });
-
-  const office = $('vfnFilterOffice')?.value;
-  const scheme = $('vfnFilterScheme')?.value;
-  const status = $('vfnFilterStatus')?.value;
-  const search = $('vfnSearchQuery')?.value.trim().toLowerCase();
-  const accountType = $('vfnFilterAccountType')?.value;
-
-  if (scheme) query = query.eq('scheme', scheme);
-  if (accountType) query = query.eq('account_type', accountType);
-  if (office) query = query.eq('office_name', office);  
-  if (status) query = query.eq('status', status);
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error("CentVfn fetch error:", error);
-    tbody.innerHTML = `<tr><td colspan="11" class="p-4 text-center text-rose-600">Error loading data: ${error.message}</td></tr>`;
-    return;
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400">Searching records...</td></tr>`;
   }
 
-  let records = data || [];
+  // Read filter values
+  const rawSearch = $('vfnSearchQuery')?.value?.trim() || '';
+  const office = $('vfnFilterOffice')?.value?.trim() || '';
+  const productGroup = $('vfnFilterProductGroup')?.value?.trim() || '';
+  const scheme = $('vfnFilterScheme')?.value?.trim() || '';
+  const status = $('vfnFilterStatus')?.value?.trim() || '';
+  const pageSizeVal = $('vfnPageSizeSelect')?.value || '10';
 
-  // Multi-field search across the full dataset
-  if (search) {
-    records = records.filter(r => 
-      (r.account_no || '').toLowerCase().includes(search) ||
-      (r.customer_name || '').toLowerCase().includes(search) ||
-      (r.article_no || '').toLowerCase().includes(search) ||
-      (r.address || '').toLowerCase().includes(search) ||
-      (r.office_name || '').toLowerCase().includes(search) ||
-      (r.scheme || '').toLowerCase().includes(search)
-    );
+  // Handle page sizing
+  const isAll = pageSizeVal === 'all';
+  const limit = isAll ? 5000 : parseInt(pageSizeVal, 10);
+  const from = isAll ? 0 : (vfnCurrentPage - 1) * limit;
+  const to = isAll ? 4999 : from + limit - 1;
+
+  try {
+    // 1. Initialize query with exact count
+    let query = supabaseClient
+      .from('cent_percent_verification')
+      .select('*', { count: 'exact' });
+
+    // 2. SERVER-SIDE SEARCH (Bypasses the 1000 visible cap)
+    if (rawSearch) {
+      // Searches account_no, customer_name, and tracking barcodes across the ENTIRE table
+      query = query.or(
+        `account_no.ilike.%${rawSearch}%,customer_name.ilike.%${rawSearch}%,outward_article_no.ilike.%${rawSearch}%,reply_article_no.ilike.%${rawSearch}%,article_no.ilike.%${rawSearch}%`
+      );
+    }
+
+    // 3. Dropdown Filters
+    if (office) {
+      query = query.eq('office_name', office);
+    }
+
+    if (scheme) {
+      query = query.eq('scheme', scheme);
+    } else if (productGroup && window.masterSchemesList?.length) {
+      // If product group selected but no scheme, match all schemes in that group
+      const matchingSchemes = window.masterSchemesList
+        .filter(s => s.product_group === productGroup)
+        .map(s => s.scheme_code);
+      if (matchingSchemes.length) {
+        query = query.in('scheme', matchingSchemes);
+      }
+    }
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    // 4. Pagination & Ordering
+    query = query
+      .order('sl_no', { ascending: true })
+      .range(from, to);
+
+    const { data, count, error } = await query;
+    if (error) throw error;
+
+    vfnTotalCount = count || 0;
+    window.cachedCentVfnRecords = data || [];
+
+    // Render Rows
+    renderCentVfnTableRows(data);
+
+    // Update Pagination UI
+    const totalPages = isAll ? 1 : Math.ceil(vfnTotalCount / limit) || 1;
+    if (countEl) {
+      countEl.innerText = `Showing ${data.length} of ${vfnTotalCount.toLocaleString('en-IN')} accounts`;
+    }
+    if (indicator) {
+      indicator.innerText = `Page ${vfnCurrentPage} / ${totalPages}`;
+    }
+    if (btnPrev) btnPrev.disabled = vfnCurrentPage <= 1;
+    if (btnNext) btnNext.disabled = vfnCurrentPage >= totalPages;
+
+  } catch (err) {
+    console.error("loadCentVfnData error:", err);
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-rose-600 font-bold">Search error: ${err.message}</td></tr>`;
+    }
   }
-
-  // Cache complete filtered records for export and pagination
-  cachedCentVfnRecords = records;
-  vfnCurrentPage = 1; // Reset to first page whenever filters or searches change
-
-  // 1. Update Scorecards (unpaginated exact counts)
-  if (typeof updateCentVfnScorecards === 'function') {
-    updateCentVfnScorecards();
-  }
-
-  // 2. Populate Office Filter Dropdown if empty
-  if (typeof populateCentVfnOfficeDropdown === 'function') {
-    populateCentVfnOfficeDropdown();
-  }
-
-  // 3. Update Scheme Breakdown Card
-  if (typeof loadCentVfnSchemeBreakdown === 'function') {
-    loadCentVfnSchemeBreakdown();
-  }
-
-  // 4. Render Table (10 items by default)
-  renderCentVfnTablePage();
 }
-
 // -------------------------------------------------------------
 // RENDER ONLY THE ACTIVE SLICE (PREVENTS DOM CRASHES ON 30k ROWS)
 // -------------------------------------------------------------
-function renderCentVfnTablePage() {
+function renderCentVfnTableRows(records) {
   const tbody = $('centVfnTableBody');
   if (!tbody) return;
 
-  const total = cachedCentVfnRecords.length;
-
-  if (!total) {
-    tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-slate-400 font-medium">No verification records found.</td></tr>`;
-    if ($('vfnTableRecordCount')) $('vfnTableRecordCount').innerText = "Showing 0 accounts";
-    if ($('vfnPageIndicator')) $('vfnPageIndicator').innerText = "Page 0 / 0";
-    if ($('btnVfnPrevPage')) $('btnVfnPrevPage').disabled = true;
-    if ($('btnVfnNextPage')) $('btnVfnNextPage').disabled = true;
+  if (!records || !records.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400 font-semibold">No accounts found matching your search criteria.</td></tr>`;
     return;
   }
 
-  // Calculate slice range based on selected page size
-  const effectivePageSize = (vfnPageSize === 'all') ? total : parseInt(vfnPageSize, 10);
-  const totalPages = Math.ceil(total / effectivePageSize);
-
-  if (vfnCurrentPage > totalPages) vfnCurrentPage = totalPages;
-  if (vfnCurrentPage < 1) vfnCurrentPage = 1;
-
-  const startIndex = (vfnCurrentPage - 1) * effectivePageSize;
-  const endIndex = Math.min(startIndex + effectivePageSize, total);
-  const pageRecords = cachedCentVfnRecords.slice(startIndex, endIndex);
-
-  // Update counter and page indicators
-  if ($('vfnTableRecordCount')) {
-    $('vfnTableRecordCount').innerText = `Showing ${startIndex + 1} - ${endIndex} of ${total.toLocaleString('en-IN')} accounts`;
-  }
-  if ($('vfnPageIndicator')) {
-    $('vfnPageIndicator').innerText = `Page ${vfnCurrentPage} / ${totalPages}`;
-  }
-  if ($('btnVfnPrevPage')) $('btnVfnPrevPage').disabled = (vfnCurrentPage <= 1);
-  if ($('btnVfnNextPage')) $('btnVfnNextPage').disabled = (vfnCurrentPage >= totalPages);
-
-  // Render rows only for the current slice
-  const htmlArr = pageRecords.map(r => {
+  tbody.innerHTML = records.map(r => {
     const bal = parseFloat(r.balance) || 0;
+    const lastTxn = r.date_of_last_txn ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn) : '-';
 
-    let statusBadge = '';
-    if (r.status === 'reply_received') {
-      statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Reply Rx'd (${r.reply_rxd_date || '✓'})</span>`;
+    let statusBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px] font-bold">Imported</span>`;
+    if (r.status === 'printed') {
+      statusBadge = `<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-[10px] font-bold">Printed</span>`;
     } else if (r.status === 'dispatched') {
-      statusBadge = `<span class="bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded font-bold text-[10px]">Dispatched (${r.dispatched_date || 'Sent'})</span>`;
-    } else if (r.status === 'printed') {
-      statusBadge = `<span class="bg-purple-100 text-purple-900 border border-purple-300 px-2 py-0.5 rounded font-extrabold text-[10px]">Printed (${r.printed_date || 'Ready'})</span>`;
-    } else {
-      statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Imported</span>`;
+      statusBadge = `<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px] font-bold">Dispatched</span>`;
+    } else if (r.status === 'reply_received') {
+      statusBadge = `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Reply Rx'd</span>`;
     }
 
-    const displayLastTxn = r.date_of_last_txn 
-      ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn) 
-      : '-';
-    
-      return `
-        <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
-          <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
-          <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
-          <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
-          <td class="p-2">
-            <div class="font-bold text-slate-900">${r.customer_name}</div>
-            <div class="text-[10px] text-slate-500 truncate max-w-[220px]" title="${r.address || ''}">${r.address || '-'}</div>
-          </td>
-          <td class="p-2 text-center">
-            <span class="bg-purple-100 text-purple-900 font-extrabold text-[10px] px-1.5 py-0.5 rounded border border-purple-200">
-              ${r.scheme || '-'}
-            </span>
-          </td>
-          <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-          <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${displayLastTxn}</td>
-          <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.outward_article_no || r.article_no || '-'}</td>
-          <td class="p-2 text-center">${statusBadge}</td>
-          <td class="p-2 text-center">
-            <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
-              ✏️ Update
-            </button>
-          </td>
-        </tr>
-      `;
-  });
-
-  tbody.innerHTML = htmlArr.join('');
+    return `
+      <tr class="hover:bg-amber-50/40 transition border-b border-slate-100 text-xs">
+        <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
+        <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
+        <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
+        <td class="p-2">
+          <div class="font-bold text-slate-900">${r.customer_name}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[220px]" title="${r.address || ''}">${r.address || '-'}</div>
+        </td>
+        <td class="p-2 text-center">
+          <span class="bg-purple-50 text-purple-900 font-extrabold text-[10px] px-1.5 py-0.5 rounded border border-purple-200">
+            ${r.scheme || '-'}
+          </span>
+        </td>
+        <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${lastTxn}</td>
+        <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.outward_article_no || r.article_no || '-'}</td>
+        <td class="p-2 text-center">${statusBadge}</td>
+        <td class="p-2 text-center">
+          <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
+            ✏️ Update
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // -------------------------------------------------------------
@@ -9131,36 +9190,57 @@ function closeAdminVfnDeleteModal() {
 function toggleVfnDeleteScopeInput() {
   const scope = $('vfnDeleteScope')?.value;
   const label = $('vfnDeleteInputLabel');
-  const input = $('vfnDeleteScopeVal');
-  if (!label || !input) return;
+  const container = $('vfnDeleteInputContainer');
+  if (!label || !container) return;
 
   if (scope === 'office') {
     label.innerText = 'Office Name *';
-    input.placeholder = 'Enter office name exactly (e.g. Mylapore HO)';
-    input.type = 'text';
+    container.innerHTML = `
+      <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Office Name *</label>
+      <input type="text" id="vfnDeleteScopeVal" placeholder="Enter office name exactly (e.g. Mylapore SO)" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+    `;
   } else if (scope === 'scheme') {
-    label.innerText = 'Scheme Identifier *';
-    input.placeholder = 'Enter scheme code exactly (e.g. TDIP1, SBGEN)';
-    input.type = 'text';
+    // Dynamically build dropdown from loaded masterSchemesList
+    let options = '<option value="">-- Select Scheme to Delete --</option>';
+    if (window.masterSchemesList && window.masterSchemesList.length) {
+      options += window.masterSchemesList.map(s => 
+        `<option value="${s.scheme_code}">${s.scheme_code} - ${s.scheme_description}</option>`
+      ).join('');
+    }
+    container.innerHTML = `
+      <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Scheme Identifier *</label>
+      <select id="vfnDeleteScopeVal" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+        ${options}
+      </select>
+    `;
   } else if (scope === 'date') {
-    label.innerText = 'Import Date (YYYY-MM-DD) *';
-    input.placeholder = 'YYYY-MM-DD';
-    input.type = 'date';
+    container.innerHTML = `
+      <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Import Date (YYYY-MM-DD) *</label>
+      <input type="date" id="vfnDeleteScopeVal" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+    `;
   } else if (scope === 'all') {
-    label.innerText = 'Confirm Full Deletion (Superadmin Only) *';
-    input.placeholder = 'Type CONFIRM exactly';
-    input.type = 'text';
+    container.innerHTML = `
+      <label id="vfnDeleteInputLabel" class="block font-bold text-slate-700 mb-0.5">Confirm Full Deletion (Superadmin Only) *</label>
+      <input type="text" id="vfnDeleteScopeVal" placeholder="Type CONFIRM exactly" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+    `;
   }
 }
 
 async function executeAdminVfnBulkDelete() {
   const scope = $('vfnDeleteScope')?.value || 'office';
-  const val = $('vfnDeleteScopeVal')?.value.trim();
+  const val = $('vfnDeleteScopeVal')?.value?.trim();
 
-  if (!val) return alert("Please specify the target value for deletion.");
+  if (!val) {
+    return alert("Please specify the target value for deletion.");
+  }
 
-  // Check superadmin status if deleting all
-  const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : (currentUser?.role || userProfile?.role || 'user')).toLowerCase();
+  // Identify user role safely
+  const userRole = (
+    (typeof currentUserRole !== 'undefined' && currentUserRole) ||
+    (typeof currentUser !== 'undefined' && currentUser?.role) ||
+    (typeof userProfile !== 'undefined' && userProfile?.role) ||
+    'user'
+  ).toLowerCase();
 
   if (scope === 'all' && userRole !== 'superadmin') {
     return alert("ACCESS DENIED: Only Superadmin accounts can delete the entire verification database!");
@@ -9170,12 +9250,15 @@ async function executeAdminVfnBulkDelete() {
     return alert("You must type 'CONFIRM' to verify deletion of the entire table.");
   }
 
-  if (!confirm(`WARNING: Are you sure you want to delete records matching ${scope.toUpperCase()} = "${val}"?\n\nThis cannot be undone.`)) {
+  if (!confirm(`⚠️ IRREVERSIBLE ACTION:\n\nAre you sure you want to delete records matching:\n${scope.toUpperCase()} = "${val}"?\n\nThis will remove all associated accounts and re-sequence serial numbers.`)) {
     return;
   }
 
   const btn = $('btnRunVfnBulkDelete');
-  if (btn) { btn.disabled = true; btn.innerText = "Deleting..."; }
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Deleting & Re-indexing...";
+  }
 
   try {
     const { data, error } = await supabaseClient.rpc('delete_cent_vfn_bulk', {
@@ -9186,15 +9269,99 @@ async function executeAdminVfnBulkDelete() {
 
     if (error) throw error;
 
-    alert(`✅ Successfully deleted ${data.deleted_count} accounts. Serial numbers re-indexed.`);
-    closeAdminVfnDeleteModal();
-    loadCentVfnData();
-    loadCentVfnDatewiseReport();
+    const count = data?.deleted_count ?? data ?? 0;
+
+    if (count === 0) {
+      alert(`No records matched ${scope.toUpperCase()} = "${val}". Nothing was deleted.`);
+    } else {
+      alert(`✅ Successfully deleted ${Number(count).toLocaleString('en-IN')} account(s).\nSerial numbers (Sl. No.) have been sequentially re-indexed.`);
+      closeAdminVfnDeleteModal();
+      await loadCentVfnData();
+      if (typeof loadCentVfnSchemeBreakdown === 'function') await loadCentVfnSchemeBreakdown();
+      if (typeof loadCentVfnDatewiseReport === 'function') await loadCentVfnDatewiseReport();
+    }
   } catch (err) {
-    alert("Deletion failed: " + err.message);
+    console.error("Bulk delete error:", err);
+    alert("Deletion failed: " + (err.message || JSON.stringify(err)));
   } finally {
-    if (btn) { btn.disabled = false; btn.innerText = "Permanently Delete"; }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Permanently Delete";
+    }
   }
+}
+
+async function loadCentVfnKpiScorecards() {
+  const cardTotal = $('vfnCardTotal');
+  const cardPrinted = $('vfnCardPrinted');
+  const cardDispatched = $('vfnCardDispatched');
+  const cardReply = $('vfnCardReplyReceived');
+  const cardPending = $('vfnCardPending');
+
+  if (!cardTotal) return;
+
+  const office = $('vfnFilterOffice')?.value?.trim() || null;
+  const scheme = $('vfnFilterScheme')?.value?.trim() || null;
+
+  try {
+    // 1. Primary path: Call the fast database RPC
+    const { data, error } = await supabaseClient.rpc('get_cent_vfn_kpis', {
+      p_office: office,
+      p_scheme: scheme
+    });
+
+    let stats = {
+      total: 0,
+      printed: 0,
+      dispatched: 0,
+      reply: 0,
+      pending: 0
+    };
+
+    if (!error && Array.isArray(data) && data.length > 0) {
+      stats.total = Number(data[0].total_count) || 0;
+      stats.printed = Number(data[0].printed_count) || 0;
+      stats.dispatched = Number(data[0].dispatched_count) || 0;
+      stats.reply = Number(data[0].reply_count) || 0;
+      stats.pending = Number(data[0].pending_count) || 0;
+    } else {
+      // 2. Resilient fallback: Direct aggregation query if RPC is missing
+      let query = supabaseClient
+        .from('cent_percent_verification')
+        .select('status');
+
+      if (office) query = query.eq('office_name', office);
+      if (scheme) query = query.eq('scheme', scheme);
+
+      const { data: rows, error: qErr } = await query;
+      if (qErr) throw qErr;
+
+      (rows || []).forEach(r => {
+        stats.total++;
+        const st = (r.status || 'imported').toLowerCase().trim();
+        if (st === 'printed') stats.printed++;
+        else if (st === 'dispatched') stats.dispatched++;
+        else if (st === 'reply_received') stats.reply++;
+        else stats.pending++;
+      });
+    }
+
+    // Update DOM scorecard values with Indian locale formatting
+    cardTotal.innerText = stats.total.toLocaleString('en-IN');
+    cardPrinted.innerText = stats.printed.toLocaleString('en-IN');
+    cardDispatched.innerText = stats.dispatched.toLocaleString('en-IN');
+    cardReply.innerText = stats.reply.toLocaleString('en-IN');
+    cardPending.innerText = stats.pending.toLocaleString('en-IN');
+
+  } catch (err) {
+    console.error("loadCentVfnKpiScorecards error:", err);
+  }
+}
+function initCentVfnPortal() {
+  loadCentVfnKpiScorecards();
+  loadCentVfnData(1);
+  loadCentVfnSchemeBreakdown();
+  loadCentVfnDatewiseReport();
 }
 
 async function loadCentVfnDatewiseReport() {
@@ -9228,6 +9395,9 @@ async function loadCentVfnDatewiseReport() {
     tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-rose-600">Failed to load: ${err.message}</td></tr>`;
   }
 }
+
+
+
 let masterSchemesList = [];
 window.masterSchemesList = window.masterSchemesList || [];
 // Shared global cache for master schemes
@@ -9378,6 +9548,7 @@ function populateVfnBarcodeSchemeDropdown() {
 // -------------------------------------------------------------
 function openSchemeMasterModal() {
   $('vfnSchemeMasterModal')?.classList.remove('hidden');
+  cancelSchemeMasterEdit(); // Explicitly unlocks fields and clears old IDs
   loadSchemeMaster();
 }
 
@@ -9385,6 +9556,11 @@ function closeSchemeMasterModal() {
   $('vfnSchemeMasterModal')?.classList.add('hidden');
 }
 
+let editingSchemeCode = null;
+
+// -------------------------------------------------------------
+// RENDER TABLE WITH EDIT & DELETE ACTIONS
+// -------------------------------------------------------------
 function renderSchemeMasterTable() {
   const tbody = $('vfnSchemeMasterTableBody');
   if (!tbody) return;
@@ -9394,53 +9570,180 @@ function renderSchemeMasterTable() {
     return;
   }
 
-  tbody.innerHTML = masterSchemesList.map(s => `
-    <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
-      <td class="p-2 font-bold font-mono text-purple-900">${s.scheme_code}</td>
-      <td class="p-2 font-bold text-slate-700">${s.product_group}</td>
-      <td class="p-2 text-slate-800">${s.product_group_name}</td>
-      <td class="p-2 text-slate-600">${s.scheme_description}</td>
-      <td class="p-2 text-center">
-        <button type="button" onclick="deleteSchemeMasterRecord('${s.scheme_code}')" class="text-rose-600 hover:text-rose-800 font-bold text-[11px] px-1.5 py-0.5 rounded hover:bg-rose-50 cursor-pointer">
-          🗑️ Delete
-        </button>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = masterSchemesList.map(s => {
+    // Escape string literals safely for inline onclick arguments
+    const safeDesc = (s.scheme_description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const safeGrpName = (s.product_group_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+    return `
+      <tr class="hover:bg-amber-50/40 transition border-b border-slate-100 ${editingSchemeCode === s.scheme_code ? 'bg-amber-100/60' : ''}">
+        <td class="p-2 font-bold font-mono text-purple-900">${s.scheme_code}</td>
+        <td class="p-2 font-bold text-slate-700">${s.product_group}</td>
+        <td class="p-2 text-slate-800">${s.product_group_name}</td>
+        <td class="p-2 text-slate-600">${s.scheme_description}</td>
+        <td class="p-2 text-center whitespace-nowrap">
+          <button type="button" onclick="editSchemeMasterRecord('${s.scheme_code}', '${s.product_group}', '${safeGrpName}', '${safeDesc}')" class="text-amber-700 hover:text-amber-900 font-bold text-[11px] px-2 py-0.5 rounded hover:bg-amber-100 mr-1 cursor-pointer transition">
+            ✏️ Edit
+          </button>
+          <button type="button" onclick="deleteSchemeMasterRecord('${s.scheme_code}')" class="text-rose-600 hover:text-rose-800 font-bold text-[11px] px-2 py-0.5 rounded hover:bg-rose-50 cursor-pointer transition">
+            🗑️ Delete
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// -------------------------------------------------------------
+// LOAD RECORD INTO FORM FOR EDITING
+// -------------------------------------------------------------
+function editSchemeMasterRecord(schemeCode, productGroup, groupName, description) {
+  editingSchemeCode = schemeCode;
+
+  const codeInput = $('smSchemeCode');
+  const groupInput = $('smProductGroup');
+  const nameInput = $('smGroupName');
+  const descInput = $('smDescription');
+  const saveBtn = $('btnSaveSchemeMaster');
+  const cancelBtn = $('btnCancelSchemeEdit');
+
+  if (codeInput) {
+    codeInput.value = schemeCode;
+    codeInput.disabled = true; // Primary Key cannot be changed
+    codeInput.classList.add('bg-slate-100', 'cursor-not-allowed', 'text-slate-500');
+  }
+
+  if (groupInput) {
+    groupInput.value = productGroup;
+    groupInput.disabled = true;
+    groupInput.classList.add('bg-slate-100', 'cursor-not-allowed', 'text-slate-500');
+  }
+
+  if (nameInput) nameInput.value = groupName;
+  if (descInput) {
+    descInput.value = description;
+    descInput.focus();
+  }
+
+  if (saveBtn) {
+    saveBtn.innerText = "💾 Update Scheme";
+    saveBtn.classList.replace('bg-amber-700', 'bg-blue-700');
+    saveBtn.classList.replace('hover:bg-amber-800', 'hover:bg-blue-800');
+  }
+
+  if (cancelBtn) cancelBtn.classList.remove('hidden');
+
+  renderSchemeMasterTable();
+}
+
+// -------------------------------------------------------------
+// CANCEL EDIT MODE
+// -------------------------------------------------------------
+function cancelSchemeMasterEdit() {
+  editingSchemeCode = null;
+
+  const codeInput = $('smSchemeCode');
+  const groupInput = $('smProductGroup');
+  const nameInput = $('smGroupName');
+  const descInput = $('smDescription');
+  const saveBtn = $('btnSaveSchemeMaster');
+  const cancelBtn = $('btnCancelSchemeEdit');
+
+  if (codeInput) {
+    codeInput.value = '';
+    codeInput.disabled = false;
+    codeInput.removeAttribute('disabled');
+    codeInput.classList.remove('bg-slate-100', 'cursor-not-allowed', 'text-slate-500');
+  }
+
+  if (groupInput) {
+    groupInput.value = '';
+    groupInput.disabled = false;
+    groupInput.removeAttribute('disabled');
+    groupInput.classList.remove('bg-slate-100', 'cursor-not-allowed', 'text-slate-500');
+  }
+
+  if (nameInput) nameInput.value = '';
+  if (descInput) descInput.value = '';
+
+  if (saveBtn) {
+    saveBtn.innerText = "➕ Save Scheme";
+    saveBtn.classList.remove('bg-blue-700', 'hover:bg-blue-800');
+    saveBtn.classList.add('bg-amber-700', 'hover:bg-amber-800');
+  }
+
+  if (cancelBtn) cancelBtn.classList.add('hidden');
+
+  renderSchemeMasterTable();
 }
 
 async function saveSchemeMasterRecord() {
-  const scheme_code = $('smSchemeCode')?.value.trim().toUpperCase();
-  const product_group = $('smProductGroup')?.value.trim().toUpperCase();
-  const product_group_name = $('smGroupName')?.value.trim();
-  const scheme_description = $('smDescription')?.value.trim();
+  const codeInput = $('smSchemeCode');
+  const groupInput = $('smProductGroup');
+  
+  // If editing, use the stored editingSchemeCode; otherwise read the input
+  const scheme_code = (editingSchemeCode || codeInput?.value || '').trim().toUpperCase();
+  const product_group = (groupInput?.value || '').trim().toUpperCase();
+  const product_group_name = $('smGroupName')?.value.trim() || '';
+  const scheme_description = $('smDescription')?.value.trim() || '';
 
-  if (!scheme_code || !product_group || !product_group_name || !scheme_description) {
-    return alert("Please fill in Scheme ID, Product Group, Group Name, and Description.");
+  if (!scheme_code) {
+    return alert("Please enter a valid Scheme ID (e.g. TDIP1, SBGEN).");
+  }
+  if (!product_group) {
+    return alert("Please enter a Product Group (e.g. TD, SB).");
+  }
+  if (!product_group_name) {
+    return alert("Please enter a Group Name (e.g. Time Deposit).");
+  }
+  if (!scheme_description) {
+    return alert("Please enter a Description (e.g. TD - 1 Year).");
   }
 
-  const { error } = await supabaseClient
-    .from('cent_vfn_schemes')
-    .upsert({
+  const btn = $('btnSaveSchemeMaster');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+  }
+
+  try {
+    const payload = {
       scheme_code,
       product_group,
       product_group_name,
-      scheme_description,
-      created_at: new Date().toISOString()
-    });
+      scheme_description
+    };
 
-  if (error) {
-    return alert("Error saving scheme: " + error.message);
+    // Use .insert() if brand new, .upsert() if editing
+    let response;
+    if (editingSchemeCode) {
+      response = await supabaseClient
+        .from('cent_vfn_schemes')
+        .update({
+          product_group_name,
+          scheme_description
+        })
+        .eq('scheme_code', editingSchemeCode);
+    } else {
+      response = await supabaseClient
+        .from('cent_vfn_schemes')
+        .insert([payload]);
+    }
+
+    if (response.error) throw response.error;
+
+    alert(`✅ Scheme '${scheme_code}' saved successfully!`);
+    cancelSchemeMasterEdit();
+    await loadSchemeMaster();
+  } catch (err) {
+    console.error("Save scheme error:", err);
+    alert("Error saving scheme: " + (err.message || err.details || JSON.stringify(err)));
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = editingSchemeCode ? "💾 Update Scheme" : "➕ Save Scheme";
+    }
   }
-
-  // Reset form inputs
-  if ($('smSchemeCode')) $('smSchemeCode').value = '';
-  if ($('smProductGroup')) $('smProductGroup').value = '';
-  if ($('smGroupName')) $('smGroupName').value = '';
-  if ($('smDescription')) $('smDescription').value = '';
-
-  await loadSchemeMaster();
-  alert(`✅ Scheme '${scheme_code}' saved successfully! All dropdowns have been updated.`);
 }
 
 async function deleteSchemeMasterRecord(code) {
@@ -9974,6 +10277,9 @@ async function executeAdminVfnBulkDelete() {
     alert("Deletion failed: " + err.message);
   }
 }
+
+
+
 
 // -------------------------------------------------------------
 // STATUS / REPLY RECEIVED UPDATE MODAL
@@ -10879,6 +11185,26 @@ function formatDate(dateString) {
   return `${day}-${month}-${year}`;
 }
 
+
+// Resolves: "Office: HO" OR "All Offices (Division Consolidation)"
+function getActiveVfnOfficeHeader() {
+  const selectedOffice = $('vfnFilterOffice')?.value?.trim();
+  if (selectedOffice) {
+    return `Office: ${selectedOffice}`;
+  }
+
+  // Check unique offices in the cached dataset if filter is empty
+  const records = window.cachedCentVfnRecords || [];
+  const uniqueOffices = [...new Set(records.map(r => r.office_name).filter(Boolean))];
+
+  if (uniqueOffices.length === 1) {
+    return `Office: ${uniqueOffices[0]}`;
+  } else if (uniqueOffices.length > 1) {
+    return `All Offices (${uniqueOffices.length} Offices Consolidated)`;
+  }
+  return "All Offices";
+}
+
 // -------------------------------------------------------------
 // EXPORT CENT PERCENT DATA TO EXCEL
 // -------------------------------------------------------------
@@ -10914,22 +11240,53 @@ async function loadCentVfnSchemeBreakdown() {
   const tfoot = $('vfnSchemeBreakdownFoot');
   if (!tbody) return;
 
-  try {
-    const { data, error } = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
+  tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Loading scheme breakdown...</td></tr>`;
 
-    if (error) throw error;
+  try {
+    let data = null;
+
+    // 1. Primary path: Attempt RPC call
+    const rpcRes = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
+    
+    if (!rpcRes.error && Array.isArray(rpcRes.data)) {
+      data = rpcRes.data;
+    } else {
+      console.warn("RPC failed, falling back to direct table aggregation...", rpcRes.error);
+      
+      // 2. Resilient fallback: Direct query if RPC is missing/failing
+      const rawRes = await supabaseClient
+        .from('cent_percent_verification')
+        .select('scheme, status');
+
+      if (rawRes.error) throw rawRes.error;
+
+      const groupMap = {};
+      (rawRes.data || []).forEach(row => {
+        const sc = (row.scheme || 'UNASSIGNED').trim().toUpperCase();
+        if (!groupMap[sc]) {
+          groupMap[sc] = { scheme: sc, total_count: 0, printed_count: 0, despatched_count: 0, reply_count: 0, pending_count: 0 };
+        }
+        groupMap[sc].total_count++;
+        const st = (row.status || 'imported').toLowerCase();
+        if (st === 'printed') groupMap[sc].printed_count++;
+        else if (st === 'dispatched') groupMap[sc].despatched_count++;
+        else if (st === 'reply_received') groupMap[sc].reply_count++;
+        else groupMap[sc].pending_count++;
+      });
+
+      data = Object.values(groupMap).sort((a, b) => a.scheme.localeCompare(b.scheme));
+    }
 
     if (!data || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">No records found.</td></tr>`;
+      window.cachedSchemeBreakdownData = [];
+      tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">No verification records found.</td></tr>`;
       if (tfoot) tfoot.innerHTML = '';
       return;
     }
 
-    let totAll = 0;
-    let totPrinted = 0;
-    let totDespatched = 0;
-    let totReply = 0;
-    let totPending = 0;
+    window.cachedSchemeBreakdownData = data;
+
+    let totAll = 0, totPrinted = 0, totDespatched = 0, totReply = 0, totPending = 0;
 
     const rowsHtml = data.map(r => {
       const total = Number(r.total_count) || 0;
@@ -10946,41 +11303,40 @@ async function loadCentVfnSchemeBreakdown() {
 
       return `
         <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
-          <td class="p-2.5 font-bold text-slate-800">
-            <span class="bg-purple-100 text-purple-900 border border-purple-200 px-2 py-0.5 rounded font-extrabold text-[11px]">
+          <td class="p-2 font-bold text-slate-800">
+            <span class="text-purple-900 font-extrabold text-[11px]">
               ${r.scheme}
             </span>
           </td>
-          <td class="p-2.5 text-right font-mono font-bold text-slate-800">${total.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono font-bold text-purple-700">${printed.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono font-bold text-blue-700">${despatched.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono font-bold text-emerald-700">${reply.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono font-bold text-amber-700">${pending.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-slate-800">${total.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-purple-700">${printed.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-blue-700">${despatched.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-emerald-700">${reply.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-amber-700">${pending.toLocaleString('en-IN')}</td>
         </tr>
       `;
     }).join('');
 
     tbody.innerHTML = rowsHtml;
 
-    // Render Summary / Total Row
     if (tfoot) {
       tfoot.innerHTML = `
-        <tr class="whitespace-nowrap">
-          <td class="p-2.5 text-slate-900 uppercase">Total</td>
-          <td class="p-2.5 text-right font-mono text-slate-900">${totAll.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono text-purple-800">${totPrinted.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono text-blue-800">${totDespatched.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono text-emerald-800">${totReply.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-mono text-amber-800">${totPending.toLocaleString('en-IN')}</td>
+        <tr class="whitespace-nowrap bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
+          <td class="p-2 uppercase">TOTAL</td>
+          <td class="p-2 text-right font-mono">${totAll.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-purple-800">${totPrinted.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-blue-800">${totDespatched.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-emerald-800">${totReply.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-amber-800">${totPending.toLocaleString('en-IN')}</td>
         </tr>
       `;
     }
   } catch (err) {
-    console.error("Failed to load scheme breakdown:", err);
-    tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-rose-600 font-semibold">Failed to load breakdown: ${err.message}</td></tr>`;
+    console.error("loadCentVfnSchemeBreakdown error:", err);
+    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-600 font-bold">Error loading breakdown: ${err.message}</td></tr>`;
+    if (tfoot) tfoot.innerHTML = '';
   }
 }
-
 // ----------------------------------------------------------------------
 // OPEN BARCODE ALLOTMENT MODAL
 // ----------------------------------------------------------------------
@@ -11143,6 +11499,427 @@ function generateBarcodeBase64(barcodeNumber) {
     return null;
   }
 }
+// Global cache for scheme breakdown
+window.cachedSchemeBreakdownData = window.cachedSchemeBreakdownData || [];
+
+// -------------------------------------------------------------
+// HELPER: GET CURRENT ACTIVE OFFICE & TIMESTAMP FOR FILENAMES
+// -------------------------------------------------------------
+function getVfnExportMeta() {
+  const officeDropdownVal = $('vfnFilterOffice')?.value?.trim();
+  
+  // Resolve office name from dropdown or records
+  let resolvedOffice = officeDropdownVal || '';
+  if (!resolvedOffice && window.cachedCentVfnRecords && window.cachedCentVfnRecords.length > 0) {
+    const uniqueOffices = [...new Set(window.cachedCentVfnRecords.map(r => r.office_name).filter(Boolean))];
+    if (uniqueOffices.length === 1) {
+      resolvedOffice = uniqueOffices[0];
+    }
+  }
+
+  const officeDisplay = resolvedOffice ? resolvedOffice.toUpperCase() : "ALL OFFICES (DIVISIONAL CONSOLIDATED)";
+  const officeFileSlug = resolvedOffice ? resolvedOffice.replace(/[^a-zA-Z0-9_-]/g, '_') : "ALL_OFFICES";
+
+  // Timestamp formatting: YYYYMMDD_HHMMSS
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const dateSlug = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  const timeSlug = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  const fullTimestamp = `${dateSlug}_${timeSlug}`;
+
+  const readableGenDate = now.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+
+  return { officeDisplay, officeFileSlug, fullTimestamp, readableGenDate };
+}
+
+// -------------------------------------------------------------
+// 1. SCHEME BREAKDOWN LOADER (SORTED A-Z + % PENDING COLUMN)
+// -------------------------------------------------------------
+async function loadCentVfnSchemeBreakdown() {
+  const tbody = $('vfnSchemeBreakdownBody');
+  const tfoot = $('vfnSchemeBreakdownFoot');
+  if (!tbody) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      window.cachedSchemeBreakdownData = [];
+      tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-medium">No records found.</td></tr>`;
+      if (tfoot) tfoot.innerHTML = '';
+      return;
+    }
+
+    // 1. Sort Scheme Names Ascending Alphabetically (A to Z)
+    const sortedData = [...data].sort((a, b) => (a.scheme || '').localeCompare(b.scheme || ''));
+    window.cachedSchemeBreakdownData = sortedData;
+
+    let totAll = 0, totPrinted = 0, totDespatched = 0, totReply = 0, totPending = 0;
+
+    const rowsHtml = sortedData.map(r => {
+      const total = Number(r.total_count) || 0;
+      const printed = Number(r.printed_count) || 0;
+      const despatched = Number(r.despatched_count) || 0;
+      const reply = Number(r.reply_count) || 0;
+      const pending = Number(r.pending_count) || 0;
+
+      totAll += total;
+      totPrinted += printed;
+      totDespatched += despatched;
+      totReply += reply;
+      totPending += pending;
+
+      // Pending % Calculation
+      const pendingPct = total > 0 ? ((pending / total) * 100).toFixed(1) : "0.0";
+
+      return `
+        <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
+          <td class="p-2 font-bold text-slate-800">
+            <span class="bg-purple-100 text-purple-900 border border-purple-200 px-2 py-0.5 rounded font-extrabold text-[11px]">
+              ${r.scheme}
+            </span>
+          </td>
+          <td class="p-2 text-right font-mono font-bold text-slate-800">${total.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-purple-700">${printed.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-blue-700">${despatched.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-emerald-700">${reply.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-bold text-amber-700">${pending.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono font-extrabold text-rose-700">${pendingPct}%</td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = rowsHtml;
+
+    if (tfoot) {
+      const overallPendingPct = totAll > 0 ? ((totPending / totAll) * 100).toFixed(1) : "0.0";
+      tfoot.innerHTML = `
+        <tr class="whitespace-nowrap bg-slate-100">
+          <td class="p-2 text-slate-900 uppercase font-black">Total</td>
+          <td class="p-2 text-right font-mono text-slate-900 font-bold">${totAll.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-purple-800 font-bold">${totPrinted.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-blue-800 font-bold">${totDespatched.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-emerald-800 font-bold">${totReply.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-amber-800 font-bold">${totPending.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-mono text-rose-800 font-black">${overallPendingPct}%</td>
+        </tr>
+      `;
+    }
+  } catch (err) {
+    console.error("loadCentVfnSchemeBreakdown error:", err);
+    tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-rose-600 font-semibold">Failed to load breakdown: ${err.message}</td></tr>`;
+  }
+}
+
+// -------------------------------------------------------------
+// 2. EXPORT TO EXCEL (.XLSX)
+// -------------------------------------------------------------
+function exportSchemeBreakdownToExcel() {
+  const data = window.cachedSchemeBreakdownData || [];
+  if (!data.length) return alert("No scheme data available to export.");
+
+  const genDate = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  const officeScopeText = getActiveVfnOfficeHeader();
+
+  const sheetRows = [
+    ["DEPARTMENT OF POSTS, INDIA"],
+    ["CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017"],
+    ["CENT PERCENT VERIFICATION: SCHEME-WISE BREAKDOWN REPORT"],
+    [officeScopeText.toUpperCase()],
+    [`Date of Generation: ${genDate}`],
+    [], // Blank spacer
+    ["Scheme Identifier", "Total Accounts", "Printed (Ready)", "Despatched", "Reply Received", "Pending for Notice"]
+  ];
+
+  let totAll = 0, totPrinted = 0, totDespatched = 0, totReply = 0, totPending = 0;
+
+  data.forEach(r => {
+    const tot = Number(r.total_count) || 0;
+    const prt = Number(r.printed_count) || 0;
+    const dsp = Number(r.despatched_count) || 0;
+    const rep = Number(r.reply_count) || 0;
+    const pnd = Number(r.pending_count) || 0;
+
+    totAll += tot;
+    totPrinted += prt;
+    totDespatched += dsp;
+    totReply += rep;
+    totPending += pnd;
+
+    sheetRows.push([r.scheme, tot, prt, dsp, rep, pnd]);
+  });
+
+  sheetRows.push(["TOTAL", totAll, totPrinted, totDespatched, totReply, totPending]);
+  sheetRows.push([]);
+  sheetRows.push(["*** END OF REPORT — CENT PERCENT VERIFICATION PORTAL ***"]);
+
+  const ws = XLSX.utils.aoa_to_sheet(sheetRows);
+  ws['!cols'] = [
+    { wch: 22 },
+    { wch: 16 },
+    { wch: 16 },
+    { wch: 16 },
+    { wch: 16 },
+    { wch: 18 }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Scheme_Breakdown");
+
+  const fileDate = new Date().toISOString().split('T')[0];
+  const safeOfficeName = officeScopeText.replace(/[^a-zA-Z0-9]/g, '_');
+  XLSX.writeFile(wb, `Scheme_Breakdown_${safeOfficeName}_${genDate}.xlsx`);
+}
+
+// -------------------------------------------------------------
+// 3. EXPORT TO PDF (.PDF)
+// -------------------------------------------------------------
+function exportSchemeBreakdownToPdf() {
+  const data = window.cachedSchemeBreakdownData || [];
+  if (!data.length) return alert("No scheme data available to export.");
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const genDate = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  const officeScopeText = getActiveVfnOfficeHeader();
+
+  // 1. Division Header
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  doc.text("DEPARTMENT OF POSTS, INDIA", 105, 14, { align: "center" });
+
+  doc.setFontSize(10);
+  doc.text("CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017", 105, 19, { align: "center" });
+
+  // 2. Dynamic Office Scope Sub-Header
+  doc.setFontSize(10.5);
+  doc.setTextColor(30, 41, 59); // Slate-800
+  doc.text(officeScopeText.toUpperCase(), 105, 24, { align: "center" });
+
+  // 3. Report Name & Generation Date
+  doc.setFontSize(11);
+  doc.setTextColor(168, 15, 40); // Postal Red
+  doc.text("Cent Percent Verification: Scheme-wise Breakdown Report", 105, 29, { align: "center" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(100);
+  doc.text(`Generated on: ${genDate}`, 105, 34, { align: "center" });
+
+  let totAll = 0, totPrinted = 0, totDespatched = 0, totReply = 0, totPending = 0;
+
+  const tableBody = data.map(r => {
+    const tot = Number(r.total_count) || 0;
+    const prt = Number(r.printed_count) || 0;
+    const dsp = Number(r.despatched_count) || 0;
+    const rep = Number(r.reply_count) || 0;
+    const pnd = Number(r.pending_count) || 0;
+
+    totAll += tot;
+    totPrinted += prt;
+    totDespatched += dsp;
+    totReply += rep;
+    totPending += pnd;
+
+    return [
+      r.scheme,
+      tot.toLocaleString('en-IN'),
+      prt.toLocaleString('en-IN'),
+      dsp.toLocaleString('en-IN'),
+      rep.toLocaleString('en-IN'),
+      pnd.toLocaleString('en-IN')
+    ];
+  });
+
+  const tableFoot = [[
+    "TOTAL",
+    totAll.toLocaleString('en-IN'),
+    totPrinted.toLocaleString('en-IN'),
+    totDespatched.toLocaleString('en-IN'),
+    totReply.toLocaleString('en-IN'),
+    totPending.toLocaleString('en-IN')
+  ]];
+
+  doc.autoTable({
+    startY: 38,
+    head: [["Scheme", "Total", "Printed", "Despatched", "Reply Rx'd", "Pending"]],
+    body: tableBody,
+    foot: tableFoot,
+    theme: 'grid',
+    headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+    footStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], fontStyle: 'bold' },
+    columnStyles: {
+      0: { fontStyle: 'bold', halign: 'left' },
+      1: { halign: 'right' },
+      2: { halign: 'right' },
+      3: { halign: 'right' },
+      4: { halign: 'right' },
+      5: { halign: 'right' }
+    },
+    styles: { fontSize: 8.5, cellPadding: 2.5 }
+  });
+
+  const finalY = doc.lastAutoTable.finalY + 12;
+  doc.setFontSize(8);
+  doc.setTextColor(120);
+  doc.setFont("helvetica", "bold");
+  doc.text("*** END OF REPORT — CENT PERCENT VERIFICATION PORTAL ***", 105, finalY, { align: "center" });
+
+  const fileDate = new Date().toISOString().split('T')[0];
+  const safeOfficeName = officeScopeText.replace(/[^a-zA-Z0-9]/g, '_');
+  doc.save(`Scheme_Breakdown_${safeOfficeName}_${genDate}.pdf`);
+}
+
+// -------------------------------------------------------------
+// 4. EXPORT TO IMAGE REPORT (.PNG VIA DEDICATED PRINT TEMPLATE)
+// -------------------------------------------------------------
+async function exportSchemeBreakdownToImage() {
+  const data = window.cachedSchemeBreakdownData || [];
+  if (!data.length) return alert("No scheme data available to export as image!");
+
+  const genDate = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  const officeScopeText = typeof getActiveVfnOfficeHeader === 'function' ? getActiveVfnOfficeHeader() : "All Offices";
+  const safeOfficeName = officeScopeText.replace(/[^a-zA-Z0-9]/g, '_');
+
+  // Exact DDMMYYYY-HHMMSS timestamp
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = now.getFullYear();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+
+  const timestamp = `${day}${month}${year}-${hours}${minutes}${seconds}`;
+  const fileName = `Scheme-wise_Breakdown_${safeOfficeName}_${timestamp}.png`;
+
+  let totAll = 0, totPrinted = 0, totDespatched = 0, totReply = 0, totPending = 0;
+
+  let rowsHtml = '';
+  data.forEach((r, i) => {
+    const tot = Number(r.total_count) || 0;
+    const prt = Number(r.printed_count) || 0;
+    const dsp = Number(r.despatched_count) || 0;
+    const rep = Number(r.reply_count) || 0;
+    const pnd = Number(r.pending_count) || 0;
+
+    totAll += tot;
+    totPrinted += prt;
+    totDespatched += dsp;
+    totReply += rep;
+    totPending += pnd;
+
+    const pendingPct = tot > 0 ? ((pnd / tot) * 100).toFixed(2) : "0.00";
+    const pendingColor = pnd > 0 ? '#b91c1c' : '#15803d';
+
+    rowsHtml += `
+      <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; font-size: 13px;">
+        <td style="padding: 10px 12px; font-weight: 800; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1e293b;">
+          ${r.scheme}
+        </td>
+        <td style="padding: 10px 12px; text-align: right; font-family: Segoe UI; font-weight: 800; font-size: 14px; color: #0f172a;">${tot.toLocaleString('en-IN')}</td>
+        <td style="padding: 10px 12px; text-align: right; font-family: Segoe UI; font-weight: 800; font-size: 14px; color: #6b21a8;">${prt.toLocaleString('en-IN')}</td>
+        <td style="padding: 10px 12px; text-align: right; font-family: Segoe UI; font-weight: 800; font-size: 14px; color: #1d4ed8;">${dsp.toLocaleString('en-IN')}</td>
+        <td style="padding: 10px 12px; text-align: right; font-family: Segoe UI; font-weight: 800; font-size: 14px; color: #047857;">${rep.toLocaleString('en-IN')}</td>
+        <td style="padding: 10px 12px; text-align: right; font-family: Segoe UI; font-weight: 800; font-size: 14px; color: #b45309;">${pnd.toLocaleString('en-IN')}</td>
+        <td style="padding: 10px 12px; text-align: right; font-family: Segoe UI; font-weight: 800; font-size: 14px; color: ${pendingColor};">${tot > 0 ? `${pendingPct}%` : '-'}</td>
+      </tr>
+    `;
+  });
+
+  const grandTotalPendingPct = totAll > 0 ? ((totPending / totAll) * 100).toFixed(2) : "0.00";
+
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.top = '-9999px';
+  container.style.left = '-9999px';
+  container.style.width = '1050px';
+  container.style.backgroundColor = '#FFFFFF';
+  container.style.paddingTop = '24px';
+  container.style.paddingBottom = '24px';
+  container.style.paddingLeft = '30mm';
+  container.style.paddingRight = '30mm';
+  container.style.boxSizing = 'border-box';
+  container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+  container.innerHTML = `
+    <div style="border: 2px solid #A80F28; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+      <div style="background: #A80F28; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="margin: 0; font-size: 18px; text-transform: uppercase; font-weight: 900; letter-spacing: 0.8px;">DEPARTMENT OF POSTS, INDIA</h2>
+          <p style="margin: 3px 0 0 0; font-size: 15px; color: #FEF9C3; font-weight: 700;">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</p>
+          <p style="margin: 3px 0 0 0; font-size: 13.5px; color: #fecdd3; font-weight: 600;">Cent Percent Verification: Scheme-wise Breakdown Report</p>
+          <p style="margin: 5px 0 0 0; font-size: 12px; color: #ffffff; opacity: 0.95;">
+            Scope: <strong>${officeScopeText.toUpperCase()}</strong> | Generated: <strong>${genDate}</strong>
+          </p>
+        </div>
+        ${typeof currentAppLogo !== 'undefined' && currentAppLogo ? `<img src="${currentAppLogo}" style="height: 54px; width: 78px; object-fit: contain; background: #fff; padding: 3px; border-radius: 6px;">` : ''}
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="background: #8A0C21; color: #ffffff; font-size: 12.5px; font-weight: bold; text-transform: uppercase;">
+            <th style="padding: 10px 12px; width: 22%;">Scheme</th>
+            <th style="padding: 10px 12px; text-align: right; width: 13%;">Total A/Cs</th>
+            <th style="padding: 10px 12px; text-align: right; width: 13%;">Printed</th>
+            <th style="padding: 10px 12px; text-align: right; width: 13%;">Despatched</th>
+            <th style="padding: 10px 12px; text-align: right; width: 13%;">Reply Rx'd</th>
+            <th style="padding: 10px 12px; text-align: right; width: 13%;">Pending</th>
+            <th style="padding: 10px 12px; text-align: right; width: 13%;">Pending %</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+          <tr style="background: #A80F28; color: #ffffff; font-weight: 800; font-size: 13px; border-top: 2px solid #6E081A;">
+            <td style="padding: 11px 12px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 14px;">TOTAL</td>
+            <td style="padding: 11px 12px; text-align: right; font-family: monospace;">${totAll.toLocaleString('en-IN')}</td>
+            <td style="padding: 11px 12px; text-align: right; font-family: monospace; color: #f3e8ff;">${totPrinted.toLocaleString('en-IN')}</td>
+            <td style="padding: 11px 12px; text-align: right; font-family: monospace; color: #dbeafe;">${totDespatched.toLocaleString('en-IN')}</td>
+            <td style="padding: 11px 12px; text-align: right; font-family: monospace; color: #d1fae5;">${totReply.toLocaleString('en-IN')}</td>
+            <td style="padding: 11px 12px; text-align: right; font-family: monospace; color: #fef08a;">${totPending.toLocaleString('en-IN')}</td>
+            <td style="padding: 11px 12px; text-align: right; font-family: monospace; color: #FEF08A; font-size: 14px; font-weight: 900;">
+              ${totAll > 0 ? `${grandTotalPendingPct}%` : '-'}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 8px 12px; text-align: center; font-size: 11px; font-weight: bold; color: #64748b; letter-spacing: 0.6px;">
+        *** END OF REPORT &bull; CENT PERCENT VERIFICATION (SB-46) PORTAL ***
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      backgroundColor: '#FFFFFF',
+      useCORS: true
+    });
+
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    console.error("Scheme breakdown image export failed:", err);
+    alert("Image export failed: " + err.message);
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
 // =========================================================================
 // FETCH TRUE REPO LAST-COMMIT DATE & TIME FROM GITHUB API
 // =========================================================================
