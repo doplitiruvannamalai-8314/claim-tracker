@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1112,40 +1109,57 @@
 </div>
 
   <!-- FILTER & SEARCH CONTROL BAR (CASCADING PRODUCT GROUP & SCHEME) -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
-    <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name</label>
-      <input type="text" id="vfnSearchQuery" oninput="debounceCentVfnSearch()" placeholder="Search accounts, names, barcodes..." class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium outline-none focus:border-postRed-600">
-    </div>
-    <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Filter by Office</label>
-      <select id="vfnFilterOffice" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
-        <option value="">-- All Offices --</option>
-      </select>
-    </div>
-    <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Product Group</label>
-      <select id="vfnFilterProductGroup" onchange="onProductGroupFilterChange()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
-        <option value="">-- All Product Groups --</option>
-      </select>
-    </div>
-    <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Scheme Identifier</label>
-      <select id="vfnFilterScheme" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
-        <option value="">-- All Schemes --</option>
-      </select>
-    </div>
-    <div>
-      <label class="block font-bold text-slate-700 mb-0.5">Status</label>
-      <select id="vfnFilterStatus" onchange="loadCentVfnData()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
-        <option value="">-- All Statuses --</option>
-        <option value="imported">Imported (Notice Pending)</option>
-        <option value="printed">Notice Printed</option>
-        <option value="dispatched">Notice Dispatched</option>
-        <option value="reply_received">Reply Received</option>
-      </select>
-    </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs items-end">
+  <div>
+    <label class="block font-bold text-slate-700 mb-0.5">Search Account / Name</label>
+    <input type="text" id="vfnSearchQuery" oninput="debounceCentVfnSearch()" placeholder="Search accounts, names, barcodes..." class="w-full border border-slate-300 p-1.5 rounded bg-white font-medium outline-none focus:border-postRed-600">
   </div>
+
+  <div>
+    <label class="block font-bold text-slate-700 mb-0.5">Filter by Office</label>
+    <select id="vfnFilterOffice" onchange="loadCentVfnData(1)" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+      <option value="">-- All Offices --</option>
+    </select>
+  </div>
+
+  <!-- 1. PRODUCT GROUP FILTER -->
+  <div>
+    <label class="block font-bold text-slate-700 mb-0.5">Product Group</label>
+    <select id="vfnFilterProductGroup" onchange="onProductGroupFilterChange(true)" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+      <option value="">-- All Product Groups --</option>
+    </select>
+  </div>
+
+  <!-- 2. SCHEME IDENTIFIER FILTER -->
+  <div>
+    <label class="block font-bold text-slate-700 mb-0.5">Scheme Identifier</label>
+    <select id="vfnFilterScheme" onchange="loadCentVfnData(1)" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+      <option value="">-- All Schemes --</option>
+    </select>
+  </div>
+
+  <!-- 3. STATUS FILTER -->
+  <div>
+    <label class="block font-bold text-slate-700 mb-0.5">Status</label>
+    <select id="vfnFilterStatus" onchange="loadCentVfnData(1)" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold outline-none">
+      <option value="">-- All Statuses --</option>
+      <option value="imported">Imported (Notice Pending)</option>
+      <option value="printed">Notice Printed</option>
+      <option value="dispatched">Notice Dispatched</option>
+      <option value="reply_received">Reply Received</option>
+    </select>
+  </div>
+
+  <!-- 4. ACTION BUTTONS: FILTER & RESET -->
+  <div class="flex gap-1.5">
+    <button type="button" onclick="loadCentVfnData(1)" class="flex-1 bg-postRed-600 hover:bg-postRed-700 text-white p-1.5 rounded font-bold text-xs cursor-pointer transition shadow-2xs">
+      🔍 Filter
+    </button>
+    <button type="button" onclick="resetCentVfnFilters()" title="Clear all filters" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer transition flex items-center justify-center gap-1">
+      🔄 Reset
+    </button>
+  </div>
+</div>
 
   <!-- TABLE CONTROLS BAR: EXPORT, PAGE SIZE & PAGINATION -->
   <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200 mb-2 text-xs">
@@ -1576,15 +1590,12 @@
 
       <!-- Mode 2: Scheme Select -->
       <div id="sb46SchemeContainer" class="hidden bg-slate-50 p-2.5 rounded border border-slate-200">
-        <label class="block font-bold text-slate-700 mb-0.5">Select Scheme to Print</label>
-        <select id="sb46SchemeSelect" class="w-full border p-1 rounded font-bold bg-white">
-          <option value="SB">Savings Bank (SB)</option>
-          <option value="RD">Recurring Deposit (RD)</option>
-          <option value="TD">Time Deposit (TD)</option>
-          <option value="MIS">Monthly Income Scheme (MIS)</option>
-          <option value="SCSS">Senior Citizen Savings Scheme (SCSS)</option>
-          <option value="PPF">Public Provident Fund (PPF)</option>
-          <option value="SSA">Sukanya Samriddhi (SSA)</option>
+        <div class="flex justify-between items-center mb-0.5">
+          <label class="block font-bold text-slate-700 text-xs">Select Scheme to Print *</label>
+          <span id="sb46SchemeLoadingIndicator" class="text-[10px] text-slate-400 font-semibold hidden">Refreshing...</span>
+        </div>
+        <select id="sb46SchemeSelect" onchange="onSb46SchemeSelectChange()" class="w-full border border-slate-300 p-1.5 rounded font-bold text-xs bg-white outline-none focus:border-postRed-600">
+          <option value="ALL">-- Loading Imported Schemes... --</option>
         </select>
       </div>
 
@@ -2678,6 +2689,7 @@ function showTab(tabName) {
   };
   loadSchemeMaster();
   loadCentVfnDatewiseReport();
+  loadCentVfnSchemeBreakdown();
 
    async function loadFilterDropdowns() {
   try {
@@ -8502,12 +8514,19 @@ function renderDayWisePivotTable() {
   tbody.innerHTML = tbodyHtml;
 }
 
-
 // =========================================================================
 // 11. CENT PERCENT VERIFICATION (CENTVFN) ENGINE
 // =========================================================================
-let vfnSearchTimer = null;
 
+// Global states for CentVfn table management
+let vfnCurrentPage = 1;
+let vfnTotalCount = 0;
+let vfnSearchTimer = null;
+window.cachedCentVfnRecords = window.cachedCentVfnRecords || [];
+
+/**
+ * Debounce handler for search input (waits 300ms after last stroke).
+ */
 function debounceCentVfnSearch() {
   clearTimeout(vfnSearchTimer);
   vfnSearchTimer = setTimeout(() => {
@@ -8516,10 +8535,13 @@ function debounceCentVfnSearch() {
   }, 300);
 }
 
+/**
+ * Pagination navigation handler (Server-side range step).
+ */
 function changeVfnPage(delta) {
   const pageSizeVal = $('vfnPageSizeSelect')?.value || '10';
   if (pageSizeVal === 'all') return;
-  
+
   const limit = parseInt(pageSizeVal, 10);
   const totalPages = Math.ceil(vfnTotalCount / limit) || 1;
   const newPage = vfnCurrentPage + delta;
@@ -8529,10 +8551,16 @@ function changeVfnPage(delta) {
   }
 }
 
+/**
+ * Page size selector change handler.
+ */
 function changeVfnPageSize(val) {
   loadCentVfnData(1);
 }
 
+/**
+ * Resets all dashboard search and dropdown filters.
+ */
 function resetCentVfnFilters() {
   if ($('vfnSearchQuery')) $('vfnSearchQuery').value = '';
   if ($('vfnFilterOffice')) $('vfnFilterOffice').value = '';
@@ -8542,24 +8570,29 @@ function resetCentVfnFilters() {
   loadCentVfnData(1);
 }
 
-// Global states for CentVfn table management
-let vfnCurrentPage = 1;
-let vfnPageSize = 10; // Default page size
-let vfnTotalCount = 0;
-
+/**
+ * Complete Controller for Cent Percent Verification (SB-46) Data Table.
+ * - Handles server-side full-database search (bypassing the 1,000-row cap).
+ * - Applies cascading Office, Product Group, Scheme, and Status filters.
+ * - Manages server-side range pagination and custom page sizing.
+ * - Synchronizes KPI summary scorecards and pagination UI controls.
+ */
 async function loadCentVfnData(page = 1) {
   vfnCurrentPage = page;
+
+  // DOM Elements
   const tbody = $('centVfnTableBody');
   const countEl = $('vfnTableRecordCount');
   const indicator = $('vfnPageIndicator');
   const btnPrev = $('btnVfnPrevPage');
   const btnNext = $('btnVfnNextPage');
 
+  // Set loading state
   if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400">Searching records...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400 font-medium">Searching and loading verification records...</td></tr>`;
   }
 
-  // Read filter values
+  // Retrieve filter inputs safely
   const rawSearch = $('vfnSearchQuery')?.value?.trim() || '';
   const office = $('vfnFilterOffice')?.value?.trim() || '';
   const productGroup = $('vfnFilterProductGroup')?.value?.trim() || '';
@@ -8567,48 +8600,49 @@ async function loadCentVfnData(page = 1) {
   const status = $('vfnFilterStatus')?.value?.trim() || '';
   const pageSizeVal = $('vfnPageSizeSelect')?.value || '10';
 
-  // Handle page sizing
+  // Calculate range boundaries for Supabase pagination
   const isAll = pageSizeVal === 'all';
   const limit = isAll ? 5000 : parseInt(pageSizeVal, 10);
   const from = isAll ? 0 : (vfnCurrentPage - 1) * limit;
   const to = isAll ? 4999 : from + limit - 1;
 
   try {
-    // 1. Initialize query with exact count
+    // 1. Initialize Supabase query requesting exact row count
     let query = supabaseClient
       .from('cent_percent_verification')
       .select('*', { count: 'exact' });
 
-    // 2. SERVER-SIDE SEARCH (Bypasses the 1000 visible cap)
+    // 2. Server-side text search across account number, customer name, and barcodes
     if (rawSearch) {
-      // Searches account_no, customer_name, and tracking barcodes across the ENTIRE table
       query = query.or(
         `account_no.ilike.%${rawSearch}%,customer_name.ilike.%${rawSearch}%,outward_article_no.ilike.%${rawSearch}%,reply_article_no.ilike.%${rawSearch}%,article_no.ilike.%${rawSearch}%`
       );
     }
 
-    // 3. Dropdown Filters
+    // 3. Office filter
     if (office) {
       query = query.eq('office_name', office);
     }
 
+    // 4. Scheme & Product Group cascading filter
     if (scheme) {
       query = query.eq('scheme', scheme);
-    } else if (productGroup && window.masterSchemesList?.length) {
-      // If product group selected but no scheme, match all schemes in that group
+    } else if (productGroup && window.masterSchemesList && window.masterSchemesList.length > 0) {
       const matchingSchemes = window.masterSchemesList
         .filter(s => s.product_group === productGroup)
         .map(s => s.scheme_code);
-      if (matchingSchemes.length) {
+
+      if (matchingSchemes.length > 0) {
         query = query.in('scheme', matchingSchemes);
       }
     }
 
+    // 5. Status filter
     if (status) {
       query = query.eq('status', status);
     }
 
-    // 4. Pagination & Ordering
+    // 6. Sorting and Range limits
     query = query
       .order('sl_no', { ascending: true })
       .range(from, to);
@@ -8619,59 +8653,76 @@ async function loadCentVfnData(page = 1) {
     vfnTotalCount = count || 0;
     window.cachedCentVfnRecords = data || [];
 
-    // Render Rows
+    // 7. Render Rows (10 Columns)
     renderCentVfnTableRows(data);
 
-    // Update Pagination UI
+    // 8. Update Pagination Controls
     const totalPages = isAll ? 1 : Math.ceil(vfnTotalCount / limit) || 1;
+
     if (countEl) {
       countEl.innerText = `Showing ${data.length} of ${vfnTotalCount.toLocaleString('en-IN')} accounts`;
     }
     if (indicator) {
       indicator.innerText = `Page ${vfnCurrentPage} / ${totalPages}`;
     }
-    if (btnPrev) btnPrev.disabled = vfnCurrentPage <= 1;
-    if (btnNext) btnNext.disabled = vfnCurrentPage >= totalPages;
+    if (btnPrev) {
+      btnPrev.disabled = vfnCurrentPage <= 1;
+    }
+    if (btnNext) {
+      btnNext.disabled = vfnCurrentPage >= totalPages;
+    }
+
+    // 9. Sync KPI summary scorecards with the current filter scope
+    if (typeof loadCentVfnKpiScorecards === 'function') {
+      loadCentVfnKpiScorecards();
+    }
 
   } catch (err) {
-    console.error("loadCentVfnData error:", err);
+    console.error("loadCentVfnData query error:", err);
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-rose-600 font-bold">Search error: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-rose-600 font-bold">Failed to load records: ${err.message}</td></tr>`;
     }
   }
 }
-// -------------------------------------------------------------
-// RENDER ONLY THE ACTIVE SLICE (PREVENTS DOM CRASHES ON 30k ROWS)
-// -------------------------------------------------------------
+
+/**
+ * Renders the 10-column verification table body for the active slice.
+ */
 function renderCentVfnTableRows(records) {
   const tbody = $('centVfnTableBody');
   if (!tbody) return;
 
-  if (!records || !records.length) {
+  if (!records || records.length === 0) {
     tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400 font-semibold">No accounts found matching your search criteria.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = records.map(r => {
     const bal = parseFloat(r.balance) || 0;
-    const lastTxn = r.date_of_last_txn ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn) : '-';
+    const lastTxn = r.date_of_last_txn
+      ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn)
+      : '-';
 
+    // Status Badges
+    const statusVal = (r.status || 'imported').toLowerCase().trim();
     let statusBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px] font-bold">Imported</span>`;
-    if (r.status === 'printed') {
+    if (statusVal === 'printed') {
       statusBadge = `<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-[10px] font-bold">Printed</span>`;
-    } else if (r.status === 'dispatched') {
+    } else if (statusVal === 'dispatched') {
       statusBadge = `<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px] font-bold">Dispatched</span>`;
-    } else if (r.status === 'reply_received') {
+    } else if (statusVal === 'reply_received') {
       statusBadge = `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Reply Rx'd</span>`;
     }
+
+    const trackingArticle = r.outward_article_no || r.article_no || '-';
 
     return `
       <tr class="hover:bg-amber-50/40 transition border-b border-slate-100 text-xs">
         <td class="p-2 text-center font-bold font-mono text-slate-400">${r.sl_no}</td>
-        <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name}</td>
+        <td class="p-2 font-bold text-slate-800 whitespace-nowrap">${r.office_name || '-'}</td>
         <td class="p-2 font-mono font-bold text-postRed-700">${r.account_no}</td>
         <td class="p-2">
-          <div class="font-bold text-slate-900">${r.customer_name}</div>
+          <div class="font-bold text-slate-900">${r.customer_name || '-'}</div>
           <div class="text-[10px] text-slate-500 truncate max-w-[220px]" title="${r.address || ''}">${r.address || '-'}</div>
         </td>
         <td class="p-2 text-center">
@@ -8681,7 +8732,7 @@ function renderCentVfnTableRows(records) {
         </td>
         <td class="p-2 text-right font-mono font-bold text-slate-800">₹${bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
         <td class="p-2 text-center text-slate-600 whitespace-nowrap font-mono text-[11px]">${lastTxn}</td>
-        <td class="p-2 text-center font-mono font-semibold text-blue-900">${r.outward_article_no || r.article_no || '-'}</td>
+        <td class="p-2 text-center font-mono font-semibold text-blue-900">${trackingArticle}</td>
         <td class="p-2 text-center">${statusBadge}</td>
         <td class="p-2 text-center">
           <button type="button" onclick="openVfnStatusModal('${r.id}')" class="bg-amber-50 hover:bg-amber-100 text-postRed-800 border border-amber-300 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
@@ -8692,21 +8743,6 @@ function renderCentVfnTableRows(records) {
     `;
   }).join('');
 }
-
-// -------------------------------------------------------------
-// PAGINATION CONTROLS
-// -------------------------------------------------------------
-function changeVfnPage(delta) {
-  vfnCurrentPage += delta;
-  renderCentVfnTablePage();
-}
-
-function changeVfnPageSize(newSize) {
-  vfnPageSize = newSize;
-  vfnCurrentPage = 1;
-  renderCentVfnTablePage();
-}
-
 // -------------------------------------------------------------
 // EXPORT ALL FILTERED RECORDS TO EXCEL (FULL DATASET, NOT JUST 10)
 // -------------------------------------------------------------
@@ -9406,6 +9442,9 @@ window.masterSchemesList = window.masterSchemesList || [];
 // -------------------------------------------------------------
 // 1. LOAD SCHEMES & POPULATE ALL DROPDOWNS DYNAMICALLY
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// 1. LOAD SCHEMES & POPULATE ALL DROPDOWNS DYNAMICALLY
+// -------------------------------------------------------------
 async function loadSchemeMaster() {
   try {
     const { data, error } = await supabaseClient
@@ -9419,62 +9458,40 @@ async function loadSchemeMaster() {
     // Fallback self-seed if table is returned empty
     if (!data || data.length === 0) {
       console.warn("cent_vfn_schemes empty, attempting client auto-seed...");
-      await autoSeedMasterSchemes();
+      if (typeof autoSeedMasterSchemes === 'function') {
+        await autoSeedMasterSchemes();
+      }
       return;
     }
 
+    // CRITICAL: Update both local and window globals
     masterSchemesList = data;
+    window.masterSchemesList = data;
 
     // Render Master Management Modal Table
-    renderSchemeMasterTable();
+    if (typeof renderSchemeMasterTable === 'function') {
+      renderSchemeMasterTable();
+    }
 
     // Dynamically Populate Dropdowns:
-    // A. Main View Filter: Product Group & Scheme
     populateCascadingFilterDropdowns();
 
-    // B. Import Accounts Modal: Select Scheme Name Dropdown
-    populateVfnImportSchemeDropdown();
+    if (typeof populateVfnImportSchemeDropdown === 'function') {
+      populateVfnImportSchemeDropdown();
+    }
 
-    // C. Barcode Generator Modal: Scheme Target Dropdown (if present)
-    populateVfnBarcodeSchemeDropdown();
+    if (typeof populateVfnBarcodeSchemeDropdown === 'function') {
+      populateVfnBarcodeSchemeDropdown();
+    }
 
   } catch (err) {
     console.error("loadSchemeMaster error:", err);
     const tbody = $('vfnSchemeMasterTableBody');
     if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-rose-600">Failed to load: ${err.message}</td></tr>`;
+
+    // Fallback: If DB query fails, harvest directly from cent_percent_verification so dropdowns still work
+    harvestAndPopulateSchemesFallback();
   }
-}
-
-// -------------------------------------------------------------
-// 2. POPULATE IMPORT ACCOUNTS MODAL SCHEME DROPDOWN
-// -------------------------------------------------------------
-function populateVfnImportSchemeDropdown() {
-  const select = $('vfnImportSchemeDropdown');
-  if (!select) return;
-
-  if (!masterSchemesList.length) {
-    select.innerHTML = `<option value="">-- No Schemes Configured --</option>`;
-    return;
-  }
-
-  // Group options by Product Group in optgroups
-  const grouped = {};
-  masterSchemesList.forEach(s => {
-    const grpKey = `${s.product_group} - ${s.product_group_name}`;
-    if (!grouped[grpKey]) grouped[grpKey] = [];
-    grouped[grpKey].push(s);
-  });
-
-  let optionsHtml = '';
-  for (const [groupTitle, schemes] of Object.entries(grouped)) {
-    optionsHtml += `<optgroup label="${groupTitle}">`;
-    schemes.forEach(s => {
-      optionsHtml += `<option value="${s.scheme_code}">${s.scheme_code} - ${s.scheme_description}</option>`;
-    });
-    optionsHtml += `</optgroup>`;
-  }
-
-  select.innerHTML = optionsHtml;
 }
 
 // -------------------------------------------------------------
@@ -9483,21 +9500,42 @@ function populateVfnImportSchemeDropdown() {
 function populateCascadingFilterDropdowns() {
   const groupSelect = $('vfnFilterProductGroup');
   const schemeSelect = $('vfnFilterScheme');
-  if (!groupSelect || !schemeSelect) return;
+  
+  // Guard: If DOM elements are not rendered yet, retry in 150ms
+  if (!groupSelect || !schemeSelect) {
+    setTimeout(populateCascadingFilterDropdowns, 150);
+    return;
+  }
+
+  // Use either local list or window list
+  const list = (masterSchemesList && masterSchemesList.length > 0) 
+    ? masterSchemesList 
+    : (window.masterSchemesList || []);
+
+  if (!list.length) {
+    // If still empty, try to harvest from existing verification records
+    harvestAndPopulateSchemesFallback();
+    return;
+  }
 
   // Build unique product groups
   const groupsMap = new Map();
-  masterSchemesList.forEach(s => {
-    if (!groupsMap.has(s.product_group)) {
-      groupsMap.set(s.product_group, s.product_group_name);
+  list.forEach(s => {
+    if (s.product_group && !groupsMap.has(s.product_group)) {
+      groupsMap.set(s.product_group, s.product_group_name || s.product_group);
     }
   });
 
+  const currentGroup = groupSelect.value;
   let groupHtml = `<option value="">-- All Product Groups --</option>`;
   groupsMap.forEach((name, code) => {
     groupHtml += `<option value="${code}">${code} - ${name}</option>`;
   });
   groupSelect.innerHTML = groupHtml;
+
+  if (currentGroup && groupsMap.has(currentGroup)) {
+    groupSelect.value = currentGroup;
+  }
 
   // Initial population of schemes
   onProductGroupFilterChange(false);
@@ -9509,15 +9547,19 @@ function onProductGroupFilterChange(triggerFetch = true) {
   if (!schemeSelect) return;
 
   const currentSelectedScheme = schemeSelect.value;
+  const list = (masterSchemesList && masterSchemesList.length > 0) 
+    ? masterSchemesList 
+    : (window.masterSchemesList || []);
 
-  let filteredSchemes = masterSchemesList;
+  let filteredSchemes = list;
   if (selectedGroup) {
-    filteredSchemes = masterSchemesList.filter(s => s.product_group === selectedGroup);
+    filteredSchemes = list.filter(s => s.product_group === selectedGroup);
   }
 
   let schemeHtml = `<option value="">-- All Schemes --</option>`;
   filteredSchemes.forEach(s => {
-    schemeHtml += `<option value="${s.scheme_code}">${s.scheme_code} (${s.scheme_description})</option>`;
+    const desc = s.scheme_description ? ` (${s.scheme_description})` : '';
+    schemeHtml += `<option value="${s.scheme_code}">${s.scheme_code}${desc}</option>`;
   });
   schemeSelect.innerHTML = schemeHtml;
 
@@ -9527,10 +9569,51 @@ function onProductGroupFilterChange(triggerFetch = true) {
   }
 
   if (triggerFetch && typeof loadCentVfnData === 'function') {
-    loadCentVfnData();
+    loadCentVfnData(1);
   }
 }
 
+// -------------------------------------------------------------
+// 4. RESILIENT FALLBACK HARVESTER (IF MASTER TABLE IS EMPTY/RLS BLOCKED)
+// -------------------------------------------------------------
+async function harvestAndPopulateSchemesFallback() {
+  try {
+    const { data } = await supabaseClient
+      .from('cent_percent_verification')
+      .select('scheme');
+
+    if (data && data.length) {
+      const unique = [...new Set(data.map(d => (d.scheme || '').trim().toUpperCase()).filter(Boolean))];
+      const harvested = unique.map(sc => {
+        let grp = 'OTHER';
+        if (sc.startsWith('TD')) grp = 'TD';
+        else if (sc.startsWith('SB')) grp = 'SB';
+        else if (sc.startsWith('RD')) grp = 'RD';
+        else if (sc.startsWith('MIS')) grp = 'MIS';
+        else if (sc.startsWith('SCSS')) grp = 'SCSS';
+        else if (sc.startsWith('PPF')) grp = 'PPF';
+        else if (sc.startsWith('SSA')) grp = 'SSA';
+        return {
+          scheme_code: sc,
+          product_group: grp,
+          product_group_name: `${grp} Scheme`,
+          scheme_description: `${sc} Account`
+        };
+      });
+
+      masterSchemesList = harvested;
+      window.masterSchemesList = harvested;
+
+      const groupSelect = $('vfnFilterProductGroup');
+      const schemeSelect = $('vfnFilterScheme');
+      if (groupSelect && schemeSelect) {
+        populateCascadingFilterDropdowns();
+      }
+    }
+  } catch (e) {
+    console.error("Fallback scheme harvest failed:", e);
+  }
+}
 // Optional helper for Barcode Modal target scheme
 function populateVfnBarcodeSchemeDropdown() {
   const select = $('vfnBarTargetScheme');
@@ -9894,6 +9977,9 @@ function closeVfnImportModal() {
     $('btnRunVfnImport').disabled = false;
     $('btnRunVfnImport').innerText = 'Start Import';
   }
+
+  loadCentVfnSchemeBreakdown()
+  loadCentVfnDatewiseReport()
 }
 function toggleVfnImportModeUI() {
   const selectedRadio = document.querySelector('input[name="vfnImportModeRadio"]:checked');
@@ -10276,6 +10362,8 @@ async function executeAdminVfnBulkDelete() {
   } catch (err) {
     alert("Deletion failed: " + err.message);
   }
+  loadCentVfnSchemeBreakdown()
+  loadCentVfnDatewiseReport()
 }
 
 
@@ -10513,8 +10601,17 @@ window.saveVfnStatusUpdate = saveVfnStatusUpdate;
 // -------------------------------------------------------------
 // SB-46 LETTER GENERATOR (PRINT ENGINE)
 // -------------------------------------------------------------
-function openSb46GeneratorModal() {
-  $('sb46GeneratorModal').classList.remove('hidden');
+async function openSb46GeneratorModal() {
+  const modal = $('sb46GeneratorModal') || $('vfnPrintModal');
+  if (modal) modal.classList.remove('hidden');
+
+  // Dynamically populate all imported schemes into the dropdown
+  await populateSb46PrintModalSchemes();
+
+  // If you calculate eligible notices count, run it here:
+  if (typeof updateSb46EligibleCount === 'function') {
+    updateSb46EligibleCount();
+  }
 }
 
 function closeSb46GeneratorModal() {
@@ -11917,6 +12014,191 @@ async function exportSchemeBreakdownToImage() {
     alert("Image export failed: " + err.message);
   } finally {
     document.body.removeChild(container);
+  }
+}
+
+/**
+ * Fully resets all dashboard filter inputs and restores all dropdown options.
+ */
+function resetCentVfnFilters() {
+  if ($('vfnSearchQuery')) $('vfnSearchQuery').value = '';
+  if ($('vfnFilterOffice')) $('vfnFilterOffice').value = '';
+  if ($('vfnFilterProductGroup')) $('vfnFilterProductGroup').value = '';
+  if ($('vfnFilterStatus')) $('vfnFilterStatus').value = '';
+
+  // Restore Scheme options without Product Group restriction
+  onProductGroupFilterChange(false);
+  if ($('vfnFilterScheme')) $('vfnFilterScheme').value = '';
+
+  // Fetch initial unfiltered page
+  loadCentVfnData(1);
+}
+/**
+ * Consolidated loader for SB-46 Print Schemes Dropdown.
+ * Uses cached breakdown data or an aggregated query rather than pulling raw rows.
+ */
+async function populateSb46PrintSchemes() {
+  const select = $('sb46SchemeSelect') || $('sb46PrintSchemeFilter') || $('sb46ModalSchemeSelect');
+  const loader = $('sb46SchemeLoadingIndicator');
+  if (!select) return;
+
+  if (loader) loader.classList.remove('hidden');
+
+  try {
+    let schemeData = [];
+
+    // 1. Fast path: Reuse already cached scheme breakdown data if available
+    if (window.cachedSchemeBreakdownData && window.cachedSchemeBreakdownData.length > 0) {
+      schemeData = window.cachedSchemeBreakdownData;
+    } else {
+      // 2. Fallback: Call the RPC aggregator directly (instant, does not pull full rows)
+      const { data, error } = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
+      if (!error && Array.isArray(data)) {
+        schemeData = data;
+      }
+    }
+
+    // 3. Fallback: Direct table query if RPC is not available
+    if (!schemeData.length) {
+      const { data: rawRows, error: rawErr } = await supabaseClient
+        .from('cent_percent_verification')
+        .select('scheme');
+
+      if (rawErr) throw rawErr;
+
+      const counts = {};
+      (rawRows || []).forEach(r => {
+        const code = (r.scheme || 'UNASSIGNED').trim().toUpperCase();
+        counts[code] = (counts[code] || 0) + 1;
+      });
+
+      schemeData = Object.keys(counts).map(code => ({
+        scheme: code,
+        total_count: counts[code]
+      }));
+    }
+
+    if (!schemeData.length) {
+      select.innerHTML = `<option value="">-- No Imported Schemes Found --</option>`;
+      return;
+    }
+
+    // Calculate total accounts across all imported schemes
+    const grandTotal = schemeData.reduce((acc, cur) => acc + (Number(cur.total_count) || 0), 0);
+
+    let optionsHtml = `<option value="ALL">All Imported Schemes (${grandTotal.toLocaleString('en-IN')} Total A/Cs)</option>`;
+
+    // Sort schemes alphabetically
+    schemeData.sort((a, b) => (a.scheme || '').localeCompare(b.scheme || ''));
+
+    schemeData.forEach(item => {
+      const code = item.scheme;
+      const count = (Number(item.total_count) || 0).toLocaleString('en-IN');
+      
+      // Look up human-readable description from Master Schemes
+      const master = (window.masterSchemesList || []).find(m => m.scheme_code === code);
+      const desc = master?.scheme_description ? ` - ${master.scheme_description}` : '';
+
+      optionsHtml += `<option value="${code}">${code}${desc} (${count} a/cs)</option>`;
+    });
+
+    select.innerHTML = optionsHtml;
+
+  } catch (err) {
+    console.error("Failed to populate SB-46 print schemes:", err);
+    select.innerHTML = `<option value="ALL">All Imported Schemes</option>`;
+  } finally {
+    if (loader) loader.classList.add('hidden');
+  }
+}
+
+/**
+ * Backward compatibility alias (points to the unified function)
+ */
+const populateSb46PrintModalSchemes = populateSb46PrintSchemes;
+
+/**
+ * Modal Opener
+ */
+async function openSb46GeneratorModal() {
+  const modal = $('sb46GeneratorModal') || $('vfnPrintModal');
+  if (modal) modal.classList.remove('hidden');
+
+  // Load imported schemes into the dropdown
+  await populateSb46PrintSchemes();
+
+  if (typeof updateSb46EligibleCount === 'function') {
+    updateSb46EligibleCount();
+  }
+}
+
+/**
+ * Recalculate eligible counts upon scheme change
+ */
+function onSb46SchemeSelectChange() {
+  if (typeof updateSb46EligibleCount === 'function') {
+    updateSb46EligibleCount();
+  }
+}
+/**
+ * Populates Product Group and Scheme dropdowns from masterSchemesList.
+ */
+function populateCascadingFilterDropdowns() {
+  const groupSelect = $('vfnFilterProductGroup');
+  const schemeSelect = $('vfnFilterScheme');
+  if (!groupSelect || !schemeSelect) return;
+
+  const currentGroup = groupSelect.value;
+  const currentScheme = schemeSelect.value;
+
+  // Build unique product groups
+  const groupsMap = new Map();
+  (window.masterSchemesList || []).forEach(s => {
+    if (s.product_group && !groupsMap.has(s.product_group)) {
+      groupsMap.set(s.product_group, s.product_group_name || s.product_group);
+    }
+  });
+
+  let groupHtml = `<option value="">-- All Product Groups --</option>`;
+  groupsMap.forEach((name, code) => {
+    groupHtml += `<option value="${code}">${code} - ${name}</option>`;
+  });
+  groupSelect.innerHTML = groupHtml;
+
+  if (currentGroup && groupsMap.has(currentGroup)) {
+    groupSelect.value = currentGroup;
+  }
+
+  // Populate scheme dropdown according to the active group
+  onProductGroupFilterChange(false);
+
+  if (currentScheme) {
+    schemeSelect.value = currentScheme;
+  }
+}
+
+/**
+ * Triggered whenever the user selects a Product Group.
+ * Re-populates the Scheme dropdown and immediately reloads the table.
+ */
+function onProductGroupFilterChange(triggerReload = true) {
+  const selectedGroup = $('vfnFilterProductGroup')?.value || '';
+  const schemeSelect = $('vfnFilterScheme');
+  if (!schemeSelect) return;
+
+  let schemes = window.masterSchemesList || [];
+  if (selectedGroup) {
+    schemes = schemes.filter(s => s.product_group === selectedGroup);
+  }
+
+  let schemeHtml = `<option value="">-- All Schemes --</option>`;
+  schemes.forEach(s => {
+    schemeHtml += `<option value="${s.scheme_code}">${s.scheme_code} (${s.scheme_description || s.scheme_code})</option>`;
+  });
+  schemeSelect.innerHTML = schemeHtml;
+
+  if (triggerReload) {
+    loadCentVfnData(1);
   }
 }
 
