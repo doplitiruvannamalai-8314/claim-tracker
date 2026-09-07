@@ -947,10 +947,10 @@
       <button type="button" onclick="openSb46GeneratorModal()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         ✉️ Prepare SB-46 Notices
       </button>
-
-      <!-- 5. Excel Exports -->
-      <button type="button" onclick="exportCentVfnExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
-        📊 Export Data (XLSX)
+      
+      <!-- 5. Verification Report & Export Dialog Trigger -->
+      <button type="button" onclick="openCentVfnExportModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+        📊 Export Data
       </button>
 
       <!-- 6. Batch Status Update -->
@@ -968,155 +968,279 @@
       </button>
     </div>
   </div>
-<!-- BULK UPDATE STATUS MODAL -->
-<div id="centVfnBatchStatusModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-150">
+
+  <!-- CENT PERCENT VERIFICATION EXPORT & REPORTING MODAL -->
+<div id="centVfnExportModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh] animate-in fade-in zoom-in duration-150">
     
     <!-- MODAL HEADER -->
-    <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-4 flex justify-between items-center shrink-0">
+    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-4 flex justify-between items-center shrink-0">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-blue-700/60 border border-blue-400/40 flex items-center justify-center text-base">
-          📮
+        <div class="w-8 h-8 rounded-lg bg-slate-700 border border-slate-500/40 flex items-center justify-center text-base">
+          📊
         </div>
         <div>
-          <h3 class="font-black text-sm tracking-wide uppercase">Batch Status &amp; Reply Mapping</h3>
-          <p class="text-[11px] text-blue-200">Import Dispatch, Reply Received dates, Article Nos &amp; Remarks</p>
+          <h3 class="font-black text-sm tracking-wide uppercase">Export Verification Data (Full Dataset)</h3>
+          <p class="text-[11px] text-slate-300">Generate unconstrained Excel (XLSX) or official formatted PDF reports</p>
         </div>
       </div>
-      <button type="button" onclick="closeCentVfnBatchModal()" class="text-blue-200 hover:text-white hover:bg-blue-800/80 rounded-lg p-1.5 transition cursor-pointer text-lg leading-none">
+      <button type="button" onclick="closeCentVfnExportModal()" class="text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition cursor-pointer text-lg leading-none">
         &times;
       </button>
     </div>
 
-    <!-- MODAL BODY (SCROLLABLE) -->
+    <!-- MODAL BODY -->
     <div class="p-5 overflow-y-auto flex-1 space-y-4 text-xs text-slate-700">
       
-      <!-- STAGE 1: UPLOAD & DROPZONE -->
-      <div id="vfnBatchDropSection">
-        <div 
-          id="vfnBatchDropZone"
-          onclick="$('centVfnBatchStatusFileInput').click()"
-          ondragover="event.preventDefault(); this.classList.add('border-blue-600', 'bg-blue-50/50');"
-          ondragleave="this.classList.remove('border-blue-600', 'bg-blue-50/50');"
-          ondrop="handleVfnBatchDrop(event)"
-          class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-slate-50 transition flex flex-col items-center justify-center gap-2 group"
-        >
-          <input type="file" id="centVfnBatchStatusFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleVfnBatchSelected(event)">
-          <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-2xl group-hover:scale-110 transition">
-            📄
-          </div>
+      <!-- FILTER SCOPE CONTAINER -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-3">
+        <div class="font-extrabold text-[11px] uppercase tracking-wider text-slate-700 border-b border-slate-200 pb-1 flex justify-between items-center">
+          <span>Report Filter Parameters</span>
+          <span class="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded">No Row Limit Applied</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- OFFICE FILTER -->
           <div>
-            <p class="font-extrabold text-sm text-slate-800">Click to browse or drag &amp; drop file here</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Supports Microsoft Excel (.xlsx, .xls) and CSV (.csv)</p>
+            <label class="block font-bold text-slate-700 mb-0.5">Filter by Office</label>
+            <select id="vfnExpFilterOffice" onchange="checkVfnExportScopeCount()" class="w-full border border-slate-300 p-1.5 rounded-lg bg-white font-semibold outline-none focus:border-slate-800">
+              <option value="">-- All Offices --</option>
+            </select>
           </div>
-          <span class="inline-block mt-1 text-[10px] font-mono font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded border border-slate-200">
-            Expected: Account Number | Article Number | Dispatched Date | Reply Received Date | Remarks
-          </span>
+
+          <!-- STATUS FILTER -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-0.5">Status</label>
+            <select id="vfnExpFilterStatus" onchange="checkVfnExportScopeCount()" class="w-full border border-slate-300 p-1.5 rounded-lg bg-white font-semibold outline-none focus:border-slate-800">
+              <option value="">-- All Statuses --</option>
+              <option value="imported">Imported (Notice Pending)</option>
+              <option value="printed">Notice Printed</option>
+              <option value="dispatched">Notice Dispatched</option>
+              <option value="reply_received">Reply Received</option>
+            </select>
+          </div>
+
+          <!-- PRODUCT GROUP FILTER -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-0.5">Product Group</label>
+            <select id="vfnExpFilterProductGroup" onchange="onVfnExpProductGroupChange()" class="w-full border border-slate-300 p-1.5 rounded-lg bg-white font-semibold outline-none focus:border-slate-800">
+              <option value="">-- All Product Groups --</option>
+            </select>
+          </div>
+
+          <!-- SCHEME IDENTIFIER FILTER -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-0.5">Scheme Identifier</label>
+            <select id="vfnExpFilterScheme" onchange="checkVfnExportScopeCount()" class="w-full border border-slate-300 p-1.5 rounded-lg bg-white font-semibold outline-none focus:border-slate-800">
+              <option value="">-- All Schemes --</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS: GET PREVIEW & RESET -->
+        <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+          <button type="button" onclick="resetVfnExportFilters()" class="text-slate-600 hover:text-slate-900 font-bold text-[11px] underline cursor-pointer">
+            🔄 Reset Filters
+          </button>
+          <button type="button" onclick="checkVfnExportScopeCount()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer transition">
+            🔍 Check Matching Accounts
+          </button>
         </div>
       </div>
 
-      <!-- STAGE 2: PROCESSING PROGRESS -->
-      <div id="vfnBatchProgressSection" class="hidden space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-        <div class="flex justify-between items-center font-bold">
-          <span id="vfnBatchProgressStatus" class="text-blue-900 flex items-center gap-2">
-            <span class="inline-block animate-spin">⏳</span> Processing records...
-          </span>
-          <span id="vfnBatchProgressPct" class="font-mono text-blue-700">0%</span>
+      <!-- PREVIEW & RECORD TALLY CARD -->
+      <div class="border border-slate-200 rounded-xl p-3.5 bg-white shadow-2xs flex items-center justify-between">
+        <div>
+          <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Records in Export Scope</span>
+          <div class="flex items-baseline gap-2">
+            <span id="vfnExpMatchedCount" class="text-xl font-mono font-black text-slate-900">0</span>
+            <span class="text-[11px] text-slate-500 font-semibold">accounts selected</span>
+          </div>
         </div>
-        <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-          <div id="vfnBatchProgressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+        <div class="text-right">
+          <span id="vfnExpScopeLabel" class="text-[11px] font-mono font-bold text-slate-700 block truncate max-w-[240px]">All Records</span>
+          <span class="text-[10px] text-slate-400">Streamed via Supabase Range Batching</span>
         </div>
-        <p id="vfnBatchProgressCount" class="text-[11px] text-slate-500 font-mono text-right">0 / 0 rows analyzed</p>
       </div>
 
-      <!-- STAGE 3: RESULTS & BREAKDOWN -->
-      <div id="vfnBatchResultSection" class="hidden space-y-4">
-        
-        <!-- METRIC SUMMARY CARDS -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase text-slate-500 block">Total Read</span>
-            <span id="resTotalRows" class="text-base font-extrabold font-mono text-slate-800">0</span>
-          </div>
-          <div class="bg-white p-3 rounded-xl border border-emerald-200 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase text-emerald-600 block">Accounts Updated</span>
-            <span id="resUpdatedRows" class="text-base font-extrabold font-mono text-emerald-700">0</span>
-          </div>
-          <div class="bg-white p-3 rounded-xl border border-blue-200 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase text-blue-600 block">Reply Dates Posted</span>
-            <span id="resReplyDatesCount" class="text-base font-extrabold font-mono text-blue-700">0</span>
-          </div>
-          <div class="bg-white p-3 rounded-xl border border-purple-200 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase text-purple-600 block">Remarks &amp; Dates</span>
-            <span id="resRemarksCount" class="text-base font-extrabold font-mono text-purple-700">0</span>
-          </div>
+      <!-- STREAMING PROGRESS BAR (VISIBLE DURING GENERATION) -->
+      <div id="vfnExpProgressContainer" class="hidden space-y-1.5 bg-blue-50/70 border border-blue-200 p-3 rounded-xl">
+        <div class="flex justify-between text-[11px] font-bold text-blue-900">
+          <span id="vfnExpProgressText">Fetching data stream...</span>
+          <span id="vfnExpProgressPct" class="font-mono">0%</span>
         </div>
-
-        <!-- SCHEME-WISE POSTING REPORT -->
-        <div class="border border-slate-200 rounded-xl overflow-hidden">
-          <div class="bg-slate-100 px-3 py-2 font-extrabold text-[11px] text-slate-800 uppercase tracking-wide flex justify-between items-center">
-            <span>Scheme-wise Status Update Summary</span>
-            <span id="resSchemeTotalBadge" class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono font-bold">0 Schemes</span>
-          </div>
-          <div class="max-h-40 overflow-y-auto">
-            <table class="w-full text-left border-collapse text-[11px]">
-              <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold sticky top-0">
-                <tr>
-                  <th class="p-2">Scheme</th>
-                  <th class="p-2 text-right">Updated</th>
-                  <th class="p-2 text-right">Reply Rx'd</th>
-                  <th class="p-2 text-right">Dispatched Only</th>
-                  <th class="p-2 text-right">Remarks Logged</th>
-                </tr>
-              </thead>
-              <tbody id="vfnBatchSchemeBreakdownBody"></tbody>
-            </table>
-          </div>
+        <div class="w-full bg-blue-200 rounded-full h-2 overflow-hidden">
+          <div id="vfnExpProgressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-150" style="width: 0%"></div>
         </div>
-
-        <!-- ERRORS & OMISSIONS TABLE -->
-        <div id="vfnBatchOmissionsCard" class="hidden border border-rose-200 rounded-xl overflow-hidden bg-rose-50/30">
-          <div class="bg-rose-100/70 px-3 py-2 text-rose-900 font-bold text-[11px] flex justify-between items-center">
-            <span class="flex items-center gap-1.5">
-              <span>⚠️</span> Unmatched / Skipped Accounts (<span id="resOmissionsCount">0</span>)
-            </span>
-            <button type="button" onclick="exportBatchOmissionsToCsv()" class="bg-white hover:bg-rose-50 text-rose-800 border border-rose-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition">
-              ⬇️ Export Skipped CSV
-            </button>
-          </div>
-          <div class="max-h-36 overflow-y-auto">
-            <table class="w-full text-left border-collapse text-[10.5px]">
-              <thead class="bg-rose-50 text-rose-900 border-b border-rose-200 font-bold sticky top-0">
-                <tr>
-                  <th class="p-2 font-mono">Account No</th>
-                  <th class="p-2">Row Data</th>
-                  <th class="p-2">Failure Reason</th>
-                </tr>
-              </thead>
-              <tbody id="vfnBatchOmissionsBody"></tbody>
-            </table>
-          </div>
-        </div>
-
       </div>
 
     </div>
 
-    <!-- MODAL FOOTER -->
+    <!-- MODAL FOOTER WITH DUAL EXPORT ACTIONS -->
     <div class="bg-slate-50 border-t border-slate-200 p-3.5 flex justify-between items-center shrink-0">
-      <span id="vfnBatchFooterNote" class="text-[11px] text-slate-500 font-medium">Ready for file input</span>
+      <span class="text-[11px] text-slate-500 font-medium">Exports maintain complete 10-column verification fidelity</span>
       <div class="flex gap-2">
-        <button type="button" id="vfnBatchResetBtn" onclick="resetBatchUploadModal()" class="hidden px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-lg transition cursor-pointer">
-          Upload Another
+        <button type="button" id="btnRunVfnExportExcel" onclick="executeVfnExport('excel')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer">
+          📊 Export XLSX
         </button>
-        <button type="button" onclick="closeCentVfnBatchModal()" class="px-4 py-1.5 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition cursor-pointer">
-          Done / Close
+        <button type="button" id="btnRunVfnExportPdf" onclick="executeVfnExport('pdf')" class="bg-postRed-700 hover:bg-postRed-800 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer">
+          📄 Export PDF
         </button>
       </div>
     </div>
 
   </div>
 </div>
+
+    <!-- BULK UPDATE STATUS MODAL -->
+    <div id="centVfnBatchStatusModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-150">
+        
+        <!-- MODAL HEADER -->
+        <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-4 flex justify-between items-center shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-blue-700/60 border border-blue-400/40 flex items-center justify-center text-base">
+              📮
+            </div>
+            <div>
+              <h3 class="font-black text-sm tracking-wide uppercase">Batch Status &amp; Reply Mapping</h3>
+              <p class="text-[11px] text-blue-200">Import Dispatch, Reply Received dates, Article Nos &amp; Remarks</p>
+            </div>
+          </div>
+          <button type="button" onclick="closeCentVfnBatchModal()" class="text-blue-200 hover:text-white hover:bg-blue-800/80 rounded-lg p-1.5 transition cursor-pointer text-lg leading-none">
+            &times;
+          </button>
+        </div>
+
+        <!-- MODAL BODY (SCROLLABLE) -->
+        <div class="p-5 overflow-y-auto flex-1 space-y-4 text-xs text-slate-700">
+          
+          <!-- STAGE 1: UPLOAD & DROPZONE -->
+          <div id="vfnBatchDropSection">
+            <div 
+              id="vfnBatchDropZone"
+              onclick="$('centVfnBatchStatusFileInput').click()"
+              ondragover="event.preventDefault(); this.classList.add('border-blue-600', 'bg-blue-50/50');"
+              ondragleave="this.classList.remove('border-blue-600', 'bg-blue-50/50');"
+              ondrop="handleVfnBatchDrop(event)"
+              class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-slate-50 transition flex flex-col items-center justify-center gap-2 group"
+            >
+              <input type="file" id="centVfnBatchStatusFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleVfnBatchSelected(event)">
+              <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                📄
+              </div>
+              <div>
+                <p class="font-extrabold text-sm text-slate-800">Click to browse or drag &amp; drop file here</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Supports Microsoft Excel (.xlsx, .xls) and CSV (.csv)</p>
+              </div>
+              <span class="inline-block mt-1 text-[10px] font-mono font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded border border-slate-200">
+                Expected: Account Number | Article Number | Dispatched Date | Reply Received Date | Remarks
+              </span>
+            </div>
+          </div>
+
+          <!-- STAGE 2: PROCESSING PROGRESS -->
+          <div id="vfnBatchProgressSection" class="hidden space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="flex justify-between items-center font-bold">
+              <span id="vfnBatchProgressStatus" class="text-blue-900 flex items-center gap-2">
+                <span class="inline-block animate-spin">⏳</span> Processing records...
+              </span>
+              <span id="vfnBatchProgressPct" class="font-mono text-blue-700">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+              <div id="vfnBatchProgressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+            </div>
+            <p id="vfnBatchProgressCount" class="text-[11px] text-slate-500 font-mono text-right">0 / 0 rows analyzed</p>
+          </div>
+
+          <!-- STAGE 3: RESULTS & BREAKDOWN -->
+          <div id="vfnBatchResultSection" class="hidden space-y-4">
+            
+            <!-- METRIC SUMMARY CARDS -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase text-slate-500 block">Total Read</span>
+                <span id="resTotalRows" class="text-base font-extrabold font-mono text-slate-800">0</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-emerald-200 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase text-emerald-600 block">Accounts Updated</span>
+                <span id="resUpdatedRows" class="text-base font-extrabold font-mono text-emerald-700">0</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-blue-200 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase text-blue-600 block">Reply Dates Posted</span>
+                <span id="resReplyDatesCount" class="text-base font-extrabold font-mono text-blue-700">0</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-purple-200 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase text-purple-600 block">Remarks &amp; Dates</span>
+                <span id="resRemarksCount" class="text-base font-extrabold font-mono text-purple-700">0</span>
+              </div>
+            </div>
+
+            <!-- SCHEME-WISE POSTING REPORT -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <div class="bg-slate-100 px-3 py-2 font-extrabold text-[11px] text-slate-800 uppercase tracking-wide flex justify-between items-center">
+                <span>Scheme-wise Status Update Summary</span>
+                <span id="resSchemeTotalBadge" class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono font-bold">0 Schemes</span>
+              </div>
+              <div class="max-h-40 overflow-y-auto">
+                <table class="w-full text-left border-collapse text-[11px]">
+                  <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold sticky top-0">
+                    <tr>
+                      <th class="p-2">Scheme</th>
+                      <th class="p-2 text-right">Updated</th>
+                      <th class="p-2 text-right">Reply Rx'd</th>
+                      <th class="p-2 text-right">Dispatched Only</th>
+                      <th class="p-2 text-right">Remarks Logged</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vfnBatchSchemeBreakdownBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ERRORS & OMISSIONS TABLE -->
+            <div id="vfnBatchOmissionsCard" class="hidden border border-rose-200 rounded-xl overflow-hidden bg-rose-50/30">
+              <div class="bg-rose-100/70 px-3 py-2 text-rose-900 font-bold text-[11px] flex justify-between items-center">
+                <span class="flex items-center gap-1.5">
+                  <span>⚠️</span> Unmatched / Skipped Accounts (<span id="resOmissionsCount">0</span>)
+                </span>
+                <button type="button" onclick="exportBatchOmissionsToCsv()" class="bg-white hover:bg-rose-50 text-rose-800 border border-rose-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition">
+                  ⬇️ Export Skipped CSV
+                </button>
+              </div>
+              <div class="max-h-36 overflow-y-auto">
+                <table class="w-full text-left border-collapse text-[10.5px]">
+                  <thead class="bg-rose-50 text-rose-900 border-b border-rose-200 font-bold sticky top-0">
+                    <tr>
+                      <th class="p-2 font-mono">Account No</th>
+                      <th class="p-2">Row Data</th>
+                      <th class="p-2">Failure Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vfnBatchOmissionsBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- MODAL FOOTER -->
+        <div class="bg-slate-50 border-t border-slate-200 p-3.5 flex justify-between items-center shrink-0">
+          <span id="vfnBatchFooterNote" class="text-[11px] text-slate-500 font-medium">Ready for file input</span>
+          <div class="flex gap-2">
+            <button type="button" id="vfnBatchResetBtn" onclick="resetBatchUploadModal()" class="hidden px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-lg transition cursor-pointer">
+              Upload Another
+            </button>
+            <button type="button" onclick="closeCentVfnBatchModal()" class="px-4 py-1.5 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition cursor-pointer">
+              Done / Close
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   <!-- KPI SUMMARY SCORECARDS (5 CARDS) -->
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
     <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
@@ -9478,6 +9602,384 @@ async function handleCentVfnBatchStatusUpload(e) {
     alert("Import failed: " + err.message);
   }
 }
+
+/**
+ * Opens the Export & Report Modal and synchronizes all dropdown filters.
+ */
+async function openCentVfnExportModal() {
+  const modal = $('centVfnExportModal');
+  if (modal) modal.classList.remove('hidden');
+
+  // Clone office options from main table filter
+  const mainOffice = $('vfnFilterOffice');
+  const expOffice = $('vfnExpFilterOffice');
+  if (mainOffice && expOffice) {
+    expOffice.innerHTML = mainOffice.innerHTML;
+  }
+
+  // Populate Product Groups & Schemes
+  populateVfnExportDropdowns();
+
+  // Initial count check
+  await checkVfnExportScopeCount();
+}
+
+/**
+ * Closes the Export Modal.
+ */
+function closeCentVfnExportModal() {
+  const modal = $('centVfnExportModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+/**
+ * Populates Product Group and Scheme dropdowns inside the export modal.
+ */
+function populateVfnExportDropdowns() {
+  const groupSelect = $('vfnExpFilterProductGroup');
+  const schemeSelect = $('vfnExpFilterScheme');
+  if (!groupSelect || !schemeSelect) return;
+
+  const schemes = (window.masterSchemesList && window.masterSchemesList.length > 0)
+    ? window.masterSchemesList
+    : (typeof masterSchemesList !== 'undefined' ? masterSchemesList : []);
+
+  const groupsMap = new Map();
+  schemes.forEach(s => {
+    const grp = (s.product_group || 'OTHER').toUpperCase().trim();
+    if (!groupsMap.has(grp)) {
+      groupsMap.set(grp, s.product_group_name || grp);
+    }
+  });
+
+  let groupHtml = `<option value="">-- All Product Groups --</option>`;
+  groupsMap.forEach((name, code) => {
+    groupHtml += `<option value="${code}">${code} - ${name}</option>`;
+  });
+  groupSelect.innerHTML = groupHtml;
+
+  onVfnExpProductGroupChange();
+}
+
+/**
+ * Cascading scheme update when product group changes inside export modal.
+ */
+function onVfnExpProductGroupChange() {
+  const groupSelect = $('vfnExpFilterProductGroup');
+  const schemeSelect = $('vfnExpFilterScheme');
+  if (!schemeSelect) return;
+
+  const selectedGroup = groupSelect?.value || '';
+  const schemes = (window.masterSchemesList && window.masterSchemesList.length > 0)
+    ? window.masterSchemesList
+    : (typeof masterSchemesList !== 'undefined' ? masterSchemesList : []);
+
+  let filtered = schemes;
+  if (selectedGroup) {
+    filtered = schemes.filter(s => (s.product_group || '').toUpperCase().trim() === selectedGroup);
+  }
+
+  let schemeHtml = `<option value="">-- All Schemes --</option>`;
+  filtered.forEach(s => {
+    const desc = s.scheme_description ? ` (${s.scheme_description})` : '';
+    schemeHtml += `<option value="${s.scheme_code}">${s.scheme_code}${desc}</option>`;
+  });
+  schemeSelect.innerHTML = schemeHtml;
+
+  checkVfnExportScopeCount();
+}
+
+/**
+ * Resets all filters in the export modal.
+ */
+function resetVfnExportFilters() {
+  if ($('vfnExpFilterOffice')) $('vfnExpFilterOffice').value = '';
+  if ($('vfnExpFilterStatus')) $('vfnExpFilterStatus').value = '';
+  if ($('vfnExpFilterProductGroup')) $('vfnExpFilterProductGroup').value = '';
+  onVfnExpProductGroupChange();
+}
+
+/**
+ * Builds standard Supabase query filters based on modal inputs.
+ */
+function buildVfnExportQuery(query) {
+  const office = $('vfnExpFilterOffice')?.value?.trim();
+  const status = $('vfnExpFilterStatus')?.value?.trim();
+  const productGroup = $('vfnExpFilterProductGroup')?.value?.trim();
+  const scheme = $('vfnExpFilterScheme')?.value?.trim();
+
+  if (office) query = query.eq('office_name', office);
+  if (status) query = query.eq('status', status);
+
+  if (scheme) {
+    query = query.eq('scheme', scheme);
+  } else if (productGroup && window.masterSchemesList?.length) {
+    const matching = window.masterSchemesList
+      .filter(s => s.product_group === productGroup)
+      .map(s => s.scheme_code);
+    if (matching.length) query = query.in('scheme', matching);
+  }
+
+  return query;
+}
+
+/**
+ * Fast HEAD query to preview record count for selected parameters.
+ */
+async function checkVfnExportScopeCount() {
+  const countEl = $('vfnExpMatchedCount');
+  const labelEl = $('vfnExpScopeLabel');
+  if (!countEl) return;
+
+  try {
+    let q = supabaseClient.from('cent_percent_verification').select('id', { count: 'exact', head: true });
+    q = buildVfnExportQuery(q);
+
+    const { count, error } = await q;
+    if (error) throw error;
+
+    const matched = count || 0;
+    countEl.innerText = matched.toLocaleString('en-IN');
+
+    const off = $('vfnExpFilterOffice')?.value || 'All Offices';
+    const sc = $('vfnExpFilterScheme')?.value || ($('vfnExpFilterProductGroup')?.value ? `Group ${$('vfnExpFilterProductGroup').value}` : 'All Schemes');
+    labelEl.innerText = `${off} | ${sc}`;
+  } catch (err) {
+    console.error("Scope count check failed:", err);
+  }
+}
+
+/**
+ * Streams ALL rows in batches of 2,000 (bypasses Supabase 1,000 row ceiling).
+ */
+async function fetchAllVfnExportRecords() {
+  let allRows = [];
+  const chunkSize = 2000;
+  let from = 0;
+  let hasMore = true;
+
+  const progressBox = $('vfnExpProgressContainer');
+  const bar = $('vfnExpProgressBar');
+  const pctText = $('vfnExpProgressPct');
+  const statusText = $('vfnExpProgressText');
+
+  if (progressBox) progressBox.classList.remove('hidden');
+
+  // 1. Get exact total count first
+  let countQ = supabaseClient.from('cent_percent_verification').select('id', { count: 'exact', head: true });
+  countQ = buildVfnExportQuery(countQ);
+  const { count: totalExpected } = await countQ;
+
+  if (!totalExpected || totalExpected === 0) {
+    if (progressBox) progressBox.classList.add('hidden');
+    return [];
+  }
+
+  while (hasMore) {
+    const to = from + chunkSize - 1;
+    let query = supabaseClient.from('cent_percent_verification').select('*');
+    query = buildVfnExportQuery(query);
+    query = query.order('sl_no', { ascending: true }).range(from, to);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (data && data.length) {
+      allRows.push(...data);
+      from += chunkSize;
+
+      const progress = Math.min(100, Math.round((allRows.length / totalExpected) * 100));
+      if (bar) bar.style.width = `${progress}%`;
+      if (pctText) pctText.innerText = `${progress}%`;
+      if (statusText) statusText.innerText = `Streamed ${allRows.length.toLocaleString('en-IN')} of ${totalExpected.toLocaleString('en-IN')} rows...`;
+
+      if (data.length < chunkSize) hasMore = false;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  if (progressBox) progressBox.classList.add('hidden');
+  return allRows;
+}
+
+/**
+ * Controller to execute Excel or PDF generation across unconstrained rows.
+ */
+async function executeVfnExport(format) {
+  const btnExcel = $('btnRunVfnExportExcel');
+  const btnPdf = $('btnRunVfnExportPdf');
+
+  try {
+    if (btnExcel) btnExcel.disabled = true;
+    if (btnPdf) btnPdf.disabled = true;
+
+    const records = await fetchAllVfnExportRecords();
+    if (!records.length) {
+      alert("No verification records match your chosen filter parameters.");
+      return;
+    }
+
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    const timestamp = `${day}${month}${year}-${hours}${mins}`;
+
+    const officeVal = $('vfnExpFilterOffice')?.value || 'AllOffices';
+    const safeOffice = officeVal.replace(/[^a-zA-Z0-9]/g, '_');
+
+    if (format === 'excel') {
+      generateVfnExcelReport(records, `CentVfn_Report_${safeOffice}_${timestamp}.xlsx`);
+    } else if (format === 'pdf') {
+      generateVfnPdfReport(records, `CentVfn_Report_${safeOffice}_${timestamp}.pdf`);
+    }
+
+  } catch (err) {
+    console.error("Export generation failed:", err);
+    alert("Export generation failed: " + err.message);
+  } finally {
+    if (btnExcel) btnExcel.disabled = false;
+    if (btnPdf) btnPdf.disabled = false;
+    $('vfnExpProgressContainer')?.classList.add('hidden');
+  }
+}
+
+/**
+ * Generates formatted Excel file using SheetJS (XLSX).
+ */
+function generateVfnExcelReport(records, fileName) {
+  if (typeof XLSX === 'undefined') {
+    return alert("SheetJS (XLSX) library is not loaded.");
+  }
+
+  const exportData = records.map(r => ({
+    'Sl No': r.sl_no,
+    'Office Name': r.office_name || '',
+    'Account Number': r.account_no || '',
+    'Customer Name': r.customer_name || '',
+    'Address': r.address || '',
+    'Scheme': r.scheme || '',
+    'Balance (INR)': parseFloat(r.balance) || 0,
+    'Last Txn Date': r.date_of_last_txn || '',
+    'Article No (Barcode)': r.outward_article_no || r.article_no || '',
+    'Reply Article No': r.reply_article_no || '',
+    'Status': (r.status || 'imported').toUpperCase(),
+    'Dispatched Date': r.dispatched_date || '',
+    'Reply Rx Date': r.reply_rxd_date || '',
+    'Remarks': r.remarks || '',
+    'Remark Entry Date': r.remark_entry_date || ''
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Verification Data');
+
+  XLSX.writeFile(workbook, fileName);
+}
+
+/**
+ * Generates official PDF report with division headers, running page numbers (Page X of Y),
+ * and End of Report marker using jsPDF and autoTable.
+ */
+function generateVfnPdfReport(records, fileName) {
+  if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
+    return alert("jsPDF library is not loaded.");
+  }
+
+  const { jsPDF } = window.jspdf || window;
+  const doc = new jsPDF('landscape', 'mm', 'a4'); // Landscape A4 for wide table
+
+  const officeScope = $('vfnExpFilterOffice')?.value?.toUpperCase() || 'ALL OFFICES';
+  const schemeScope = $('vfnExpFilterScheme')?.value?.toUpperCase() || 'ALL SCHEMES';
+  const genTimestamp = new Date().toLocaleString('en-IN');
+
+  const headers = [
+    ['Sl', 'Office', 'Account No', 'Customer Name', 'Scheme', 'Balance (Rs.)', 'Last Txn', 'Article No', 'Status', 'Reply Date']
+  ];
+
+  const rows = records.map(r => [
+    r.sl_no,
+    r.office_name || '-',
+    r.account_no,
+    (r.customer_name || '-').substring(0, 22),
+    r.scheme || '-',
+    (parseFloat(r.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 }),
+    r.date_of_last_txn ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn) : '-',
+    r.outward_article_no || r.article_no || '-',
+    (r.status || 'imported').replace(/_/g, ' ').toUpperCase(),
+    r.reply_rxd_date ? (typeof formatDate === 'function' ? formatDate(r.reply_rxd_date) : r.reply_rxd_date) : '-'
+  ]);
+
+  doc.autoTable({
+    head: headers,
+    body: rows,
+    startY: 28,
+    theme: 'grid',
+    styles: {
+      fontSize: 7.5,
+      cellPadding: 1.5,
+      font: 'helvetica'
+    },
+    headStyles: {
+      fillColor: [168, 15, 40], // India Post Red (#A80F28)
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      halign: 'center'
+    },
+    columnStyles: {
+      0: { halign: 'center', cellWidth: 10 },
+      1: { cellWidth: 32 },
+      2: { font: 'courier', fontStyle: 'bold', cellWidth: 28 },
+      3: { cellWidth: 42 },
+      4: { halign: 'center', fontStyle: 'bold', cellWidth: 16 },
+      5: { halign: 'right', font: 'courier', fontStyle: 'bold', cellWidth: 26 },
+      6: { halign: 'center', cellWidth: 22 },
+      7: { halign: 'center', font: 'courier', cellWidth: 28 },
+      8: { halign: 'center', cellWidth: 22 },
+      9: { halign: 'center', cellWidth: 20 }
+    },
+    margin: { top: 28, bottom: 15, left: 10, right: 10 },
+    didDrawPage: (data) => {
+      // Running Page Header
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(168, 15, 40);
+      doc.text('DEPARTMENT OF POSTS, INDIA — CHENNAI CITY CENTRAL DIVISION', 148.5, 9, { align: 'center' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(30, 41, 59);
+      doc.text('CENT PERCENT VERIFICATION (SB-46) DETAILED REPORT', 148.5, 14, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Scope: ${officeScope} | Scheme: ${schemeScope} | Total: ${records.length.toLocaleString('en-IN')} Records | Generated: ${genTimestamp}`, 148.5, 19, { align: 'center' });
+
+      // Running Page Footer (Page X of Y)
+      const pageCount = doc.internal.getNumberOfPages();
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Page ${data.pageNumber} of ${pageCount}`, 287, 203, { align: 'right' });
+      doc.text('CONFIDENTIAL — POSTAL INTERNAL VERIFICATION RECORD', 10, 203, { align: 'left' });
+    }
+  });
+
+  // End of Report Marker
+  const finalY = doc.lastAutoTable.finalY || 180;
+  if (finalY < 195) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text('*** END OF REPORT — ALL RECORDS ACCOUNTED FOR ***', 148.5, finalY + 7, { align: 'center' });
+  }
+
+  doc.save(fileName);
+}
 //admin verification
 function openAdminVfnDeleteModal() {
   const role = (userProfile?.role || '').toLowerCase();
@@ -12969,6 +13471,406 @@ function onProductGroupFilterChange(triggerReload = true) {
   if (triggerReload) {
     loadCentVfnData(1);
   }
+}
+
+/**
+ * Opens the Export & Report Modal and synchronizes all dropdown filters.
+ */
+async function openCentVfnExportModal() {
+  const modal = $('centVfnExportModal');
+  if (modal) modal.classList.remove('hidden');
+
+  // Clone office options from main table filter
+  const mainOffice = $('vfnFilterOffice');
+  const expOffice = $('vfnExpFilterOffice');
+  if (mainOffice && expOffice) {
+    expOffice.innerHTML = mainOffice.innerHTML;
+  }
+
+  // Populate Product Groups & Schemes
+  populateVfnExportDropdowns();
+
+  // Initial count check
+  await checkVfnExportScopeCount();
+}
+
+/**
+ * Closes the Export Modal.
+ */
+function closeCentVfnExportModal() {
+  const modal = $('centVfnExportModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+/**
+ * Populates Product Group and Scheme dropdowns inside the export modal.
+ */
+function populateVfnExportDropdowns() {
+  const groupSelect = $('vfnExpFilterProductGroup');
+  const schemeSelect = $('vfnExpFilterScheme');
+  if (!groupSelect || !schemeSelect) return;
+
+  const schemes = (window.masterSchemesList && window.masterSchemesList.length > 0)
+    ? window.masterSchemesList
+    : (typeof masterSchemesList !== 'undefined' ? masterSchemesList : []);
+
+  const groupsMap = new Map();
+  schemes.forEach(s => {
+    const grp = (s.product_group || 'OTHER').toUpperCase().trim();
+    if (!groupsMap.has(grp)) {
+      groupsMap.set(grp, s.product_group_name || grp);
+    }
+  });
+
+  let groupHtml = `<option value="">-- All Product Groups --</option>`;
+  groupsMap.forEach((name, code) => {
+    groupHtml += `<option value="${code}">${code} - ${name}</option>`;
+  });
+  groupSelect.innerHTML = groupHtml;
+
+  onVfnExpProductGroupChange();
+}
+
+/**
+ * Cascading scheme update when product group changes inside export modal.
+ */
+function onVfnExpProductGroupChange() {
+  const groupSelect = $('vfnExpFilterProductGroup');
+  const schemeSelect = $('vfnExpFilterScheme');
+  if (!schemeSelect) return;
+
+  const selectedGroup = groupSelect?.value || '';
+  const schemes = (window.masterSchemesList && window.masterSchemesList.length > 0)
+    ? window.masterSchemesList
+    : (typeof masterSchemesList !== 'undefined' ? masterSchemesList : []);
+
+  let filtered = schemes;
+  if (selectedGroup) {
+    filtered = schemes.filter(s => (s.product_group || '').toUpperCase().trim() === selectedGroup);
+  }
+
+  let schemeHtml = `<option value="">-- All Schemes --</option>`;
+  filtered.forEach(s => {
+    const desc = s.scheme_description ? ` (${s.scheme_description})` : '';
+    schemeHtml += `<option value="${s.scheme_code}">${s.scheme_code}${desc}</option>`;
+  });
+  schemeSelect.innerHTML = schemeHtml;
+
+  checkVfnExportScopeCount();
+}
+
+/**
+ * Resets all filters in the export modal.
+ */
+function resetVfnExportFilters() {
+  if ($('vfnExpFilterOffice')) $('vfnExpFilterOffice').value = '';
+  if ($('vfnExpFilterStatus')) $('vfnExpFilterStatus').value = '';
+  if ($('vfnExpFilterProductGroup')) $('vfnExpFilterProductGroup').value = '';
+  onVfnExpProductGroupChange();
+}
+
+/**
+ * Builds standard Supabase query filters based on modal inputs.
+ */
+function buildVfnExportQuery(query) {
+  const office = $('vfnExpFilterOffice')?.value?.trim();
+  const status = $('vfnExpFilterStatus')?.value?.trim();
+  const productGroup = $('vfnExpFilterProductGroup')?.value?.trim();
+  const scheme = $('vfnExpFilterScheme')?.value?.trim();
+
+  if (office) query = query.eq('office_name', office);
+  if (status) query = query.eq('status', status);
+
+  if (scheme) {
+    query = query.eq('scheme', scheme);
+  } else if (productGroup && window.masterSchemesList?.length) {
+    const matching = window.masterSchemesList
+      .filter(s => s.product_group === productGroup)
+      .map(s => s.scheme_code);
+    if (matching.length) query = query.in('scheme', matching);
+  }
+
+  return query;
+}
+
+/**
+ * Fast HEAD query to preview record count for selected parameters.
+ */
+async function checkVfnExportScopeCount() {
+  const countEl = $('vfnExpMatchedCount');
+  const labelEl = $('vfnExpScopeLabel');
+  if (!countEl) return;
+
+  try {
+    let q = supabaseClient.from('cent_percent_verification').select('id', { count: 'exact', head: true });
+    q = buildVfnExportQuery(q);
+
+    const { count, error } = await q;
+    if (error) throw error;
+
+    const matched = count || 0;
+    countEl.innerText = matched.toLocaleString('en-IN');
+
+    const off = $('vfnExpFilterOffice')?.value || 'All Offices';
+    const sc = $('vfnExpFilterScheme')?.value || ($('vfnExpFilterProductGroup')?.value ? `Group ${$('vfnExpFilterProductGroup').value}` : 'All Schemes');
+    labelEl.innerText = `${off} | ${sc}`;
+  } catch (err) {
+    console.error("Scope count check failed:", err);
+  } 
+}
+
+/**
+ * Streams ALL rows in batches of 2,000 (bypasses Supabase 1,000 row ceiling).
+ */
+
+async function fetchAllVfnExportRecords() {
+  let allRows = [];
+  const chunkSize = 1000; // PostgREST strict maximum per-request ceiling
+  let from = 0;
+  let keepFetching = true;
+
+  const progressBox = $('vfnExpProgressContainer');
+  const bar = $('vfnExpProgressBar');
+  const pctText = $('vfnExpProgressPct');
+  const statusText = $('vfnExpProgressText');
+
+  if (progressBox) progressBox.classList.remove('hidden');
+
+  // 1. Get exact total count first
+  let countQ = supabaseClient
+    .from('cent_percent_verification')
+    .select('id', { count: 'exact', head: true });
+    
+  countQ = buildVfnExportQuery(countQ);
+  const { count: totalExpected, error: countErr } = await countQ;
+
+  if (countErr) {
+    console.error("Failed to fetch exact record count:", countErr);
+    if (progressBox) progressBox.classList.add('hidden');
+    throw countErr;
+  }
+
+  if (!totalExpected || totalExpected === 0) {
+    if (progressBox) progressBox.classList.add('hidden');
+    return [];
+  }
+
+  // 2. Fetch sequentially in blocks of 1,000
+  while (keepFetching) {
+    const to = from + chunkSize - 1;
+
+    let query = supabaseClient
+      .from('cent_percent_verification')
+      .select('*');
+
+    query = buildVfnExportQuery(query);
+    query = query
+      .order('sl_no', { ascending: true })
+      .range(from, to);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      allRows.push(...data);
+      from += data.length;
+
+      // Update progress bar
+      const progress = Math.min(100, Math.round((allRows.length / totalExpected) * 100));
+      if (bar) bar.style.width = `${progress}%`;
+      if (pctText) pctText.innerText = `${progress}%`;
+      if (statusText) {
+        statusText.innerText = `Streamed ${allRows.length.toLocaleString('en-IN')} of ${totalExpected.toLocaleString('en-IN')} records...`;
+      }
+
+      // Stop once all rows are retrieved or when no more records arrive
+      if (allRows.length >= totalExpected || data.length < chunkSize) {
+        keepFetching = false;
+      }
+    } else {
+      keepFetching = false;
+    }
+  }
+
+  if (progressBox) progressBox.classList.add('hidden');
+  return allRows;
+}
+/**
+ * Controller to execute Excel or PDF generation across unconstrained rows.
+ */
+async function executeVfnExport(format) {
+  const btnExcel = $('btnRunVfnExportExcel');
+  const btnPdf = $('btnRunVfnExportPdf');
+
+  try {
+    if (btnExcel) btnExcel.disabled = true;
+    if (btnPdf) btnPdf.disabled = true;
+
+    const records = await fetchAllVfnExportRecords();
+    if (!records.length) {
+      alert("No verification records match your chosen filter parameters.");
+      return;
+    }
+
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    const timestamp = `${day}${month}${year}-${hours}${mins}`;
+
+    const officeVal = $('vfnExpFilterOffice')?.value || 'AllOffices';
+    const safeOffice = officeVal.replace(/[^a-zA-Z0-9]/g, '_');
+
+    if (format === 'excel') {
+      generateVfnExcelReport(records, `CentVfn_Report_${safeOffice}_${timestamp}.xlsx`);
+    } else if (format === 'pdf') {
+      generateVfnPdfReport(records, `CentVfn_Report_${safeOffice}_${timestamp}.pdf`);
+    }
+
+  } catch (err) {
+    console.error("Export generation failed:", err);
+    alert("Export generation failed: " + err.message);
+  } finally {
+    if (btnExcel) btnExcel.disabled = false;
+    if (btnPdf) btnPdf.disabled = false;
+    $('vfnExpProgressContainer')?.classList.add('hidden');
+  }
+}
+
+/**
+ * Generates formatted Excel file using SheetJS (XLSX).
+ */
+function generateVfnExcelReport(records, fileName) {
+  if (typeof XLSX === 'undefined') {
+    return alert("SheetJS (XLSX) library is not loaded.");
+  }
+
+  const exportData = records.map(r => ({
+    'Sl No': r.sl_no,
+    'Office Name': r.office_name || '',
+    'Account Number': r.account_no || '',
+    'Customer Name': r.customer_name || '',
+    'Address': r.address || '',
+    'Scheme': r.scheme || '',
+    'Balance (INR)': parseFloat(r.balance) || 0,
+    'Last Txn Date': r.date_of_last_txn || '',
+    'Article No (Barcode)': r.outward_article_no || r.article_no || '',
+    'Reply Article No': r.reply_article_no || '',
+    'Status': (r.status || 'imported').toUpperCase(),
+    'Dispatched Date': r.dispatched_date || '',
+    'Reply Rx Date': r.reply_rxd_date || '',
+    'Remarks': r.remarks || '',
+    'Remark Entry Date': r.remark_entry_date || ''
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Verification Data');
+
+  XLSX.writeFile(workbook, fileName);
+}
+
+/**
+ * Generates official PDF report with division headers, running page numbers (Page X of Y),
+ * and End of Report marker using jsPDF and autoTable.
+ */
+function generateVfnPdfReport(records, fileName) {
+  if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
+    return alert("jsPDF library is not loaded.");
+  }
+
+  const { jsPDF } = window.jspdf || window;
+  const doc = new jsPDF('landscape', 'mm', 'a4'); // Landscape A4 for wide table
+
+  const officeScope = $('vfnExpFilterOffice')?.value?.toUpperCase() || 'ALL OFFICES';
+  const schemeScope = $('vfnExpFilterScheme')?.value?.toUpperCase() || 'ALL SCHEMES';
+  const genTimestamp = new Date().toLocaleString('en-IN');
+
+  const headers = [
+    ['Sl', 'Office', 'Account No', 'Customer Name', 'Scheme', 'Balance (Rs.)', 'Last Txn', 'Article No', 'Status', 'Reply Date']
+  ];
+
+  const rows = records.map(r => [
+    r.sl_no,
+    r.office_name || '-',
+    r.account_no,
+    (r.customer_name || '-').substring(0, 22),
+    r.scheme || '-',
+    (parseFloat(r.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 }),
+    r.date_of_last_txn ? (typeof formatDate === 'function' ? formatDate(r.date_of_last_txn) : r.date_of_last_txn) : '-',
+    r.outward_article_no || r.article_no || '-',
+    (r.status || 'imported').replace(/_/g, ' ').toUpperCase(),
+    r.reply_rxd_date ? (typeof formatDate === 'function' ? formatDate(r.reply_rxd_date) : r.reply_rxd_date) : '-'
+  ]);
+
+  doc.autoTable({
+    head: headers,
+    body: rows,
+    startY: 28,
+    theme: 'grid',
+    styles: {
+      fontSize: 7.5,
+      cellPadding: 1.5,
+      font: 'helvetica'
+    },
+    headStyles: {
+      fillColor: [168, 15, 40], // India Post Red (#A80F28)
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      halign: 'center'
+    },
+    columnStyles: {
+      0: { halign: 'center', cellWidth: 10 },
+      1: { cellWidth: 32 },
+      2: { font: 'courier', fontStyle: 'bold', cellWidth: 28 },
+      3: { cellWidth: 42 },
+      4: { halign: 'center', fontStyle: 'bold', cellWidth: 16 },
+      5: { halign: 'right', font: 'courier', fontStyle: 'bold', cellWidth: 26 },
+      6: { halign: 'center', cellWidth: 22 },
+      7: { halign: 'center', font: 'courier', cellWidth: 28 },
+      8: { halign: 'center', cellWidth: 22 },
+      9: { halign: 'center', cellWidth: 20 }
+    },
+    margin: { top: 28, bottom: 15, left: 10, right: 10 },
+    didDrawPage: (data) => {
+      // Running Page Header
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(168, 15, 40);
+      doc.text('DEPARTMENT OF POSTS, INDIA — CHENNAI CITY CENTRAL DIVISION', 148.5, 9, { align: 'center' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(30, 41, 59);
+      doc.text('CENT PERCENT VERIFICATION (SB-46) DETAILED REPORT', 148.5, 14, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Scope: ${officeScope} | Scheme: ${schemeScope} | Total: ${records.length.toLocaleString('en-IN')} Records | Generated: ${genTimestamp}`, 148.5, 19, { align: 'center' });
+
+      // Running Page Footer (Page X of Y)
+      const pageCount = doc.internal.getNumberOfPages();
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Page ${data.pageNumber} of ${pageCount}`, 287, 203, { align: 'right' });
+      doc.text('CONFIDENTIAL — POSTAL INTERNAL VERIFICATION RECORD', 10, 203, { align: 'left' });
+    }
+  });
+
+  // End of Report Marker
+  const finalY = doc.lastAutoTable.finalY || 180;
+  if (finalY < 195) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text('*** END OF REPORT — ALL RECORDS ACCOUNTED FOR ***', 148.5, finalY + 7, { align: 'center' });
+  }
+
+  doc.save(fileName);
 }
 
 // =========================================================================
