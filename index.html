@@ -957,8 +957,8 @@
       <button type="button" onclick="downloadCentVfnBatchTemplate()" class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-300 px-3 py-1.5 rounded font-bold text-xs shadow-2xs cursor-pointer flex items-center gap-1 transition">
         📥 Batch Template
       </button>
-      <input type="file" id="centVfnBatchStatusInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCentVfnBatchStatusUpload(event)">
-      <button type="button" onclick="$('centVfnBatchStatusInput').click()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
+
+      <button type="button" onclick="openCentVfnBatchModal()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1.5 transition">
         📮 Bulk Update Status
       </button>
 
@@ -968,7 +968,155 @@
       </button>
     </div>
   </div>
+<!-- BULK UPDATE STATUS MODAL -->
+<div id="centVfnBatchStatusModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-150">
+    
+    <!-- MODAL HEADER -->
+    <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-4 flex justify-between items-center shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-700/60 border border-blue-400/40 flex items-center justify-center text-base">
+          📮
+        </div>
+        <div>
+          <h3 class="font-black text-sm tracking-wide uppercase">Batch Status &amp; Reply Mapping</h3>
+          <p class="text-[11px] text-blue-200">Import Dispatch, Reply Received dates, Article Nos &amp; Remarks</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeCentVfnBatchModal()" class="text-blue-200 hover:text-white hover:bg-blue-800/80 rounded-lg p-1.5 transition cursor-pointer text-lg leading-none">
+        &times;
+      </button>
+    </div>
 
+    <!-- MODAL BODY (SCROLLABLE) -->
+    <div class="p-5 overflow-y-auto flex-1 space-y-4 text-xs text-slate-700">
+      
+      <!-- STAGE 1: UPLOAD & DROPZONE -->
+      <div id="vfnBatchDropSection">
+        <div 
+          id="vfnBatchDropZone"
+          onclick="$('centVfnBatchStatusFileInput').click()"
+          ondragover="event.preventDefault(); this.classList.add('border-blue-600', 'bg-blue-50/50');"
+          ondragleave="this.classList.remove('border-blue-600', 'bg-blue-50/50');"
+          ondrop="handleVfnBatchDrop(event)"
+          class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-slate-50 transition flex flex-col items-center justify-center gap-2 group"
+        >
+          <input type="file" id="centVfnBatchStatusFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleVfnBatchSelected(event)">
+          <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+            📄
+          </div>
+          <div>
+            <p class="font-extrabold text-sm text-slate-800">Click to browse or drag &amp; drop file here</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Supports Microsoft Excel (.xlsx, .xls) and CSV (.csv)</p>
+          </div>
+          <span class="inline-block mt-1 text-[10px] font-mono font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded border border-slate-200">
+            Expected: Account Number | Article Number | Dispatched Date | Reply Received Date | Remarks
+          </span>
+        </div>
+      </div>
+
+      <!-- STAGE 2: PROCESSING PROGRESS -->
+      <div id="vfnBatchProgressSection" class="hidden space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="flex justify-between items-center font-bold">
+          <span id="vfnBatchProgressStatus" class="text-blue-900 flex items-center gap-2">
+            <span class="inline-block animate-spin">⏳</span> Processing records...
+          </span>
+          <span id="vfnBatchProgressPct" class="font-mono text-blue-700">0%</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+          <div id="vfnBatchProgressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+        </div>
+        <p id="vfnBatchProgressCount" class="text-[11px] text-slate-500 font-mono text-right">0 / 0 rows analyzed</p>
+      </div>
+
+      <!-- STAGE 3: RESULTS & BREAKDOWN -->
+      <div id="vfnBatchResultSection" class="hidden space-y-4">
+        
+        <!-- METRIC SUMMARY CARDS -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase text-slate-500 block">Total Read</span>
+            <span id="resTotalRows" class="text-base font-extrabold font-mono text-slate-800">0</span>
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-emerald-200 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase text-emerald-600 block">Accounts Updated</span>
+            <span id="resUpdatedRows" class="text-base font-extrabold font-mono text-emerald-700">0</span>
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-blue-200 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase text-blue-600 block">Reply Dates Posted</span>
+            <span id="resReplyDatesCount" class="text-base font-extrabold font-mono text-blue-700">0</span>
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-purple-200 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase text-purple-600 block">Remarks &amp; Dates</span>
+            <span id="resRemarksCount" class="text-base font-extrabold font-mono text-purple-700">0</span>
+          </div>
+        </div>
+
+        <!-- SCHEME-WISE POSTING REPORT -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="bg-slate-100 px-3 py-2 font-extrabold text-[11px] text-slate-800 uppercase tracking-wide flex justify-between items-center">
+            <span>Scheme-wise Status Update Summary</span>
+            <span id="resSchemeTotalBadge" class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono font-bold">0 Schemes</span>
+          </div>
+          <div class="max-h-40 overflow-y-auto">
+            <table class="w-full text-left border-collapse text-[11px]">
+              <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold sticky top-0">
+                <tr>
+                  <th class="p-2">Scheme</th>
+                  <th class="p-2 text-right">Updated</th>
+                  <th class="p-2 text-right">Reply Rx'd</th>
+                  <th class="p-2 text-right">Dispatched Only</th>
+                  <th class="p-2 text-right">Remarks Logged</th>
+                </tr>
+              </thead>
+              <tbody id="vfnBatchSchemeBreakdownBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ERRORS & OMISSIONS TABLE -->
+        <div id="vfnBatchOmissionsCard" class="hidden border border-rose-200 rounded-xl overflow-hidden bg-rose-50/30">
+          <div class="bg-rose-100/70 px-3 py-2 text-rose-900 font-bold text-[11px] flex justify-between items-center">
+            <span class="flex items-center gap-1.5">
+              <span>⚠️</span> Unmatched / Skipped Accounts (<span id="resOmissionsCount">0</span>)
+            </span>
+            <button type="button" onclick="exportBatchOmissionsToCsv()" class="bg-white hover:bg-rose-50 text-rose-800 border border-rose-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition">
+              ⬇️ Export Skipped CSV
+            </button>
+          </div>
+          <div class="max-h-36 overflow-y-auto">
+            <table class="w-full text-left border-collapse text-[10.5px]">
+              <thead class="bg-rose-50 text-rose-900 border-b border-rose-200 font-bold sticky top-0">
+                <tr>
+                  <th class="p-2 font-mono">Account No</th>
+                  <th class="p-2">Row Data</th>
+                  <th class="p-2">Failure Reason</th>
+                </tr>
+              </thead>
+              <tbody id="vfnBatchOmissionsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- MODAL FOOTER -->
+    <div class="bg-slate-50 border-t border-slate-200 p-3.5 flex justify-between items-center shrink-0">
+      <span id="vfnBatchFooterNote" class="text-[11px] text-slate-500 font-medium">Ready for file input</span>
+      <div class="flex gap-2">
+        <button type="button" id="vfnBatchResetBtn" onclick="resetBatchUploadModal()" class="hidden px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-lg transition cursor-pointer">
+          Upload Another
+        </button>
+        <button type="button" onclick="closeCentVfnBatchModal()" class="px-4 py-1.5 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition cursor-pointer">
+          Done / Close
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
   <!-- KPI SUMMARY SCORECARDS (5 CARDS) -->
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
     <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
@@ -11658,6 +11806,348 @@ async function loadCentVfnSchemeBreakdown() {
     if (tfoot) tfoot.innerHTML = '';
   }
 }
+
+
+// State tracker for omissions during batch execution
+let vfnBatchSkippedRows = [];
+
+/**
+ * Opens the Batch Upload Status Modal
+ */
+function openCentVfnBatchModal() {
+  const modal = $('centVfnBatchStatusModal');
+  if (modal) modal.classList.remove('hidden');
+  resetBatchUploadModal();
+}
+
+/**
+ * Closes the Batch Upload Status Modal
+ */
+function closeCentVfnBatchModal() {
+  const modal = $('centVfnBatchStatusModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+/**
+ * Resets Modal UI back to Stage 1 (Dropzone)
+ */
+function resetBatchUploadModal() {
+  $('vfnBatchDropSection')?.classList.remove('hidden');
+  $('vfnBatchProgressSection')?.classList.add('hidden');
+  $('vfnBatchResultSection')?.classList.add('hidden');
+  $('vfnBatchOmissionsCard')?.classList.add('hidden');
+  $('vfnBatchResetBtn')?.classList.add('hidden');
+
+  if ($('centVfnBatchStatusFileInput')) $('centVfnBatchStatusFileInput').value = '';
+  if ($('vfnBatchProgressBar')) $('vfnBatchProgressBar').style.width = '0%';
+  if ($('vfnBatchProgressPct')) $('vfnBatchProgressPct').innerText = '0%';
+  if ($('vfnBatchFooterNote')) $('vfnBatchFooterNote').innerText = 'Ready for file input';
+  vfnBatchSkippedRows = [];
+}
+
+/**
+ * Handles Drag-and-Drop files
+ */
+function handleVfnBatchDrop(e) {
+  e.preventDefault();
+  $('vfnBatchDropZone')?.classList.remove('border-blue-600', 'bg-blue-50/50');
+  const file = e.dataTransfer?.files?.[0];
+  if (file) startBatchUploadProcessing(file);
+}
+
+/**
+ * Handles Normal File Selection
+ */
+function handleVfnBatchSelected(e) {
+  const file = e.target.files?.[0];
+  if (file) startBatchUploadProcessing(file);
+}
+
+/**
+ * Core Batch Engine: Reads File, Parses Dates, Updates Database, and Renders Reports
+ */
+async function startBatchUploadProcessing(file) {
+  $('vfnBatchDropSection')?.classList.add('hidden');
+  $('vfnBatchProgressSection')?.classList.remove('hidden');
+  $('vfnBatchFooterNote').innerText = `Reading file: ${file.name}...`;
+
+  const yieldThread = () => new Promise(r => setTimeout(r, 0));
+  const isCsv = file.name.toLowerCase().endsWith('.csv');
+
+  const executeProcessing = async (rows) => {
+    if (!rows || !rows.length) {
+      alert("No data rows detected in the uploaded file.");
+      resetBatchUploadModal();
+      return;
+    }
+
+    const totalRows = rows.length;
+    let updatedCount = 0;
+    let replyDatesPosted = 0;
+    let remarksPosted = 0;
+
+    const schemeMap = {};
+    vfnBatchSkippedRows = [];
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const nowIso = new Date().toISOString();
+
+    for (let i = 0; i < totalRows; i++) {
+      if (i % 25 === 0) {
+        const pct = Math.round(((i + 1) / totalRows) * 100);
+        $('vfnBatchProgressBar').style.width = `${pct}%`;
+        $('vfnBatchProgressPct').innerText = `${pct}%`;
+        $('vfnBatchProgressCount').innerText = `${i + 1} / ${totalRows} rows processed`;
+        await yieldThread();
+      }
+
+      const r = rows[i];
+
+      // 1. Account Number Extraction
+      const rawAccNo = String(
+        r['Account Number'] || r['account_no'] || r['Account No'] || r['ACCOUNT NO'] || ''
+      ).trim();
+      const accNo = rawAccNo.replace(/[^0-9]/g, '');
+
+      if (!accNo || accNo.length < 5) {
+        vfnBatchSkippedRows.push({
+          account_no: rawAccNo || 'BLANK',
+          details: JSON.stringify(r),
+          reason: 'Invalid or missing Account Number'
+        });
+        continue;
+      }
+
+      // 2. Article No Extraction
+      const articleNo = String(
+        r['Article Number'] || r['article_no'] || r['Article No'] || r['ARTICLE NO'] || ''
+      ).trim().toUpperCase();
+
+      // 3. Timezone-Safe Date Parsing
+      const rawDispatchDate = r['Dispatched Date'] || r['dispatched_date'] || r['Dispatch Date'] || null;
+      const rawReplyDate = r['Reply Received Date'] || r['reply_rxd_date'] || r['Reply Date'] || null;
+      const remarks = String(r['Remarks'] || r['remarks'] || '').trim();
+
+      const dispatchDate = normalizeDateToYMD(rawDispatchDate);
+      const replyDate = normalizeDateToYMD(rawReplyDate);
+
+      // 4. Construct Payload
+      const updates = {};
+      if (articleNo) {
+        updates.outward_article_no = articleNo;
+        updates.article_no = articleNo;
+      }
+      if (remarks) {
+        updates.remarks = remarks;
+        updates.remark_entry_date = todayStr;
+      }
+
+      let isReply = false;
+      let isDispatch = false;
+
+      if (replyDate) {
+        updates.status = 'reply_received';
+        updates.reply_rxd_date = replyDate;
+        if (dispatchDate) updates.dispatched_date = dispatchDate;
+        updates.last_event_record = `Batch update: Reply Received on ${replyDate}`;
+        isReply = true;
+      } else if (dispatchDate || articleNo) {
+        updates.status = 'dispatched';
+        updates.dispatched_date = dispatchDate || todayStr;
+        updates.last_event_record = `Batch update: Dispatched (${articleNo || 'No Barcode'}) on ${dispatchDate || todayStr}`;
+        isDispatch = true;
+      }
+
+      if (Object.keys(updates).length === 0) {
+        vfnBatchSkippedRows.push({
+          account_no: accNo,
+          details: `Dispatch: ${rawDispatchDate || '-'}, Reply: ${rawReplyDate || '-'}, Remarks: ${remarks || '-'}`,
+          reason: 'No actionable status, date, or remarks data to update'
+        });
+        continue;
+      }
+
+      updates.updated_at = nowIso;
+
+      // 5. Update Database Record and retrieve updated row info for breakdown
+      const { data: updatedRows, error } = await supabaseClient
+        .from('cent_percent_verification')
+        .update(updates)
+        .eq('account_no', accNo)
+        .select('account_no, scheme');
+
+      if (error) {
+        vfnBatchSkippedRows.push({
+          account_no: accNo,
+          details: `Error: ${error.message}`,
+          reason: 'Database update rejected'
+        });
+      } else if (!updatedRows || updatedRows.length === 0) {
+        vfnBatchSkippedRows.push({
+          account_no: accNo,
+          details: `Article: ${articleNo || '-'}`,
+          reason: 'Account not found in Cent Percent Verification table'
+        });
+      } else {
+        updatedCount++;
+        if (replyDate) replyDatesPosted++;
+        if (remarks) remarksPosted++;
+
+        // Track scheme breakdown
+        const schemeCode = (updatedRows[0].scheme || 'UNASSIGNED').trim().toUpperCase();
+        if (!schemeMap[schemeCode]) {
+          schemeMap[schemeCode] = { updated: 0, replies: 0, dispatches: 0, remarks: 0 };
+        }
+        schemeMap[schemeCode].updated++;
+        if (isReply) schemeMap[schemeCode].replies++;
+        if (isDispatch) schemeMap[schemeCode].dispatches++;
+        if (remarks) schemeMap[schemeCode].remarks++;
+      }
+    }
+
+    // Processing finished: Render Results
+    displayBatchUploadResults({
+      totalRows,
+      updatedCount,
+      replyDatesPosted,
+      remarksPosted,
+      schemeMap
+    });
+  };
+
+  try {
+    if (isCsv && typeof Papa !== 'undefined') {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: async (results) => executeProcessing(results.data),
+        error: (err) => {
+          alert("CSV Parsing Error: " + err.message);
+          resetBatchUploadModal();
+        }
+      });
+    } else {
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { 
+            type: 'array', 
+            dense: true, 
+            cellDates: false, // Prevents UTC offset errors
+            cellFormula: false,
+            cellStyles: false 
+          });
+          const sheetName = workbook.SheetNames[0];
+          const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { 
+            defval: '',
+            raw: false 
+          });
+          await executeProcessing(rows);
+        } catch (err) {
+          alert("Excel Parsing Error: " + err.message);
+          resetBatchUploadModal();
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  } catch (err) {
+    alert("Import failed: " + err.message);
+    resetBatchUploadModal();
+  }
+}
+
+/**
+ * Renders the Post-Processing Results Matrix
+ */
+async function displayBatchUploadResults({ totalRows, updatedCount, replyDatesPosted, remarksPosted, schemeMap }) {
+  $('vfnBatchProgressSection')?.classList.add('hidden');
+  $('vfnBatchResultSection')?.classList.remove('hidden');
+  $('vfnBatchResetBtn')?.classList.remove('hidden');
+
+  // 1. Populate summary KPIs
+  $('resTotalRows').innerText = totalRows.toLocaleString('en-IN');
+  $('resUpdatedRows').innerText = updatedCount.toLocaleString('en-IN');
+  $('resReplyDatesCount').innerText = replyDatesPosted.toLocaleString('en-IN');
+  $('resRemarksCount').innerText = remarksPosted.toLocaleString('en-IN');
+
+  // 2. Populate Scheme Breakdown
+  const tbodyScheme = $('vfnBatchSchemeBreakdownBody');
+  const schemeKeys = Object.keys(schemeMap).sort();
+  $('resSchemeTotalBadge').innerText = `${schemeKeys.length} Schemes`;
+
+  if (schemeKeys.length === 0) {
+    tbodyScheme.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No scheme data updated</td></tr>`;
+  } else {
+    tbodyScheme.innerHTML = schemeKeys.map(code => {
+      const s = schemeMap[code];
+      return `
+        <tr class="border-b border-slate-100 hover:bg-slate-50 transition font-mono">
+          <td class="p-2 font-bold font-sans text-slate-800">${code}</td>
+          <td class="p-2 text-right font-bold text-slate-900">${s.updated.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-bold text-emerald-700">${s.replies.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-bold text-blue-700">${s.dispatches.toLocaleString('en-IN')}</td>
+          <td class="p-2 text-right font-bold text-purple-700">${s.remarks.toLocaleString('en-IN')}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 3. Populate Omissions/Errors (if any)
+  if (vfnBatchSkippedRows.length > 0) {
+    $('vfnBatchOmissionsCard')?.classList.remove('hidden');
+    $('resOmissionsCount').innerText = vfnBatchSkippedRows.length.toLocaleString('en-IN');
+
+    const tbodyErr = $('vfnBatchOmissionsBody');
+    tbodyErr.innerHTML = vfnBatchSkippedRows.slice(0, 100).map(item => `
+      <tr class="border-b border-rose-100 hover:bg-rose-50/50 transition">
+        <td class="p-2 font-mono font-bold text-rose-800 whitespace-nowrap">${item.account_no}</td>
+        <td class="p-2 text-slate-600 truncate max-w-[200px]" title="${item.details}">${item.details}</td>
+        <td class="p-2 font-bold text-rose-700">${item.reason}</td>
+      </tr>
+    `).join('');
+
+    if (vfnBatchSkippedRows.length > 100) {
+      tbodyErr.innerHTML += `<tr><td colspan="3" class="p-2 text-center text-[10px] text-rose-600 font-semibold italic">Showing first 100 skipped rows. Use Export CSV to view all ${vfnBatchSkippedRows.length.toLocaleString('en-IN')} items.</td></tr>`;
+    }
+  } else {
+    $('vfnBatchOmissionsCard')?.classList.add('hidden');
+  }
+
+  $('vfnBatchFooterNote').innerText = `Batch complete: ${updatedCount.toLocaleString('en-IN')} accounts updated successfully.`;
+
+  // 4. TRIGGER ALL REQUIRED DASHBOARD REFRESHERS
+  await Promise.allSettled([
+    typeof loadCentVfnSchemeBreakdown === 'function' ? loadCentVfnSchemeBreakdown() : Promise.resolve(),
+    typeof loadCentVfnDatewiseReport === 'function' ? loadCentVfnDatewiseReport() : Promise.resolve(),
+    typeof loadCentVfnKpiScorecards === 'function' ? loadCentVfnKpiScorecards() : Promise.resolve(),
+    typeof loadCentVfnData === 'function' ? loadCentVfnData(1) : Promise.resolve()
+  ]);
+}
+
+/**
+ * Exports Skipped/Omitted Accounts to CSV
+ */
+function exportBatchOmissionsToCsv() {
+  if (!vfnBatchSkippedRows.length) return alert("No omitted accounts to export.");
+
+  let csvContent = "data:text/csv;charset=utf-8,Account Number,Details,Failure Reason\n";
+  vfnBatchSkippedRows.forEach(row => {
+    const acc = `"${String(row.account_no).replace(/"/g, '""')}"`;
+    const det = `"${String(row.details).replace(/"/g, '""')}"`;
+    const rsn = `"${String(row.reason).replace(/"/g, '""')}"`;
+    csvContent += `${acc},${det},${rsn}\n`;
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `Batch_Update_Skipped_Accounts_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 // ----------------------------------------------------------------------
 // OPEN BARCODE ALLOTMENT MODAL
 // ----------------------------------------------------------------------
