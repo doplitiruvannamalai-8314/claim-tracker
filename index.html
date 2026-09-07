@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1338,23 +1339,49 @@
       <div class="grid grid-cols-2 gap-3 bg-amber-50/60 p-3 rounded-xl border border-amber-200">
         <div>
           <label class="block font-bold text-slate-700 mb-1">Outward Prefix (SSPO &rarr; Dep)</label>
-          <input type="text" id="vfnBarPrefixOutward" value="RT" maxlength="2" class="w-full border p-1.5 rounded font-mono font-bold uppercase bg-white">
+          <input type="text" id="vfnBarPrefixOutward" value="" maxlength="2" class="w-full border p-1.5 rounded font-mono font-bold uppercase bg-white">
         </div>
         <div>
           <label class="block font-bold text-slate-700 mb-1">Inward Prefix (Reply Slip)</label>
-          <input type="text" id="vfnBarPrefixInward" value="RM" maxlength="2" class="w-full border p-1.5 rounded font-mono font-bold uppercase bg-white">
+          <input type="text" id="vfnBarPrefixInward" value="" maxlength="2" class="w-full border p-1.5 rounded font-mono font-bold uppercase bg-white">
         </div>
         <div>
           <label class="block font-bold text-slate-700 mb-1">Start Serial (8 Digits)</label>
-          <input type="text" id="vfnBarStartSerial" value="00100001" maxlength="8" class="w-full border p-1.5 rounded font-mono font-bold bg-white">
+          <input type="text" id="vfnBarStartSerial" value="" maxlength="8" class="w-full border p-1.5 rounded font-mono font-bold bg-white">
         </div>
+        
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Target Scheme / Filter</label>
-          <select id="vfnBarTargetScheme" class="w-full border p-1.5 rounded font-bold bg-white">
-            <option value="ALL">All Schemes (Pending Only)</option>
+          <label class="block font-bold text-slate-700 text-xs mb-1">Target Scheme / Filter *</label>
+          <select id="vfnBarcodeSchemeTarget" onchange="updateBarcodeAllotmentEligibleCount()" class="w-full border border-slate-300 p-2 rounded-lg font-bold text-xs bg-white outline-none focus:border-postRed-600">
+            <option value="ALL">All Schemes (Pending Accounts)</option>
           </select>
+          <p id="vfnBarcodeEligibleCounter" class="text-[11px] text-amber-700 font-semibold mt-1">
+            Calculating eligible accounts...
+          </p>
         </div>
       </div>
+      <!-- BARCODE RESET ACCORDION / TOOLBAR (SAFE REVERSAL) -->
+        <div class="mt-4 pt-3 border-t border-slate-200 bg-rose-50/50 p-3 rounded-xl border border-rose-200">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h4 class="text-xs font-bold text-rose-900 flex items-center gap-1">
+                <span>🔄</span> Reset Allotted Barcodes
+              </h4>
+              <p class="text-[10px] text-rose-700">
+                Clears allotted article numbers and reverts status to <strong>'Imported'</strong> for unreplied accounts.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="vfnResetBarcodeScope" class="border border-rose-300 p-1.5 rounded text-xs font-bold bg-white text-slate-800 outline-none">
+                <option value="SELECTED">Selected Scheme Only</option>
+                <option value="ALL">All Schemes in Division</option>
+              </select>
+              <button type="button" id="btnResetVfnBarcodes" onclick="executeResetVfnBarcodes()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs px-3 py-1.5 rounded shadow-2xs cursor-pointer transition flex items-center gap-1">
+                🗑️ Reset Barcodes
+              </button>
+            </div>
+          </div>
+        </div>
 
       <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 leading-relaxed text-[11px]">
         <b>Rule:</b> Accounts already marked as <b>Printed</b> or having assigned barcodes will <b>NOT</b> be overwritten. Accounts in <i>Reply Received</i> status are completely excluded.
@@ -9104,6 +9131,53 @@ function downloadCentVfnBatchTemplate() {
 // -------------------------------------------------------------
 // 2. HARDENED BATCH STATUS UPLOAD ENGINE
 // -------------------------------------------------------------
+/**
+ * Normalizes Excel dates, JS Dates, Finacle strings (DD-MM-YYYY),
+ * and ISO strings to a standard 'YYYY-MM-DD' format for PostgreSQL.
+ */
+function normalizeDateToYMD(val) {
+  if (!val) return null;
+
+  // If already a JS Date object from XLSX cellDates: true
+  if (val instanceof Date) {
+    if (isNaN(val.getTime())) return null;
+    const y = val.getFullYear();
+    const m = String(val.getMonth() + 1).padStart(2, '0');
+    const d = String(val.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  // If numeric Excel Serial Date
+  if (typeof val === 'number') {
+    const jsDate = new Date(Math.round((val - 25569) * 86400 * 1000));
+    if (isNaN(jsDate.getTime())) return null;
+    return jsDate.toISOString().split('T')[0];
+  }
+
+  const str = String(val).trim();
+  if (!str) return null;
+
+  // Matches DD-MM-YYYY or DD/MM/YYYY
+  const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (dmyMatch) {
+    const day = dmyMatch[1].padStart(2, '0');
+    const month = dmyMatch[2].padStart(2, '0');
+    const year = dmyMatch[3];
+    return `${year}-${month}-${day}`;
+  }
+
+  // Matches YYYY-MM-DD
+  const ymdMatch = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (ymdMatch) {
+    const year = ymdMatch[1];
+    const month = ymdMatch[2].padStart(2, '0');
+    const day = ymdMatch[3].padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  return null;
+}
+
 async function handleCentVfnBatchStatusUpload(e) {
   const file = e.target.files?.[0];
   if (!file) return;
@@ -9119,60 +9193,83 @@ async function handleCentVfnBatchStatusUpload(e) {
 
     let updatedCount = 0;
     const todayStr = new Date().toISOString().split('T')[0];
+    const nowIso = new Date().toISOString();
 
     for (let i = 0; i < rows.length; i++) {
-      if (i % 100 === 0) await yieldThread();
+      if (i % 50 === 0) await yieldThread();
 
       const r = rows[i];
-      // Match flexible account number keys
+
+      // 1. Account Number Extraction
       const rawAccNo = String(
         r['Account Number'] || r['account_no'] || r['Account No'] || r['ACCOUNT NO'] || ''
       ).trim();
       const accNo = rawAccNo.replace(/[^0-9]/g, '');
       if (!accNo || accNo.length < 5) continue;
 
+      // 2. Article Number Extraction
       const articleNo = String(
         r['Article Number'] || r['article_no'] || r['Article No'] || r['ARTICLE NO'] || ''
       ).trim().toUpperCase();
 
+      // 3. Normalized Date Parsing
       const rawDispatchDate = r['Dispatched Date'] || r['dispatched_date'] || r['Dispatch Date'] || null;
       const rawReplyDate = r['Reply Received Date'] || r['reply_rxd_date'] || r['Reply Date'] || null;
       const remarks = String(r['Remarks'] || r['remarks'] || '').trim();
 
-      const dispatchDate = typeof parseFinacleDate === 'function' ? parseFinacleDate(rawDispatchDate) : rawDispatchDate;
-      const replyDate = typeof parseFinacleDate === 'function' ? parseFinacleDate(rawReplyDate) : rawReplyDate;
+      const dispatchDate = normalizeDateToYMD(rawDispatchDate);
+      const replyDate = normalizeDateToYMD(rawReplyDate);
 
+      // 4. Construct Updates Object
       const updates = {};
-      if (articleNo) updates.article_no = articleNo;
-      if (remarks) updates.remarks = remarks;
 
+      if (articleNo) {
+        updates.outward_article_no = articleNo;
+        updates.article_no = articleNo;
+      }
+
+      if (remarks) {
+        updates.remarks = remarks;
+        updates.remark_entry_date = todayStr;
+      }
+
+      // 5. Status & Date Rules
       if (replyDate) {
         updates.status = 'reply_received';
         updates.reply_rxd_date = replyDate;
         if (dispatchDate) updates.dispatched_date = dispatchDate;
-        updates.last_event_record = `Batch updated: Reply Received on ${replyDate}`;
+        updates.last_event_record = `Batch update: Reply Received on ${replyDate}`;
       } else if (dispatchDate || articleNo) {
         updates.status = 'dispatched';
         updates.dispatched_date = dispatchDate || todayStr;
-        updates.last_event_record = `Batch updated: Dispatched (${articleNo || 'No barcode'})`;
+        updates.last_event_record = `Batch update: Dispatched (${articleNo || 'No barcode'}) on ${dispatchDate || todayStr}`;
       }
 
+      // 6. Push Update to Database
       if (Object.keys(updates).length > 0) {
-        updates.updated_at = new Date().toISOString();
+        updates.updated_at = nowIso;
+
         const { error } = await supabaseClient
           .from('cent_percent_verification')
           .update(updates)
           .eq('account_no', accNo);
 
-        if (!error) updatedCount++;
+        if (!error) {
+          updatedCount++;
+        } else {
+          console.error(`Failed to update account ${accNo}:`, error);
+        }
       }
     }
 
-    alert(`Batch mapping completed: ${updatedCount.toLocaleString('en-IN')} accounts updated.`);
-    $('centVfnBatchStatusInput').value = '';
-    if (typeof loadCentVfnData === 'function') {
-      loadCentVfnData();
-    }
+    alert(`✅ Batch upload complete: ${updatedCount.toLocaleString('en-IN')} accounts updated.`);
+    if ($('centVfnBatchStatusInput')) $('centVfnBatchStatusInput').value = '';
+
+    // Refresh dashboard tables and reports
+    if (typeof loadCentVfnData === 'function') await loadCentVfnData(1);
+    if (typeof loadCentVfnKpiScorecards === 'function') await loadCentVfnKpiScorecards();
+    if (typeof loadCentVfnSchemeBreakdown === 'function') await loadCentVfnSchemeBreakdown();
+    if (typeof loadCentVfnDatewiseReport === 'function') await loadCentVfnDatewiseReport();
   };
 
   try {
@@ -9615,15 +9712,117 @@ async function harvestAndPopulateSchemesFallback() {
   }
 }
 // Optional helper for Barcode Modal target scheme
-function populateVfnBarcodeSchemeDropdown() {
-  const select = $('vfnBarTargetScheme');
+
+async function openAdminVfnBarcodeModal() {
+  const modal = $('adminVfnBarcodeModal') || $('vfnBarcodeModal');
+  if (modal) modal.classList.remove('hidden');
+
+  // Populate dynamic schemes dropdown
+  await populateVfnBarcodeSchemeDropdown();
+}
+
+/**
+ * Populates Barcode Target Scheme Dropdown using database-side grouping
+ * (Solves the 1,000 row ceiling limitation).
+ */
+async function populateVfnBarcodeSchemeDropdown() {
+  const select = $('vfnBarcodeSchemeTarget') || $('vfnBarcodeSchemeDropdown') || $('barcodeTargetScheme');
   if (!select) return;
 
-  let html = `<option value="ALL">All Schemes (Pending Only)</option>`;
-  masterSchemesList.forEach(s => {
-    html += `<option value="${s.scheme_code}">${s.scheme_code} (${s.scheme_description})</option>`;
-  });
-  select.innerHTML = html;
+  const masterList = (window.masterSchemesList && window.masterSchemesList.length > 0)
+    ? window.masterSchemesList
+    : (typeof masterSchemesList !== 'undefined' ? masterSchemesList : []);
+
+  select.innerHTML = `<option value="ALL">Loading schemes across all 30k+ accounts...</option>`;
+
+  try {
+    let schemeData = [];
+
+    // 1. Primary path: Call the SQL Aggregator (Fast, zero pagination ceiling)
+    const { data, error } = await supabaseClient.rpc('get_cent_vfn_barcode_pending_schemes');
+
+    if (!error && Array.isArray(data)) {
+      schemeData = data;
+    } else {
+      console.warn("RPC get_cent_vfn_barcode_pending_schemes failed, falling back to master list:", error);
+      // Fallback using master schemes
+      schemeData = masterList.map(s => ({
+        scheme: s.scheme_code,
+        pending_count: 0
+      }));
+    }
+
+    let grandTotalPending = 0;
+    const grouped = {};
+
+    schemeData.forEach(item => {
+      const code = (item.scheme || 'UNASSIGNED').trim().toUpperCase();
+      const count = Number(item.pending_count) || 0;
+      grandTotalPending += count;
+
+      const master = masterList.find(m => m.scheme_code === code);
+      const grp = master?.product_group || 'OTHER';
+      const grpName = master?.product_group_name || grp;
+      const groupTitle = `${grp} - ${grpName}`;
+
+      if (!grouped[groupTitle]) grouped[groupTitle] = [];
+      grouped[groupTitle].push({
+        code,
+        desc: master?.scheme_description || code,
+        count
+      });
+    });
+
+    // 2. Build grouped dropdown options
+    let optionsHtml = `<option value="ALL">-- ALL SCHEMES (${grandTotalPending.toLocaleString('en-IN')} Unallotted Pending) --</option>`;
+
+    for (const [groupTitle, schemes] of Object.entries(grouped)) {
+      optionsHtml += `<optgroup label="${groupTitle}">`;
+      schemes.forEach(s => {
+        const countLabel = s.count > 0 ? `(${s.count.toLocaleString('en-IN')} pending)` : '(0 pending)';
+        optionsHtml += `<option value="${s.code}">${s.code} - ${s.desc} ${countLabel}</option>`;
+      });
+      optionsHtml += `</optgroup>`;
+    }
+
+    select.innerHTML = optionsHtml;
+
+    // Refresh dynamic eligible counter
+    updateBarcodeAllotmentEligibleCount();
+
+  } catch (err) {
+    console.error("Failed to populate barcode schemes:", err);
+    select.innerHTML = `<option value="ALL">All Schemes (Pending Accounts)</option>`;
+  }
+}
+
+/**
+ * Accurately updates the count of unallotted accounts for the selected scheme.
+ */
+async function updateBarcodeAllotmentEligibleCount() {
+  const counterEl = $('vfnBarcodeEligibleCounter');
+  const targetScheme = $('vfnBarcodeSchemeTarget')?.value || 'ALL';
+  if (!counterEl) return;
+
+  try {
+    let query = supabaseClient
+      .from('cent_percent_verification')
+      .select('id', { count: 'exact', head: true })
+      .neq('status', 'reply_received')
+      .is('outward_article_no', null);
+
+    if (targetScheme && targetScheme !== 'ALL') {
+      query = query.eq('scheme', targetScheme);
+    }
+
+    const { count, error } = await query;
+    if (error) throw error;
+
+    const pendingCount = count || 0;
+    counterEl.innerHTML = `Eligible for allotment: <strong class="text-postRed-700 font-mono text-xs">${pendingCount.toLocaleString('en-IN')}</strong> accounts (Reply not received & unallotted).`;
+  } catch (e) {
+    counterEl.innerText = "Ready to allot barcodes.";
+  }
 }
 
 // -------------------------------------------------------------
@@ -11636,7 +11835,62 @@ function getVfnExportMeta() {
 
   return { officeDisplay, officeFileSlug, fullTimestamp, readableGenDate };
 }
+/**
+ * Executes safe rollback of allotted barcodes.
+ */
+async function executeResetVfnBarcodes() {
+  const targetScheme = $('vfnBarcodeSchemeTarget')?.value || 'ALL';
+  const scopeType = $('vfnResetBarcodeScope')?.value || 'SELECTED';
+  const schemeToReset = scopeType === 'ALL' ? 'ALL' : targetScheme;
 
+  const targetLabel = schemeToReset === 'ALL' 
+    ? 'ALL SCHEMES across the division' 
+    : `Scheme: ${schemeToReset}`;
+
+  const confirmMsg = `⚠️ CAUTION: RESET BARCODES\n\nAre you sure you want to clear allotted barcodes for:\n${targetLabel}?\n\n- Barcode (Outward Article No) will be set to NULL.\n- Account status will be reverted to 'Imported'.\n- Accounts with 'Reply Received' will NOT be touched.\n\nProceed?`;
+
+  if (!confirm(confirmMsg)) return;
+
+  const btn = $('btnResetVfnBarcodes');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Resetting...";
+  }
+
+  try {
+    const userRole = (
+      (typeof currentUserRole !== 'undefined' && currentUserRole) ||
+      (typeof currentUser !== 'undefined' && currentUser?.role) ||
+      'admin'
+    ).toLowerCase();
+
+    const { data, error } = await supabaseClient.rpc('reset_cent_vfn_barcodes', {
+      p_scheme: schemeToReset,
+      p_user_role: userRole
+    });
+
+    if (error) throw error;
+
+    const count = data?.reset_count ?? 0;
+
+    alert(`✅ Success: Reset barcodes for ${Number(count).toLocaleString('en-IN')} account(s). Status set to 'Imported'.`);
+
+    // Refresh UI states
+    await populateVfnBarcodeSchemeDropdown();
+    await loadCentVfnData(1);
+    if (typeof loadCentVfnKpiScorecards === 'function') loadCentVfnKpiScorecards();
+    if (typeof loadCentVfnSchemeBreakdown === 'function') loadCentVfnSchemeBreakdown();
+
+  } catch (err) {
+    console.error("Reset barcode failed:", err);
+    alert("Reset failed: " + (err.message || JSON.stringify(err)));
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "🗑️ Reset Barcodes";
+    }
+  }
+}
 // -------------------------------------------------------------
 // 1. SCHEME BREAKDOWN LOADER (SORTED A-Z + % PENDING COLUMN)
 // -------------------------------------------------------------
