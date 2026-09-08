@@ -892,7 +892,7 @@
             <div class="flex items-center gap-2.5">
               <div class="h-10 w-20 bg-white border border-slate-300 rounded flex items-center justify-center overflow-hidden p-0.5 shadow-xs shrink-0">
                 <img id="issuerSigPreview" src="" alt="Signature" class="max-h-full max-w-full object-contain hidden">
-                <span id="noSigNotice" class="text-[10px] text-slate-400 italic">No Sig</span>
+                <span id="noSigNotice" class="text-[10px] text-slate-400 italic">No Sign</span>
               </div>
               <div>
                 <h4 class="font-bold text-xs text-blue-900 uppercase">SB-46 Issuer Signature</h4>
@@ -901,7 +901,7 @@
             </div>
             <div class="flex items-center justify-end gap-1.5 pt-1 border-t border-blue-200/60">
               <input type="file" id="customSigFileInput" accept="image/*" class="hidden" onchange="handleSignatureUpload(event)">
-              <button type="button" onclick="document.getElementById('customSigFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-xs font-semibold shadow-xs cursor-pointer">✍️ Upload Sig</button>
+              <button type="button" onclick="document.getElementById('customSigFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-xs font-semibold shadow-xs cursor-pointer">✍️ Upload Sign</button>
               <button type="button" onclick="removeIssuerSignature()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded text-xs font-semibold cursor-pointer">✕ Remove</button>
             </div>
           </div>
@@ -12032,7 +12032,7 @@ function renderSb46PrintWindow(accounts) {
               ${!excludeBarcode ? `
                 <div style="display: flex; flex-direction: column; align-items: center;">
                   ${outwardBarcodeImg ? `<img src="${outwardBarcodeImg}" style="height: 20px;" />` : ''}
-                  <span style="font-family: Consolas, monospace; font-size: 8px; font-weight: bold; color: #000;">${formatReadable(outwardCode)}</span>
+                  <span style="font-family: Consolas, monospace; font-size: 12px; font-weight: bold; color: #000;">${formatReadable(outwardCode)}</span>
                 </div>
               ` : '<div></div>'}
               <span class="postage-free-tag">BY SPEED POST</span>
@@ -12045,8 +12045,8 @@ function renderSb46PrintWindow(accounts) {
                   <b>The Senior Superintendent of Post Offices</b><br>
                   Chennai City Central Division<br>
                   Chennai - 600017
-                </p>
                 <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>
+                </p>
               </div>
 
               <div class="to-sub-box">
@@ -12079,7 +12079,7 @@ function renderSb46PrintWindow(accounts) {
               ${!excludeBarcode ? `
                 <div style="display: flex; flex-direction: column; align-items: center;">
                   ${replyBarcodeImg ? `<img src="${replyBarcodeImg}" style="height: 20px;" />` : ''}
-                  <span style="font-family: Consolas, monospace; font-size: 8px; font-weight: bold; color: #000;">${formatReadable(replyCode)}</span>
+                  <span style="font-family: Consolas, monospace; font-size: 12px; font-weight: bold; color: #000;">${formatReadable(replyCode)}</span>
                 </div>
               ` : '<div></div>'}
               <span class="postage-free-tag">NO POSTAGE STAMP REQUIRED</span>
@@ -12092,8 +12092,7 @@ function renderSb46PrintWindow(accounts) {
                   <b>${acc.customer_name}</b><br>
                   ${acc.address || 'Address on record'}<br>   
                   ${acc.mobile_no ? `<b>Mob:</b> ${acc.mobile_no}` : ''}
-                </p>
-                <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>               
+                                <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>   </p>            
               </div>
 
               <div class="to-sub-box highlight-to">
@@ -12230,13 +12229,13 @@ function renderSb46PrintWindow(accounts) {
           margin-bottom: 6px;
         }
         .return-badge { border-bottom-color: #065f46; color: #065f46; }
-        .postage-free-tag { border: 1px solid #065f46; color: #065f46; padding: 1px 5px; border-radius: 2px; font-size: 8px; font-weight: 800; }
+        .postage-free-tag { border: 1px solid #065f46; color: #065f46; padding: 1px 5px; border-radius: 2px; font-size: 10px; font-weight: 800; }
 
-        .address-grid { display: grid; grid-template-columns: 44% 56%; gap: 10px; align-items: start; }
-        .from-sub-box { border-right: 1px dashed #cbd5e1; padding-right: 10px; font-size: 10px; }
-        .to-sub-box { padding-left: 2px; font-size: 10.5px; }
+        .address-grid { display: grid; grid-template-columns: 44% 56%; gap: 5px; align-items: start; }
+        .from-sub-box { border-right: 1px dashed #cbd5e1; padding-right: 10px; font-size: 12px; }
+        .to-sub-box { padding-left: 2px; font-size: 12.5px; }
         .lbl { font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 2px; }
-        .addr-text { margin: 0; line-height: 1.35; color: #334155; font-size: 10px; }
+        .addr-text { margin: 0; line-height: 1.35; color: #334155; font-size: 12px; }
         .addr-main { margin: 0; line-height: 1.35; color: #0f172a; }
         .ref-sub { margin-top: 4px; font-size: 9px; font-weight: bold; color: #475569; }
         .highlight-to { background: #f8fafc; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
