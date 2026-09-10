@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,18 +123,31 @@
       <!-- MAIN DASHBOARD -->
       <div id="mainDashboard" class="hidden space-y-4">
 
-        <!-- TABS NAVIGATION -->
+        <!-- CONSOLIDATED 4-TAB NAVIGATION -->
         <div class="flex flex-wrap gap-2 border-b border-amber-300 pb-2">
-
-          <button type="button" id="tabBtnTrack" onclick="showTab('track')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">🔍Track Claim</button>
-          <button type="button" id="tabBtnRegister" onclick="showTab('registerClaim')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📝 Claim Registration</button>
-          <button type="button" id="tabBtnConverter" onclick="showTab('converterTab')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">☀️ Theme Converter</button>
-          <button type="button" id="tabBtnReports" onclick="showTab('reports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📊MIS &amp; Pendency Reports</button>
-          <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">📈  Digital vs Cash Performance</button>
-          <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer">👥 User Management</button>
-          <button type="button" id="tabBtnCentVfn" onclick="showTab('centVfn')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-3.5 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer"> 🔍Cent Percent Verification</button>
+          <button type="button" id="tabBtnClaimsHub" onclick="showTab('claimsHub')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+            📋 Claims &amp; Verification Portal
+          </button>
+          <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+            📈 Digital vs Cash Performance
+          </button>
+          <button type="button" id="adminTabBtn" onclick="showTab('adminRoleMgmt')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+            👥 User Management
+          </button>
+          <button type="button" id="tabBtnCentVfn" onclick="showTab('centVfn')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+            🔍 Cent Percent Verification
+          </button>
         </div>
 
+
+        <!-- TAB 1: CLAIMS & VERIFICATION PORTAL (CONSOLIDATED) -->
+        <div id="claimsHubView" class="tab-content hidden space-y-3">
+          <div class="flex items-center gap-1.5 bg-amber-50/70 p-1.5 rounded-lg border border-amber-200 w-fit">
+            <button type="button" id="subBtnTrack" onclick="switchClaimsSubView('track')" class="px-3 py-1 text-xs font-bold rounded bg-postRed-600 text-white shadow-xs cursor-pointer">🔍 Track Claim</button>
+            <button type="button" id="subBtnRegister" onclick="switchClaimsSubView('register')" class="px-3 py-1 text-xs font-semibold rounded text-slate-700 hover:bg-white cursor-pointer">📝 Claim Registration</button>
+            <button type="button" id="subBtnConverter" onclick="switchClaimsSubView('converter')" class="px-3 py-1 text-xs font-semibold rounded text-slate-700 hover:bg-white cursor-pointer">☀️ Theme Converter</button>
+            <button type="button" id="subBtnReports" onclick="switchClaimsSubView('reports')" class="px-3 py-1 text-xs font-semibold rounded text-slate-700 hover:bg-white cursor-pointer">📊 MIS &amp; Pendency Reports</button>
+          </div>
 
         <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW & TRACKING -->
         <div id="trackView" class="tab-content bg-white p-4 rounded-xl shadow-md border border-amber-200 space-y-4">
@@ -689,7 +703,9 @@
           </div>
         </div>
 
-       <!-- TAB 5: BOOKING DASHBOARD -->
+               </div> <!-- /claimsHubView -->
+
+        <!-- TAB 5: BOOKING DASHBOARD -->
 <div id="bookingDashView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
   <!-- TOP HEADER & ACTION BUTTONS -->
   <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
@@ -2310,6 +2326,7 @@
     let cachedPdfLogoBase64 = null;
     let currentUser = null;
     let userProfile = null;
+    let appInitialized = false;
     let rawClaimsList = [];
     let currentClaimsList = [];
     let currentMISClaimsList = [];
@@ -2322,7 +2339,8 @@
     let modalAdminPastedBlob = null;
     let userPastedImageBlob = null;
     let activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
-    let currentActiveTab = sessionStorage.getItem('activePortalTab') || 'track';
+    let currentActiveTab = sessionStorage.getItem('activePortalTab') || 'claimsHub';
+  let currentClaimsSubTab = sessionStorage.getItem('claimsSubTab') || 'track';
 
     let currentSortCol = 'created_at';
     let currentSortDir = 'desc';
@@ -2923,8 +2941,12 @@ async function handleEmpIdRegister(e) {
     }
 
 async function initApp() {
+  if (appInitialized) return;
+
   const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
   if (authError || !user) return;
+
+  appInitialized = true;
   currentUser = user;
 
   let { data: profile } = await supabaseClient
@@ -2970,6 +2992,8 @@ async function initApp() {
   }
 
   // Toggle Cent Percent Verification Tab
+  if ($('tabBtnClaimsHub')) $('tabBtnClaimsHub').classList.remove('hidden');
+  if ($('subBtnConverter') && !isAdmin) $('subBtnConverter').classList.add('hidden');
   if ($('tabBtnCentVfn')) {
     if (canAccessCentVfn) {
       $('tabBtnCentVfn').classList.remove('hidden');
@@ -2984,13 +3008,13 @@ async function initApp() {
       $('btnAdminVfnBulkDelete').classList.add('hidden');
     }
   }
-  // Tab Guardrails: redirect unauthorized active tabs back to 'track'
-  const adminOnlyTabs = ['converterTab', 'bookingDash', 'adminRoleMgmt'];
+  // Tab Guardrails: redirect unauthorized active tabs back to Claims Hub.
+  const adminOnlyTabs = ['bookingDash', 'adminRoleMgmt'];
   if (!isAdmin && adminOnlyTabs.includes(currentActiveTab)) {
-    currentActiveTab = 'track';
+    currentActiveTab = 'claimsHub';
   }
   if (!canAccessCentVfn && (currentActiveTab === 'centVfnView' || currentActiveTab === 'centVfn')) {
-    currentActiveTab = 'track';
+    currentActiveTab = 'claimsHub';
   }
 
   const mobileInput = $('claimUserMobile');
@@ -3033,31 +3057,40 @@ function showTab(tabName) {
   const role = (userProfile?.role || 'user').toLowerCase();
   const isAdmin = role === 'admin' || role === 'superadmin';
   const canAccessCentVfn = role === 'centvfn' || isAdmin;
-  const adminOnlyTabs = ['converterTab', 'bookingDash', 'adminRoleMgmt'];
+  const claimsSubModules = ['track', 'registerClaim', 'converterTab', 'reports'];
 
-  // Guard 1: Block non-admins from admin-restricted modules
-  if (!isAdmin && adminOnlyTabs.includes(tabName)) {
-    alert("Access Restricted: You do not have permission to access this module.");
-    tabName = 'track';
+  // Preserve compatibility with existing inline handlers.
+  if (claimsSubModules.includes(tabName)) {
+    if (!isAdmin && tabName === 'converterTab') {
+      alert("Access Restricted: You do not have permission to access the Theme Converter.");
+      tabName = 'track';
+    }
+    const targetSub = tabName === 'registerClaim' ? 'register' : (tabName === 'converterTab' ? 'converter' : tabName);
+    showTab('claimsHub');
+    switchClaimsSubView(targetSub);
+    return;
   }
 
-  // Guard 2: Block unauthorized users from Cent Percent Verification
+  const adminOnlyTabs = ['bookingDash', 'adminRoleMgmt'];
+  if (!isAdmin && adminOnlyTabs.includes(tabName)) {
+    alert("Access Restricted: You do not have permission to access this module.");
+    tabName = 'claimsHub';
+  }
+
   if (!canAccessCentVfn && tabName === 'centVfn') {
     alert("Access Restricted: Cent Percent Verification requires centvfn or admin privileges.");
-    tabName = 'track';
+    tabName = 'claimsHub';
   }
 
   currentActiveTab = tabName;
+  sessionStorage.setItem('activePortalTab', tabName);
 
   // 1. Hide all tab view containers
   const viewMap = {
-    'track': 'trackView',
-    'registerClaim': 'registerClaimView',
-    'converterTab': 'converterTabView',
-    'reports': 'reportsView',
+    'claimsHub': 'claimsHubView',
     'bookingDash': 'bookingDashView',
     'adminRoleMgmt': 'adminRoleMgmtView',
-    'centVfn': 'centVfnView' // Added CentVfn View
+    'centVfn': 'centVfnView'
   };
 
   Object.values(viewMap).forEach(viewId => {
@@ -3067,13 +3100,10 @@ function showTab(tabName) {
 
   // 2. Reset navigation button styles
   const btnMap = {
-    'track': 'tabBtnTrack',
-    'registerClaim': 'tabBtnRegister',
-    'converterTab': 'tabBtnConverter',
-    'reports': 'tabBtnReports',
+    'claimsHub': 'tabBtnClaimsHub',
     'bookingDash': 'adminBookingDashTabBtn',
     'adminRoleMgmt': 'adminTabBtn',
-    'centVfn': 'tabBtnCentVfn' // Added CentVfn Button
+    'centVfn': 'tabBtnCentVfn'
   };
 
   Object.values(btnMap).forEach(btnId => {
@@ -3094,7 +3124,12 @@ function showTab(tabName) {
     activeBtn.classList.add('bg-postRed-600', 'text-white');
   }
 
-  // 4. Trigger on-demand loaders for selected tab
+  // 4. Activate the Claims Hub's persisted sub-view.
+  if (tabName === 'claimsHub') {
+    switchClaimsSubView(currentClaimsSubTab || 'track');
+  }
+
+  // 5. Trigger on-demand loaders for selected tab
   if (tabName === 'bookingDash' && isAdmin) {
     if (!$('bookingFromDate')?.value || !$('bookingToDate')?.value) {
       if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'yesterday';
@@ -3116,15 +3151,47 @@ function showTab(tabName) {
   }
 }
 
-  // Fallback alias in case HTML elements still call switchTab
-  window.switchTab = function(tabName) {
-    const clean = tabName.replace('View', '');
-    showTab(clean);
-  };
-  loadSchemeMaster();
-  loadCentVfnDatewiseReport();
-  loadCentVfnSchemeBreakdown();
+function switchClaimsSubView(subKey) {
+  const role = (userProfile?.role || 'user').toLowerCase();
+  const isAdmin = role === 'admin' || role === 'superadmin';
 
+  if (subKey === 'converter' && !isAdmin) {
+    alert("Access Restricted: Theme Converter requires admin privileges.");
+    subKey = 'track';
+  }
+
+  const subViewMap = {
+    track: { view: 'trackView', btn: 'subBtnTrack' },
+    register: { view: 'registerClaimView', btn: 'subBtnRegister' },
+    converter: { view: 'converterTabView', btn: 'subBtnConverter' },
+    reports: { view: 'reportsView', btn: 'subBtnReports' }
+  };
+  const active = subViewMap[subKey] || subViewMap.track;
+
+  currentClaimsSubTab = Object.keys(subViewMap).find(key => subViewMap[key] === active) || 'track';
+  sessionStorage.setItem('claimsSubTab', currentClaimsSubTab);
+
+  Object.values(subViewMap).forEach(({ view, btn }) => {
+    $(view)?.classList.add('hidden');
+    const button = $(btn);
+    button?.classList.remove('bg-postRed-600', 'text-white', 'font-bold', 'shadow-xs');
+    button?.classList.add('text-slate-700', 'font-semibold', 'hover:bg-white');
+  });
+
+  $(active.view)?.classList.remove('hidden');
+  const activeBtn = $(active.btn);
+  activeBtn?.classList.remove('text-slate-700', 'font-semibold', 'hover:bg-white');
+  activeBtn?.classList.add('bg-postRed-600', 'text-white', 'font-bold', 'shadow-xs');
+
+  if (currentClaimsSubTab === 'reports' && typeof generateMISReport === 'function') {
+    generateMISReport(currentMISReportFilter || 'All');
+  }
+}
+
+// Fallback alias in case HTML elements still call switchTab.
+window.switchTab = function(tabName) {
+  showTab(String(tabName).replace('View', ''));
+};
    async function loadFilterDropdowns() {
   try {
     const { data: offices, error: offErr } = await supabaseClient
@@ -3560,6 +3627,10 @@ async function handleUserClipboardPaste(e) {
   const clipboardItems = e.clipboardData?.items;
   if (!clipboardItems) return;
 
+  // Let the centralized registration paste handler process the image once.
+  const registerClaimView = document.getElementById('registerClaimView');
+  if (registerClaimView && !registerClaimView.classList.contains('hidden')) return;
+
   let imageItem = null;
   for (let i = 0; i < clipboardItems.length; i++) {
     if (clipboardItems[i].type.indexOf('image') !== -1) {
@@ -3782,6 +3853,8 @@ function handleFileSelectPreview(e) {
 // AUTO LIGHT THEME CONVERSION + 500KB COMPRESSION PIPELINE
 // -------------------------------------------------------------
 function processImageToLightTheme(fileOrBlob, callback) {
+  if (!fileOrBlob || !fileOrBlob.type?.startsWith('image/')) return;
+
   const reader = new FileReader();
   reader.onload = function(event) {
     const img = new Image();
@@ -7581,8 +7654,8 @@ function applyRoleBasedUI() {
   const role = (userProfile?.role || 'user').toLowerCase();
   const isAdmin = role === 'admin' || role === 'superadmin';
 
-  // 1. Theme Converter Button
-  const btnConverter = $('tabBtnConverter');
+  // 1. Theme Converter sub-tab
+  const btnConverter = $('subBtnConverter');
   if (btnConverter) {
     if (isAdmin) {
       btnConverter.classList.remove('hidden');
@@ -8847,21 +8920,18 @@ async function deleteClaimByAdmin() {
       }
 
       if (registerClaimView && !registerClaimView.classList.contains('hidden')) {
-        userPastedImageBlob = imageBlob;
+        const autoLightEnabled = $('autoConvertDark')?.checked !== false;
 
-        if ($('claimFile')) $('claimFile').value = '';
-        if ($('pdfFilePreviewBlock')) $('pdfFilePreviewBlock').classList.add('hidden');
-
-        const preview = $('userPastedImagePreview');
-        if (preview) {
-          preview.src = URL.createObjectURL(imageBlob);
-          preview.classList.remove('hidden');
+        // Convert pasted dark screenshots before attaching them to the claim form.
+        if (autoLightEnabled && typeof processImageToLightTheme === 'function') {
+          originalRawUserImageFile = imageBlob;
+          processImageToLightTheme(imageBlob, (processedFile, previewUrl) => {
+            setUserPastedFile(processedFile, previewUrl, true);
+          });
+        } else {
+          originalRawUserImageFile = imageBlob;
+          setUserPastedFile(imageBlob, URL.createObjectURL(imageBlob), true);
         }
-        const container = $('userPastedPreviewContainer');
-        if (container) container.classList.remove('hidden');
-
-        const sizeEl = $('userPastedImageSize');
-        if (sizeEl) sizeEl.innerText = `Clipboard Screenshot: ${(imageBlob.size / 1024).toFixed(1)} KB`;
         return;
       }
 
@@ -14651,59 +14721,19 @@ async function loadGitHubLastUpdatedDate(username, repoName) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    
-  loadFilterDropdowns();
 
-  if (typeof loadLogoFromDatabase === 'function') {
-    loadLogoFromDatabase();
-  }
 
-  supabaseClient.auth.getSession().then(({ data: { session } }) => {
-    if (session?.user && typeof initApp === 'function') {
-      initApp();
-    }
-  }).catch(err => {
-    console.warn("Session check error:", err);
-  });
-});
-// Add inside your DOMContentLoaded or when opening the CentVfn tab:
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof loadSchemeMaster === 'function') {
-    loadSchemeMaster();
-  }
-  if (typeof loadCentVfnDatewiseReport === 'function') {
-    loadCentVfnDatewiseReport();
-  }
-});
     // 14. INITIALIZATION LISTENER
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof loadLogoFromDatabase === 'function') {
-        loadLogoFromDatabase();
-      }
+      // Repository metadata is intentionally not fetched during startup.
 
-      loadGitHubLastUpdatedDate('doplitiruvannamalai-8314', 'claim-tracker');
-
-      document.addEventListener('DOMContentLoaded', () => {
-  // Load office options for registration form immediately on page boot
-  loadFilterDropdowns();
-
-  if (typeof loadLogoFromDatabase === 'function') {
-    loadLogoFromDatabase();
-  }
-
-  supabaseClient.auth.getSession().then(({ data: { session } }) => {
-    if (session?.user && typeof initApp === 'function') {
-      initApp();
-    }
-  }).catch(err => {
-    console.warn("Session check error:", err);
-  });
-});
+      // Prevent duplicate session initialization if multiple startup hooks fire.
+      if (window.__portalInitStarted) return;
+      window.__portalInitStarted = true;
 
       supabaseClient.auth.getSession().then(({ data: { session } }) => {
         if (session?.user && typeof initApp === 'function') {
-          initApp();
+          return initApp();
         }
       }).catch(err => {
         console.warn("Session retrieval failed:", err);
