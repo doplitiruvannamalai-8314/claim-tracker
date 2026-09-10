@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -321,46 +319,47 @@
     </div>
 
     <!-- RIGHT PANEL: ATTACHMENT & PREVIEW -->
-    <div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
-      <div>
-        <div class="flex items-center justify-between mb-1.5">
-          <label class="block text-xs font-bold text-slate-700">Document Attachment <span id="docRequiredStar">*</span></label>
-          <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
-          <input type="checkbox" id="autoConvertDark" checked onchange="handleAutoLightToggle()" class="accent-postRed-600 rounded">
-          <span>☀️ Auto Light Theme</span>
-        </label>
-        </div>
-
-        <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileSelectPreview(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
-        
-        <div id="userPasteDropZone" tabindex="0" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
-        <span class="text-xl">📋</span>
-        <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
-      </div>
-      </div>
-
-      <!-- PREVIEW BOX -->
-      <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
-        <div id="previewMediaWrapper" class="flex flex-col items-center justify-center w-full">
-          <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
-          <div id="pdfFilePreviewBlock" class="hidden flex items-center gap-2 bg-white px-3 py-2 rounded border border-emerald-300 shadow-xs">
-            <span class="text-xl">📄</span>
-            <div>
-              <p id="pdfPreviewFileName" class="font-bold text-slate-800 text-xs">document.pdf</p>
-              <p class="text-[10px] text-emerald-700 font-semibold">PDF Document Ready for Upload</p>
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center justify-between w-full mt-2 text-[11px] pt-1 border-t border-emerald-200">
-          <span id="userPastedImageSize" class="font-bold text-emerald-800 text-[10px]">✓ File Attached</span>
-          <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove Attachment</button>
-        </div>
-      </div>
-
-      <button type="submit" id="btnSubmitClaimForm" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-md cursor-pointer transition uppercase tracking-wide">
-        Submit Claim Registration
-      </button>
+<div class="lg:col-span-5 bg-amber-50/50 border border-amber-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
+  <div>
+    <div class="flex items-center justify-between mb-1.5">
+      <label class="block text-xs font-bold text-slate-700">Document Attachment <span id="docRequiredStar">*</span></label>
+      <label class="inline-flex items-center gap-1 text-[11px] font-bold text-postRed-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded cursor-pointer">
+        <input type="checkbox" id="autoConvertDark" checked onchange="handleAutoLightToggle()" class="accent-postRed-600 rounded">
+        <span>☀️ Auto Light Theme</span>
+      </label>
     </div>
+
+    <input type="file" id="claimFile" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileSelectPreview(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+    
+    <div id="userPasteDropZone" tabindex="0" onclick="this.focus()" class="border-2 border-dashed border-amber-400 hover:border-postRed-600 bg-white p-3 rounded-lg text-center cursor-pointer outline-none mt-2 transition">
+      <span class="text-xl">📋</span>
+      <p class="text-xs font-bold text-postRed-800 mt-0.5">Click &amp; press <kbd class="bg-amber-100 px-1 py-0.5 border rounded shadow-xs font-mono">Ctrl + V</kbd> to Paste Screenshot</p>
+      <p class="text-[10px] text-slate-500 mt-0.5">Compressed to &le; 500 KB (Strict limit: 1 MB)</p>
+    </div>
+  </div>
+
+  <!-- PREVIEW BOX -->
+  <div id="userPastedPreviewContainer" class="hidden relative border-2 border-emerald-400 rounded-lg p-2 bg-emerald-50/60 flex flex-col items-center justify-center min-h-[140px]">
+    <div id="previewMediaWrapper" class="flex flex-col items-center justify-center w-full">
+      <img id="userPastedImagePreview" src="" alt="Pasted Screenshot" class="max-h-36 max-w-full object-contain rounded border border-emerald-300 bg-white shadow-xs">
+      <div id="pdfFilePreviewBlock" class="hidden flex items-center gap-2 bg-white px-3 py-2 rounded border border-emerald-300 shadow-xs">
+        <span class="text-xl">📄</span>
+        <div>
+          <p id="pdfPreviewFileName" class="font-bold text-slate-800 text-xs">document.pdf</p>
+          <p class="text-[10px] text-emerald-700 font-semibold">PDF Document Ready for Upload</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center justify-between w-full mt-2 text-[11px] pt-1 border-t border-emerald-200">
+      <span id="userPastedImageSize" class="font-bold text-emerald-800 text-[10px]">✓ File Attached</span>
+      <button type="button" onclick="clearUserPastedImage()" class="text-rose-700 hover:text-rose-900 font-bold underline cursor-pointer">Remove Attachment</button>
+    </div>
+  </div>
+
+  <button type="submit" id="btnSubmitClaimForm" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-md cursor-pointer transition uppercase tracking-wide">
+    Submit Claim Registration
+  </button>
+</div>
   </form>
 </div>
 
@@ -2090,47 +2089,47 @@
       <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
     </div>
 
-    <!-- ATTACHMENT SECTION 1: USER REPLACEMENT UPLOAD -->
-    <div id="modalPendingUserDocSection" class="p-2.5 bg-rose-50/70 rounded-xl border border-rose-200 space-y-1.5 text-xs">
-      <div class="flex justify-between items-center">
-        <label class="font-bold text-rose-900">1. Replace User Uploaded Document (If Illegible/Wrong)</label>
-        <span class="text-[10px] text-rose-700 font-semibold">Overrides User Doc</span>
-      </div>
-      <input type="file" id="modalUserReplaceFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalUserFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
-      
-      <div id="modalUserPasteDropZone" tabindex="0" class="border border-dashed border-rose-300 hover:border-rose-600 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
-        <p class="text-[11px] font-bold text-rose-800">📋 Click &amp; press <kbd class="bg-rose-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Replacement Image</p>
-      </div>
+        <!-- ATTACHMENT SECTION 1: USER REPLACEMENT UPLOAD -->
+        <div id="modalPendingUserDocSection" class="p-2.5 bg-rose-50/70 rounded-xl border border-rose-200 space-y-1.5 text-xs">
+          <div class="flex justify-between items-center">
+            <label class="font-bold text-rose-900">1. Replace User Uploaded Document (If Illegible/Wrong)</label>
+            <span class="text-[10px] text-rose-700 font-semibold">Overrides User Doc</span>
+          </div>
+          <input type="file" id="modalUserReplaceFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalUserFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+          
+          <div id="modalUserPasteDropZone" tabindex="0" class="border border-dashed border-rose-300 hover:border-rose-600 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+            <p class="text-[11px] font-bold text-rose-800">📋 Click &amp; press <kbd class="bg-rose-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Replacement Image</p>
+          </div>
 
-      <div id="modalUserPastedPreviewContainer" class="hidden relative border border-rose-300 rounded p-1.5 bg-rose-50 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <img id="modalUserPastedImagePreview" src="" alt="Replacement User Preview" class="h-10 w-15 object-cover rounded border border-rose-200">
-          <span class="text-rose-800 font-bold text-xs">✓ User Replacement File Attached</span>
+          <div id="modalUserPastedPreviewContainer" class="hidden relative border border-rose-300 rounded p-1.5 bg-rose-50 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <img id="modalUserPastedImagePreview" src="" alt="Replacement User Preview" class="h-10 w-15 object-cover rounded border border-rose-200">
+              <span id="modalUserSizeLabel" class="text-rose-800 font-bold text-xs">✓ User Replacement File Attached</span>
+            </div>
+            <button type="button" onclick="clearModalUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold underline cursor-pointer">Remove</button>
+          </div>
         </div>
-        <button type="button" onclick="clearModalUserPastedImage()" class="text-rose-700 hover:text-rose-900 text-xs font-bold underline cursor-pointer">Remove</button>
-      </div>
-    </div>
 
-    <!-- ATTACHMENT SECTION 2: ADMIN RESOLUTION ATTACHMENT -->
-    <div id="modalSettledAdminDocSection" class="hidden p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-1.5 text-xs">
-      <div class="flex justify-between items-center">
-        <label class="font-bold text-emerald-900">2. Attach Admin Resolution / Confirmation Proof Document</label>
-        <span class="text-[10px] text-emerald-700 font-semibold">Resolution Proof</span>
-      </div>
-      <input type="file" id="modalAdminFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalAdminFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
-      
-      <div id="modalAdminPasteDropZone" tabindex="0" class="border border-dashed border-emerald-400 hover:border-emerald-700 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
-        <p class="text-[11px] font-bold text-emerald-900">📋 Click &amp; press <kbd class="bg-emerald-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Admin Resolution Image</p>
-      </div>
+        <!-- ATTACHMENT SECTION 2: ADMIN RESOLUTION ATTACHMENT -->
+        <div id="modalSettledAdminDocSection" class="hidden p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-1.5 text-xs">
+          <div class="flex justify-between items-center">
+            <label class="font-bold text-emerald-900">2. Attach Admin Resolution / Confirmation Proof Document</label>
+            <span class="text-[10px] text-emerald-700 font-semibold">Resolution Proof</span>
+          </div>
+          <input type="file" id="modalAdminFileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="handleModalAdminFileSelect(event)" class="w-full border p-1 rounded text-xs bg-white">
+          
+          <div id="modalAdminPasteDropZone" tabindex="0" class="border border-dashed border-emerald-400 hover:border-emerald-700 bg-white p-2 rounded text-center cursor-pointer outline-none transition">
+            <p class="text-[11px] font-bold text-emerald-900">📋 Click &amp; press <kbd class="bg-emerald-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to Paste Admin Resolution Image</p>
+          </div>
 
-      <div id="modalAdminPastedPreviewContainer" class="hidden relative border border-emerald-300 rounded p-1.5 bg-emerald-50 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <img id="modalAdminPastedImagePreview" src="" alt="Admin Resolution Preview" class="h-10 w-15 object-cover rounded border border-emerald-200">
-          <span class="text-emerald-800 font-bold text-xs">✓ Admin Resolution File Attached</span>
+          <div id="modalAdminPastedPreviewContainer" class="hidden relative border border-emerald-300 rounded p-1.5 bg-emerald-50 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <img id="modalAdminPastedImagePreview" src="" alt="Admin Resolution Preview" class="h-10 w-15 object-cover rounded border border-emerald-200">
+              <span id="modalAdminSizeLabel" class="text-emerald-800 font-bold text-xs">✓ Admin Resolution File Attached</span>
+            </div>
+            <button type="button" onclick="clearModalAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold underline cursor-pointer">Remove</button>
+          </div>
         </div>
-        <button type="button" onclick="clearModalAdminPastedImage()" class="text-postRed-600 hover:text-postRed-800 text-xs font-bold underline cursor-pointer">Remove</button>
-      </div>
-    </div>
 
     <!-- MODAL FOOTER BUTTONS -->
     <div class="flex justify-between items-center pt-2 border-t border-amber-200">
@@ -3345,7 +3344,7 @@ function showTab(tabName) {
     }
 
     
-    function handleFileSelectPreview(e) {
+function handleFileSelectPreview(e) {
   const file = e.target.files?.[0];
   if (!file) return;
 
@@ -3410,28 +3409,151 @@ function initUserPasteHandlers() {
 // -------------------------------------------------------------
 // DYNAMIC CHECKBOX TOGGLE HANDLER (DARK <-> LIGHT ON DEMAND)
 // -------------------------------------------------------------
-function handleAutoLightToggle() {
-  if (!originalRawUserImageFile) return; // No image attached yet
 
-  // If the attached file is a PDF, theme inversion does not apply
-  if (originalRawUserImageFile.type === 'application/pdf') return;
+      function handleAutoLightToggle() {
+        if (!originalRawUserImageFile) return; // No image attached yet
 
-  const isChecked = document.getElementById('autoConvertDark')?.checked;
+        // If the attached file is a PDF, theme inversion does not apply
+        if (originalRawUserImageFile.type === 'application/pdf') return;
 
-  if (isChecked) {
-    // Re-run light conversion on the stored original file
-    processImageToLightTheme(originalRawUserImageFile, (processedFile, previewUrl) => {
-      setUserPastedFile(processedFile, previewUrl, false);
-    });
-  } else {
-    // Restore the raw untouched original image
-    const rawPreviewUrl = URL.createObjectURL(originalRawUserImageFile);
-    setUserPastedFile(originalRawUserImageFile, rawPreviewUrl, false);
-  }
+        const isChecked = document.getElementById('autoConvertDark')?.checked;
+
+        // Run compression pipeline passing the checkbox state
+        processImageToTarget(originalRawUserImageFile, isChecked, (processedFile, previewUrl) => {
+          setUserPastedFile(processedFile, previewUrl, false);
+        });
+      }
+
+/**
+ * Processes, optionally converts dark-to-light, and strictly compresses
+ * file size to <= 500 KB (Ceiling: 1 MB).
+ */
+function processImageToTarget(fileOrBlob, applyLightInversion, callback) {
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const img = new Image();
+    img.onload = function () {
+      let width = img.width;
+      let height = img.height;
+
+      // Downscale if 4K / wide displays
+      const MAX_DIM = 1920;
+      if (width > MAX_DIM || height > MAX_DIM) {
+        if (width > height) {
+          height = Math.round((height * MAX_DIM) / width);
+          width = MAX_DIM;
+        } else {
+          width = Math.round((width * MAX_DIM) / height);
+          height = MAX_DIM;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+
+      // Default white canvas background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // --- AUTO LIGHT THEME INVERSION ---
+      if (applyLightInversion) {
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imgData.data;
+
+        // Sample background brightness across 4 corners and center
+        let darkPixelCount = 0;
+        let totalSampled = 0;
+        const step = 4 * 4; // Check every 4th pixel for speed and accuracy
+
+        for (let i = 0; i < data.length; i += step) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          // Standard Perceived Luminance
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+          if (lum < 110) darkPixelCount++;
+          totalSampled++;
+        }
+
+        const isDarkTheme = (darkPixelCount / totalSampled) > 0.25;
+
+        // If the screenshot has >25% dark elements (IDE, Finacle dark, or terminal), invert it
+        if (isDarkTheme) {
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            if (lum < 60) {
+              // Dark UI backgrounds -> convert directly to pure white
+              data[i] = 255;
+              data[i + 1] = 255;
+              data[i + 2] = 255;
+            } else if (lum > 190) {
+              // Bright white/cyan text -> convert directly to deep dark grey/black
+              data[i] = 20;
+              data[i + 1] = 20;
+              data[i + 2] = 20;
+            } else {
+              // Midtones (borders, accents, buttons) -> invert color spectrum
+              data[i] = 255 - r;
+              data[i + 1] = 255 - g;
+              data[i + 2] = 255 - b;
+            }
+          }
+          ctx.putImageData(imgData, 0, 0);
+        }
+      }
+
+      // --- STRICT 500 KB COMPRESSION ---
+      let quality = 0.85;
+
+      const compressLoop = () => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return;
+            const sizeKB = blob.size / 1024;
+
+            if (sizeKB <= 500 || quality <= 0.25) {
+              if (sizeKB > 1000 && (width > 700 || height > 700)) {
+                width = Math.round(width * 0.75);
+                height = Math.round(height * 0.75);
+                canvas.width = width;
+                canvas.height = height;
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                quality = 0.75;
+                compressLoop();
+                return;
+              }
+
+              const finalFile = new File([blob], `claim_doc_${Date.now()}.jpg`, { type: 'image/jpeg' });
+              const previewUrl = URL.createObjectURL(blob);
+              callback(finalFile, previewUrl);
+            } else {
+              quality -= 0.15;
+              compressLoop();
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+
+      compressLoop();
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(fileOrBlob);
 }
-
 // -------------------------------------------------------------
-// CLIPBOARD PASTE HANDLER
+// -------------------------------------------------------------
+// CLIPBOARD PASTE HANDLER (RACE-CONDITION SAFE)
 // -------------------------------------------------------------
 async function handleUserClipboardPaste(e) {
   const clipboardItems = e.clipboardData?.items;
@@ -3446,27 +3568,173 @@ async function handleUserClipboardPaste(e) {
   }
 
   if (!imageItem) return;
-
   e.preventDefault();
 
   const blob = imageItem.getAsFile();
   if (!blob) return;
 
-  // Cache raw untouched paste as original
-  const rawFile = new File([blob], `pasted_screenshot_${Date.now()}.png`, { type: blob.type });
-  originalRawUserImageFile = rawFile;
+  originalRawUserImageFile = blob;
 
-  const shouldAutoLight = document.getElementById('autoConvertDark')?.checked;
+  const isChecked = document.getElementById('autoConvertDark')?.checked;
 
-  if (shouldAutoLight) {
-    processImageToLightTheme(rawFile, (processedFile, previewUrl) => {
+  if (isChecked) {
+    forceConvertImageToLightMode(blob, (processedFile, previewUrl) => {
       setUserPastedFile(processedFile, previewUrl, true);
     });
   } else {
-    setUserPastedFile(rawFile, URL.createObjectURL(rawFile), true);
+    forceConvertImageToLightMode(blob, (processedFile, previewUrl) => {
+      setUserPastedFile(processedFile, previewUrl, true);
+    });
   }
 }
+/**
+ * Unconditionally inverts dark theme screenshots to black text on white paper,
+ * then enforces strict <= 500 KB compression.
+ */
+function forceConvertImageToLightMode(fileOrBlob, callback) {
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const img = new Image();
+    img.onload = function () {
+      let width = img.width;
+      let height = img.height;
 
+      // Downscale 2K/4K screenshots to prevent multi-megabyte memory dumps
+      const MAX_DIM = 1920;
+      if (width > MAX_DIM || height > MAX_DIM) {
+        if (width > height) {
+          height = Math.round((height * MAX_DIM) / width);
+          width = MAX_DIM;
+        } else {
+          width = Math.round((width * MAX_DIM) / height);
+          height = MAX_DIM;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw original image on clean white background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Extract raw pixel data
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+
+      // Test overall brightness: only invert if it's actually dark/mixed
+      let totalLuminance = 0;
+      const sampleStep = 4 * 6;
+      let samples = 0;
+      for (let i = 0; i < data.length; i += sampleStep) {
+        totalLuminance += (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+        samples++;
+      }
+
+      // If average brightness is dark or moderate (<= 155), force convert
+      if ((totalLuminance / samples) <= 155) {
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+          if (lum < 75) {
+            // Dark UI background -> Crisp Document White
+            data[i] = 255;
+            data[i + 1] = 255;
+            data[i + 2] = 255;
+          } else if (lum > 175) {
+            // Bright white/yellow text -> Sharp Black text
+            data[i] = 20;
+            data[i + 1] = 20;
+            data[i + 2] = 20;
+          } else {
+            // Mid-tones: invert cleanly
+            data[i] = 255 - r;
+            data[i + 1] = 255 - g;
+            data[i + 2] = 255 - b;
+          }
+        }
+        ctx.putImageData(imgData, 0, 0);
+      }
+
+      // Strict <= 500 KB Compression Loop
+      let quality = 0.85;
+      const compressLoop = () => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return;
+            const sizeKB = blob.size / 1024;
+
+            if (sizeKB <= 500 || quality <= 0.25) {
+              if (sizeKB > 1000 && (width > 700 || height > 700)) {
+                width = Math.round(width * 0.75);
+                height = Math.round(height * 0.75);
+                canvas.width = width;
+                canvas.height = height;
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                quality = 0.75;
+                compressLoop();
+                return;
+              }
+
+              const finalFile = new File([blob], `claim_doc_${Date.now()}.jpg`, { type: 'image/jpeg' });
+              const previewUrl = URL.createObjectURL(blob);
+              callback(finalFile, previewUrl);
+            } else {
+              quality -= 0.15;
+              compressLoop();
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+
+      compressLoop();
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(fileOrBlob);
+}
+function compressImageStrict(fileOrBlob, callback) {
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+
+      let quality = 0.82;
+      const loop = () => {
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          if (blob.size / 1024 <= 500 || quality <= 0.25) {
+            const finalFile = new File([blob], `doc_${Date.now()}.jpg`, { type: 'image/jpeg' });
+            callback(finalFile, URL.createObjectURL(blob));
+          } else {
+            quality -= 0.15;
+            loop();
+          }
+        }, 'image/jpeg', quality);
+      };
+      loop();
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(fileOrBlob);
+}
 // -------------------------------------------------------------
 // FILE INPUT SELECTION HANDLER (MANUAL BROWSE)
 // -------------------------------------------------------------
@@ -3509,53 +3777,127 @@ function handleFileSelectPreview(e) {
 // -------------------------------------------------------------
 // AUTO LIGHT THEME CONVERSION (CANVAS INVERSION)
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// AUTO LIGHT THEME CONVERSION + 500KB COMPRESSION PIPELINE
+// -------------------------------------------------------------
 function processImageToLightTheme(fileOrBlob, callback) {
   const reader = new FileReader();
   reader.onload = function(event) {
     const img = new Image();
     img.onload = function() {
+      let width = img.width;
+      let height = img.height;
+
+      // Downscale high-resolution displays (4K/Retina) to prevent multi-megabyte payloads
+      const MAX_DIMENSION = 1920;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        if (width > height) {
+          height = Math.round((height * MAX_DIMENSION) / width);
+          width = MAX_DIMENSION;
+        } else {
+          width = Math.round((width * MAX_DIMENSION) / height);
+          height = MAX_DIMENSION;
+        }
+      }
+
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      canvas.width = width;
+      canvas.height = height;
 
-      // Draw original
-      ctx.drawImage(img, 0, 0);
+      // Fill solid white background (prevents transparent PNG black-box artifacts)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
 
       const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imgData.data;
 
-      // Sample dark pixels to detect dark mode
-      let darkPixels = 0;
-      let totalSamples = 0;
-      const step = 4 * 10;
+      // Step 1: Accurate average luminance sampling across the screenshot
+      let totalLuminance = 0;
+      let sampledCount = 0;
+      const step = 4 * 8; // Sample every 8th pixel
 
       for (let i = 0; i < data.length; i += step) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
-        const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-        if (brightness < 85) darkPixels++;
-        totalSamples++;
+        // Standard relative luminance (ITU-R BT.709)
+        const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        totalLuminance += lum;
+        sampledCount++;
       }
 
-      const isDarkMode = (darkPixels / totalSamples) > 0.40;
+      const avgLuminance = totalLuminance / sampledCount;
 
-      // Invert if background is predominantly dark
-      if (isDarkMode) {
+      // Dark mode detected if average luminance is under 130
+      if (avgLuminance < 130) {
         for (let i = 0; i < data.length; i += 4) {
-          data[i] = 255 - data[i];       // Red
-          data[i + 1] = 255 - data[i + 1]; // Green
-          data[i + 2] = 255 - data[i + 2]; // Blue
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const pixelLum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+          if (pixelLum < 70) {
+            // Dark UI background -> Convert to crisp white document background
+            data[i] = 255;
+            data[i + 1] = 255;
+            data[i + 2] = 255;
+          } else if (pixelLum > 180) {
+            // Bright white text -> Convert to high-contrast dark text
+            data[i] = 25;
+            data[i + 1] = 25;
+            data[i + 2] = 25;
+          } else {
+            // Midtone elements / badges -> Invert smoothly
+            data[i] = 255 - r;
+            data[i + 1] = 255 - g;
+            data[i + 2] = 255 - b;
+          }
         }
         ctx.putImageData(imgData, 0, 0);
       }
 
-      canvas.toBlob((convertedBlob) => {
-        const processedFile = new File([convertedBlob], `claim_doc_${Date.now()}.png`, { type: 'image/png' });
-        const previewUrl = canvas.toDataURL('image/png');
-        callback(processedFile, previewUrl);
-      }, 'image/png', 0.92);
+      // Step 2: Iterative Compression Loop (Guarantees <= 500 KB and < 1000 KB)
+      let quality = 0.85;
+
+      const compressLoop = () => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return;
+            const sizeKB = blob.size / 1024;
+
+            // Target met (<= 500 KB) OR reached compression limit
+            if (sizeKB <= 500 || quality <= 0.25) {
+              // Safety ceiling: If still over 1000 KB (1 MB), resize dimensions by 25%
+              if (sizeKB > 1000 && (width > 800 || height > 800)) {
+                width = Math.round(width * 0.75);
+                height = Math.round(height * 0.75);
+                canvas.width = width;
+                canvas.height = height;
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                quality = 0.75;
+                compressLoop();
+                return;
+              }
+
+              const processedFile = new File([blob], `claim_doc_${Date.now()}.jpg`, { type: 'image/jpeg' });
+              const previewUrl = URL.createObjectURL(blob);
+              callback(processedFile, previewUrl);
+            } else {
+              // Step down quality progressively
+              quality -= 0.15;
+              compressLoop();
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+
+      compressLoop();
     };
     img.src = event.target.result;
   };
@@ -14002,6 +14344,269 @@ function generateVfnPdfReport(records, fileName) {
 
   doc.save(fileName);
 }
+/**
+ * Compresses an image File/Blob/DataURL to <= targetMaxKB (500KB default),
+ * strictly never exceeding hardMaxKB (1000KB / 1MB).
+ */
+async function compressImageToTarget(fileOrBlob, targetMaxKB = 500, hardMaxKB = 1000) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        // Downscale ultra-high-resolution screenshots (Retina, 2K/4K)
+        const MAX_DIMENSION = 1920;
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIMENSION) / width);
+            width = MAX_DIMENSION;
+          } else {
+            width = Math.round((width * MAX_DIMENSION) / height);
+            height = MAX_DIMENSION;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // Fill white background to prevent dark artifacts from transparent PNG screenshots
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let quality = 0.85;
+
+        const evaluateQuality = () => {
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Canvas compression failed'));
+                return;
+              }
+
+              const sizeKB = blob.size / 1024;
+
+              // Met the target or reached minimal quality threshold
+              if (sizeKB <= targetMaxKB || quality <= 0.25) {
+                // If still above 1MB, progressively scale canvas dimensions down
+                if (sizeKB > hardMaxKB && (width > 600 || height > 600)) {
+                  width = Math.round(width * 0.75);
+                  height = Math.round(height * 0.75);
+                  canvas.width = width;
+                  canvas.height = height;
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.fillRect(0, 0, width, height);
+                  ctx.drawImage(img, 0, 0, width, height);
+                  quality = 0.75;
+                  evaluateQuality();
+                  return;
+                }
+
+                const outReader = new FileReader();
+                outReader.onloadend = () => {
+                  resolve({
+                    blob: blob,
+                    base64: outReader.result,
+                    sizeKB: sizeKB.toFixed(1),
+                    fileName: `screenshot_${Date.now()}.jpg`
+                  });
+                };
+                outReader.readAsDataURL(blob);
+              } else {
+                quality -= 0.15;
+                evaluateQuality();
+              }
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+
+        evaluateQuality();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(fileOrBlob);
+  });
+}
+
+// Global state holding processed upload files
+const activeAttachments = {
+  claim: null,          // { type: 'image'|'pdf', file, base64, sizeKB, fileName }
+  modalUserReplace: null,
+  modalAdminResolution: null
+};
+
+// Generic pipeline for handling pasted clipboard image
+async function handleClipboardPaste(event, targetType) {
+  event.preventDefault();
+  const clipboardItems = (event.clipboardData || window.clipboardData).items;
+  let imageItem = null;
+
+  for (let item of clipboardItems) {
+    if (item.type.indexOf('image') !== -1) {
+      imageItem = item;
+      break;
+    }
+  }
+
+  if (!imageItem) {
+    alert('No image found in clipboard. Copy or take a screenshot first.');
+    return;
+  }
+
+  const rawBlob = imageItem.getAsFile();
+  await processAndApplyAttachment(rawBlob, targetType, true);
+}
+
+// Unified processor for both File Inputs and Pasted Images
+async function processAndApplyAttachment(file, targetType, isPasted = false) {
+  if (!file) return;
+
+  // 1. PDF Handling (Direct size guard, no image compression)
+  if (file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf')) {
+    const sizeKB = file.size / 1024;
+    if (sizeKB > 1024) {
+      alert(`PDF file size is ${sizeKB.toFixed(1)} KB. Strictly maximum allowed size is 1 MB.`);
+      return;
+    }
+
+    const payload = {
+      type: 'pdf',
+      file: file,
+      base64: null,
+      sizeKB: sizeKB.toFixed(1),
+      fileName: file.name
+    };
+
+    activeAttachments[targetType] = payload;
+    updateAttachmentUI(targetType, payload);
+    return;
+  }
+
+  // 2. Image Handling (Screenshots / JPEGs / PNGs)
+  try {
+    const compressed = await compressImageToTarget(file, 500, 1000);
+    const payload = {
+      type: 'image',
+      file: compressed.blob,
+      base64: compressed.base64,
+      sizeKB: compressed.sizeKB,
+      fileName: file.name || compressed.fileName
+    };
+
+    activeAttachments[targetType] = payload;
+    updateAttachmentUI(targetType, payload);
+  } catch (err) {
+    alert('Failed to compress attachment: ' + err.message);
+  }
+}
+
+// Updates previews and size indicators across the 3 sections
+function updateAttachmentUI(targetType, payload) {
+  if (targetType === 'claim') {
+    const previewContainer = document.getElementById('userPastedPreviewContainer');
+    const imgPreview = document.getElementById('userPastedImagePreview');
+    const pdfBlock = document.getElementById('pdfFilePreviewBlock');
+    const pdfName = document.getElementById('pdfPreviewFileName');
+    const sizeLabel = document.getElementById('userPastedImageSize');
+
+    previewContainer.classList.remove('hidden');
+
+    if (payload.type === 'pdf') {
+      imgPreview.classList.add('hidden');
+      pdfBlock.classList.remove('hidden');
+      pdfName.innerText = payload.fileName;
+      sizeLabel.innerText = `✓ PDF Attached (${payload.sizeKB} KB)`;
+    } else {
+      pdfBlock.classList.add('hidden');
+      imgPreview.classList.remove('hidden');
+      imgPreview.src = payload.base64;
+      sizeLabel.innerText = `✓ Compressed (${payload.sizeKB} KB &le; 500 KB)`;
+    }
+  } 
+  else if (targetType === 'modalUserReplace') {
+    const previewContainer = document.getElementById('modalUserPastedPreviewContainer');
+    const imgPreview = document.getElementById('modalUserPastedImagePreview');
+    const sizeLabel = document.getElementById('modalUserSizeLabel');
+
+    previewContainer.classList.remove('hidden');
+    imgPreview.src = payload.base64 || '';
+    if (sizeLabel) sizeLabel.innerText = `✓ Attached (${payload.sizeKB} KB)`;
+  } 
+  else if (targetType === 'modalAdminResolution') {
+    const previewContainer = document.getElementById('modalAdminPastedPreviewContainer');
+    const imgPreview = document.getElementById('modalAdminPastedImagePreview');
+    const sizeLabel = document.getElementById('modalAdminSizeLabel');
+
+    previewContainer.classList.remove('hidden');
+    imgPreview.src = payload.base64 || '';
+    if (sizeLabel) sizeLabel.innerText = `✓ Attached (${payload.sizeKB} KB)`;
+  }
+}
+
+// File Select Handlers
+function handleFileSelectPreview(event) {
+  const file = event.target.files[0];
+  if (file) processAndApplyAttachment(file, 'claim');
+}
+
+function handleModalUserFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) processAndApplyAttachment(file, 'modalUserReplace');
+}
+
+function handleModalAdminFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) processAndApplyAttachment(file, 'modalAdminResolution');
+}
+
+// Clear Attachment Functions
+function clearUserPastedImage() {
+  activeAttachments.claim = null;
+  document.getElementById('claimFile').value = '';
+  document.getElementById('userPastedPreviewContainer').classList.add('hidden');
+  document.getElementById('userPastedImagePreview').src = '';
+}
+
+function clearModalUserPastedImage() {
+  activeAttachments.modalUserReplace = null;
+  document.getElementById('modalUserReplaceFileInput').value = '';
+  document.getElementById('modalUserPastedPreviewContainer').classList.add('hidden');
+  document.getElementById('modalUserPastedImagePreview').src = '';
+}
+
+function clearModalAdminPastedImage() {
+  activeAttachments.modalAdminResolution = null;
+  document.getElementById('modalAdminFileInput').value = '';
+  document.getElementById('modalAdminPastedPreviewContainer').classList.add('hidden');
+  document.getElementById('modalAdminPastedImagePreview').src = '';
+}
+
+// Attach Clipboard Listeners to Dropzones on Load
+document.addEventListener('DOMContentLoaded', () => {
+  const userDropZone = document.getElementById('userPasteDropZone');
+  if (userDropZone) {
+    userDropZone.addEventListener('paste', (e) => handleClipboardPaste(e, 'claim'));
+  }
+
+  const modalUserDropZone = document.getElementById('modalUserPasteDropZone');
+  if (modalUserDropZone) {
+    modalUserDropZone.addEventListener('paste', (e) => handleClipboardPaste(e, 'modalUserReplace'));
+  }
+
+  const modalAdminDropZone = document.getElementById('modalAdminPasteDropZone');
+  if (modalAdminDropZone) {
+    modalAdminDropZone.addEventListener('paste', (e) => handleClipboardPaste(e, 'modalAdminResolution'));
+  }
+});
 
 // =========================================================================
 // FETCH TRUE REPO LAST-COMMIT DATE & TIME FROM GITHUB API
