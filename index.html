@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1557,8 +1559,8 @@
 
   <!-- TRANSACTION STATEMENT IMPORT MODAL -->
   <div id="vfnTransactionImportModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-5 max-w-6xl w-full space-y-4 shadow-2xl border-t-8 border-cyan-700 max-h-[92vh] overflow-y-auto">
-      <div class="border-b pb-2 border-cyan-200 flex justify-between items-center">
+    <div class="bg-white rounded-2xl p-5 max-w-6xl w-full space-y-4 shadow-2xl border-t-8 border-cyan-700 max-h-[92vh] overflow-hidden flex flex-col">
+      <div class="border-b pb-2 border-cyan-200 flex justify-between items-center shrink-0">
         <div>
           <h3 class="font-bold text-sm text-cyan-900">🧾 Import Account Transaction Statement</h3>
           <p class="text-[11px] text-slate-500">Paste statement rows or upload a TXT file. Duplicate account/date rows are removed.</p>
@@ -1566,8 +1568,8 @@
         <button type="button" onclick="closeVfnTransactionImportModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-        <div class="space-y-2.5 bg-cyan-50/40 border border-cyan-200 rounded-xl p-3 flex flex-col min-w-0">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch min-h-0 flex-1">
+        <div class="space-y-2.5 bg-cyan-50/40 border border-cyan-200 rounded-xl p-3 flex flex-col min-w-0 min-h-0">
           <div class="flex items-center justify-between border-b border-cyan-200 pb-2">
             <label class="font-extrabold text-cyan-950">Statement text</label>
             <span class="text-[10px] font-bold text-cyan-700 bg-cyan-100 px-2 py-0.5 rounded-full">Paste or upload</span>
@@ -1586,12 +1588,12 @@
             <span class="animate-spin">⏳</span><span id="vfnTxnProcessingText">Processing statement...</span>
           </div>
         </div>
-        <div class="border border-indigo-200 rounded-xl overflow-hidden bg-indigo-50/30 flex flex-col min-w-0 min-h-[350px]">
-          <div class="flex items-center justify-between bg-indigo-100/70 border-b border-indigo-200 px-3 py-2">
+        <div class="border border-indigo-200 rounded-xl overflow-hidden bg-indigo-50/30 flex flex-col min-w-0 min-h-0">
+          <div class="flex items-center justify-between bg-indigo-100/70 border-b border-indigo-200 px-3 py-2 shrink-0">
             <span class="font-extrabold text-indigo-950">Matched transaction output</span>
             <span class="text-[10px] font-bold text-indigo-700">Preview</span>
           </div>
-          <div class="overflow-auto flex-1 min-h-[300px]">
+          <div class="overflow-auto flex-1 min-h-0 max-h-[58vh]">
             <table class="w-full text-left text-[11px] border-collapse bg-white">
               <thead class="bg-indigo-700 text-white sticky top-0 font-bold">
                 <tr><th class="p-2">Sl.</th><th class="p-2">Date</th><th class="p-2">Txn ID</th><th class="p-2">Account</th><th class="p-2">Scheme</th><th class="p-2">Amount</th><th class="p-2">Type</th><th class="p-2">Match</th></tr>
@@ -1602,7 +1604,7 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center bg-gradient-to-r from-slate-800 to-cyan-900 border border-cyan-700 rounded-xl px-3 py-2.5 flex-wrap gap-2 shadow-sm">
+      <div class="flex justify-between items-center bg-gradient-to-r from-slate-800 to-cyan-900 border border-cyan-700 rounded-xl px-3 py-2.5 flex-wrap gap-2 shadow-sm shrink-0">
         <div class="flex items-center gap-2 flex-wrap">
           <span id="vfnTxnStatementSummary" class="text-[11px] font-bold text-cyan-50">0 unique transactions • 0 matched • 0 unmatched</span>
           <label class="font-bold text-cyan-100 text-[11px]">Export:</label>
