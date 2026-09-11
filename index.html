@@ -1581,9 +1581,9 @@
         <div class="border border-slate-200 rounded-lg overflow-auto max-h-72">
           <table class="w-full text-left text-[11px] border-collapse">
             <thead class="bg-cyan-50 text-cyan-900 sticky top-0 font-bold">
-              <tr><th class="p-2">Date</th><th class="p-2">Txn ID</th><th class="p-2">Account</th><th class="p-2">Amount</th><th class="p-2">Type</th><th class="p-2">Match</th></tr>
+              <tr><th class="p-2">Date</th><th class="p-2">Txn ID</th><th class="p-2">Account</th><th class="p-2">Scheme</th><th class="p-2">Amount</th><th class="p-2">Type</th><th class="p-2">Match</th></tr>
             </thead>
-            <tbody id="vfnTxnStatementPreviewBody"><tr><td colspan="6" class="p-3 text-center text-slate-400">No parsed transactions.</td></tr></tbody>
+            <tbody id="vfnTxnStatementPreviewBody"><tr><td colspan="7" class="p-3 text-center text-slate-400">No parsed transactions.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -9476,7 +9476,13 @@ function parseVfnTransactionLines(text) {
 async function parseVfnTransactionStatement() {
   const text = $('vfnTxnStatementText')?.value || '';
   const parsed = parseVfnTransactionLines(text);
-  vfnTransactionReportRows = parsed.map(r => ({ ...r, customer_name: '', address: '', match_status: 'Not matched' }));
+      vfnTransactionReportRows = parsed.map(r => ({
+      ...r,
+      scheme: '',
+      customer_name: '',
+      address: '',
+      match_status: 'Not matched'
+    }));
 
   // Query in chunks so large pasted statements remain within request URL limits.
   const accountNos = [...new Set(parsed.map(r => r.account_no))];
@@ -9484,13 +9490,18 @@ async function parseVfnTransactionStatement() {
     const chunk = accountNos.slice(i, i + 100);
     const { data, error } = await supabaseClient
       .from('cent_percent_verification')
-      .select('account_no, customer_name, address')
+      .select('account_no, customer_name, address, scheme')
       .in('account_no', chunk);
     if (error) return alert('Account matching failed: ' + error.message);
-    const map = new Map((data || []).map(a => [String(a.account_no), a]));
+          const map = new Map((data || []).map(a => [String(a.account_no), a]));
     vfnTransactionReportRows.forEach(r => {
       const match = map.get(r.account_no);
-      if (match) Object.assign(r, { customer_name: match.customer_name || '', address: match.address || '', match_status: 'Matched' });
+      if (match) Object.assign(r, {
+        customer_name: match.customer_name || '',
+        address: match.address || '',
+        scheme: match.scheme || '',
+        match_status: 'Matched'
+      });
     });
   }
   renderVfnTransactionPreview();
@@ -9505,7 +9516,7 @@ function renderVfnTransactionPreview() {
     tbody.innerHTML = vfnTransactionReportRows.map(r => `
       <tr class="border-b border-slate-100">
         <td class="p-2 whitespace-nowrap">${r.date}</td><td class="p-2 font-mono">${r.txnid}</td>
-        <td class="p-2 font-mono">${r.account_no}</td><td class="p-2 text-right">₹${r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td class="p-2 font-mono">${r.account_no}</td><td class="p-2 font-semibold">${r.scheme || '-'}</td><td class="p-2 text-right">₹${r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
         <td class="p-2 font-bold ${r.txntype === 'Credit' ? 'text-emerald-700' : 'text-rose-700'}">${r.txntype}</td>
         <td class="p-2 font-bold ${r.match_status === 'Matched' ? 'text-emerald-700' : 'text-rose-700'}">${r.match_status}</td>
       </tr>`).join('');
@@ -9517,14 +9528,14 @@ function renderVfnTransactionPreview() {
 function exportVfnTransactionReport(format) {
   if (!vfnTransactionReportRows.length) return alert('Parse and match transaction data first.');
   const rows = vfnTransactionReportRows.map(r => ({
-    Date: r.date, 'Txn ID': r.txnid, 'Account No': r.account_no, Remarks: r.remarks,
+    Date: r.date, 'Txn ID': r.txnid, 'Account No': r.account_no, Scheme: r.scheme || '', Remarks: r.remarks,
     Amount: r.amount, 'Txn Type': r.txntype, 'Customer Name': r.customer_name, Address: r.address,
     'Match Status': r.match_status
   }));
   const stamp = new Date().toISOString().slice(0, 10);
   if (format === 'excel') {
     const ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [{wch:12},{wch:20},{wch:16},{wch:55},{wch:16},{wch:12},{wch:28},{wch:55},{wch:14}];
+    ws['!cols'] = [{wch:12},{wch:20},{wch:16},{wch:16},{wch:55},{wch:16},{wch:12},{wch:28},{wch:55},{wch:14}];
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
     XLSX.writeFile(wb, `Account_Transactions_${stamp}.xlsx`);
     return;
@@ -9533,7 +9544,7 @@ function exportVfnTransactionReport(format) {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   doc.setFontSize(13); doc.setTextColor(168, 15, 40); doc.text('Cent Percent Verification - Account Transactions', 148, 12, { align: 'center' });
   doc.setFontSize(8); doc.setTextColor(30, 41, 59); doc.text(`Generated: ${new Date().toLocaleString('en-IN')} | Records: ${rows.length}`, 148, 18, { align: 'center' });
-  doc.autoTable({ startY: 23, head: [['Date','Txn ID','Account No','Remarks','Amount','Type','Customer Name','Address','Match']], body: rows.map(r => [r.Date,r['Txn ID'],r['Account No'],r.Remarks,`Rs. ${r.Amount.toFixed(2)}`,r['Txn Type'],r['Customer Name'],r.Address,r['Match Status']]), styles: { fontSize: 7, cellPadding: 1.5 }, headStyles: { fillColor: [168,15,40], textColor: [255,255,255] }, columnStyles: { 3:{cellWidth:45}, 7:{cellWidth:45} } });
+  doc.autoTable({ startY: 23, head: [['Date','Txn ID','Account No','Scheme','Remarks','Amount','Type','Customer Name','Address','Match']], body: rows.map(r => [r.Date,r['Txn ID'],r['Account No'],r.Scheme,r.Remarks,`Rs. ${r.Amount.toFixed(2)}`,r['Txn Type'],r['Customer Name'],r.Address,r['Match Status']]), styles: { fontSize: 7, cellPadding: 1.5 }, headStyles: { fillColor: [168,15,40], textColor: [255,255,255] }, columnStyles: { 4:{cellWidth:40}, 8:{cellWidth:40} } });
   doc.save(`Account_Transactions_${stamp}.pdf`);
 }
 
