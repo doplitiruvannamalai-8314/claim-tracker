@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2916,7 +2917,36 @@ function updateSignaturePreview(sigUrl) {
 window.addEventListener('DOMContentLoaded', () => {
   loadLogoFromDatabase();
   loadIssuerSignatureFromDatabase();
+  loadRegistrationOfficeDropdown();
 });
+
+    // Load offices for New Staff Registration before login/authentication.
+    async function loadRegistrationOfficeDropdown() {
+      const select = $('regOfficeName');
+      if (!select) return;
+
+      try {
+        const { data: offices, error } = await supabaseClient
+          .from('offices')
+          .select('office_name')
+          .order('office_name', { ascending: true });
+
+        if (error) throw error;
+
+        const uniqueOffices = [...new Set((offices || [])
+          .map(office => String(office.office_name || '').trim())
+          .filter(Boolean))];
+
+        select.innerHTML = uniqueOffices.length
+          ? '<option value="">-- Select Office --</option>' + uniqueOffices
+              .map(office => `<option value="${office.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}">${office.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</option>`)
+              .join('')
+          : '<option value="">-- No Offices Found --</option>';
+      } catch (error) {
+        console.warn('Registration office load error:', error);
+        select.innerHTML = '<option value="">-- Unable to Load Offices --</option>';
+      }
+    }
 
     // 3. AUTH LOGIC
     async function handleEmpIdLogin(e) {
