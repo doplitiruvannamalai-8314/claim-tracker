@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -446,6 +447,14 @@
           <!-- FILTERS WITH INSTANT DYNAMIC LISTENERS -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs">
             <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Report Mode</label>
+              <select id="misReportMode" onchange="applyMISReportMode()" class="w-full border border-postGold-400 p-1.5 rounded text-xs bg-white font-semibold outline-none">
+                <option value="all">All Claims (Txn Date)</option>
+                <option value="settledSettlement">Settled Claims (Settlement Date)</option>
+                <option value="activeTxn">Pending + In Progress (Txn Date)</option>
+              </select>
+            </div>
+            <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Quick Period</label>
               <select id="misQuickPeriod" onchange="applyMISQuickPeriod()" class="w-full border p-1.5 rounded text-xs bg-white font-semibold outline-none">
                 <option value="all">All Dates</option>
@@ -690,8 +699,8 @@
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('emp_name')">Raised By <span id="sort_mis_emp_name">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('module')">Module <span id="sort_mis_module">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('raised_for_office')">Office <span id="sort_mis_raised_for_office">⇅</span></th>
-                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('txn_date')">Txn Date <span id="sort_mis_txn_date">⇅</span></th>
-                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('settlement_date')">Settlement Date <span id="sort_mis_settlement_date">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('txn_date')"><span id="misTxnDateHeader">Txn Date</span> <span id="sort_mis_txn_date">⇅</span></th>
+                  <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('settlement_date')"><span id="misSettlementDateHeader">Settlement Date</span> <span id="sort_mis_settlement_date">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('tat_aging')">TAT / Aging <span id="sort_mis_tat_aging">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('txn_amount')">Amount <span id="sort_mis_txn_amount">⇅</span></th>
                   <th class="p-2 bg-postRed-50 hover:bg-postRed-100 transition" onclick="sortMISReport('claim_status')">Status <span id="sort_mis_claim_status">⇅</span></th>
@@ -2408,6 +2417,7 @@
     let currentMISClaimsList = [];
     let rawMISMasterList = [];
     let currentMISReportFilter = 'All';
+    let currentMISReportMode = 'all';
     let allLoadedUsers = [];
     let isRrnManuallyEdited = false;
     let bookingImportedRecords = [];
@@ -4959,8 +4969,18 @@ function sortTable(col) {
         monthTbody.innerHTML = monthArr.join('');
       }
     }
+    function applyMISReportMode() {
+      currentMISReportMode = $('misReportMode')?.value || 'all';
+      currentMISReportFilter = 'All';
+      generateMISReport('All');
+    }
+
     async function generateMISReport(filterType = 'All') {
       currentMISReportFilter = filterType;
+      currentMISReportMode = $('misReportMode')?.value || currentMISReportMode || 'all';
+      const isSettlementMode = currentMISReportMode === 'settledSettlement';
+      if ($('misTxnDateHeader')) $('misTxnDateHeader').innerText = isSettlementMode ? 'Transaction Date' : 'Txn Date';
+      if ($('misSettlementDateHeader')) $('misSettlementDateHeader').innerText = isSettlementMode ? 'Settlement Date (Report Date)' : 'Settlement Date';
       const isAdmin = userProfile && (userProfile.role === 'admin' || userProfile.role === 'superadmin');
       const isViewer = userProfile?.role === 'viewer';
 
@@ -4975,8 +4995,19 @@ function sortTable(col) {
       const selectedOffice = $('filterOfficeName')?.value;
       const selectedUser = $('filterEmpUser')?.value;
 
-      if (from) query = query.gte('txn_date', from);
-      if (to) query = query.lte('txn_date', to);
+      // Date scope follows the selected report mode. Settlement mode only
+      // includes settled claims with a settlement date in the chosen period.
+      if (currentMISReportMode === 'settledSettlement') {
+        query = query.eq('claim_status', 'Settled');
+        if (from) query = query.gte('settlement_date', from);
+        if (to) query = query.lte('settlement_date', to);
+      } else {
+        if (from) query = query.gte('txn_date', from);
+        if (to) query = query.lte('txn_date', to);
+        if (currentMISReportMode === 'activeTxn') {
+          query = query.in('claim_status', ['Pending', 'In Progress']);
+        }
+      }
       if (selectedModule) query = query.eq('module', selectedModule);
       if (selectedOffice) query = query.eq('raised_for_office', selectedOffice);
       if (selectedUser) query = query.eq('created_by', selectedUser);
@@ -5053,9 +5084,16 @@ function sortTable(col) {
 
       if (filterType === 'All') {
         currentMISClaimsList = rawMISMasterList;
-        $('misReportTableTitle').innerText = `Report Summary View: All Registered Claims (${rawMISMasterList.length})`;
-        $('allReportConsolidationContainer').classList.remove('hidden');
-        renderConsolidatedSummaries(rawMISMasterList);
+        const modeTitle = currentMISReportMode === 'settledSettlement'
+          ? 'Settled Claims by Settlement Date'
+          : (currentMISReportMode === 'activeTxn' ? 'Pending + In Progress by Transaction Date' : 'All Registered Claims by Transaction Date');
+        $('misReportTableTitle').innerText = `Report Summary View: ${modeTitle} (${rawMISMasterList.length})`;
+        if (currentMISReportMode === 'all') {
+          $('allReportConsolidationContainer').classList.remove('hidden');
+          renderConsolidatedSummaries(rawMISMasterList);
+        } else {
+          $('allReportConsolidationContainer').classList.add('hidden');
+        }
       } else {
         $('allReportConsolidationContainer').classList.add('hidden');
 
@@ -5258,6 +5296,8 @@ function sortTable(col) {
     function resetMISFilters() {
       $('filterFromDate').value = '';
       $('filterToDate').value = '';
+      $('misReportMode').value = 'all';
+      currentMISReportMode = 'all';
       $('filterModule').value = '';
       $('filterOfficeName').value = '';
       $('filterEmpUser').value = '';
