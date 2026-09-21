@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -867,6 +863,13 @@
             <option value="cash">Cash Txn (Cnt)</option>
             <option value="all">Combined (Dig / Cash / %)</option>
           </select>
+        </div>
+        <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-rose-300 shadow-2xs">
+          <label for="digitalAdoptionThreshold" class="text-[11px] font-bold text-rose-800">Red below:</label>
+          <input id="digitalAdoptionThreshold" type="number" min="0" max="100" step="1"
+            value="60" onchange="updateDigitalAdoptionThreshold(this.value)"
+            class="w-14 bg-transparent text-[11px] font-bold text-rose-800 outline-none text-center">
+          <span id="digitalAdoptionThresholdValue" class="text-[11px] font-bold text-rose-800">60%</span>
         </div>
       </div>
       
@@ -2391,6 +2394,32 @@
     const SUPABASE_URL = "https://pkjojktbjskjcjgptzqc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_RNksRosKOOXxmSquWIr2ww_a8sOCKqs";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Digital adoption below this percentage is highlighted in red.
+    // Change this value to adjust the red/green threshold everywhere.
+    let DIGITAL_ADOPTION_RED_THRESHOLD = Number(localStorage.getItem('digitalAdoptionRedThreshold')) || 60;
+
+    function getDigitalAdoptionRedThreshold() {
+      return DIGITAL_ADOPTION_RED_THRESHOLD;
+    }
+
+    function updateDigitalAdoptionThreshold(value) {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+        alert('Enter a threshold between 0 and 100.');
+        if ($('digitalAdoptionThreshold')) $('digitalAdoptionThreshold').value = DIGITAL_ADOPTION_RED_THRESHOLD;
+        return;
+      }
+
+      DIGITAL_ADOPTION_RED_THRESHOLD = parsed;
+      localStorage.setItem('digitalAdoptionRedThreshold', String(parsed));
+      if ($('digitalAdoptionThresholdValue')) $('digitalAdoptionThresholdValue').innerText = `${parsed}%`;
+
+      // Refresh visible performance tables and reports immediately.
+      if (typeof loadBookingDashboardData === 'function' && bookingImportedRecords.length) {
+        loadBookingDashboardData();
+      }
+    }
 
     const DIGITAL_CHANNEL_CONFIG = [
       { key: 'dqr', cntField: 'dqr_cnt', amtField: 'dqr_amt', label: 'DQR Scan' },
@@ -4560,7 +4589,21 @@ function renderClaimsSummaryTable() {
 
     let adminDocHtml = '';
     if (c.admin_file_url) {
-      adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
+      adminDocHtml = `
+        <a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>
+        ${isAdmin ? `
+          <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
+            ♻️ Replace
+            <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
+          </label>
+          <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
+        ` : ''}`;
+    } else if (isAdmin) {
+      adminDocHtml = `
+        <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
+          📤 Upload Admin Doc
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
+        </label>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -4720,7 +4763,21 @@ function sortTable(col) {
 
     let adminDocHtml = '';
     if (c.admin_file_url) {
-      adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
+      adminDocHtml = `
+        <a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>
+        ${isAdmin ? `
+          <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
+            ♻️ Replace
+            <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
+          </label>
+          <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
+        ` : ''}`;
+    } else if (isAdmin) {
+      adminDocHtml = `
+        <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
+          📤 Upload Admin Doc
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
+        </label>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -5512,7 +5569,7 @@ async function loadBookingDashboardData() {
       processedOffices.forEach((o, i) => {
         let pctDisplay = o.isZero 
           ? `<span class="font-bold text-slate-400">-</span>`
-          : (o.pct >= 50 
+          : (o.pct >= DIGITAL_ADOPTION_RED_THRESHOLD 
               ? `<span class="font-extrabold text-emerald-700">${o.pct.toFixed(2)}%</span>`
               : `<span class="font-extrabold text-rose-700">${o.pct.toFixed(2)}%</span>`);
 
@@ -5558,7 +5615,7 @@ async function loadBookingDashboardData() {
       dayWiseList.forEach((d, idx) => {
         let pctDisplay = d.isZero 
           ? `<span class="font-bold text-slate-400">-</span>`
-          : (d.pct >= 50 
+          : (d.pct >= DIGITAL_ADOPTION_RED_THRESHOLD 
               ? `<span class="font-extrabold text-emerald-700">${d.pct.toFixed(2)}%</span>`
               : `<span class="font-extrabold text-rose-700">${d.pct.toFixed(2)}%</span>`);
 
@@ -5670,7 +5727,7 @@ async function exportDayWisePivotImage() {
       if (metric === 'pct') {
         if (tot > 0) {
           cellText = `${pct.toFixed(2)}`;
-          fontColor = pct >= 50 ? '#15803d' : '#be123c';
+          fontColor = pct >= DIGITAL_ADOPTION_RED_THRESHOLD ? '#15803d' : '#be123c';
         }
       } else if (metric === 'dig') {
         cellText = tot > 0 ? cellData.dig.toLocaleString('en-IN') : '-';
@@ -5681,7 +5738,7 @@ async function exportDayWisePivotImage() {
       } else if (metric === 'all') {
         if (tot > 0) {
           cellText = `${cellData.dig}/${cellData.cash} (${pct.toFixed(2)})`;
-          fontColor = pct >= 50 ? '#15803d' : '#be123c';
+          fontColor = pct >= DIGITAL_ADOPTION_RED_THRESHOLD ? '#15803d' : '#be123c';
         }
       }
 
@@ -5838,7 +5895,7 @@ function printDayWisePivotReport() {
       if (metric === 'pct') {
         if (tot > 0) {
           cellText = `${pct.toFixed(2)}`;
-          fontColor = pct >= 50 ? '#15803d' : '#be123c';
+          fontColor = pct >= DIGITAL_ADOPTION_RED_THRESHOLD ? '#15803d' : '#be123c';
         }
       } else if (metric === 'dig') {
         cellText = tot > 0 ? cellData.dig : '-';
@@ -6010,7 +6067,7 @@ async function exportBookingReportImage() {
     let pctValText = '-';
 
     if (!o.isZero) {
-      if (o.pct >= 50) {
+      if (o.pct >= DIGITAL_ADOPTION_RED_THRESHOLD) {
         fontColor = '#15803d'; // Forest Green
         pctValText = `${o.pct.toFixed(2)}%`;
       } else {
@@ -8331,7 +8388,21 @@ function renderClaimsSummaryTable() {
 
     let adminDocHtml = '';
     if (c.admin_file_url) {
-      adminDocHtml = `<a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>`;
+      adminDocHtml = `
+        <a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>
+        ${isAdmin ? `
+          <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
+            ♻️ Replace
+            <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
+          </label>
+          <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
+        ` : ''}`;
+    } else if (isAdmin) {
+      adminDocHtml = `
+        <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
+          📤 Upload Admin Doc
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
+        </label>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -8959,6 +9030,87 @@ async function submitDeleteBookingData() {
 }
 
 // =========================================================================
+// ADMIN CLAIM DOCUMENT MANAGEMENT
+// =========================================================================
+
+function assertAdminForClaimDocumentAction() {
+  const role = (userProfile?.role || '').toLowerCase();
+  if (!['admin', 'superadmin'].includes(role)) {
+    alert('Access denied. Only administrators can manage admin documents.');
+    return false;
+  }
+  return true;
+}
+
+function getClaimStoragePath(publicUrl) {
+  if (!publicUrl) return null;
+  const marker = '/storage/v1/object/public/claim-attachments/';
+  const index = publicUrl.indexOf(marker);
+  return index >= 0 ? decodeURIComponent(publicUrl.slice(index + marker.length)) : null;
+}
+
+async function deleteAdminClaimDocument(claimId) {
+  if (!assertAdminForClaimDocumentAction()) return;
+  if (!confirm('Delete the admin resolution document from this claim?')) return;
+
+  const claim = rawClaimsList.find(c => String(c.id) === String(claimId)) ||
+    rawMISMasterList.find(c => String(c.id) === String(claimId));
+  if (!claim) return alert('Claim record not found.');
+
+  const storagePath = getClaimStoragePath(claim.admin_file_url);
+  if (storagePath) await supabaseClient.storage.from('claim-attachments').remove([storagePath]);
+
+  const { error } = await supabaseClient.from('claims').update({ admin_file_url: null }).eq('id', claimId);
+  if (error) return alert('Could not delete admin document: ' + error.message);
+
+  alert('Admin document deleted successfully.');
+  await loadClaimsSummary();
+  await generateMISReport(currentMISReportFilter || 'All');
+}
+
+async function replaceAdminClaimDocument(claimId, input) {
+  if (!assertAdminForClaimDocumentAction()) {
+    if (input) input.value = '';
+    return;
+  }
+
+  const file = input?.files?.[0];
+  if (!file) return;
+  if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)) {
+    input.value = '';
+    return alert('Please select a JPG, PNG, or PDF document.');
+  }
+
+  const claim = rawClaimsList.find(c => String(c.id) === String(claimId)) ||
+    rawMISMasterList.find(c => String(c.id) === String(claimId));
+  if (!claim) return alert('Claim record not found.');
+
+  try {
+    const { blob, extension } = await optimizeImageForUpload(file);
+    const filePath = `claims/admin-resolution-proof-${claimId}-${Date.now()}.${extension}`;
+    const { error: uploadError } = await supabaseClient.storage
+      .from('claim-attachments')
+      .upload(filePath, blob, { upsert: true, contentType: extension === 'pdf' ? 'application/pdf' : 'image/jpeg' });
+    if (uploadError) throw uploadError;
+
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    const { error } = await supabaseClient.from('claims').update({ admin_file_url: publicUrl }).eq('id', claimId);
+    if (error) throw error;
+
+    const oldPath = getClaimStoragePath(claim.admin_file_url);
+    if (oldPath) await supabaseClient.storage.from('claim-attachments').remove([oldPath]);
+
+    alert('Admin document uploaded successfully.');
+    await loadClaimsSummary();
+    await generateMISReport(currentMISReportFilter || 'All');
+  } catch (error) {
+    alert('Admin document upload failed: ' + error.message);
+  } finally {
+    input.value = '';
+  }
+}
+
+// =========================================================================
 // 2. DELETE INDIVIDUAL CLAIM REQUEST (ADMIN / SUPERADMIN ONLY)
 // =========================================================================
 
@@ -9416,7 +9568,7 @@ function renderDayWisePivotTable() {
 
     let overallCell = '-';
     if (metric === 'pct') {
-      overallCell = totOverall === 0 ? '-' : (pctOverall >= 50 
+      overallCell = totOverall === 0 ? '-' : (pctOverall >= DIGITAL_ADOPTION_RED_THRESHOLD 
         ? `<span class="font-extrabold text-emerald-700">${pctOverall.toFixed(2)}%</span>` 
         : `<span class="font-extrabold text-rose-700">${pctOverall.toFixed(2)}%</span>`);
     } else if (metric === 'dig') {
@@ -9424,7 +9576,7 @@ function renderDayWisePivotTable() {
     } else if (metric === 'cash') {
       overallCell = `<span class="font-semibold text-slate-700">${oTot.cash.toLocaleString('en-IN')}</span>`;
     } else if (metric === 'all') {
-      overallCell = `<div class="text-[10px] leading-tight"><b>${oTot.dig}</b>/${oTot.cash} <span class="${pctOverall >= 50 ? 'text-emerald-700' : 'text-rose-700'} font-bold">(${totOverall > 0 ? pctOverall.toFixed(2) + '%' : '-'})</span></div>`;
+      overallCell = `<div class="text-[10px] leading-tight"><b>${oTot.dig}</b>/${oTot.cash} <span class="${pctOverall >= DIGITAL_ADOPTION_RED_THRESHOLD ? 'text-emerald-700' : 'text-rose-700'} font-bold">(${totOverall > 0 ? pctOverall.toFixed(2) + '%' : '-'})</span></div>`;
     }
 
     tbodyHtml += `
@@ -9442,7 +9594,7 @@ function renderDayWisePivotTable() {
       if (metric === 'pct') {
         if (tot === 0) {
           valDisplay = `<span class="text-slate-300">-</span>`;
-        } else if (pct >= 50) {
+        } else if (pct >= DIGITAL_ADOPTION_RED_THRESHOLD) {
           valDisplay = `<span class="font-extrabold text-emerald-700">${pct.toFixed(2)}</span>`;
         } else {
           valDisplay = `<span class="font-extrabold text-rose-700">${pct.toFixed(2)}</span>`;
@@ -9452,7 +9604,7 @@ function renderDayWisePivotTable() {
       } else if (metric === 'cash') {
         valDisplay = tot === 0 ? `<span class="text-slate-300">-</span>` : `<span class="font-semibold text-slate-700">${cellData.cash}</span>`;
       } else if (metric === 'all') {
-        valDisplay = tot === 0 ? `<span class="text-slate-300">-</span>` : `<div class="text-[10px] leading-tight"><b>${cellData.dig}</b>/${cellData.cash}<br><span class="${pct >= 50 ? 'text-emerald-700' : 'text-rose-700'} font-bold">${pct.toFixed(2)}</span></div>`;
+        valDisplay = tot === 0 ? `<span class="text-slate-300">-</span>` : `<div class="text-[10px] leading-tight"><b>${cellData.dig}</b>/${cellData.cash}<br><span class="${pct >= DIGITAL_ADOPTION_RED_THRESHOLD ? 'text-emerald-700' : 'text-rose-700'} font-bold">${pct.toFixed(2)}</span></div>`;
       }
 
       tbodyHtml += `<td class="p-1.5 text-center whitespace-nowrap border-r border-slate-100">${valDisplay}</td>`;
@@ -15065,6 +15217,8 @@ async function loadGitHubLastUpdatedDate(username, repoName) {
     // 14. INITIALIZATION LISTENER
     document.addEventListener('DOMContentLoaded', () => {
       setFooterLastUpdatedDate();
+      if ($('digitalAdoptionThreshold')) $('digitalAdoptionThreshold').value = DIGITAL_ADOPTION_RED_THRESHOLD;
+      if ($('digitalAdoptionThresholdValue')) $('digitalAdoptionThresholdValue').innerText = `${DIGITAL_ADOPTION_RED_THRESHOLD}%`;
       // Repository metadata is intentionally not fetched during startup.
 
       // Prevent duplicate session initialization if multiple startup hooks fire.
