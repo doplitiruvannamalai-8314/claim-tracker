@@ -1,3 +1,7 @@
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5706,7 +5710,9 @@ async function exportDayWisePivotImage() {
 
     let overallText = '-';
     if (metric === 'pct') {
-      overallText = totOverall === 0 ? '-' : `${pctOverall.toFixed(2)}%`;
+      overallText = totOverall === 0
+        ? '-'
+        : `<span style="font-weight:800; color:${pctOverall >= DIGITAL_ADOPTION_RED_THRESHOLD ? '#15803d' : '#be123c'}">${pctOverall.toFixed(2)}%</span>`;
     } else if (metric === 'dig') {
       overallText = oTot.dig.toLocaleString('en-IN');
     } else if (metric === 'cash') {
@@ -5758,7 +5764,9 @@ async function exportDayWisePivotImage() {
   const grandBookings = grandTotalCashAll + grandTotalDigAll;
   const grandPct = grandBookings > 0 ? (grandTotalDigAll / grandBookings) * 100 : 0;
   
-  let grandOverallText = grandBookings === 0 ? '-' : `${grandPct.toFixed(2)}%`;
+  let grandOverallText = grandBookings === 0
+    ? '-'
+    : `<span style="font-weight:800; color:#FEF08A">${grandPct.toFixed(2)}%</span>`;
   if (metric === 'dig') grandOverallText = grandTotalDigAll.toLocaleString('en-IN');
   if (metric === 'cash') grandOverallText = grandTotalCashAll.toLocaleString('en-IN');
   if (metric === 'all') grandOverallText = `${grandTotalDigAll} / ${grandTotalCashAll} (${grandPct.toFixed(2)}%)`;
@@ -5880,7 +5888,12 @@ function printDayWisePivotReport() {
     const totOverall = oTot.cash + oTot.dig;
     const pctOverall = totOverall > 0 ? (oTot.dig / totOverall) * 100 : 0;
 
-    let overallText = totOverall === 0 ? '-' : `${pctOverall.toFixed(2)}%`;
+    let overallText = '-';
+    if (metric === 'pct') {
+      overallText = totOverall === 0
+        ? '-'
+        : `<span style="font-weight:800; color:${pctOverall >= DIGITAL_ADOPTION_RED_THRESHOLD ? '#15803d' : '#be123c'}">${pctOverall.toFixed(2)}%</span>`;
+    }
     if (metric === 'dig') overallText = oTot.dig.toLocaleString('en-IN');
     if (metric === 'cash') overallText = oTot.cash.toLocaleString('en-IN');
 
@@ -5920,7 +5933,9 @@ function printDayWisePivotReport() {
 
   const grandBookings = grandTotalCashAll + grandTotalDigAll;
   const grandPct = grandBookings > 0 ? (grandTotalDigAll / grandBookings) * 100 : 0;
-  let grandOverallText = grandBookings === 0 ? '-' : `${grandPct.toFixed(2)}%`;
+  let grandOverallText = grandBookings === 0
+    ? '-'
+    : `<span style="font-weight:800; color:#FEF08A">${grandPct.toFixed(2)}%</span>`;
   if (metric === 'dig') grandOverallText = grandTotalDigAll.toLocaleString('en-IN');
   if (metric === 'cash') grandOverallText = grandTotalCashAll.toLocaleString('en-IN');
 
@@ -9619,7 +9634,9 @@ function renderDayWisePivotTable() {
 
   let grandOverallCell = '-';
   if (metric === 'pct') {
-    grandOverallCell = totalAllBookings === 0 ? '-' : `${grandDigPctAll.toFixed(2)}%`;
+    grandOverallCell = totalAllBookings === 0
+      ? '-'
+      : `<span class="font-extrabold ${grandDigPctAll >= DIGITAL_ADOPTION_RED_THRESHOLD ? 'text-emerald-700' : 'text-rose-700'}">${grandDigPctAll.toFixed(2)}%</span>`;
   } else if (metric === 'dig') {
     grandOverallCell = grandTotalDigAll.toLocaleString('en-IN');
   } else if (metric === 'cash') {
