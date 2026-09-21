@@ -1,3 +1,7 @@
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5929,9 +5933,10 @@ function printDayWisePivotReport() {
 
   const grandBookings = grandTotalCashAll + grandTotalDigAll;
   const grandPct = grandBookings > 0 ? (grandTotalDigAll / grandBookings) * 100 : 0;
+  // PDF/print export: keep Division Total Overall % red regardless of the percentage.
   let grandOverallText = grandBookings === 0
     ? '-'
-    : `<span style="font-weight:800; color:#c41b32">${grandPct.toFixed(2)}%</span>`;
+    : `<span style="font-weight:800; color:#C4122F">${grandPct.toFixed(2)}%</span>`;
   if (metric === 'dig') grandOverallText = grandTotalDigAll.toLocaleString('en-IN');
   if (metric === 'cash') grandOverallText = grandTotalCashAll.toLocaleString('en-IN');
 
