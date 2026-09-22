@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15137,6 +15133,8 @@ function clearUserPastedImage() {
 }
 
 function clearModalUserPastedImage() {
+  // Clear both attachment systems so an old pasted file cannot be reused.
+  modalUserPastedBlob = null;
   activeAttachments.modalUserReplace = null;
   document.getElementById('modalUserReplaceFileInput').value = '';
   document.getElementById('modalUserPastedPreviewContainer').classList.add('hidden');
@@ -15144,6 +15142,8 @@ function clearModalUserPastedImage() {
 }
 
 function clearModalAdminPastedImage() {
+  // The submit handler uses modalAdminPastedBlob, so it must be reset too.
+  modalAdminPastedBlob = null;
   activeAttachments.modalAdminResolution = null;
   document.getElementById('modalAdminFileInput').value = '';
   document.getElementById('modalAdminPastedPreviewContainer').classList.add('hidden');
