@@ -721,14 +721,14 @@
             <button type="button" onclick="loadAdminDocuments()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">🔄 Refresh</button>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end">
             <div class="sm:col-span-2">
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Search Ref No / Amount / Office</label>
               <input type="text" id="adminDocumentSearch" oninput="renderAdminDocuments()" placeholder="Type to filter..." class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none focus:ring-2 focus:ring-postRed-600">
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Status</label>
-              <select id="adminDocumentStatusFilter" onchange="renderAdminDocuments()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+              <select id="adminDocumentStatusFilter" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Statuses --</option>
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
@@ -736,10 +736,37 @@
                 <option value="Rejected">Rejected</option>
               </select>
             </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Document Type</label>
+              <select id="adminDocumentTypeFilter" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="admin">Admin Document</option>
+                <option value="user">User Document</option>
+                <option value="both" selected>Both Documents</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Date Filter Type</label>
+              <select id="adminDocumentDateTypeFilter" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="txn">Transaction Date</option>
+                <option value="settlement">Settlement Date</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">From Date</label>
+              <input type="date" id="adminDocumentDateFrom" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">To Date</label>
+              <input type="date" id="adminDocumentDateTo" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+            </div>
+            <div class="lg:col-span-6 flex justify-end gap-2 pt-1 border-t border-amber-200">
+              <button type="button" onclick="resetAdminDocumentFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Reset</button>
+              <button type="button" onclick="loadAdminDocuments()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">🔍 Load Previews</button>
+            </div>
           </div>
 
           <div id="adminDocumentsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            <div class="col-span-full p-6 text-center text-slate-400">Loading admin documents...</div>
+            <div class="col-span-full p-6 text-center text-slate-500 font-semibold">Select filters and click “Load Previews” to view admin documents.</div>
           </div>
         </div>
 
@@ -3372,8 +3399,8 @@ function switchClaimsSubView(subKey) {
   if (currentClaimsSubTab === 'reports' && typeof generateMISReport === 'function') {
     generateMISReport(currentMISReportFilter || 'All');
   }
-  if (currentClaimsSubTab === 'adminDocuments' && typeof loadAdminDocuments === 'function') {
-    loadAdminDocuments();
+  if (currentClaimsSubTab === 'adminDocuments' && typeof resetAdminDocumentFilters === 'function') {
+    resetAdminDocumentFilters();
   }
 }
 
@@ -4889,16 +4916,37 @@ function sortTable(col) {
       if (!['admin', 'superadmin'].includes(role)) return;
 
       const grid = $('adminDocumentsGrid');
-      if (grid) grid.innerHTML = '<div class="col-span-full p-6 text-center text-slate-400">Loading admin documents...</div>';
+      const documentType = $('adminDocumentTypeFilter')?.value || 'both';
+      const dateType = $('adminDocumentDateTypeFilter')?.value || 'txn';
+      const dateFrom = $('adminDocumentDateFrom')?.value || '';
+      const dateTo = $('adminDocumentDateTo')?.value || '';
+      const status = $('adminDocumentStatusFilter')?.value || '';
+
+      if (dateFrom && dateTo && dateFrom > dateTo) {
+        return alert('From Date cannot be later than To Date.');
+      }
+
+      if (grid) grid.innerHTML = '<div class="col-span-full p-6 text-center text-slate-400">Loading filtered admin documents...</div>';
 
       try {
-        const { data, error } = await supabaseClient
+        let query = supabaseClient
           .from('claims')
-          .select('id, txn_id_ref, txn_amount, claim_status, raised_for_office, module, admin_file_url, reply_remarks_admin, created_at')
-          .not('admin_file_url', 'is', null)
-          .neq('admin_file_url', '')
+          .select('id, txn_id_ref, txn_amount, claim_status, raised_for_office, module, txn_date, settlement_date, file_url, admin_file_url, reply_remarks_admin, created_at')
           .order('created_at', { ascending: false });
 
+        if (status) query = query.eq('claim_status', status);
+        if (dateFrom) query = query.gte(dateType === 'settlement' ? 'settlement_date' : 'txn_date', dateFrom);
+        if (dateTo) query = query.lte(dateType === 'settlement' ? 'settlement_date' : 'txn_date', dateTo);
+
+        if (documentType === 'admin') {
+          query = query.not('admin_file_url', 'is', null).neq('admin_file_url', '');
+        } else if (documentType === 'user') {
+          query = query.not('file_url', 'is', null).neq('file_url', '');
+        } else {
+          query = query.or('file_url.not.is.null,admin_file_url.not.is.null');
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
         adminDocumentsList = data || [];
         renderAdminDocuments();
@@ -4908,16 +4956,35 @@ function sortTable(col) {
       }
     }
 
+    function resetAdminDocumentFilters() {
+      ['adminDocumentSearch', 'adminDocumentDateFrom', 'adminDocumentDateTo'].forEach(id => {
+        if ($(id)) $(id).value = '';
+      });
+      if ($('adminDocumentStatusFilter')) $('adminDocumentStatusFilter').value = '';
+      if ($('adminDocumentTypeFilter')) $('adminDocumentTypeFilter').value = 'both';
+      if ($('adminDocumentDateTypeFilter')) $('adminDocumentDateTypeFilter').value = 'txn';
+      adminDocumentsList = [];
+      if ($('adminDocumentsGrid')) $('adminDocumentsGrid').innerHTML = '<div class="col-span-full p-6 text-center text-slate-500 font-semibold">Select filters and click “Load Previews” to view admin documents.</div>';
+    }
+
     function renderAdminDocuments() {
       const grid = $('adminDocumentsGrid');
       if (!grid) return;
 
       const search = ($('adminDocumentSearch')?.value || '').trim().toLowerCase();
       const status = $('adminDocumentStatusFilter')?.value || '';
+      const documentType = $('adminDocumentTypeFilter')?.value || 'both';
       const records = adminDocumentsList.filter(c => {
-        const searchable = [c.txn_id_ref, c.txn_amount, c.raised_for_office, c.module, c.reply_remarks_admin]
+        const searchable = [c.txn_id_ref, c.txn_amount, c.raised_for_office, c.module, c.txn_date, c.settlement_date, c.reply_remarks_admin]
           .map(value => String(value || '').toLowerCase()).join(' ');
-        return (!search || searchable.includes(search)) && (!status || c.claim_status === status);
+        const hasAdminDoc = Boolean(c.admin_file_url);
+        const hasUserDoc = Boolean(c.file_url);
+        const matchesType = documentType === 'admin'
+          ? hasAdminDoc
+          : documentType === 'user'
+            ? hasUserDoc
+            : hasAdminDoc || hasUserDoc;
+        return matchesType && (!search || searchable.includes(search)) && (!status || c.claim_status === status);
       });
 
       if (!records.length) {
@@ -4926,29 +4993,45 @@ function sortTable(col) {
       }
 
       grid.innerHTML = records.map(c => {
-        const url = escapeAdminDocumentHtml(c.admin_file_url);
         const ref = escapeAdminDocumentHtml(c.txn_id_ref || '-');
         const office = escapeAdminDocumentHtml(c.raised_for_office || '-');
         const module = escapeAdminDocumentHtml(c.module || '-');
         const statusText = escapeAdminDocumentHtml(c.claim_status || 'Pending');
         const amount = `₹${(parseFloat(c.txn_amount) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-        const isPdf = /\.pdf(?:$|\?)/i.test(c.admin_file_url || '');
         const remarks = escapeAdminDocumentHtml(c.reply_remarks_admin || 'No admin remarks');
-        const preview = isPdf
-          ? `<iframe src="${url}" title="Admin document for ${ref}" class="w-full h-56 rounded border border-slate-300 bg-white"></iframe>`
-          : `<img src="${url}" alt="Admin document for ${ref}" class="w-full h-56 object-contain rounded border border-slate-300 bg-slate-50">`;
+        const buildPreview = (urlValue, label, colorClass) => {
+          if (!urlValue) return '';
+          const url = escapeAdminDocumentHtml(urlValue);
+          const isPdf = /\.pdf(?:$|\?)/i.test(urlValue);
+          const media = isPdf
+            ? `<iframe src="${url}" title="${label} for ${ref}" class="w-full h-56 rounded border border-slate-300 bg-white"></iframe>`
+            : `<img src="${url}" alt="${label} for ${ref}" class="w-full h-56 object-contain rounded border border-slate-300 bg-slate-50">`;
+          return `<div class="border ${colorClass} rounded-lg p-1.5 space-y-1">
+            <div class="text-[10px] font-extrabold uppercase text-slate-700">${label}</div>
+            ${media}
+            <a href="${url}" target="_blank" rel="noopener" class="inline-block text-[10px] font-bold text-blue-700 hover:underline">Open ${label}</a>
+          </div>`;
+        };
+        const documentPreviews = [
+          buildPreview(c.admin_file_url, 'Admin Document', 'border-amber-300'),
+          buildPreview(c.file_url, 'User Document', 'border-emerald-300')
+        ].filter(Boolean).join('');
 
         return `<article class="border border-amber-200 rounded-xl overflow-hidden bg-white shadow-sm">
           <div class="p-2 bg-slate-50 border-b border-slate-200 flex justify-between items-start gap-2">
             <div class="min-w-0"><p class="text-[10px] text-slate-500 font-bold uppercase">Reference No.</p><p class="font-mono font-extrabold text-postRed-700 truncate" title="${ref}">${ref}</p></div>
             <span class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor(c.claim_status)}">${statusText}</span>
           </div>
-          <div class="p-2">${preview}</div>
+          <div class="p-2 grid grid-cols-1 ${c.admin_file_url && c.file_url ? 'sm:grid-cols-2' : ''} gap-2">${documentPreviews}</div>
           <div class="px-3 pb-3 space-y-1.5 text-xs">
             <div class="grid grid-cols-2 gap-2"><div><span class="block text-[10px] text-slate-500 font-bold">Amount</span><strong class="text-emerald-800">${amount}</strong></div><div><span class="block text-[10px] text-slate-500 font-bold">Module</span><strong>${module}</strong></div></div>
             <div><span class="block text-[10px] text-slate-500 font-bold">Office</span><span>${office}</span></div>
+            <div class="grid grid-cols-2 gap-2"><div><span class="block text-[10px] text-slate-500 font-bold">Txn Date</span><span>${escapeAdminDocumentHtml(c.txn_date || '-')}</span></div><div><span class="block text-[10px] text-slate-500 font-bold">Settled Date</span><span>${escapeAdminDocumentHtml(c.settlement_date || '-')}</span></div></div>
             <div class="bg-amber-50 border border-amber-200 rounded p-1.5 text-[11px] break-words"><span class="font-bold">Admin Remarks:</span> ${remarks}</div>
-            <a href="${url}" target="_blank" rel="noopener" class="inline-block bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded font-bold text-[11px]">🔎 Open Full Document</a>
+            <div class="flex flex-wrap gap-1.5">
+              ${c.admin_file_url ? `<a href="${escapeAdminDocumentHtml(c.admin_file_url)}" target="_blank" rel="noopener" class="inline-block bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded font-bold text-[11px]">🔎 Open Admin Document</a>` : ''}
+              ${c.file_url ? `<a href="${escapeAdminDocumentHtml(c.file_url)}" target="_blank" rel="noopener" class="inline-block bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 rounded font-bold text-[11px]">🔎 Open User Document</a>` : ''}
+            </div>
           </div>
         </article>`;
       }).join('');
