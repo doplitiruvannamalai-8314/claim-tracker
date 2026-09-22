@@ -146,6 +146,7 @@
             <button type="button" id="subBtnRegister" onclick="switchClaimsSubView('register')" class="px-3 py-1 text-xs font-semibold rounded text-slate-700 hover:bg-white cursor-pointer">📝 Claim Registration</button>
             <button type="button" id="subBtnConverter" onclick="switchClaimsSubView('converter')" class="px-3 py-1 text-xs font-semibold rounded text-slate-700 hover:bg-white cursor-pointer">☀️ Theme Converter</button>
             <button type="button" id="subBtnReports" onclick="switchClaimsSubView('reports')" class="px-3 py-1 text-xs font-semibold rounded text-slate-700 hover:bg-white cursor-pointer">📊 MIS &amp; Pendency Reports</button>
+            <button type="button" id="subBtnAdminDocuments" onclick="switchClaimsSubView('adminDocuments')" class="hidden px-3 py-1 text-xs font-semibold rounded text-slate-700 hover:bg-white cursor-pointer">🖼️ Admin Documents</button>
           </div>
 
         <!-- TAB 1: SUBMITTED CLAIMS OVERVIEW & TRACKING -->
@@ -707,6 +708,38 @@
                 <tr><td colspan="10" class="p-3 text-center text-slate-400">Loading Report...</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- TAB 5: ADMIN DOCUMENT PREVIEW (ADMINS ONLY) -->
+        <div id="adminDocumentsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
+            <div>
+              <h3 class="text-sm font-bold text-postRed-700 uppercase">🖼️ Admin Document Preview</h3>
+              <p class="text-[11px] text-slate-500">Review uploaded admin resolution documents and confirm the reference number and amount before action.</p>
+            </div>
+            <button type="button" onclick="loadAdminDocuments()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">🔄 Refresh</button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end">
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Search Ref No / Amount / Office</label>
+              <input type="text" id="adminDocumentSearch" oninput="renderAdminDocuments()" placeholder="Type to filter..." class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none focus:ring-2 focus:ring-postRed-600">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Status</label>
+              <select id="adminDocumentStatusFilter" onchange="renderAdminDocuments()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="">-- All Statuses --</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Settled">Settled</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="adminDocumentsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div class="col-span-full p-6 text-center text-slate-400">Loading admin documents...</div>
           </div>
         </div>
 
@@ -3138,6 +3171,9 @@ async function initApp() {
   // Toggle Cent Percent Verification Tab
   if ($('tabBtnClaimsHub')) $('tabBtnClaimsHub').classList.remove('hidden');
   if ($('subBtnConverter') && !isAdmin) $('subBtnConverter').classList.add('hidden');
+  if ($('subBtnAdminDocuments')) {
+    $('subBtnAdminDocuments').classList.toggle('hidden', !isAdmin);
+  }
   if ($('tabBtnCentVfn')) {
     if (canAccessCentVfn) {
       $('tabBtnCentVfn').classList.remove('hidden');
@@ -3201,7 +3237,12 @@ function showTab(tabName) {
   const role = (userProfile?.role || 'user').toLowerCase();
   const isAdmin = role === 'admin' || role === 'superadmin';
   const canAccessCentVfn = role === 'centvfn' || isAdmin;
-  const claimsSubModules = ['track', 'registerClaim', 'converterTab', 'reports'];
+  const claimsSubModules = ['track', 'registerClaim', 'converterTab', 'reports', 'adminDocuments'];
+
+  if (tabName === 'adminDocuments' && !isAdmin) {
+    alert("Access Restricted: Admin Documents requires admin privileges.");
+    tabName = 'track';
+  }
 
   // Preserve compatibility with existing inline handlers.
   if (claimsSubModules.includes(tabName)) {
@@ -3308,7 +3349,8 @@ function switchClaimsSubView(subKey) {
     track: { view: 'trackView', btn: 'subBtnTrack' },
     register: { view: 'registerClaimView', btn: 'subBtnRegister' },
     converter: { view: 'converterTabView', btn: 'subBtnConverter' },
-    reports: { view: 'reportsView', btn: 'subBtnReports' }
+    reports: { view: 'reportsView', btn: 'subBtnReports' },
+    adminDocuments: { view: 'adminDocumentsView', btn: 'subBtnAdminDocuments' }
   };
   const active = subViewMap[subKey] || subViewMap.track;
 
@@ -3329,6 +3371,9 @@ function switchClaimsSubView(subKey) {
 
   if (currentClaimsSubTab === 'reports' && typeof generateMISReport === 'function') {
     generateMISReport(currentMISReportFilter || 'All');
+  }
+  if (currentClaimsSubTab === 'adminDocuments' && typeof loadAdminDocuments === 'function') {
+    loadAdminDocuments();
   }
 }
 
@@ -4826,6 +4871,88 @@ function sortTable(col) {
   });
   tbody.innerHTML = htmlArr.join('');
 }
+
+    // ADMIN DOCUMENT PREVIEW GALLERY
+    let adminDocumentsList = [];
+
+    function escapeAdminDocumentHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    async function loadAdminDocuments() {
+      const role = (userProfile?.role || '').toLowerCase();
+      if (!['admin', 'superadmin'].includes(role)) return;
+
+      const grid = $('adminDocumentsGrid');
+      if (grid) grid.innerHTML = '<div class="col-span-full p-6 text-center text-slate-400">Loading admin documents...</div>';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('claims')
+          .select('id, txn_id_ref, txn_amount, claim_status, raised_for_office, module, admin_file_url, reply_remarks_admin, created_at')
+          .not('admin_file_url', 'is', null)
+          .neq('admin_file_url', '')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        adminDocumentsList = data || [];
+        renderAdminDocuments();
+      } catch (error) {
+        console.error('Admin document load error:', error);
+        if (grid) grid.innerHTML = `<div class="col-span-full p-6 text-center text-rose-600 font-bold">Unable to load documents: ${escapeAdminDocumentHtml(error.message)}</div>`;
+      }
+    }
+
+    function renderAdminDocuments() {
+      const grid = $('adminDocumentsGrid');
+      if (!grid) return;
+
+      const search = ($('adminDocumentSearch')?.value || '').trim().toLowerCase();
+      const status = $('adminDocumentStatusFilter')?.value || '';
+      const records = adminDocumentsList.filter(c => {
+        const searchable = [c.txn_id_ref, c.txn_amount, c.raised_for_office, c.module, c.reply_remarks_admin]
+          .map(value => String(value || '').toLowerCase()).join(' ');
+        return (!search || searchable.includes(search)) && (!status || c.claim_status === status);
+      });
+
+      if (!records.length) {
+        grid.innerHTML = '<div class="col-span-full p-6 text-center text-slate-500">No admin documents match the selected filters.</div>';
+        return;
+      }
+
+      grid.innerHTML = records.map(c => {
+        const url = escapeAdminDocumentHtml(c.admin_file_url);
+        const ref = escapeAdminDocumentHtml(c.txn_id_ref || '-');
+        const office = escapeAdminDocumentHtml(c.raised_for_office || '-');
+        const module = escapeAdminDocumentHtml(c.module || '-');
+        const statusText = escapeAdminDocumentHtml(c.claim_status || 'Pending');
+        const amount = `₹${(parseFloat(c.txn_amount) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+        const isPdf = /\.pdf(?:$|\?)/i.test(c.admin_file_url || '');
+        const remarks = escapeAdminDocumentHtml(c.reply_remarks_admin || 'No admin remarks');
+        const preview = isPdf
+          ? `<iframe src="${url}" title="Admin document for ${ref}" class="w-full h-56 rounded border border-slate-300 bg-white"></iframe>`
+          : `<img src="${url}" alt="Admin document for ${ref}" class="w-full h-56 object-contain rounded border border-slate-300 bg-slate-50">`;
+
+        return `<article class="border border-amber-200 rounded-xl overflow-hidden bg-white shadow-sm">
+          <div class="p-2 bg-slate-50 border-b border-slate-200 flex justify-between items-start gap-2">
+            <div class="min-w-0"><p class="text-[10px] text-slate-500 font-bold uppercase">Reference No.</p><p class="font-mono font-extrabold text-postRed-700 truncate" title="${ref}">${ref}</p></div>
+            <span class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor(c.claim_status)}">${statusText}</span>
+          </div>
+          <div class="p-2">${preview}</div>
+          <div class="px-3 pb-3 space-y-1.5 text-xs">
+            <div class="grid grid-cols-2 gap-2"><div><span class="block text-[10px] text-slate-500 font-bold">Amount</span><strong class="text-emerald-800">${amount}</strong></div><div><span class="block text-[10px] text-slate-500 font-bold">Module</span><strong>${module}</strong></div></div>
+            <div><span class="block text-[10px] text-slate-500 font-bold">Office</span><span>${office}</span></div>
+            <div class="bg-amber-50 border border-amber-200 rounded p-1.5 text-[11px] break-words"><span class="font-bold">Admin Remarks:</span> ${remarks}</div>
+            <a href="${url}" target="_blank" rel="noopener" class="inline-block bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1 rounded font-bold text-[11px]">🔎 Open Full Document</a>
+          </div>
+        </article>`;
+      }).join('');
+    }
 
     // 7. MIS REPORTS & CONSOLIDATED BREAKDOWNS
    function renderConsolidatedSummaries(claims) {
