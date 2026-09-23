@@ -529,18 +529,26 @@
                 <span class="font-bold text-[11px] text-emerald-900 uppercase">⏱️ Settled Claims TAT Breakdown</span>
                 <span class="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Avg: <strong id="misAvgTat">0 Days</strong></span>
               </div>
-              <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                <div onclick="generateMISReport('Settled_le3')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">&le; 3 Days</span>
-                  <span id="misSettledLe3" class="text-sm font-extrabold text-emerald-800">0</span>
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
+                <div onclick="generateMISReport('Settled_lt4')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">&lt; 4 Days</span>
+                  <span id="misSettledLt4" class="text-sm font-extrabold text-emerald-800">0</span>
                 </div>
-                <div onclick="generateMISReport('Settled_4to15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">4 - 15 Days</span>
-                  <span id="misSettled4to15" class="text-sm font-extrabold text-amber-700">0</span>
+                <div onclick="generateMISReport('Settled_4to10')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">4 - 10 Days</span>
+                  <span id="misSettled4to10" class="text-sm font-extrabold text-amber-700">0</span>
                 </div>
-                <div onclick="generateMISReport('Settled_gt15')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
-                  <span class="text-[10px] text-slate-500 font-bold block">&gt; 15 Days</span>
-                  <span id="misSettledGt15" class="text-sm font-extrabold text-rose-700">0</span>
+                <div onclick="generateMISReport('Settled_10to20')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">10 - 20 Days</span>
+                  <span id="misSettled10to20" class="text-sm font-extrabold text-orange-700">0</span>
+                </div>
+                <div onclick="generateMISReport('Settled_20to30')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-slate-500 font-bold block">20 - 30 Days</span>
+                  <span id="misSettled20to30" class="text-sm font-extrabold text-blue-700">0</span>
+                </div>
+                <div onclick="generateMISReport('Settled_gt30')" class="bg-white border border-emerald-300 p-1.5 rounded cursor-pointer hover:bg-emerald-100/50 transition">
+                  <span class="text-[10px] text-rose-700 font-bold block">&gt; 30 Days</span>
+                  <span id="misSettledGt30" class="text-sm font-extrabold text-rose-700">0</span>
                 </div>
               </div>
             </div>
@@ -551,19 +559,19 @@
                 <span class="text-[10px] text-slate-500">From Txn Date</span>
               </div>
               <div class="grid grid-cols-4 gap-1 text-center text-xs">
-                <div onclick="generateMISReport('InProgress_lessthan10')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_le10')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">&le; 10 Days</span>
                   <span id="misInProgressLe10" class="text-sm font-extrabold text-slate-800">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_11to20days')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_11to20')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">11-20 Days</span>
                   <span id="misInProgress11to20" class="text-sm font-extrabold text-amber-700">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_21to30days')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_21to30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">21-30 Days</span>
                   <span id="misInProgress21to30" class="text-sm font-extrabold text-orange-700">0</span>
                 </div>
-                <div onclick="generateMISReport('InProgress_morethan30days')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
+                <div onclick="generateMISReport('InProgress_gt30')" class="bg-white border border-blue-300 p-1.5 rounded cursor-pointer hover:bg-blue-100/50 transition">
                   <span class="text-[10px] text-slate-500 font-bold block">&gt; 30 Days</span>
                   <span id="misInProgressGt30" class="text-sm font-extrabold text-rose-700">0</span>
                 </div>
@@ -5307,9 +5315,11 @@ function sortTable(col) {
 
       let totalTatSum = 0;
       let settledCountWithDate = 0;
-      let settledLe3Count = 0;
-      let settled4to15Count = 0;
-      let settledGt15Count = 0;
+      let settledLt4Count = 0;
+      let settled4to10Count = 0;
+      let settled10to20Count = 0;
+      let settled20to30Count = 0;
+      let settledGt30Count = 0;
 
       settledClaims.forEach(c => {
         const settleDate = c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null);
@@ -5317,17 +5327,21 @@ function sortTable(col) {
         if (days !== null) {
           totalTatSum += days;
           settledCountWithDate++;
-          if (days <= 3) settledLe3Count++;
-          else if (days <= 15) settled4to15Count++;
-          else settledGt15Count++;
+          if (days < 4) settledLt4Count++;
+          else if (days < 10) settled4to10Count++;
+          else if (days < 20) settled10to20Count++;
+          else if (days < 30) settled20to30Count++;
+          else settledGt30Count++;
         }
       });
 
       const avgTatDays = settledCountWithDate > 0 ? (totalTatSum / settledCountWithDate).toFixed(1) : "0";
       $('misAvgTat').innerText = `${avgTatDays} Days`;
-      $('misSettledLe3').innerText = settledLe3Count;
-      $('misSettled4to15').innerText = settled4to15Count;
-      $('misSettledGt15').innerText = settledGt15Count;
+      $('misSettledLt4').innerText = settledLt4Count;
+      $('misSettled4to10').innerText = settled4to10Count;
+      $('misSettled10to20').innerText = settled10to20Count;
+      $('misSettled20to30').innerText = settled20to30Count;
+      $('misSettledGt30').innerText = settledGt30Count;
 
       let inProgressLe10Count = 0;
       let inProgress11to20Count = 0;
@@ -5376,48 +5390,60 @@ function sortTable(col) {
         } else if (filterType === 'Rejected') {
           currentMISClaimsList = rejectedClaims;
           $('misReportTableTitle').innerText = `Report Summary View: Rejected Claims (${rejectedClaims.length})`;
-        } else if (filterType === 'Settled_le3') {
+        } else if (filterType === 'Settled_lt4') {
           currentMISClaimsList = settledClaims.filter(c => {
             const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d <= 3;
+            return d !== null && d < 4;
           });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled within 3 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'Settled_4to15') {
+          $('misReportTableTitle').innerText = `Settlement TAT: Settled in < 4 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_4to10') {
           currentMISClaimsList = settledClaims.filter(c => {
             const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d >= 4 && d <= 15;
+            return d !== null && d >= 4 && d < 10;
           });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled in 4 to 15 Days (${currentMISClaimsList.length})`;
-        } else if (filterType === 'Settled_gt15') {
+          $('misReportTableTitle').innerText = `Report Summary View: All — Settlement TAT 4 to 10 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_10to20') {
           currentMISClaimsList = settledClaims.filter(c => {
             const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
-            return d !== null && d > 15;
+            return d !== null && d >= 10 && d < 20;
           });
-          $('misReportTableTitle').innerText = `Settlement TAT: Settled in > 15 Days (${currentMISClaimsList.length})`;
+          $('misReportTableTitle').innerText = `Report Summary View: All — Settlement TAT 10 to 20 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_20to30') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d >= 20 && d < 30;
+          });
+          $('misReportTableTitle').innerText = `Report Summary View: All — Settlement TAT 20 to 30 Days (${currentMISClaimsList.length})`;
+        } else if (filterType === 'Settled_gt30') {
+          currentMISClaimsList = settledClaims.filter(c => {
+            const d = calculateDaysDifference(c.txn_date, c.settlement_date || (c.created_at ? c.created_at.split('T')[0] : null));
+            return d !== null && d >= 30;
+          });
+          $('misReportTableTitle').innerText = `Report Summary View: All — Settlement TAT above 30 Days (${currentMISClaimsList.length})`;
         } else if (filterType === 'InProgress_le10') {
           currentMISClaimsList = inProgressClaims.filter(c => {
             const d = calculateDaysDifference(c.txn_date, todayStr);
             return d !== null && d <= 10;
           });
-          $('misReportTableTitle').innerText = `In-Progress Aging: <= 10 Days (${currentMISClaimsList.length})`;
+          $('misReportTableTitle').innerText = `Report Summary View: All — In-Progress Aging <= 10 Days (${currentMISClaimsList.length})`;
         } else if (filterType === 'InProgress_11to20') {
           currentMISClaimsList = inProgressClaims.filter(c => {
             const d = calculateDaysDifference(c.txn_date, todayStr);
             return d !== null && d >= 11 && d <= 20;
           });
-          $('misReportTableTitle').innerText = `In-Progress Aging: 11 to 20 Days (${currentMISClaimsList.length})`;
+          $('misReportTableTitle').innerText = `Report Summary View: All — In-Progress Aging 11 to 20 Days (${currentMISClaimsList.length})`;
         } else if (filterType === 'InProgress_21to30') {
           currentMISClaimsList = inProgressClaims.filter(c => {
             const d = calculateDaysDifference(c.txn_date, todayStr);
             return d !== null && d >= 21 && d <= 30;
           });
-          $('misReportTableTitle').innerText = `In-Progress Aging: 21 to 30 Days (${currentMISClaimsList.length})`;
+          $('misReportTableTitle').innerText = `Report Summary View: All — In-Progress Aging 21 to 30 Days (${currentMISClaimsList.length})`;
         } else if (filterType === 'InProgress_gt30') {
           currentMISClaimsList = inProgressClaims.filter(c => {
             const d = calculateDaysDifference(c.txn_date, todayStr);
             return d !== null && d > 30;
           });
-          $('misReportTableTitle').innerText = `In-Progress Aging: > 30 Days (${currentMISClaimsList.length})`;
+          $('misReportTableTitle').innerText = `Report Summary View: All — In-Progress Aging above 30 Days (${currentMISClaimsList.length})`;
         }
       }
 
