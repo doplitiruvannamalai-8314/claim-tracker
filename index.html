@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -234,7 +235,7 @@
               <select id="overviewFilterStatus" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
                 <option value="">-- All Statuses --</option>
                 <option value="Pending">Pending</option>
-                <option value="In Progress" selected>In Progress</option>
+                <option value="In Progress">In Progress</option>
                 <option value="Settled">Settled</option>
                 <option value="Rejected">Rejected</option>
               </select>
@@ -706,14 +707,6 @@
             <div class="sticky top-0 z-20 bg-amber-50 border-b border-amber-200 p-2.5 flex flex-wrap justify-between items-center gap-2">
               <h4 id="misReportTableTitle" class="font-bold text-xs text-postRed-900">Report Summary View (All)</h4>
               <div class="flex items-center gap-1.5 text-[11px]">
-                <label class="font-bold text-slate-700">Status:</label>
-                <select id="misSummaryStatusFilter" onchange="applyMISSummaryControls()" class="border border-slate-300 rounded p-1 bg-white font-semibold">
-                  <option value="Pending" selected>Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Settled">Settled</option>
-                  <option value="Rejected">Rejected</option>
-                  <option value="all">All Statuses</option>
-                </select>
                 <label class="font-bold text-slate-700">Show:</label>
                 <select id="misSummaryLimit" onchange="applyMISSummaryControls()" class="border border-slate-300 rounded p-1 bg-white font-semibold">
                   <option value="5" selected>Latest 5</option>
@@ -2018,8 +2011,9 @@
     </div>
     <div id="bookingExportPreviewBody" class="p-3 overflow-auto flex-1 bg-slate-50"></div>
     <div class="flex justify-end gap-2 p-3 border-t border-slate-200">
-      <button type="button" onclick="copyBookingExportPreview()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📋 Copy</button>
-      <button type="button" onclick="downloadBookingExportPreview()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">⬇️ Download</button>
+                    <button type="button" onclick="copyBookingExportPreview()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📋 Copy Text</button>
+              <button type="button" onclick="copyBookingExportPreviewAsImage()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">🖼️ Copy Image</button>
+              <button type="button" onclick="downloadBookingExportPreview()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">⬇️ Download</button>
       <button type="button" onclick="closeBookingExportPreview()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Close</button>
     </div>
   </div>
@@ -2034,7 +2028,8 @@
     </div>
     <div id="misExportPreviewBody" class="p-3 overflow-auto flex-1 bg-slate-50"></div>
     <div class="flex justify-end gap-2 p-3 border-t border-slate-200">
-      <button type="button" onclick="copyMISExportPreview()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📋 Copy</button>
+      <button type="button" onclick="copyMISExportPreview()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📋 Copy Text</button>
+      <button type="button" onclick="copyMISExportPreviewAsImage()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">🖼️ Copy Image</button>
       <button type="button" onclick="downloadMISExportPreview()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">⬇️ Download</button>
       <button type="button" onclick="closeMISExportPreview()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Close</button>
     </div>
@@ -4833,6 +4828,7 @@ function renderClaimsSummaryTable() {
             ♻️ Replace
             <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
           </label>
+          <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>
           <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
         ` : ''}`;
     } else if (isAdmin) {
@@ -4840,7 +4836,8 @@ function renderClaimsSummaryTable() {
         <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
           📤 Upload Admin Doc
           <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-        </label>`;
+        </label>
+        <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -4936,9 +4933,9 @@ function resetOverviewFilters() {
     if ($('overviewFilterModule')) $('overviewFilterModule').value = ''; 
     if ($('overviewFilterOffice')) $('overviewFilterOffice').value = ''; 
     if ($('overviewFilterEmpUser')) $('overviewFilterEmpUser').value = ''; 
-    if ($('overviewFilterStatus')) $('overviewFilterStatus').value = 'In Progress'; 
-    currentClaimsList = rawClaimsList.filter(c => c.claim_status === 'In Progress');
-    currentClaimsList.sort((a, b) => new Date(b.txn_date || 0) - new Date(a.txn_date || 0)); 
+        if ($('overviewFilterStatus')) $('overviewFilterStatus').value = '';
+    currentClaimsList = [...rawClaimsList];
+    currentClaimsList.sort((a, b) => new Date(b.txn_date || 0) - new Date(a.txn_date || 0));  
     renderClaimsSummaryTable(); 
 } 
 
@@ -5011,6 +5008,7 @@ function sortTable(col) {
             ♻️ Replace
             <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
           </label>
+          <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>
           <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
         ` : ''}`;
     } else if (isAdmin) {
@@ -5018,7 +5016,8 @@ function sortTable(col) {
         <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
           📤 Upload Admin Doc
           <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-        </label>`;
+        </label>
+        <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -5672,7 +5671,8 @@ function sortTable(col) {
 }
 
     function applyMISSummaryControls() {
-      const status = $('misSummaryStatusFilter')?.value || 'Pending';
+      // The summary view shows all statuses; the limit controls the latest entries.
+      const status = 'all';
       const limitValue = $('misSummaryLimit')?.value || '5';
       let rows = [...(misSummaryBaseRows || [])];
       if (status !== 'all') rows = rows.filter(row => row.claim_status === status);
@@ -6914,6 +6914,21 @@ async function exportBookingReportImage() {
       }
     }
 
+    async function copyBookingExportPreviewAsImage() {
+      const target = $('bookingExportPreviewCapture');
+      if (!target || !navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+        return alert('Image clipboard copy is not supported by this browser.');
+      }
+      try {
+        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#fff', useCORS: true });
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        alert('Booking preview image copied to clipboard.');
+      } catch (error) {
+        alert('Image copy failed: ' + error.message);
+      }
+    }
+
     async function downloadBookingExportPreview() {
       closeBookingExportPreview();
       if (bookingPreviewFormat === 'pdf') return exportBookingReportPDF();
@@ -6952,6 +6967,21 @@ async function exportBookingReportImage() {
       const text = table.innerText;
       try { await navigator.clipboard.writeText(text); alert('Preview copied to clipboard.'); }
       catch (err) { alert('Copy failed: ' + err.message); }
+    }
+
+    async function copyMISExportPreviewAsImage() {
+      const target = $('misExportPreviewCapture');
+      if (!target || !navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+        return alert('Image clipboard copy is not supported by this browser.');
+      }
+      try {
+        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#fff', useCORS: true });
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        alert('MIS preview image copied to clipboard.');
+      } catch (error) {
+        alert('Image copy failed: ' + error.message);
+      }
     }
 
     async function downloadMISExportPreview() {
@@ -8938,6 +8968,7 @@ function renderClaimsSummaryTable() {
             ♻️ Replace
             <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
           </label>
+          <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>
           <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
         ` : ''}`;
     } else if (isAdmin) {
@@ -8945,7 +8976,8 @@ function renderClaimsSummaryTable() {
         <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
           📤 Upload Admin Doc
           <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-        </label>`;
+        </label>
+        <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -9609,6 +9641,52 @@ async function deleteAdminClaimDocument(claimId) {
   alert('Admin document deleted successfully.');
   await loadClaimsSummary();
   await generateMISReport(currentMISReportFilter || 'All');
+}
+
+async function pasteAdminClaimDocument(claimId) {
+  if (!assertAdminForClaimDocumentAction()) return;
+  if (!navigator.clipboard?.read) {
+    return alert('Clipboard image access is not supported by this browser. Use the file upload option.');
+  }
+
+  try {
+    const items = await navigator.clipboard.read();
+    let clipboardFile = null;
+    for (const item of items) {
+      const imageType = item.types.find(type => type.startsWith('image/'));
+      if (imageType) {
+        clipboardFile = await item.getType(imageType);
+        break;
+      }
+    }
+    if (!clipboardFile) return alert('No image was found in the clipboard. Copy a screenshot first.');
+
+    const claim = rawClaimsList.find(c => String(c.id) === String(claimId)) ||
+      rawMISMasterList.find(c => String(c.id) === String(claimId));
+    if (!claim) return alert('Claim record not found.');
+
+    const { blob, extension } = await optimizeImageForUpload(clipboardFile);
+    const filePath = `claims/admin-resolution-proof-${claimId}-${Date.now()}.${extension}`;
+    const { error: uploadError } = await supabaseClient.storage
+      .from('claim-attachments')
+      .upload(filePath, blob, { upsert: true, contentType: extension === 'pdf' ? 'application/pdf' : 'image/jpeg' });
+    if (uploadError) throw uploadError;
+
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${filePath}`;
+    const { error } = await supabaseClient.from('claims')
+      .update({ admin_file_url: publicUrl })
+      .eq('id', claimId);
+    if (error) throw error;
+
+    const oldPath = getClaimStoragePath(claim.admin_file_url);
+    if (oldPath) await supabaseClient.storage.from('claim-attachments').remove([oldPath]);
+
+    alert('Admin document pasted and uploaded successfully.');
+    await loadClaimsSummary();
+    await generateMISReport(currentMISReportFilter || 'All');
+  } catch (error) {
+    alert('Clipboard admin document upload failed: ' + error.message);
+  }
 }
 
 async function replaceAdminClaimDocument(claimId, input) {
