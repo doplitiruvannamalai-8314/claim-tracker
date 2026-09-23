@@ -271,7 +271,7 @@
     <button type="button" id="btnCancelEditClaim" onclick="cancelClaimEditing()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1 rounded text-xs font-bold cursor-pointer">✕ Cancel Edit</button>
   </div>
   
-  <form id="claimRegistrationForm" onsubmit="submitClaim(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+  <form id="claimRegistrationForm" onsubmit="validateClaimSubmission(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
     <input type="hidden" id="editingClaimId">
     
     <div class="lg:col-span-7 space-y-2.5">
@@ -297,7 +297,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-0.5">12-Digit Reference / Transaction ID *</label>
-          <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" placeholder="Exact 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
+          <input type="text" id="claimTxnId" maxlength="12" pattern="\d{12}" oninput="handleClaimTxnInput(event)" placeholder="Enter exactly 12 digits" required class="w-full border border-slate-300 p-1.5 rounded text-xs outline-none font-mono">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-0.5">Transaction Date *</label>
@@ -309,7 +309,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-0.5">Payment Channel *</label>
-          <select id="claimChannel" onchange="handlePaymentChannelChange()" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-800">
+          <select id="claimChannel" onchange="handlePaymentChannelChange(); handleClaimTxnInput({ target: $('claimTxnId') })" required class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none font-bold text-postRed-800">
             <option value="SBI DQR">SBI DQR</option>
             <option value="SBI POS">SBI POS</option>
             <option value="SBI ePay">SBI ePay</option>
@@ -3585,12 +3585,38 @@ window.switchTab = function(tabName) {
         ...(Array.isArray(currentClaimsList) ? currentClaimsList : [])
       ];
 
-      let found = masterPool.find(c => {
-        const txn = String(c.txn_id_ref || '').trim().toLowerCase();
-        const art = String(c.article_number || '').trim().toLowerCase();
-        const rrn = String(c.rrn_number || '').trim().toLowerCase();
-        return txn === q || art === q || rrn === q || txn.includes(q) || art.includes(q) || rrn.includes(q);
-      });
+      const normalize = value => String(value ?? '').trim().toLowerCase();
+
+      // Search every displayed field, including ticket/ref, article, RRN,
+      // employee name/ID, office, module, status, amount, and remarks.
+      const searchableFields = claim => [
+        claim.txn_id_ref, claim.ticket_no, claim.ticket_number,
+        claim.article_number, claim.rrn_number, claim.module,
+        claim.claim_status, claim.txn_amount, claim.raised_for_office,
+        claim.remarks_by_user, claim.reply_remarks_admin,
+        claim.profiles?.emp_name, claim.profiles?.emp_id
+      ].map(normalize);
+
+      let found = masterPool.find(c => searchableFields(c).some(value => value.includes(q)));
+
+      if (!found) {
+        resCard.classList.remove('hidden');
+        resCard.innerHTML = `<div class="p-2 text-center text-slate-500 italic">Searching database for "${searchVal}"...</div>`;
+
+        try {
+          const { data, error } = await supabaseClient
+            .from('claims')
+            .select('*, profiles:created_by (emp_id, emp_name)')
+            .or(`txn_id_ref.ilike.%${searchVal}%,article_number.ilike.%${searchVal}%,rrn_number.ilike.%${searchVal}%,raised_for_office.ilike.%${searchVal}%,remarks_by_user.ilike.%${searchVal}%,reply_remarks_admin.ilike.%${searchVal}%`)
+            .limit(1);
+
+          if (!error && data?.length) found = data[0];
+        } catch (err) {
+          console.warn("DB tracking query error:", err);
+        }
+      }
+
+      resCard.classList.remove('hidden');
 
       if (!found) {
         resCard.classList.remove('hidden');
@@ -3675,6 +3701,70 @@ window.switchTab = function(tabName) {
     }
 
     // 6. CLAIM CREATION & OVERVIEW TABLE
+    function handleClaimTxnInput(e) {
+      const input = e.target;
+      input.value = input.value.replace(/\D/g, '').slice(0, 12);
+
+      const channel = $('claimChannel')?.value || '';
+      const requiredLength = 12;
+      input.setCustomValidity(
+        input.value.length === 0 || input.value.length === requiredLength
+          ? ''
+          : `Reference number must be exactly ${requiredLength} digits for ${channel}.`
+      );
+
+      if (input.value.length === requiredLength) {
+        checkDuplicateClaimReference(input.value, true);
+      }
+    }
+
+    async function checkDuplicateClaimReference(refNo, showAlert = false, excludeClaimId = '') {
+      const normalizedRef = String(refNo || '').trim();
+      if (!normalizedRef) return false;
+
+      const inMemoryDuplicate = (rawClaimsList || []).some(c =>
+        String(c.txn_id_ref || '').trim() === normalizedRef && String(c.id) !== String(excludeClaimId)
+      );
+      if (inMemoryDuplicate) {
+        if (showAlert) alert(`Claim already registered with the same Ref. ID: ${normalizedRef}`);
+        return true;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('claims')
+        .select('id')
+        .eq('txn_id_ref', normalizedRef)
+        .limit(1);
+
+      if (error) {
+        console.warn('Duplicate Ref. ID check failed:', error);
+        return false;
+      }
+
+      const duplicate = Boolean(data?.length);
+      if (duplicate && showAlert) {
+        alert(`Claim already registered with the same Ref. ID: ${normalizedRef}`);
+      }
+      return duplicate;
+    }
+
+    async function validateClaimSubmission(e) {
+      e.preventDefault();
+
+      const channel = $('claimChannel')?.value || '';
+      const refNo = ($('claimTxnId')?.value || '').trim();
+      const requiredLength = 12;
+
+      if (!new RegExp(`^\\d{${requiredLength}}$`).test(refNo)) {
+        alert(`Reference number must be exactly ${requiredLength} digits for ${channel}.`);
+        $('claimTxnId')?.focus();
+        return;
+      }
+
+      if (await checkDuplicateClaimReference(refNo, true)) return;
+      return submitClaim(e);
+    }
+
     function handlePaymentChannelChange() {
       const channel = $('claimChannel')?.value;
       const rrnContainer = $('rrnFieldContainer');
@@ -4536,7 +4626,12 @@ async function submitClaim(e) {
       doc_status: 'Approved'
     }]);
 
-    if (error) return alert("Error submitting claim: " + error.message);
+    if (error) {
+      if (error.code === '23505' || /claims_txn_id_ref_key/i.test(error.message || '')) {
+        return alert(`Claim already registered with the same Ref. ID: ${txn_id_ref}`);
+      }
+      return alert("Error submitting claim: " + error.message);
+    }
 
     alert("Claim registered successfully!");
     e.target.reset();
