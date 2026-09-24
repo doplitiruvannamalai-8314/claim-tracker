@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2371,6 +2369,51 @@
     </div>
   </div>
 </div>
+      <!-- ADMIN DOCUMENT PREVIEW / REPLACE MODAL -->
+      <div id="adminDocumentActionModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 max-w-xl w-full space-y-3 shadow-2xl border-t-8 border-amber-600 max-h-[92vh] overflow-y-auto">
+          <div class="flex justify-between items-center border-b pb-2 border-amber-200">
+            <div>
+              <h3 class="font-bold text-sm text-postRed-700 uppercase">📎 Admin Resolution Document</h3>
+              <p class="text-[11px] text-slate-500">Preview, upload, paste, replace, or remove the admin document.</p>
+            </div>
+            <button type="button" onclick="closeAdminDocumentActionModal()" class="text-xl font-bold cursor-pointer text-slate-400 hover:text-slate-700">&times;</button>
+          </div>
+
+          <input type="hidden" id="adminDocumentActionClaimId">
+          <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-xs grid grid-cols-2 gap-2">
+            <div><span class="block text-[10px] text-slate-500 font-bold">Reference No.</span><span id="adminDocumentActionRef" class="font-mono font-bold text-postRed-700">-</span></div>
+            <div><span class="block text-[10px] text-slate-500 font-bold">Office / Module</span><span id="adminDocumentActionOffice" class="font-semibold text-slate-800">-</span></div>
+          </div>
+
+          <div id="adminDocumentCurrentPreview" class="hidden border border-amber-300 rounded-lg p-2 bg-amber-50/40">
+            <p class="font-bold text-[11px] text-amber-900 mb-1">Current Admin Document</p>
+            <div id="adminDocumentCurrentMedia" class="flex justify-center"></div>
+          </div>
+
+          <div class="p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-200 space-y-2">
+            <label class="font-bold text-emerald-900 text-xs">Upload Replacement Document</label>
+            <input type="file" id="adminDocumentActionFile" accept=".jpg,.jpeg,.png,.pdf" onchange="previewAdminDocumentActionFile(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+            <div id="adminDocumentActionDropZone" tabindex="0" class="border-2 border-dashed border-emerald-400 hover:border-emerald-700 bg-white p-3 rounded-lg text-center cursor-pointer outline-none transition">
+              <p class="text-[11px] font-bold text-emerald-900">📋 Click here, then press <kbd class="bg-emerald-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to paste</p>
+              <p class="text-[10px] text-slate-500">The selected file will be previewed before saving.</p>
+            </div>
+            <div id="adminDocumentActionNewPreview" class="hidden border border-emerald-300 rounded p-2 bg-white">
+              <div id="adminDocumentActionNewMedia" class="flex justify-center"></div>
+              <p id="adminDocumentActionNewLabel" class="text-[10px] text-emerald-800 font-bold text-center mt-1"></p>
+            </div>
+          </div>
+
+          <div class="flex justify-between gap-2 pt-2 border-t border-amber-200">
+            <button type="button" onclick="deleteAdminDocumentFromModal()" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">🗑️ Delete Current</button>
+            <div class="flex gap-2">
+              <button type="button" onclick="closeAdminDocumentActionModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+              <button type="button" id="btnSaveAdminDocumentAction" onclick="saveAdminDocumentFromModal()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Upload / Replace</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ADMIN EDIT USER MODAL -->
       <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
@@ -4825,20 +4868,11 @@ function renderClaimsSummaryTable() {
       adminDocHtml = `
         <a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>
         ${isAdmin ? `
-          <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
-            ♻️ Replace
-            <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-          </label>
-          <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>
-          <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
+          <button type="button" onclick="openAdminDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage Admin Doc</button>
         ` : ''}`;
     } else if (isAdmin) {
       adminDocHtml = `
-        <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
-          📤 Upload Admin Doc
-          <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-        </label>
-        <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>`;
+        <button type="button" onclick="openAdminDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage Admin Doc</button>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -5005,20 +5039,11 @@ function sortTable(col) {
       adminDocHtml = `
         <a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>
         ${isAdmin ? `
-          <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
-            ♻️ Replace
-            <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-          </label>
-          <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>
-          <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
+          <button type="button" onclick="openAdminDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage Admin Doc</button>
         ` : ''}`;
     } else if (isAdmin) {
       adminDocHtml = `
-        <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
-          📤 Upload Admin Doc
-          <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-        </label>
-        <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>`;
+        <button type="button" onclick="openAdminDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage Admin Doc</button>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -8965,20 +8990,11 @@ function renderClaimsSummaryTable() {
       adminDocHtml = `
         <a href="${c.admin_file_url}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📎 Admin Doc</a>
         ${isAdmin ? `
-          <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
-            ♻️ Replace
-            <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-          </label>
-          <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>
-          <button type="button" onclick="deleteAdminClaimDocument('${c.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🗑️ Delete</button>
+          <button type="button" onclick="openAdminDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage Admin Doc</button>
         ` : ''}`;
     } else if (isAdmin) {
       adminDocHtml = `
-        <label class="w-full bg-blue-700 hover:bg-blue-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center cursor-pointer">
-          📤 Upload Admin Doc
-          <input type="file" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="replaceAdminClaimDocument('${c.id}', this)">
-        </label>
-        <button type="button" onclick="pasteAdminClaimDocument('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">📋 Paste Admin Doc</button>`;
+        <button type="button" onclick="openAdminDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage Admin Doc</button>`;
     } else {
       adminDocHtml = `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">-</span>`;
     }
@@ -9609,6 +9625,121 @@ async function submitDeleteBookingData() {
 // ADMIN CLAIM DOCUMENT MANAGEMENT
 // =========================================================================
 
+let adminDocumentActionFile = null;
+
+function openAdminDocumentActionModal(claimId, initialFile = null) {
+  if (!assertAdminForClaimDocumentAction()) return;
+
+  const claim = rawClaimsList.find(c => String(c.id) === String(claimId)) ||
+    rawMISMasterList.find(c => String(c.id) === String(claimId));
+  if (!claim) return alert('Claim record not found.');
+
+  $('adminDocumentActionClaimId').value = claim.id;
+  $('adminDocumentActionRef').innerText = claim.txn_id_ref || '-';
+  $('adminDocumentActionOffice').innerText = `${claim.raised_for_office || '-'} / ${claim.module || '-'}`;
+  adminDocumentActionFile = initialFile || null;
+  if ($('adminDocumentActionFile')) $('adminDocumentActionFile').value = '';
+  renderAdminDocumentPreview('adminDocumentCurrentPreview', 'adminDocumentCurrentMedia', claim.admin_file_url, 'Current admin document');
+  renderAdminDocumentActionFile(adminDocumentActionFile);
+  $('adminDocumentActionModal').classList.remove('hidden');
+}
+
+function closeAdminDocumentActionModal() {
+  $('adminDocumentActionModal')?.classList.add('hidden');
+  adminDocumentActionFile = null;
+  if ($('adminDocumentActionFile')) $('adminDocumentActionFile').value = '';
+  $('adminDocumentActionNewPreview')?.classList.add('hidden');
+}
+
+function renderAdminDocumentPreview(containerId, mediaId, url, title) {
+  const container = $(containerId);
+  const media = $(mediaId);
+  if (!container || !media) return;
+  if (!url) {
+    container.classList.add('hidden');
+    media.innerHTML = '';
+    return;
+  }
+  const safeUrl = String(url).replace(/"/g, '&quot;');
+  media.innerHTML = /\\.pdf(?:$|\\?)/i.test(url)
+    ? `<iframe src="${safeUrl}" title="${title}" class="w-full h-64 rounded border border-slate-300 bg-white"></iframe>`
+    : `<img src="${safeUrl}" alt="${title}" class="max-h-64 max-w-full object-contain rounded border border-slate-300 bg-white">`;
+  container.classList.remove('hidden');
+}
+
+function renderAdminDocumentActionFile(file) {
+  const preview = $('adminDocumentActionNewPreview');
+  const media = $('adminDocumentActionNewMedia');
+  const label = $('adminDocumentActionNewLabel');
+  if (!preview || !media || !label) return;
+  if (!file) {
+    preview.classList.add('hidden');
+    media.innerHTML = '';
+    label.innerText = '';
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  media.innerHTML = file.type === 'application/pdf'
+    ? `<iframe src="${url}" title="Replacement admin document" class="w-full h-64 rounded border border-slate-300 bg-white"></iframe>`
+    : `<img src="${url}" alt="Replacement admin document" class="max-h-64 max-w-full object-contain rounded border border-slate-300 bg-white">`;
+  label.innerText = `✓ ${file.name || 'Pasted image'} (${(file.size / 1024).toFixed(1)} KB)`;
+  preview.classList.remove('hidden');
+}
+
+function previewAdminDocumentActionFile(event) {
+  adminDocumentActionFile = event.target.files?.[0] || null;
+  renderAdminDocumentActionFile(adminDocumentActionFile);
+}
+
+function handleAdminDocumentActionPaste(event) {
+  const item = [...(event.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (!item) return;
+  event.preventDefault();
+  adminDocumentActionFile = item.getAsFile();
+  renderAdminDocumentActionFile(adminDocumentActionFile);
+}
+
+async function saveAdminDocumentFromModal() {
+  if (!assertAdminForClaimDocumentAction()) return;
+  const claimId = $('adminDocumentActionClaimId')?.value;
+  if (!claimId || !adminDocumentActionFile) return alert('Select a file or paste an image first.');
+
+  const btn = $('btnSaveAdminDocumentAction');
+  if (btn) { btn.disabled = true; btn.innerText = 'Saving...'; }
+  try {
+    const { blob, extension } = await optimizeImageForUpload(adminDocumentActionFile);
+    const path = `claims/admin-resolution-proof-${claimId}-${Date.now()}.${extension}`;
+    const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(path, blob, {
+      upsert: true,
+      contentType: extension === 'pdf' ? 'application/pdf' : 'image/jpeg'
+    });
+    if (uploadError) throw uploadError;
+
+    const claim = rawClaimsList.find(c => String(c.id) === String(claimId)) || rawMISMasterList.find(c => String(c.id) === String(claimId));
+    const oldPath = getClaimStoragePath(claim?.admin_file_url);
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${path}`;
+    const { error } = await supabaseClient.from('claims').update({ admin_file_url: publicUrl }).eq('id', claimId);
+    if (error) throw error;
+    if (oldPath) await supabaseClient.storage.from('claim-attachments').remove([oldPath]);
+
+    alert('Admin document uploaded/replaced successfully.');
+    closeAdminDocumentActionModal();
+    await loadClaimsSummary();
+    await generateMISReport(currentMISReportFilter || 'All');
+  } catch (error) {
+    alert('Admin document upload failed: ' + error.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerText = 'Upload / Replace'; }
+  }
+}
+
+async function deleteAdminDocumentFromModal() {
+  const claimId = $('adminDocumentActionClaimId')?.value;
+  if (!claimId) return;
+  closeAdminDocumentActionModal();
+  await deleteAdminClaimDocument(claimId);
+}
+
 function assertAdminForClaimDocumentAction() {
   const role = (userProfile?.role || '').toLowerCase();
   if (!['admin', 'superadmin'].includes(role)) {
@@ -9794,6 +9925,13 @@ async function deleteClaimByAdmin() {
       const registerClaimView = $('registerClaimView');
       const converterView = $('converterTabView');
       const reuploadModal = $('reuploadModal');
+
+      const adminDocumentActionModal = $('adminDocumentActionModal');
+      if (adminDocumentActionModal && !adminDocumentActionModal.classList.contains('hidden')) {
+        adminDocumentActionFile = imageBlob;
+        renderAdminDocumentActionFile(adminDocumentActionFile);
+        return;
+      }
 
       if (replyModal && !replyModal.classList.contains('hidden')) {
         const currentStatus = $('modalStatus')?.value || 'Pending';
@@ -15762,7 +15900,13 @@ function clearModalAdminPastedImage() {
 
 // Attach Clipboard Listeners to Dropzones on Load
 document.addEventListener('DOMContentLoaded', () => {
-  const userDropZone = document.getElementById('userPasteDropZone');
+      const adminDocumentDropZone = document.getElementById('adminDocumentActionDropZone');
+      if (adminDocumentDropZone) {
+        adminDocumentDropZone.addEventListener('click', () => adminDocumentDropZone.focus());
+        adminDocumentDropZone.addEventListener('paste', handleAdminDocumentActionPaste);
+      }
+
+      const userDropZone = document.getElementById('userPasteDropZone');
   if (userDropZone) {
     userDropZone.addEventListener('paste', (e) => handleClipboardPaste(e, 'claim'));
   }
