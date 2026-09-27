@@ -7779,68 +7779,88 @@ async function exportUsersPDF() {
       clearModalAdminPastedImage();
     }
 
-    async function pasteBankRefundDetailsToAdminRemarks() {
+    let pendingBankRefundPaste = false;
+
+function parseAndInsertBankRefundDetails(rawText) {
   const remarksInput = $('modalAdminRemarks');
-  if (!remarksInput) return;
+  if (!remarksInput || !String(rawText || '').trim()) return false;
 
-  if (!navigator.clipboard?.readText) {
-    return alert('Clipboard access is not supported here. Copy the row and paste it manually into Admin Remarks.');
-  }
+  const lines = String(rawText).replace(/\r/g, '').split('\n').map(line => line.trim()).filter(Boolean);
+  const splitRow = line => line.includes('\t')
+    ? line.split('\t').map(value => value.trim())
+    : line.split(/\s{2,}/).map(value => value.trim());
 
-  let rawText = '';
-  try {
-    rawText = await navigator.clipboard.readText();
-  } catch (error) {
-    return alert('Clipboard access was blocked. Allow clipboard access, copy the bank row again, and click the button.');
-  }
+  const headerIndex = lines.findIndex(line => {
+    const normalized = line.toLowerCase().replace(/\s+/g, ' ');
+    return /arrn/.test(normalized) && /bank\s*remark/.test(normalized) && /refund\s*date/.test(normalized);
+  });
 
-  if (!rawText.trim()) {
-    return alert('Clipboard is empty. Copy the complete bank refund row first.');
-  }
+  let arrn = '', bankRemark = '', refundDate = '';
+  const dataLine = lines[headerIndex >= 0 ? headerIndex + 1 : 0] || String(rawText);
 
-  const lines = rawText.trim().split(/\\r?\\n/).map(line => line.trim()).filter(Boolean);
-  const header = lines.find(line => /ARRN/i.test(line) && /Bank\\s*remark/i.test(line) && /refund\\s*date/i.test(line));
-  const valueLine = lines.find(line => line !== header) || lines[0];
-
-  const splitRow = line => line.includes('\\t')
-    ? line.split('\\t').map(value => value.trim())
-    : line.split(/\\s{2,}/).map(value => value.trim());
-
-  let cells = splitRow(valueLine);
-  let arrn = '';
-  let bankRemark = '';
-  let refundDate = '';
-
-  if (header) {
-    const headers = splitRow(header).map(value => value.toLowerCase());
-    const values = cells;
+  if (headerIndex >= 0 && lines[headerIndex + 1]) {
+    const headers = splitRow(lines[headerIndex]).map(value => value.toLowerCase().replace(/\s+/g, ' ').trim());
+    const values = splitRow(lines[headerIndex + 1]);
     const findCell = pattern => {
       const index = headers.findIndex(value => pattern.test(value));
       return index >= 0 ? (values[index] || '') : '';
     };
-    arrn = findCell(/\\barrn\\b/);
-    bankRemark = findCell(/bank\\s*remark/);
-    refundDate = findCell(/refund\\s*date/);
+    arrn = findCell(/\barrn\b/);
+    bankRemark = findCell(/bank\s*remark/);
+    refundDate = findCell(/refund\s*date/);
   } else {
-    // Supports rows pasted without headers:
-    // Refund Req No | Amount | Type | Status | ARRN | Bank Remark | Refund Date
-    if (cells.length < 7) {
-      cells = valueLine.split(/\\t|,/).map(value => value.trim());
-    }
+    const cells = splitRow(lines[0]);
     arrn = cells[4] || '';
     bankRemark = cells[5] || '';
     refundDate = cells[6] || '';
   }
 
-  if (!arrn && !bankRemark && !refundDate) {
-    return alert('Could not extract ARRN, bank remark, or refund date. Copy the complete row and try again.');
+  const arrnMatch = dataLine.match(/\b\d{10,20}\b/);
+  const dateMatch = dataLine.match(/\b\d{1,2}\s+(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}\b/i);
+  if (!arrn && arrnMatch) arrn = arrnMatch[0];
+  if (!refundDate && dateMatch) refundDate = dateMatch[0];
+  if (!bankRemark && arrnMatch && dateMatch) {
+    bankRemark = dataLine.slice(arrnMatch.index + arrnMatch[0].length, dateMatch.index).trim();
   }
+
+  if (!arrn && !bankRemark && !refundDate) return false;
 
   const formatted = `ARRN: ${arrn || '-'} | BANK REMARK: ${bankRemark || '-'} | REFUND DATE: ${refundDate || '-'}`;
   const existing = remarksInput.value.trim();
-  remarksInput.value = existing ? `${existing}\\n${formatted}` : formatted;
+  remarksInput.value = existing ? `${existing}\n${formatted}` : formatted;
   remarksInput.focus();
+  return true;
 }
+
+async function pasteBankRefundDetailsToAdminRemarks() {
+  const remarksInput = $('modalAdminRemarks');
+  if (!remarksInput) return;
+
+  try {
+    if (navigator.clipboard?.readText) {
+      const rawText = await navigator.clipboard.readText();
+      if (parseAndInsertBankRefundDetails(rawText)) return;
+    }
+  } catch (error) {
+    // Clipboard permission can be blocked in browsers or restricted contexts.
+  }
+
+  // Clipboard APIs cannot bypass permission. Focus a real paste target instead.
+  pendingBankRefundPaste = true;
+  remarksInput.focus();
+  alert('Clipboard permission is blocked. Press Ctrl+V now while Admin Remarks is focused.');
+}
+
+document.addEventListener('paste', event => {
+  if (!pendingBankRefundPaste || $('replyModal')?.classList.contains('hidden')) return;
+  const rawText = event.clipboardData?.getData('text/plain') || '';
+  if (!rawText) return;
+  event.preventDefault();
+  pendingBankRefundPaste = false;
+  if (!parseAndInsertBankRefundDetails(rawText)) {
+    alert('Could not extract ARRN, bank remark, or refund date from the pasted row.');
+  }
+});
 
 function onModalStatusChanged() {
       const status = $('modalStatus') ? $('modalStatus').value : 'Pending';
