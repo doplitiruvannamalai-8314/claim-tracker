@@ -2311,8 +2311,14 @@
 
     <!-- REMARKS / INSTRUCTIONS -->
     <div>
-      <label class="block text-xs font-bold text-slate-700 mb-0.5">Admin Remarks / Instructions</label>
+      <div class="flex items-center justify-between gap-2 mb-0.5">
+        <label class="block text-xs font-bold text-slate-700">Admin Remarks / Instructions</label>
+        <button type="button" onclick="pasteBankRefundDetailsToAdminRemarks()" class="bg-cyan-100 hover:bg-cyan-200 text-cyan-900 border border-cyan-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition" title="Copy the bank refund row first, then click this button">
+          📋 Paste Bank Refund Details
+        </button>
+      </div>
       <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
+      <p class="text-[10px] text-slate-500 mt-0.5">Copy the complete bank refund row, then click the button to insert ARRN, bank remark, and refund date.</p>
     </div>
 
         <!-- ATTACHMENT SECTION 1: USER REPLACEMENT UPLOAD -->
@@ -7773,7 +7779,70 @@ async function exportUsersPDF() {
       clearModalAdminPastedImage();
     }
 
-    function onModalStatusChanged() {
+    async function pasteBankRefundDetailsToAdminRemarks() {
+  const remarksInput = $('modalAdminRemarks');
+  if (!remarksInput) return;
+
+  if (!navigator.clipboard?.readText) {
+    return alert('Clipboard access is not supported here. Copy the row and paste it manually into Admin Remarks.');
+  }
+
+  let rawText = '';
+  try {
+    rawText = await navigator.clipboard.readText();
+  } catch (error) {
+    return alert('Clipboard access was blocked. Allow clipboard access, copy the bank row again, and click the button.');
+  }
+
+  if (!rawText.trim()) {
+    return alert('Clipboard is empty. Copy the complete bank refund row first.');
+  }
+
+  const lines = rawText.trim().split(/\\r?\\n/).map(line => line.trim()).filter(Boolean);
+  const header = lines.find(line => /ARRN/i.test(line) && /Bank\\s*remark/i.test(line) && /refund\\s*date/i.test(line));
+  const valueLine = lines.find(line => line !== header) || lines[0];
+
+  const splitRow = line => line.includes('\\t')
+    ? line.split('\\t').map(value => value.trim())
+    : line.split(/\\s{2,}/).map(value => value.trim());
+
+  let cells = splitRow(valueLine);
+  let arrn = '';
+  let bankRemark = '';
+  let refundDate = '';
+
+  if (header) {
+    const headers = splitRow(header).map(value => value.toLowerCase());
+    const values = cells;
+    const findCell = pattern => {
+      const index = headers.findIndex(value => pattern.test(value));
+      return index >= 0 ? (values[index] || '') : '';
+    };
+    arrn = findCell(/\\barrn\\b/);
+    bankRemark = findCell(/bank\\s*remark/);
+    refundDate = findCell(/refund\\s*date/);
+  } else {
+    // Supports rows pasted without headers:
+    // Refund Req No | Amount | Type | Status | ARRN | Bank Remark | Refund Date
+    if (cells.length < 7) {
+      cells = valueLine.split(/\\t|,/).map(value => value.trim());
+    }
+    arrn = cells[4] || '';
+    bankRemark = cells[5] || '';
+    refundDate = cells[6] || '';
+  }
+
+  if (!arrn && !bankRemark && !refundDate) {
+    return alert('Could not extract ARRN, bank remark, or refund date. Copy the complete row and try again.');
+  }
+
+  const formatted = `ARRN: ${arrn || '-'} | BANK REMARK: ${bankRemark || '-'} | REFUND DATE: ${refundDate || '-'}`;
+  const existing = remarksInput.value.trim();
+  remarksInput.value = existing ? `${existing}\\n${formatted}` : formatted;
+  remarksInput.focus();
+}
+
+function onModalStatusChanged() {
       const status = $('modalStatus') ? $('modalStatus').value : 'Pending';
       const settlementContainer = $('modalSettlementDateContainer');
       const pendingUserDocSection = $('modalPendingUserDocSection');
