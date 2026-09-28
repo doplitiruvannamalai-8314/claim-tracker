@@ -2251,6 +2251,7 @@
     </div>
     
     <input type="hidden" id="modalClaimId">
+    <input type="hidden" id="modalExistingAdminRemarks">
 
 <!-- ADMIN EDIT/REPLY MODAL HEADER BADGE STRIP -->
 <div class="bg-amber-50/90 border border-amber-300/80 rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 text-xs mb-2.5">
@@ -2317,8 +2318,10 @@
           📋 Paste Bank Refund Details
         </button>
       </div>
-      <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Provide instructions or status details..."></textarea>
-      <p class="text-[10px] text-slate-500 mt-0.5">Copy the complete bank refund row, then click the button to insert ARRN, bank remark, and refund date.</p>
+      <div id="modalAdminRemarksHistory" class="hidden max-h-24 overflow-y-auto whitespace-pre-wrap rounded border border-slate-200 bg-slate-50 p-1.5 text-[11px] text-slate-600"></div>
+      <label for="modalAdminRemarks" class="block text-[10px] font-semibold text-slate-600 mb-0.5">New follow-up remark (optional)</label>
+      <textarea id="modalAdminRemarks" class="w-full border border-slate-300 p-1.5 rounded text-xs h-16 outline-none" placeholder="Enter the latest follow-up or action..."></textarea>
+      <p class="text-[10px] text-slate-500 mt-0.5">Each save adds a dated status and remark entry to the history below. Copy a bank refund row, then click the button to insert its details.</p>
     </div>
 
         <!-- ATTACHMENT SECTION 1: USER REPLACEMENT UPLOAD -->
@@ -3767,30 +3770,48 @@ window.switchTab = function(tabName) {
       const normalizedRef = String(refNo || '').trim();
       if (!normalizedRef) return false;
 
-      const inMemoryDuplicate = (rawClaimsList || []).some(c =>
+      const formatEntryDate = value => {
+        if (!value) return 'unknown date';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return 'unknown date';
+        return `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+      };
+      const showDuplicateAlert = claim => {
+        const name = claim?.profiles?.emp_name || claim?.profiles?.emp_id || 'unknown user';
+        const entryDate = formatEntryDate(claim?.created_at);
+        alert(`Claim already registered with the same Ref. ID: ${normalizedRef} by ${name} on ${entryDate}.`);
+      };
+
+      const inMemoryDuplicate = (rawClaimsList || []).find(c =>
         String(c.txn_id_ref || '').trim() === normalizedRef && String(c.id) !== String(excludeClaimId)
       );
       if (inMemoryDuplicate) {
-        if (showAlert) alert(`Claim already registered with the same Ref. ID: ${normalizedRef}`);
+        if (showAlert) showDuplicateAlert(inMemoryDuplicate);
         return true;
       }
 
-      const { data, error } = await supabaseClient
+      let query = supabaseClient
         .from('claims')
-        .select('id')
-        .eq('txn_id_ref', normalizedRef)
-        .limit(1);
+        .select('id, created_by, created_at')
+        .eq('txn_id_ref', normalizedRef);
+      if (excludeClaimId) query = query.neq('id', excludeClaimId);
+      const { data, error } = await query.limit(1);
 
       if (error) {
         console.warn('Duplicate Ref. ID check failed:', error);
         return false;
       }
 
-      const duplicate = Boolean(data?.length);
-      if (duplicate && showAlert) {
-        alert(`Claim already registered with the same Ref. ID: ${normalizedRef}`);
+      const duplicateClaim = data?.[0];
+      if (duplicateClaim && showAlert) {
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('emp_name, emp_id')
+          .eq('id', duplicateClaim.created_by)
+          .maybeSingle();
+        showDuplicateAlert({ ...duplicateClaim, profiles: profile });
       }
-      return duplicate;
+      return Boolean(duplicateClaim);
     }
 
     async function validateClaimSubmission(e) {
@@ -3806,7 +3827,8 @@ window.switchTab = function(tabName) {
         return;
       }
 
-      if (await checkDuplicateClaimReference(refNo, true)) return;
+      const editingId = $('editingClaimId')?.value || '';
+      if (await checkDuplicateClaimReference(refNo, true, editingId)) return;
       return submitClaim(e);
     }
 
@@ -4768,7 +4790,12 @@ async function submitAdminReply() {
   const newModule = $('modalModule')?.value || 'Booking';
   const status = $('modalStatus')?.value || 'Pending';
   const docStatus = $('modalDocStatus')?.value || 'Approved';
-  const remarks = $('modalAdminRemarks')?.value.trim() || '';
+  const newRemark = $('modalAdminRemarks')?.value.trim() || '';
+  const previousRemarks = $('modalExistingAdminRemarks')?.value.trim() || '';
+  const today = new Date();
+  const todayLabel = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+  const datedEntry = `Status on: ${todayLabel} - Remarks: ${newRemark || 'No additional remark.'}`;
+  const remarks = previousRemarks ? `${previousRemarks}\n${datedEntry}` : datedEntry;
   const settlementDate = (status === 'Settled') ? ($('modalSettlementDate')?.value || null) : null;
 
   const saveBtn = $('btnAdminSave');
@@ -8952,7 +8979,14 @@ async function openReplyModal(claimId, directRef, directAmount, directOffice, di
     setModalVal('#modalModule', mod);
     setModalVal('#modalStatus', claim.claim_status || 'Pending');
     setModalVal('#modalDocStatus', claim.doc_status || 'Approved');
-    setModalVal('#modalAdminRemarks', claim.reply_remarks_admin || claim.doc_revision_remarks || '');
+    const existingRemarks = claim.reply_remarks_admin || claim.doc_revision_remarks || '';
+    setModalVal('#modalExistingAdminRemarks', existingRemarks);
+    setModalVal('#modalAdminRemarks', '');
+    const remarksHistory = modal.querySelector('#modalAdminRemarksHistory');
+    if (remarksHistory) {
+      remarksHistory.innerText = existingRemarks;
+      remarksHistory.classList.toggle('hidden', !existingRemarks);
+    }
     
     const settleDateInput = modal.querySelector('#modalSettlementDate');
     if (settleDateInput) {
@@ -8975,7 +9009,12 @@ async function submitAdminReply() {
   const newModule = $('modalModule')?.value || 'Booking';
   const status = $('modalStatus')?.value || 'Pending';
   const docStatus = $('modalDocStatus')?.value || 'Approved';
-  const remarks = $('modalAdminRemarks')?.value.trim() || '';
+  const newRemark = $('modalAdminRemarks')?.value.trim() || '';
+  const previousRemarks = $('modalExistingAdminRemarks')?.value.trim() || '';
+  const today = new Date();
+  const todayLabel = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+  const datedEntry = `Status on: ${todayLabel} - ${status} - Remarks: ${newRemark || 'No additional remark.'}`;
+  const remarks = previousRemarks ? `${previousRemarks}\n${datedEntry}` : datedEntry;
   const settlementDate = (status === 'Settled') ? ($('modalSettlementDate')?.value || null) : null;
 
   const saveBtn = $('btnAdminSave');
@@ -9104,10 +9143,13 @@ function renderClaimsSummaryTable() {
     htmlArr.push(`
       <tr class="hover:bg-amber-50/40 transition align-middle">
         <td class="p-2 whitespace-nowrap">
-          <span class="text-postRed-700 font-bold font-mono text-xs block cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
-          <div class="mt-1 flex items-center gap-2">
-            <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-postRed-700 font-bold font-mono text-xs cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
             <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer">📋 Copy</button>
+          </div>
+          <div class="mt-1 flex items-center gap-1.5">
+            <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+            <span class="inline-block bg-blue-50 text-blue-800 font-semibold px-1.5 py-0.2 rounded text-[10px] border border-blue-200">${c.payment_channel || '-'}</span>
           </div>
         </td>
         <td class="p-2 whitespace-nowrap">
