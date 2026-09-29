@@ -12142,7 +12142,7 @@ async function fetchCentVfnRowsForOffice(office) {
     const from = page * pageSize;
     const { data, error } = await supabaseClient
       .from('cent_percent_verification')
-      .select('id, sl_no, scheme, status, created_at, imported_at, import_date, printed_date, dispatched_date, reply_rxd_date')
+      .select('id, sl_no, scheme, status, created_at, printed_date, dispatched_date, reply_rxd_date')
       .eq('office_name', office)
       .order('id', { ascending: true })
       .range(from, from + pageSize - 1);
@@ -12174,7 +12174,7 @@ async function loadCentVfnDatewiseReport() {
       };
 
       records.forEach(record => {
-        addEvent(record.created_at || record.imported_at || record.import_date, 'total_imported');
+        addEvent(record.created_at, 'total_imported');
         addEvent(record.printed_date, 'printed_count');
         addEvent(record.dispatched_date, 'dispatched_count');
         addEvent(record.reply_rxd_date, 'reply_count');
