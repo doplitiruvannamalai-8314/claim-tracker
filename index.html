@@ -2891,6 +2891,19 @@ function printOfficeWiseReport() {
       el.value = el.value.replace(/\D/g, '').slice(0, 10);
     }
 
+    // Normalize pasted phone values so spaces and punctuation never reach the field.
+    document.addEventListener('paste', event => {
+      const input = event.target;
+      if (!(input instanceof HTMLInputElement) || input.type !== 'tel') return;
+
+      const pastedText = event.clipboardData?.getData('text') || '';
+      if (!pastedText) return;
+
+      event.preventDefault();
+      input.value = pastedText.replace(/\D/g, '').slice(0, 10);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
     function copyTextToClipboard(text, btnEl) {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
@@ -9013,7 +9026,7 @@ async function submitAdminReply() {
   const previousRemarks = $('modalExistingAdminRemarks')?.value.trim() || '';
   const today = new Date();
   const todayLabel = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
-  const datedEntry = `Status on: ${todayLabel} - ${status} - Remarks: ${newRemark || 'No additional remark.'}`;
+  const datedEntry = `Status on: ${todayLabel} - ${status} - Remarks: ${newRemark}`;
   const remarks = previousRemarks ? `${previousRemarks}\n${datedEntry}` : datedEntry;
   const settlementDate = (status === 'Settled') ? ($('modalSettlementDate')?.value || null) : null;
 
@@ -9145,9 +9158,9 @@ function renderClaimsSummaryTable() {
         <td class="p-2 whitespace-nowrap">
           <div class="flex items-center gap-1.5">
             <span class="text-postRed-700 font-bold font-mono text-xs cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
-            <button type="button" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1 py-0.2 rounded text-[9.5px] font-bold cursor-pointer">📋 Copy</button>
           </div>
           <div class="mt-1 flex items-center gap-1.5">
+            <button type="button" aria-label="Copy reference number" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-sm font-bold cursor-pointer">📋</button>
             <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
             <span class="inline-block bg-blue-50 text-blue-800 font-semibold px-1.5 py-0.2 rounded text-[10px] border border-blue-200">${c.payment_channel || '-'}</span>
           </div>
