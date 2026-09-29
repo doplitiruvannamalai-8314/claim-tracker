@@ -1435,6 +1435,12 @@
           <span class="text-base">📅</span>
           <h3 class="font-bold text-sm text-slate-800 tracking-tight">Date-wise Verification Progress</h3>
         </div>
+        <div class="flex items-center gap-1.5">
+          <label for="vfnDatewiseOfficeFilter" class="text-[10px] font-bold text-slate-600">Filter by Office</label>
+          <select id="vfnDatewiseOfficeFilter" onchange="loadCentVfnDatewiseReport()" class="border border-slate-300 p-1 rounded text-[10px] bg-white max-w-40">
+            <option value="">All Offices</option>
+          </select>
+        </div>
         <button type="button" onclick="loadCentVfnDatewiseReport()" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded cursor-pointer transition flex items-center gap-1">
           🔄 Refresh
         </button>
@@ -1473,6 +1479,13 @@
       <div class="flex items-center gap-2">
         <span class="text-base">📊</span>
         <h3 class="font-bold text-sm text-slate-800 tracking-tight">Scheme-wise Verification Breakdown</h3>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <label for="vfnSchemeOfficeFilter" class="text-[10px] font-bold text-slate-600">Filter by Office</label>
+        <select id="vfnSchemeOfficeFilter" onchange="loadCentVfnSchemeBreakdown()" class="border border-slate-300 p-1 rounded text-[10px] bg-white max-w-40">
+          <option value="">All Offices</option>
+        </select>
       </div>
 
       <!-- EXPORT & REFRESH ACTIONS -->
@@ -2129,8 +2142,15 @@
 
     <div class="space-y-2.5 text-xs">
       <div>
-        <label class="block font-bold text-slate-700 mb-0.5">Print Generation Mode</label>
-        <select id="sb46PrintMode" onchange="toggleSb46ModeInputs()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white">
+        <label for="sb46OfficeFilter" class="block font-bold text-slate-700 mb-0.5">1. Filter by Office</label>
+        <select id="sb46OfficeFilter" onchange="onSb46OfficeChange()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white">
+          <option value="">All Offices</option>
+        </select>
+        <p id="sb46EligibleCount" class="mt-1 text-[11px] font-bold text-emerald-800">Matching eligible accounts: checking…</p>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-0.5">2. Print Generation Mode</label>
+        <select id="sb46PrintMode" onchange="toggleSb46ModeInputs(); updateSb46EligibleCount()" class="w-full border border-slate-300 p-1.5 rounded font-bold bg-white">
           <option value="range">Bulk Mode: Serial Number Range (From Sl - To Sl)</option>
           <option value="scheme">Bulk Mode: By Scheme / Account Type</option>
           <option value="individual">Individual Mode: Specific Account Number</option>
@@ -2141,11 +2161,11 @@
       <div id="sb46RangeContainer" class="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded border border-slate-200">
         <div>
           <label class="block font-bold text-slate-700 mb-0.5">From Sl. No.</label>
-          <input type="number" id="sb46FromSl" min="1" placeholder="1" class="w-full border p-1 rounded font-mono bg-white">
+          <input type="number" id="sb46FromSl" min="1" placeholder="1" onchange="updateSb46EligibleCount()" class="w-full border p-1 rounded font-mono bg-white">
         </div>
         <div>
           <label class="block font-bold text-slate-700 mb-0.5">To Sl. No.</label>
-          <input type="number" id="sb46ToSl" min="1" placeholder="100" class="w-full border p-1 rounded font-mono bg-white">
+          <input type="number" id="sb46ToSl" min="1" placeholder="100" onchange="updateSb46EligibleCount()" class="w-full border p-1 rounded font-mono bg-white">
         </div>
       </div>
 
@@ -2163,7 +2183,7 @@
       <!-- Mode 3: Single Account No -->
       <div id="sb46IndividualContainer" class="hidden bg-slate-50 p-2.5 rounded border border-slate-200">
         <label class="block font-bold text-slate-700 mb-0.5">Target Account Number</label>
-        <input type="text" id="sb46TargetAccNo" placeholder="Enter full account number" class="w-full border p-1 rounded font-mono font-bold bg-white uppercase">
+        <input type="text" id="sb46TargetAccNo" placeholder="Enter full account number" onchange="updateSb46EligibleCount()" class="w-full border p-1 rounded font-mono font-bold bg-white uppercase">
       </div>
 
       <div class="bg-amber-50 p-2 rounded border border-amber-200 text-[11px] text-amber-900 leading-snug">
@@ -12084,15 +12104,94 @@ function initCentVfnPortal() {
   loadCentVfnDatewiseReport();
 }
 
+function populateCentVfnOfficeFilters() {
+  const source = $('vfnFilterOffice');
+  if (!source) return;
+
+  ['vfnDatewiseOfficeFilter', 'vfnSchemeOfficeFilter', 'sb46OfficeFilter'].forEach(id => {
+    const select = $(id);
+    if (!select) return;
+    const selectedValue = select.value;
+    select.innerHTML = '<option value="">All Offices</option>' +
+      Array.from(source.options).filter(option => option.value).map(option => {
+        const safeValue = option.value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        const safeText = option.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<option value="${safeValue}">${safeText}</option>`;
+      }).join('');
+    if (selectedValue && Array.from(select.options).some(option => option.value === selectedValue)) {
+      select.value = selectedValue;
+    }
+  });
+}
+
+async function fetchCentVfnRowsForOffice(office) {
+  const table = supabaseClient.from('cent_percent_verification');
+  const { count, error: countError } = await table
+    .select('id', { count: 'exact', head: true })
+    .eq('office_name', office);
+  if (countError) throw countError;
+  if (!count) return [];
+
+  const rows = [];
+  const pageSize = 500;
+  const pageCount = Math.ceil(count / pageSize);
+
+  // A fixed page count and stable unique ordering prevent repeated-page loops.
+  for (let page = 0; page < pageCount; page++) {
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const from = page * pageSize;
+    const { data, error } = await supabaseClient
+      .from('cent_percent_verification')
+      .select('id, sl_no, scheme, status, created_at, imported_at, import_date, printed_date, dispatched_date, reply_rxd_date')
+      .eq('office_name', office)
+      .order('id', { ascending: true })
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data?.length) break;
+    rows.push(...data);
+    if (data.length < pageSize) break;
+  }
+  return rows;
+}
+
 async function loadCentVfnDatewiseReport() {
+  populateCentVfnOfficeFilters();
   const tbody = $('vfnDatewiseReportBody');
   if (!tbody) return;
 
   try {
-    const { data, error } = await supabaseClient.rpc('get_cent_vfn_datewise_report');
-    if (error) throw error;
+    const office = $('vfnDatewiseOfficeFilter')?.value || '';
+    let data;
+    if (office) {
+      const records = await fetchCentVfnRowsForOffice(office);
+      const events = new Map();
+      const addEvent = (date, field) => {
+        if (!date) return;
+        const key = String(date).slice(0, 10);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
+        if (!events.has(key)) events.set(key, { report_date: key, total_imported: 0, printed_count: 0, dispatched_count: 0, reply_count: 0 });
+        events.get(key)[field]++;
+      };
 
-    if (!data || !data.length) {
+      records.forEach(record => {
+        addEvent(record.created_at || record.imported_at || record.import_date, 'total_imported');
+        addEvent(record.printed_date, 'printed_count');
+        addEvent(record.dispatched_date, 'dispatched_count');
+        addEvent(record.reply_rxd_date, 'reply_count');
+      });
+
+      let pending = 0;
+      data = [...events.values()].sort((a, b) => a.report_date.localeCompare(b.report_date)).map(row => {
+        pending += row.total_imported - row.reply_count;
+        return { ...row, pending_count: Math.max(0, pending) };
+      });
+    } else {
+      const { data: reportData, error } = await supabaseClient.rpc('get_cent_vfn_datewise_report');
+      if (error) throw error;
+      data = reportData || [];
+    }
+
+    if (!data.length) {
       tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400">No date-wise events found.</td></tr>`;
       return;
     }
@@ -13409,6 +13508,61 @@ function toggleSb46ModeInputs() {
   $('sb46RangeContainer').classList.toggle('hidden', mode !== 'range');
   $('sb46SchemeContainer').classList.toggle('hidden', mode !== 'scheme');
   $('sb46IndividualContainer').classList.toggle('hidden', mode !== 'individual');
+  updateSb46EligibleCount();
+}
+
+let sb46CountRequestId = 0;
+
+async function updateSb46EligibleCount() {
+  const countEl = $('sb46EligibleCount');
+  if (!countEl) return;
+
+  const requestId = ++sb46CountRequestId;
+  const mode = $('sb46PrintMode')?.value || 'range';
+  const office = $('sb46OfficeFilter')?.value?.trim() || '';
+  const scheme = $('sb46SchemeSelect')?.value || 'ALL';
+  countEl.innerText = 'Matching eligible accounts: checking…';
+
+  try {
+    let query = supabaseClient
+      .from('cent_percent_verification')
+      .select('id', { count: 'exact', head: true });
+
+    if (office) query = query.eq('office_name', office);
+
+    if (mode === 'individual') {
+      const accountNo = ($('sb46TargetAccNo')?.value || '').trim().replace(/[^0-9]/g, '');
+      if (!accountNo) {
+        if (requestId === sb46CountRequestId) countEl.innerText = 'Enter an account number to check.';
+        return;
+      }
+      query = query.eq('account_no', accountNo);
+    } else {
+      query = query.in('status', ['imported', 'printed']);
+      if (mode === 'range') {
+        const fromSl = parseInt($('sb46FromSl')?.value, 10) || 1;
+        const toSl = parseInt($('sb46ToSl')?.value, 10) || 999999;
+        query = query.gte('sl_no', fromSl).lte('sl_no', toSl);
+      } else if (scheme && scheme !== 'ALL') {
+        query = query.eq('scheme', scheme);
+      }
+    }
+
+    const { count, error } = await query;
+    if (error) throw error;
+    if (requestId === sb46CountRequestId) {
+      countEl.innerText = `Matching eligible accounts: ${(count || 0).toLocaleString('en-IN')}`;
+    }
+  } catch (error) {
+    if (requestId === sb46CountRequestId) {
+      countEl.innerText = `Could not load account count: ${error.message}`;
+    }
+  }
+}
+
+async function onSb46OfficeChange() {
+  await populateSb46PrintSchemes();
+  updateSb46EligibleCount();
 }
 
 // -------------------------------------------------------------
@@ -13422,27 +13576,29 @@ async function executeSb46Print() {
   const mode = $('sb46PrintMode')?.value || 'range';
   let rawAccounts = [];
 
+  // Apply the office scope consistently across range, scheme, and individual printing.
+  const selectedOffice = $('sb46OfficeFilter')?.value?.trim() || '';
+
   // Step 1: Query selected records
   if (mode === 'range') {
     const fromSl = parseInt($('sb46FromSl')?.value, 10) || 1;
     const toSl = parseInt($('sb46ToSl')?.value, 10) || 999999;
-
-    const { data, error } = await supabaseClient
+    let query = supabaseClient
       .from('cent_percent_verification')
       .select('*')
       .gte('sl_no', fromSl)
-      .lte('sl_no', toSl)
-      .order('sl_no', { ascending: true });
+      .lte('sl_no', toSl);
+    if (selectedOffice) query = query.eq('office_name', selectedOffice);
+    const { data, error } = await query.order('sl_no', { ascending: true });
 
     if (error) return alert("Fetch error: " + error.message);
     rawAccounts = data || [];
   } else if (mode === 'scheme') {
-    const scheme = $('sb46SchemeSelect')?.value;
-    const { data, error } = await supabaseClient
-      .from('cent_percent_verification')
-      .select('*')
-      .eq('scheme', scheme)
-      .order('sl_no', { ascending: true });
+    const scheme = $('sb46SchemeSelect')?.value || 'ALL';
+    let query = supabaseClient.from('cent_percent_verification').select('*');
+    if (scheme && scheme !== 'ALL') query = query.eq('scheme', scheme);
+    if (selectedOffice) query = query.eq('office_name', selectedOffice);
+    const { data, error } = await query.order('sl_no', { ascending: true });
 
     if (error) return alert("Fetch error: " + error.message);
     rawAccounts = data || [];
@@ -13450,10 +13606,9 @@ async function executeSb46Print() {
     const acc = $('sb46TargetAccNo')?.value.trim().replace(/[^0-9]/g, '');
     if (!acc) return alert("Please enter a valid Account Number!");
 
-    const { data, error } = await supabaseClient
-      .from('cent_percent_verification')
-      .select('*')
-      .eq('account_no', acc);
+    let query = supabaseClient.from('cent_percent_verification').select('*').eq('account_no', acc);
+    if (selectedOffice) query = query.eq('office_name', selectedOffice);
+    const { data, error } = await query;
 
     if (error) return alert("Fetch error: " + error.message);
     rawAccounts = data || [];
@@ -14079,7 +14234,7 @@ function formatDate(dateString) {
 
 // Resolves: "Office: HO" OR "All Offices (Division Consolidation)"
 function getActiveVfnOfficeHeader() {
-  const selectedOffice = $('vfnFilterOffice')?.value?.trim();
+  const selectedOffice = $('vfnSchemeOfficeFilter')?.value?.trim() || $('vfnFilterOffice')?.value?.trim();
   if (selectedOffice) {
     return `Office: ${selectedOffice}`;
   }
@@ -14837,8 +14992,35 @@ async function loadCentVfnSchemeBreakdown() {
   if (!tbody) return;
 
   try {
-    const { data, error } = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
-    if (error) throw error;
+    const office = $('vfnSchemeOfficeFilter')?.value?.trim() || '';
+    let data;
+
+    if (office) {
+      // Aggregate the selected office's complete record set (not just the current page).
+      const records = await fetchCentVfnRowsForOffice(office);
+      const schemeStats = {};
+      records.forEach(record => {
+        const scheme = (record.scheme || 'UNASSIGNED').trim().toUpperCase();
+        if (!schemeStats[scheme]) {
+          schemeStats[scheme] = {
+            scheme, total_count: 0, printed_count: 0,
+            despatched_count: 0, reply_count: 0, pending_count: 0
+          };
+        }
+        const stats = schemeStats[scheme];
+        stats.total_count++;
+        const status = (record.status || 'imported').toLowerCase().trim();
+        if (status === 'printed') stats.printed_count++;
+        else if (status === 'dispatched') stats.despatched_count++;
+        else if (status === 'reply_received') stats.reply_count++;
+        else stats.pending_count++;
+      });
+      data = Object.values(schemeStats);
+    } else {
+      const { data: reportData, error } = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
+      if (error) throw error;
+      data = reportData || [];
+    }
 
     if (!data || data.length === 0) {
       window.cachedSchemeBreakdownData = [];
@@ -15224,82 +15406,75 @@ function resetCentVfnFilters() {
   // Fetch initial unfiltered page
   loadCentVfnData(1);
 }
-/**
- * Consolidated loader for SB-46 Print Schemes Dropdown.
- * Uses cached breakdown data or an aggregated query rather than pulling raw rows.
- */
+let sb46SchemeLoadRequestId = 0;
+
+/** Populate SB-46 scheme options with counts of printable accounts in the selected office. */
 async function populateSb46PrintSchemes() {
   const select = $('sb46SchemeSelect') || $('sb46PrintSchemeFilter') || $('sb46ModalSchemeSelect');
   const loader = $('sb46SchemeLoadingIndicator');
   if (!select) return;
 
+  const requestId = ++sb46SchemeLoadRequestId;
+  const selectedOffice = $('sb46OfficeFilter')?.value?.trim() || '';
+  const previousScheme = select.value;
   if (loader) loader.classList.remove('hidden');
 
   try {
-    let schemeData = [];
-
-    // 1. Fast path: Reuse already cached scheme breakdown data if available
-    if (window.cachedSchemeBreakdownData && window.cachedSchemeBreakdownData.length > 0) {
-      schemeData = window.cachedSchemeBreakdownData;
-    } else {
-      // 2. Fallback: Call the RPC aggregator directly (instant, does not pull full rows)
+    let schemeData = window.cachedSchemeBreakdownData || [];
+    if (!schemeData.length) {
       const { data, error } = await supabaseClient.rpc('get_cent_vfn_scheme_breakdown');
-      if (!error && Array.isArray(data)) {
-        schemeData = data;
-      }
+      if (error) throw error;
+      schemeData = data || [];
     }
 
-    // 3. Fallback: Direct table query if RPC is not available
-    if (!schemeData.length) {
-      const { data: rawRows, error: rawErr } = await supabaseClient
-        .from('cent_percent_verification')
-        .select('scheme');
+    const codes = [...new Set([
+      ...schemeData.map(item => String(item.scheme || '').trim().toUpperCase()),
+      ...(window.masterSchemesList || []).map(item => String(item.scheme_code || '').trim().toUpperCase())
+    ])].filter(Boolean).sort((a, b) => a.localeCompare(b));
 
-      if (rawErr) throw rawErr;
-
-      const counts = {};
-      (rawRows || []).forEach(r => {
-        const code = (r.scheme || 'UNASSIGNED').trim().toUpperCase();
-        counts[code] = (counts[code] || 0) + 1;
-      });
-
-      schemeData = Object.keys(counts).map(code => ({
-        scheme: code,
-        total_count: counts[code]
-      }));
-    }
-
-    if (!schemeData.length) {
-      select.innerHTML = `<option value="">-- No Imported Schemes Found --</option>`;
+    if (!codes.length) {
+      if (requestId === sb46SchemeLoadRequestId) select.innerHTML = '<option value="ALL">All Schemes (0 printable accounts)</option>';
       return;
     }
 
-    // Calculate total accounts across all imported schemes
-    const grandTotal = schemeData.reduce((acc, cur) => acc + (Number(cur.total_count) || 0), 0);
+    const countPrintable = async scheme => {
+      let query = supabaseClient
+        .from('cent_percent_verification')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['imported', 'printed']);
+      if (selectedOffice) query = query.eq('office_name', selectedOffice);
+      if (scheme) query = query.eq('scheme', scheme);
+      const { count, error } = await query;
+      if (error) throw error;
+      return count || 0;
+    };
 
-    let optionsHtml = `<option value="ALL">All Imported Schemes (${grandTotal.toLocaleString('en-IN')} Total A/Cs)</option>`;
+    const [allCount, ...schemeCounts] = await Promise.all([
+      countPrintable(''),
+      ...codes.map(code => countPrintable(code))
+    ]);
 
-    // Sort schemes alphabetically
-    schemeData.sort((a, b) => (a.scheme || '').localeCompare(b.scheme || ''));
+    if (requestId !== sb46SchemeLoadRequestId) return;
 
-    schemeData.forEach(item => {
-      const code = item.scheme;
-      const count = (Number(item.total_count) || 0).toLocaleString('en-IN');
-      
-      // Look up human-readable description from Master Schemes
-      const master = (window.masterSchemesList || []).find(m => m.scheme_code === code);
+    const countLabel = `${allCount.toLocaleString('en-IN')} printable`;
+    let optionsHtml = `<option value="ALL">All Schemes (${countLabel} accounts)</option>`;
+    codes.forEach((code, index) => {
+      const master = (window.masterSchemesList || []).find(item => item.scheme_code === code);
       const desc = master?.scheme_description ? ` - ${master.scheme_description}` : '';
-
-      optionsHtml += `<option value="${code}">${code}${desc} (${count} a/cs)</option>`;
+      optionsHtml += `<option value="${code}">${code}${desc} (${schemeCounts[index].toLocaleString('en-IN')} printable)</option>`;
     });
 
     select.innerHTML = optionsHtml;
-
+    if (previousScheme && Array.from(select.options).some(option => option.value === previousScheme)) {
+      select.value = previousScheme;
+    }
   } catch (err) {
-    console.error("Failed to populate SB-46 print schemes:", err);
-    select.innerHTML = `<option value="ALL">All Imported Schemes</option>`;
+    console.error('Failed to populate SB-46 print schemes:', err);
+    if (requestId === sb46SchemeLoadRequestId) {
+      select.innerHTML = '<option value="ALL">All Schemes (count unavailable)</option>';
+    }
   } finally {
-    if (loader) loader.classList.add('hidden');
+    if (requestId === sb46SchemeLoadRequestId && loader) loader.classList.add('hidden');
   }
 }
 
@@ -15314,6 +15489,9 @@ const populateSb46PrintModalSchemes = populateSb46PrintSchemes;
 async function openSb46GeneratorModal() {
   const modal = $('sb46GeneratorModal') || $('vfnPrintModal');
   if (modal) modal.classList.remove('hidden');
+
+  // Ensure the office selector reflects the current division office list.
+  populateCentVfnOfficeFilters();
 
   // Load imported schemes into the dropdown
   await populateSb46PrintSchemes();
