@@ -1096,7 +1096,10 @@
       <button type="button" onclick="openVfnBarcodeGenModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         🏷️ Allot Speedpost Barcodes
       </button>
-
+      <!-- TAB BUTTON -->
+      <button type="button" id="tabBtnLotImport" onclick="openLotImportModal()" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+        📥 Lot Import & Address Verification
+      </button>
       <!-- 4. Prepare Notices -->
       <button type="button" onclick="openSb46GeneratorModal()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition">
         ✉️ Prepare SB-46 Notices
@@ -1127,7 +1130,140 @@
       </button>
     </div>
   </div>
+<!-- TAB CONTENT: LOT IMPORT & ADDRESS VERIFICATION -->
+<div id="lotImportView" class="tab-content hidden space-y-4 bg-white p-4 rounded-xl shadow-md border border-amber-200">
+  
+  <!-- HEADER & FILE UPLOAD -->
+  <div class="bg-gradient-to-r from-postRed-50 to-amber-50 border-2 border-postGold-400 p-4 rounded-xl shadow-xs space-y-3">
+    <div class="flex items-center justify-between border-b border-postGold-300 pb-2">
+      <h3 class="font-extrabold text-xs text-postRed-800 uppercase tracking-wide">📥 Import Lot & Match Address with CentPercentVfn</h3>
+      <span class="text-[10px] font-bold text-postRed-700 bg-white border border-postGold-400 px-2 py-0.5 rounded-full">Automated Verification</span>
+    </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold text-slate-700 mb-1">Upload Lot File (.xlsx, .csv) *</label>
+        <div class="flex flex-wrap gap-2">
+          <input type="file" id="lotFileInput" accept=".xlsx,.xls,.csv,.txt" multiple onchange="updateLotFileSelection(event)" class="hidden">
+          <input type="file" id="lotFolderInput" accept=".xlsx,.xls,.csv,.txt" multiple webkitdirectory directory onchange="updateLotFileSelection(event)" class="hidden">
+          <button type="button" onclick="$('lotFileInput').click()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📄 Select Files</button>
+          <button type="button" onclick="$('lotFolderInput').click()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📁 Select Folder</button>
+        </div>
+        <p id="lotFileSelectionLabel" class="mt-1 text-[10px] text-slate-500">Select XLSX, XLS, CSV, or TXT files directly, or choose a folder containing them.</p>
+
+      </div>
+      <div>
+        <label for="lotSkipAccountPrefix" class="block text-xs font-bold text-slate-700 mb-1">Skip account prefix</label>
+        <input type="text" id="lotSkipAccountPrefix" value="60" maxlength="12" inputmode="numeric" placeholder="Leave blank for none" class="w-full border border-slate-300 p-1.5 rounded text-xs font-mono bg-white">
+      </div>
+      <div>
+        <button type="button" onclick="processLotImport()" class="w-full bg-postRed-600 hover:bg-postRed-700 text-white font-bold py-2 px-3 rounded text-xs transition shadow-md cursor-pointer">
+          ⚙️ Process & Parse Data
+        </button>
+      </div>
+      <div>
+        <button type="button" onclick="resetLotImport()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-3 rounded text-xs transition cursor-pointer">
+          🔄 Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY COUNTERS -->
+  <div id="lotSummaryContainer" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+    <div class="bg-amber-50 p-3 rounded-lg border border-amber-300">
+      <div class="text-xs text-slate-600 font-bold">Total Processed</div>
+      <div id="cntTotal" class="text-lg font-extrabold text-slate-800">0</div>
+    </div>
+    <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-300">
+      <div class="text-xs text-emerald-800 font-bold">Address Matched</div>
+      <div id="cntMatched" class="text-lg font-extrabold text-emerald-700">0</div>
+    </div>
+    <div class="bg-rose-50 p-3 rounded-lg border border-rose-300">
+      <div class="text-xs text-rose-800 font-bold">Address Unmatched</div>
+      <div id="cntUnmatched" class="text-lg font-extrabold text-rose-700">0</div>
+    </div>
+    <div class="bg-blue-50 p-3 rounded-lg border border-blue-300 flex flex-col justify-center gap-1 p-2">
+      <button onclick="exportLotToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded text-[11px] shadow-xs cursor-pointer">
+        📊 Export Excel (.xlsx)
+      </button>
+      <button onclick="exportLotToPDF()" class="bg-postRed-600 hover:bg-postRed-700 text-white font-bold px-2 py-1 rounded text-[11px] shadow-xs cursor-pointer">
+        📄 Export PDF
+      </button>
+      <button type="button" onclick="saveLotRecordsToDatabase()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-2 py-1 rounded text-[11px] shadow-xs cursor-pointer">
+        💾 Save Lot Data to Database
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULT TABLES (SUMMARY, MATCHED & UNMATCHED DATA) -->
+  <div id="lotResultsContainer" class="hidden space-y-4">
+
+    <div class="border border-blue-300 rounded-xl overflow-hidden shadow-xs">
+      <div class="bg-blue-100 text-blue-900 px-3 py-2 font-bold text-xs">📊 Date-wise / Scheme-wise / Category-wise Summary</div>
+      <div class="max-h-60 overflow-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-blue-50 border-b border-blue-200 sticky top-0 font-bold text-slate-800">
+            <tr>
+              <th class="p-2">Date</th><th class="p-2">Scheme</th><th class="p-2">Category</th>
+              <th class="p-2 text-center">Total</th><th class="p-2 text-center text-emerald-700">Matched</th><th class="p-2 text-center text-rose-700">Unmatched</th>
+            </tr>
+          </thead>
+          <tbody id="tblLotSummaryBody" class="divide-y divide-blue-100 bg-white"></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- MATCHED DATA SECTION -->
+    <div class="border border-emerald-300 rounded-xl overflow-hidden shadow-xs">
+      <div class="bg-emerald-100 text-emerald-900 px-3 py-2 font-bold text-xs flex justify-between items-center">
+        <span>✅ Address Matched Records</span>
+        <span id="badgeMatched" class="bg-emerald-700 text-white px-2 py-0.5 rounded-full text-[10px]">0 Records</span>
+      </div>
+      <div class="max-h-60 overflow-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-emerald-50 border-b border-emerald-200 sticky top-0 font-bold text-slate-800">
+            <tr>
+              <th class="p-2">Date</th>
+              <th class="p-2">Scheme</th>
+              <th class="p-2">Category</th>
+              <th class="p-2">Account/Ref No</th>
+              <th class="p-2">Credit Amount (₹)</th>
+              <th class="p-2">Debit Amount (₹)</th>
+              <th class="p-2">CentPercentVfn Address</th>
+            </tr>
+          </thead>
+          <tbody id="tblMatchedBody" class="divide-y divide-emerald-100 bg-white"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- UNMATCHED DATA SECTION -->
+    <div class="border border-rose-300 rounded-xl overflow-hidden shadow-xs">
+      <div class="bg-rose-100 text-rose-900 px-3 py-2 font-bold text-xs flex justify-between items-center">
+        <span>❌ Address Unmatched / Missing Records</span>
+        <span id="badgeUnmatched" class="bg-rose-700 text-white px-2 py-0.5 rounded-full text-[10px]">0 Records</span>
+      </div>
+      <div class="max-h-60 overflow-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-rose-50 border-b border-rose-200 sticky top-0 font-bold text-slate-800">
+            <tr>
+              <th class="p-2">Date</th>
+              <th class="p-2">Scheme</th>
+              <th class="p-2">Category</th>
+              <th class="p-2">Account/Ref No</th>
+              <th class="p-2">Credit Amount (₹)</th>
+              <th class="p-2">Debit Amount (₹)</th>
+              <th class="p-2">CentPercentVfn Address</th>
+            </tr>
+          </thead>
+          <tbody id="tblUnmatchedBody" class="divide-y divide-rose-100 bg-white"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
   <!-- CENT PERCENT VERIFICATION EXPORT & REPORTING MODAL -->
 <div id="centVfnExportModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh] animate-in fade-in zoom-in duration-150">
@@ -2014,6 +2150,20 @@
 </div>
 
 </div>
+<!-- LOT IMPORT & ADDRESS VERIFICATION MODAL -->
+<div id="lotImportModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 md:p-5" role="dialog" aria-modal="true" aria-labelledby="lotImportModalTitle" onclick="if(event.target===this) closeLotImportModal()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-7xl max-h-[94vh] overflow-hidden flex flex-col border-t-8 border-postRed-600">
+    <div class="flex justify-between items-center p-3 border-b border-amber-200 bg-amber-50 shrink-0">
+      <div>
+        <h3 id="lotImportModalTitle" class="font-bold text-sm text-postRed-700">📥 Lot Import &amp; Address Verification</h3>
+        <p class="text-[11px] text-slate-600">Reads account numbers from column B, matches CentPercentVfn addresses, and prepares matched/unmatched reports.</p>
+      </div>
+      <button type="button" onclick="closeLotImportModal()" aria-label="Close lot import dialog" class="text-xl font-bold text-slate-500 hover:text-slate-800 cursor-pointer px-2">&times;</button>
+    </div>
+    <div id="lotImportModalContent" class="p-3 overflow-y-auto flex-1"></div>
+  </div>
+</div>
+
 <!-- BOOKING EXPORT PREVIEW MODAL -->
 <div id="bookingExportPreviewModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[92vh] overflow-hidden flex flex-col border-t-8 border-blue-700">
@@ -3420,6 +3570,19 @@ function showTab(tabName) {
   if (tabName === 'adminDocuments' && !isAdmin) {
     alert("Access Restricted: Admin Documents requires admin privileges.");
     tabName = 'track';
+  }
+
+  // Lot Import is a nested view inside the Cent Percent Verification tab.
+  if (tabName === 'lotImportView') {
+    if (!canAccessCentVfn) {
+      alert("Access Restricted: Cent Percent Verification requires centvfn or admin privileges.");
+      showTab('claimsHub');
+      return;
+    }
+    showTab('centVfn');
+    $('lotImportView')?.classList.remove('hidden');
+    $('lotImportView')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
   }
 
   // Preserve compatibility with existing inline handlers.
@@ -5953,23 +6116,42 @@ async function applyBookingQuickPeriod() {
 }
 
 async function loadBookingDashboardData() {
-  let query = supabaseClient.from('booking_performance').select('*');
-
   const from = $('bookingFromDate')?.value;
   const to = $('bookingToDate')?.value;
   const office = $('bookingFilterOffice')?.value;
+  const applyFilters = query => {
+    if (from) query = query.gte('booking_date', from);
+    if (to) query = query.lte('booking_date', to);
+    if (office) query = query.eq('office_name', office);
+    return query;
+  };
 
-  if (from) query = query.gte('booking_date', from);
-  if (to) query = query.lte('booking_date', to);
-  if (office) query = query.eq('office_name', office);
+  try {
+    const { count, error: countError } = await applyFilters(
+      supabaseClient.from('booking_performance').select('id', { count: 'exact', head: true })
+    );
+    if (countError) throw countError;
 
-  const { data, error } = await query;
-  if (error) {
+    const records = [];
+    const pageSize = 1000;
+    for (let start = 0; start < (count || 0); start += pageSize) {
+      const { data, error } = await applyFilters(
+        supabaseClient.from('booking_performance').select('*')
+      )
+        .order('id', { ascending: true })
+        .range(start, start + pageSize - 1);
+
+      if (error) throw error;
+      records.push(...(data || []));
+      if (!data || data.length < pageSize) break;
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
+    bookingImportedRecords = records;
+  } catch (error) {
     console.error("Booking data fetch error:", error);
     return;
   }
-
-  bookingImportedRecords = data || [];
 
   if (!activeSelectedChannelKeys || activeSelectedChannelKeys.size === 0) {
     activeSelectedChannelKeys = new Set(DIGITAL_CHANNEL_CONFIG.map(c => c.key));
@@ -10671,6 +10853,7 @@ async function parseVfnTransactionStatement() {
 
   // Query in chunks so large pasted statements remain within request URL limits.
   const accountNos = [...new Set(parsed.map(r => r.account_no))];
+  const accountMatches = new Map();
   if (processingText) processingText.innerText = `Matching ${accountNos.length.toLocaleString('en-IN')} account numbers...`;
   for (let i = 0; i < accountNos.length; i += 100) {
     const chunk = accountNos.slice(i, i + 100);
@@ -10682,17 +10865,18 @@ async function parseVfnTransactionStatement() {
       if (processingAlert) processingAlert.classList.add('hidden');
       return alert('Account matching failed: ' + error.message);
     }
-          const map = new Map((data || []).map(a => [String(a.account_no), a]));
-    vfnTransactionReportRows.forEach(r => {
-      const match = map.get(r.account_no);
-      if (match) Object.assign(r, {
-        customer_name: match.customer_name || '',
-        address: match.address || '',
-        scheme: match.scheme || '',
-        match_status: 'Matched'
-      });
-    });
+    (data || []).forEach(account => accountMatches.set(String(account.account_no), account));
   }
+
+  vfnTransactionReportRows.forEach(row => {
+    const match = accountMatches.get(row.account_no);
+    if (match) Object.assign(row, {
+      customer_name: match.customer_name || '',
+      address: match.address || '',
+      scheme: match.scheme || '',
+      match_status: 'Matched'
+    });
+  });
   const schemeSelect = $('vfnTxnExportScheme');
   if (schemeSelect) {
     const schemes = [...new Set(vfnTransactionReportRows.map(r => r.scheme).filter(Boolean))].sort();
@@ -15407,7 +15591,464 @@ function resetCentVfnFilters() {
   loadCentVfnData(1);
 }
 let sb46SchemeLoadRequestId = 0;
+// Global stores for lot processing
+let parsedLotData = [];
+let matchedLotData = [];
+let unmatchedLotData = [];
 
+function normalizeLotHeader(value) {
+  return String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function getLotField(row, aliases) {
+  const normalized = new Map(Object.entries(row || {}).map(([key, value]) => [normalizeLotHeader(key), value]));
+  for (const alias of aliases) {
+    const value = normalized.get(normalizeLotHeader(alias));
+    if (value !== undefined && String(value).trim() !== '') return value;
+  }
+  return '';
+}
+
+function parseLotAmount(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  let text = String(value ?? '').trim();
+  if (!text || ['-', '--', 'NA', 'N/A'].includes(text.toUpperCase())) return 0;
+  const isNegative = /^\(.*\)$/.test(text);
+  text = text.replace(/[₹,\s]/g, '').replace(/^(?:rs\.?|inr)/i, '').replace(/[^\d.+-]/g, '');
+  const amount = Number(text);
+  if (!Number.isFinite(amount)) return 0;
+  return isNegative ? -Math.abs(amount) : amount;
+}
+
+function getLotAmount(row, direction, component) {
+  const isCredit = direction === 'credit';
+  const directionTokens = isCredit ? ['credit', 'cr'] : ['debit', 'dr'];
+  const componentTokens = component === 'cash'
+    ? ['cash']
+    : component === 'clearing'
+      ? ['clearing', 'clear', 'clg']
+      : ['transfer', 'txfr', 'trfr', 'trf'];
+
+  for (const [header, value] of Object.entries(row || {})) {
+    const key = normalizeLotHeader(header);
+    const hasDirection = directionTokens.some(token => key.includes(token));
+    const hasComponent = componentTokens.some(token => key.includes(token));
+    if (hasDirection && hasComponent) return parseLotAmount(value);
+  }
+
+  return 0;
+}
+
+function normalizeLotAccount(value) {
+  if (value === null || value === undefined) return '';
+  // Preserve numeric account identifiers read from Excel without a trailing .0.
+  return String(value).trim().replace(/\.0$/, '').replace(/[^0-9]/g, '');
+}
+
+function normalizeLotDate(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+  }
+  const parsed = typeof parseFinacleDate === 'function' ? parseFinacleDate(value) : null;
+  return parsed || String(value || '').trim();
+}
+
+function normalizeLotCategory(value, row = {}) {
+  const raw = String(value || '').trim().toLowerCase();
+  if (/withdraw|withdrawal|debit|\bwd\b|\bw\b/.test(raw)) return 'Withdrawal';
+  if (/deposit|credit|\bdep\b|\bd\b/.test(raw)) return 'Deposit';
+  const rowText = Object.values(row || {}).map(v => String(v || '').toLowerCase()).join(' ');
+  if (/withdraw|withdrawal|debit/.test(rowText)) return 'Withdrawal';
+  if (/deposit|credit/.test(rowText)) return 'Deposit';
+  return 'Unspecified';
+}
+
+function getLotSummaryRows() {
+  const groups = new Map();
+  parsedLotData.forEach(row => {
+    const key = `${row.date}|${row.scheme}|${row.category}`;
+    if (!groups.has(key)) groups.set(key, { date: row.date, scheme: row.scheme, category: row.category, total: 0, matched: 0, unmatched: 0 });
+    const group = groups.get(key);
+    group.total++;
+    group[row.matchStatus === 'MATCHED' ? 'matched' : 'unmatched']++;
+  });
+  return [...groups.values()].sort((a, b) => a.date.localeCompare(b.date) || a.scheme.localeCompare(b.scheme) || a.category.localeCompare(b.category));
+}
+
+/**
+ * Normalizes string for strict/fuzzy address comparison
+ */
+function cleanAddress(addr) {
+  if (!addr) return '';
+  return String(addr)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+    .trim();
+}
+
+/**
+ * Reads Excel/CSV file and parses lot data
+ */
+function openLotImportModal() {
+  const modal = $('lotImportModal');
+  const content = $('lotImportModalContent');
+  const panel = $('lotImportView');
+  if (!modal || !content || !panel) return;
+
+  // Move the existing import panel out of the hidden dashboard tab into a true modal.
+  if (panel.parentElement !== content) content.appendChild(panel);
+  panel.classList.remove('hidden', 'tab-content');
+  modal.classList.remove('hidden');
+  $('lotFileInput')?.focus();
+}
+
+function closeLotImportModal() {
+  $('lotImportModal')?.classList.add('hidden');
+}
+
+async function processLotImport() {
+  const fileInput = $('lotFileInput');
+  const file = fileInput?.files?.[0];
+  if (!file) return alert('Please select an Excel or CSV file to import.');
+
+  const reader = new FileReader();
+  reader.onerror = () => alert('Could not read the selected lot file.');
+  reader.onload = async event => {
+    try {
+      const workbook = XLSX.read(new Uint8Array(event.target.result), { type: 'array', cellDates: false });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false, blankrows: false });
+      if (!rows.length) return alert('The uploaded file contains no readable data.');
+
+      // Account number is specifically read from column B; other fields use header names when available.
+      const normalizeHeader = value => normalizeLotHeader(value);
+      let headerRowIndex = -1;
+      for (let i = 0; i < Math.min(rows.length, 40); i++) {
+        const colB = normalizeHeader(rows[i]?.[1]);
+        if (/account(number|no|num|id)?|acno|accountnumber/.test(colB)) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+
+      const header = headerRowIndex >= 0 ? rows[headerRowIndex] : [];
+      const previousHeader = headerRowIndex > 0 ? rows[headerRowIndex - 1] : [];
+      const nextHeader = headerRowIndex >= 0 ? (rows[headerRowIndex + 1] || []) : [];
+      const rowHasGroupLabels = row => (row || []).some(value => /^(credit|cr|debit|dr)$/i.test(String(value || '').trim()));
+      const rowHasAmountSubheaders = row => {
+        const labels = (row || []).map(normalizeHeader);
+        return labels.some(label => /cash/.test(label)) && labels.some(label => /clear|clg/.test(label)) && labels.some(label => /transfer|txfr|trfr|trf/.test(label));
+      };
+      const groupIsAbove = rowHasGroupLabels(previousHeader) && rowHasAmountSubheaders(header);
+      const groupIsCurrent = rowHasGroupLabels(header) && rowHasAmountSubheaders(nextHeader);
+      const hasGroupedHeaders = groupIsAbove || groupIsCurrent;
+      const groupRow = groupIsAbove ? previousHeader : (groupIsCurrent ? header : []);
+      const detailRow = groupIsCurrent ? nextHeader : header;
+      let activeAmountGroup = '';
+      const expandedGroupRow = (groupRow || []).map(value => {
+        const label = String(value || '').trim();
+        if (/^(credit|cr)$/i.test(label)) activeAmountGroup = 'Credit';
+        else if (/^(debit|dr)$/i.test(label)) activeAmountGroup = 'Debit';
+        else if (label) activeAmountGroup = '';
+        return activeAmountGroup;
+      });
+      const combinedHeaders = (detailRow || []).map((value, index) => {
+        const group = String(expandedGroupRow[index] || '').trim();
+        const detail = String(value || '').trim();
+        return group ? `${group} ${detail}` : detail;
+      });
+      const headerRows = hasGroupedHeaders ? combinedHeaders : header;
+      const findColumn = aliases => {
+        const keys = aliases.map(normalizeHeader);
+        return headerRows.findIndex(value => keys.includes(normalizeHeader(value)));
+      };
+      const dateCol = findColumn(['Date', 'Transaction Date', 'Txn Date', 'Txn Dt', 'Value Date', 'Tran Date', 'Posting Date']);
+      const schemeCol = findColumn(['Scheme', 'Scheme Name', 'Scheme Code', 'Product', 'Product Name', 'Account Type', 'Account Scheme']);
+      const categoryCol = findColumn(['Category', 'Transaction Type', 'Transaction Category', 'Type', 'Particulars', 'Txn Type', 'Dr Cr', 'Cr Dr']);
+
+      const records = [];
+      const startAt = headerRowIndex >= 0 ? headerRowIndex + (hasGroupedHeaders ? 2 : 1) : 0;
+      const skipPrefix = normalizeLotAccount($('lotSkipAccountPrefix')?.value || '');
+      const getAmount = (rowObject, direction, component) => getLotAmount(rowObject, direction, component);
+
+      rows.slice(startAt).forEach((row, rowOffset) => {
+        const accountNo = normalizeLotAccount(row?.[1]);
+        // Column B is the source of truth; ignore headings, totals, and invalid account rows.
+        if (!/^\d{5,}$/.test(accountNo) || (skipPrefix && accountNo.startsWith(skipPrefix))) return;
+
+        let dateValue = dateCol >= 0 ? row[dateCol] : '';
+        if (!dateValue) {
+          dateValue = row.find((value, index) => index !== 1 && /^\d{4}-\d{2}-\d{2}$/.test(normalizeLotDate(value)));
+        }
+        const date = normalizeLotDate(dateValue);
+        const rowObject = Object.fromEntries((headerRows || []).map((key, index) => [String(key || `Column ${index + 1}`), row[index]]));
+        const categoryValue = categoryCol >= 0 ? row[categoryCol] : '';
+        let scheme = schemeCol >= 0 ? String(row[schemeCol] || '').trim() : '';
+        if (!scheme) {
+          const schemeCell = row.find(value => /\b(?:SBGEN|TDIP[1-5]?|RD|MIS|SCSS|PPF|SSA|KVP|NSC)\b/i.test(String(value || '')));
+          scheme = schemeCell ? String(schemeCell).trim() : 'Unspecified';
+        }
+
+        const creditCash = getAmount(rowObject, 'credit', 'cash');
+        const creditClearing = getAmount(rowObject, 'credit', 'clearing');
+        const creditTransfer = getAmount(rowObject, 'credit', 'transfer');
+        const debitCash = getAmount(rowObject, 'debit', 'cash');
+        const debitClearing = getAmount(rowObject, 'debit', 'clearing');
+        const debitTransfer = getAmount(rowObject, 'debit', 'transfer');
+        const credit = creditCash + creditClearing + creditTransfer;
+        const debit = debitCash + debitClearing + debitTransfer;
+        // Transaction category is determined only by the parsed credit/debit amounts.
+        const category = credit > 0 ? 'CREDIT' : (debit > 0 ? 'DEBIT' : 'UNSPECIFIED');
+
+        records.push({
+          sourceRow: startAt + rowOffset + 1,
+          slNo: getLotField(rowObject, ['Sl No', 'Sl. No.', 'Serial No', 'S No']) || records.length + 1,
+          accountNo,
+          scheme: scheme || 'Unspecified',
+          txnId: getLotField(rowObject, ['Tran ID', 'Transaction ID', 'Txn ID', 'Transaction Id', 'Tran Id']),
+          date: date || 'Unspecified',
+          entryUserId: getLotField(rowObject, ['Entry User ID', 'Entry User Id', 'User ID', 'User Id', 'Entered By']),
+          remarks: getLotField(rowObject, ['Remarks', 'Remark', 'Particulars', 'Narration']),
+          creditCash, creditClearing, creditTransfer,
+          debitCash, debitClearing, debitTransfer,
+          credit, debit, category,
+          importedAddress: '',
+          vfnAddress: 'NOT FOUND IN DATABASE',
+          matchStatus: 'UNMATCHED'
+        });
+      });
+
+      parsedLotData = records;
+      if (!parsedLotData.length) {
+        return alert('No rows with an account number in column B were found. Confirm the lot file has account numbers in column B.');
+      }
+      await crossMatchWithCentPercentVfn();
+    } catch (error) {
+      console.error('Lot import error:', error);
+      alert('Failed to parse lot file: ' + error.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/**
+ * Fetches records from centpercentvfn table and compares addresses
+ */
+async function crossMatchWithCentPercentVfn() {
+  matchedLotData = [];
+  unmatchedLotData = [];
+
+  const accountNos = [...new Set(parsedLotData.map(item => item.accountNo).filter(Boolean))];
+  const vfnRecordsMap = new Map();
+  const chunkSize = 100;
+
+  try {
+    for (let start = 0; start < accountNos.length; start += chunkSize) {
+      const batch = accountNos.slice(start, start + chunkSize);
+      const { data, error } = await supabaseClient
+        .from('cent_percent_verification')
+        .select('account_no, address, scheme')
+        .in('account_no', batch);
+      if (error) throw error;
+      (data || []).forEach(record => {
+        const key = normalizeLotAccount(record.account_no);
+        const existing = vfnRecordsMap.get(key);
+        if (!existing || (!existing.address && record.address)) {
+          vfnRecordsMap.set(key, { address: record.address || '', scheme: record.scheme || '' });
+        }
+      });
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+  } catch (error) {
+    console.error('CentPercentVfn lookup failed:', error);
+    alert('Could not load addresses from centpercentvfn: ' + error.message);
+    return;
+  }
+
+  parsedLotData.forEach(item => {
+    const accountRecord = vfnRecordsMap.get(item.accountNo);
+    const dbAddress = accountRecord?.address || '';
+    // Lot files omit address, so a match requires a database account with an available address.
+    const isMatched = Boolean(accountRecord && dbAddress.trim());
+    const result = {
+      ...item,
+      scheme: item.scheme && item.scheme !== 'Unspecified' ? item.scheme : (accountRecord?.scheme || 'Unspecified'),
+      vfnAddress: dbAddress || 'NOT FOUND IN DATABASE',
+      matchStatus: isMatched ? 'MATCHED' : 'UNMATCHED'
+    };
+    (isMatched ? matchedLotData : unmatchedLotData).push(result);
+  });
+
+  renderLotResults();
+}
+
+/**
+ * Renders output tables and summary statistics
+ */
+function renderLotResults() {
+  $('cntTotal').innerText = parsedLotData.length;
+  $('cntMatched').innerText = matchedLotData.length;
+  $('cntUnmatched').innerText = unmatchedLotData.length;
+  $('badgeMatched').innerText = `${matchedLotData.length} Records`;
+  $('badgeUnmatched').innerText = `${unmatchedLotData.length} Records`;
+
+  const escapeHtml = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const summaryBody = $('tblLotSummaryBody');
+  if (summaryBody) {
+    summaryBody.innerHTML = getLotSummaryRows().map(row => `
+      <tr><td class="p-2 font-mono">${escapeHtml(row.date || '-')}</td><td class="p-2 font-semibold">${escapeHtml(row.scheme)}</td>
+      <td class="p-2">${escapeHtml(row.category)}</td><td class="p-2 text-center font-bold">${row.total}</td>
+      <td class="p-2 text-center font-bold text-emerald-700">${row.matched}</td><td class="p-2 text-center font-bold text-rose-700">${row.unmatched}</td></tr>
+    `).join('') || '<tr><td colspan="6" class="p-3 text-center text-slate-400">No summary data.</td></tr>';
+  }
+
+  const renderRows = rows => rows.map(row => `
+    <tr class="hover:bg-slate-50/70">
+      <td class="p-2 font-mono whitespace-nowrap">${escapeHtml(row.date || '-')}</td>
+      <td class="p-2 font-semibold">${escapeHtml(row.scheme)}</td>
+      <td class="p-2"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${row.category === 'CREDIT' ? 'bg-emerald-100 text-emerald-800' : row.category === 'DEBIT' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'}">${escapeHtml(row.category)}</span></td>
+      <td class="p-2 font-mono">${escapeHtml(row.accountNo)}</td>
+      <td class="p-2 font-medium">${escapeHtml(row.vfnAddress || 'NOT FOUND IN DATABASE')}</td>
+    </tr>`).join('');
+
+  $('tblMatchedBody').innerHTML = renderRows(matchedLotData) || '<tr><td colspan="5" class="p-3 text-center text-slate-400">No matched records found.</td></tr>';
+  $('tblUnmatchedBody').innerHTML = renderRows(unmatchedLotData) || '<tr><td colspan="5" class="p-3 text-center text-slate-400">No unmatched records found.</td></tr>';
+  $('lotSummaryContainer').classList.remove('hidden');
+  $('lotResultsContainer').classList.remove('hidden');
+}
+
+/**
+ * Resets the Lot Import view
+ */
+function resetLotImport() {
+  if ($('lotFileInput')) $('lotFileInput').value = '';
+  if ($('lotFolderInput')) $('lotFolderInput').value = '';
+  if ($('lotFileSelectionLabel')) $('lotFileSelectionLabel').textContent = 'Select XLSX, XLS, CSV, or TXT files directly, or choose a folder containing them.';
+  parsedLotData = [];
+  matchedLotData = [];
+  unmatchedLotData = [];
+  document.getElementById('lotSummaryContainer').classList.add('hidden');
+  document.getElementById('lotResultsContainer').classList.add('hidden');
+}
+
+/**
+ * Export results to Excel (.xlsx) with multiple sheets
+ */
+function buildLotExportRows(rows, consolidated = false) {
+  return rows.map(row => consolidated ? ({
+    'Sl. No.': row.slNo,
+    'Account No': row.accountNo,
+    Scheme: row.scheme,
+    'Tran ID': row.txnId || '',
+    'Value Date': row.date || '',
+    'Entry User ID': row.entryUserId || '',
+    Remarks: row.remarks || '',
+    Credit: row.credit || 0,
+    Debit: row.debit || 0,
+    Category: row.category,
+    Address: row.vfnAddress || 'NOT FOUND IN DATABASE',
+    'Address Match': row.matchStatus
+  }) : ({
+    'Sl. No.': row.slNo,
+    'Account No': row.accountNo,
+    Scheme: row.scheme,
+    'Tran ID': row.txnId || '',
+    'Value Date': row.date || '',
+    'Entry User ID': row.entryUserId || '',
+    Remarks: row.remarks || '',
+    'Credit Cash': row.creditCash || 0,
+    'Credit Clearing': row.creditClearing || 0,
+    'Credit Txfr': row.creditTransfer || 0,
+    'Debit Cash': row.debitCash || 0,
+    'Debit Clearing': row.debitClearing || 0,
+    'Debit Txfr': row.debitTransfer || 0,
+    Category: row.category,
+    Address: row.vfnAddress || 'NOT FOUND IN DATABASE',
+    'Address Match': row.matchStatus
+  }));
+}
+
+function exportLotToExcel() {
+  if (!parsedLotData.length) return alert('No parsed data available to export.');
+  const wb = XLSX.utils.book_new();
+  const summary = getLotSummaryRows().map(row => ({
+    'Value Date': row.date || '-', Scheme: row.scheme, Category: row.category,
+    Total: row.total, Matched: row.matched, Unmatched: row.unmatched
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), 'Date Scheme Category');
+
+  const addSheet = (name, records, consolidated) => {
+    const sheet = XLSX.utils.json_to_sheet(buildLotExportRows(records, consolidated));
+    sheet['!cols'] = consolidated
+      ? [{wch:10},{wch:18},{wch:14},{wch:18},{wch:14},{wch:16},{wch:35},{wch:16},{wch:16},{wch:20},{wch:48},{wch:14}]
+      : [{wch:10},{wch:18},{wch:14},{wch:18},{wch:14},{wch:16},{wch:35},{wch:14},{wch:18},{wch:14},{wch:14},{wch:18},{wch:14},{wch:20},{wch:48},{wch:14}];
+    XLSX.utils.book_append_sheet(wb, sheet, name);
+  };
+  addSheet('Matched Detailed', matchedLotData, false);
+  addSheet('Unmatched Detailed', unmatchedLotData, false);
+  addSheet('Matched Credit Debit', matchedLotData, true);
+  addSheet('Unmatched Credit Debit', unmatchedLotData, true);
+  XLSX.writeFile(wb, `Lot_Verification_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+/**
+ * Export results to PDF document using jsPDF & AutoTable
+ */
+function exportLotToPDF() {
+  if (!parsedLotData.length) return alert('No parsed data available to export.');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' });
+  const generated = new Date().toLocaleString('en-IN');
+  const summaryRows = getLotSummaryRows().map(row => [row.date || '-', row.scheme, row.category, row.total, row.matched, row.unmatched]);
+
+  doc.setFontSize(14);
+  doc.setTextColor(196, 18, 47);
+  doc.text('Lot Import & Address Verification Report', 14, 15);
+  doc.setFontSize(9);
+  doc.setTextColor(100);
+  doc.text(`Generated: ${generated} | Total: ${parsedLotData.length} | Address matched: ${matchedLotData.length} | Unmatched: ${unmatchedLotData.length}`, 14, 21);
+  doc.setFontSize(11);
+  doc.setTextColor(30, 41, 59);
+  doc.text('Date-wise / Scheme-wise / Category-wise Summary', 14, 29);
+  doc.autoTable({
+    startY: 32,
+    head: [['Value Date', 'Scheme', 'Category', 'Total', 'Matched', 'Unmatched']],
+    body: summaryRows,
+    theme: 'grid', styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255] }
+  });
+
+  const addReportTable = (title, records, consolidated, color) => {
+    doc.addPage();
+    doc.setFontSize(11);
+    doc.setTextColor(...color);
+    doc.text(`${title} — ${consolidated ? 'Consolidated Credit / Debit' : 'Transaction Details'}`, 14, 14);
+    if (!records.length) {
+      doc.setFontSize(9);
+      doc.text('No records in this section.', 14, 22);
+      return;
+    }
+    const rows = buildLotExportRows(records, consolidated);
+    const headers = Object.keys(rows[0]);
+    doc.autoTable({
+      startY: 19,
+      head: [headers],
+      body: rows.map(row => headers.map(header => row[header] ?? '')),
+      theme: 'grid',
+      styles: { fontSize: consolidated ? 6.5 : 5.8, cellPadding: 1.2, overflow: 'linebreak' },
+      headStyles: { fillColor: color, textColor: [255, 255, 255], fontSize: 6.5 },
+      margin: { left: 10, right: 10, bottom: 12 },
+      horizontalPageBreak: true,
+      horizontalPageBreakRepeat: [0, 1, 2]
+    });
+  };
+
+  addReportTable('Address Matched Records', matchedLotData, false, [16, 140, 90]);
+  addReportTable('Address Unmatched Records', unmatchedLotData, false, [190, 35, 55]);
+  addReportTable('Matched Records', matchedLotData, true, [16, 140, 90]);
+  addReportTable('Unmatched Records', unmatchedLotData, true, [190, 35, 55]);
+  doc.save(`Lot_Verification_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
 /** Populate SB-46 scheme options with counts of printable accounts in the selected office. */
 async function populateSb46PrintSchemes() {
   const select = $('sb46SchemeSelect') || $('sb46PrintSchemeFilter') || $('sb46ModalSchemeSelect');
@@ -16363,6 +17004,327 @@ async function loadGitHubLastUpdatedDate(username, repoName) {
         });
       }
     });
+
+// LOT IMPORT: direct file selection and folder selection share one import pipeline.
+function updateLotFileSelection(event) {
+  const selected = Array.from(event.target.files || []).filter(file => /\.(xlsx|xls|csv|txt)$/i.test(file.name));
+  const otherInput = event.target.id === 'lotFileInput' ? $('lotFolderInput') : $('lotFileInput');
+  if (otherInput) otherInput.value = '';
+  const label = $('lotFileSelectionLabel');
+  if (label) label.textContent = selected.length
+    ? `${selected.length} supported file${selected.length === 1 ? '' : 's'} selected.`
+    : 'Select XLSX, XLS, CSV, or TXT files directly, or choose a folder containing them.';
+}
+
+function lotHeaderKey(value) {
+  return String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function lotFindColumn(headers, aliases) {
+  const normalized = headers.map(lotHeaderKey);
+  for (const alias of aliases) {
+    const key = lotHeaderKey(alias);
+    const exact = normalized.findIndex(header => header === key);
+    if (exact >= 0) return exact;
+  }
+  for (const alias of aliases) {
+    const key = lotHeaderKey(alias);
+    const partial = normalized.findIndex(header => header && (header.includes(key) || key.includes(header)));
+    if (partial >= 0) return partial;
+  }
+  return -1;
+}
+
+function lotReadAmount(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  let text = String(value ?? '').trim();
+  if (!text || /^[-–—]$/.test(text)) return 0;
+  const negative = /^\(.*\)$/.test(text);
+  text = text.replace(/[₹,\s]/g, '').replace(/^(?:rs\.?|inr)/i, '').replace(/[^\d.+-]/g, '');
+  const amount = Number(text);
+  return Number.isFinite(amount) ? (negative ? -Math.abs(amount) : amount) : 0;
+}
+
+function lotFormatAmount(value) {
+  return (Number(value) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function parseLotWorksheet(rows, fileName, skipPrefix) {
+  const findHeaderIndex = (row, regex) => (row || []).findIndex(cell => regex.test(String(cell || '').trim()));
+  let headerIndex = -1;
+  for (let i = 0; i < Math.min(rows.length, 50); i++) {
+    if (findHeaderIndex(rows[i], /account\s*(number|no\.?|num|id)/i) >= 0) {
+      headerIndex = i;
+      break;
+    }
+  }
+
+  // This report layout uses fixed columns: Sl No, Account, Scheme, Tran ID,
+  // Value Date, Entry User ID, Remarks, then Credit/ Debit Cash-Clearing-Transfer.
+  const fixedHeaders = ['Sl No', 'Account Number', 'Scheme Code', 'Tran ID', 'Value Date', 'Entry User ID', 'Remarks',
+    'Credit Cash', 'Credit Clearing', 'Credit Transfer', 'Debit Cash', 'Debit Clearing', 'Debit Transfer'];
+  const headerRow = headerIndex >= 0 ? rows[headerIndex] : fixedHeaders;
+  const nextRow = headerIndex >= 0 ? (rows[headerIndex + 1] || []) : [];
+  const previousRow = headerIndex > 0 ? (rows[headerIndex - 1] || []) : [];
+  const detailLooksLikeAmounts = row => (row || []).some(cell => /cash|clearing|transfer|txfr/i.test(String(cell || '')));
+  let headers = headerRow.map(value => String(value ?? '').trim());
+
+  // Combine grouped header rows such as Credit / Debit over Cash, Clearing, Transfer.
+  if (headerIndex >= 0 && detailLooksLikeAmounts(nextRow)) {
+    let group = '';
+    const expanded = nextRow.map((cell, index) => {
+      const current = String(cell || '').trim();
+      const above = String(headerRow[index] || '').trim();
+      if (/^(credit|cred|cr)$/i.test(above)) group = 'Credit';
+      else if (/^(debit|deb|dr)$/i.test(above)) group = 'Debit';
+      else if (above) group = '';
+      return `${group} ${current}`.trim();
+    });
+    headers = expanded.map((value, index) => value || String(headerRow[index] || '').trim());
+  } else if (headerIndex >= 0 && detailLooksLikeAmounts(previousRow)) {
+    let group = '';
+    headers = headerRow.map((cell, index) => {
+      const above = String(previousRow[index] || '').trim();
+      if (/^(credit|cred|cr)$/i.test(above)) group = 'Credit';
+      else if (/^(debit|deb|dr)$/i.test(above)) group = 'Debit';
+      else if (above) group = '';
+      return `${group} ${String(cell || '').trim()}`.trim();
+    });
+  }
+
+  const columns = {
+    slNo: lotFindColumn(headers, ['S No', 'Sl No', 'Serial No']),
+    account: lotFindColumn(headerRow, ['Account Number', 'Account No', 'Account']),
+    scheme: lotFindColumn(headerRow, ['Scheme Code', 'Scheme', 'Scheme Name']),
+    txnId: lotFindColumn(headerRow, ['Tran ID', 'Transaction ID', 'Txn ID', 'Tran Id']),
+    date: lotFindColumn(headerRow, ['Value Date', 'Date', 'Transaction Date', 'Txn Date']),
+    userId: lotFindColumn(headerRow, ['Entry User ID', 'Entry User Id', 'User ID']),
+    remarks: lotFindColumn(headerRow, ['Remarks', 'Remark', 'Narration']),
+    creditCash: lotFindColumn(headers, ['Credit Cash', 'Cr Cash']),
+    creditClearing: lotFindColumn(headers, ['Credit Clearing', 'Credit Clg', 'Cr Clearing', 'Cr Clg']),
+    creditTransfer: lotFindColumn(headers, ['Credit Transfer', 'Credit Txfr', 'Credit Trf', 'Cr Transfer', 'Cr Txfr', 'Cr Trf']),
+    debitCash: lotFindColumn(headers, ['Debit Cash', 'Dr Cash']),
+    debitClearing: lotFindColumn(headers, ['Debit Clearing', 'Debit Clg', 'Dr Clearing', 'Dr Clg']),
+    debitTransfer: lotFindColumn(headers, ['Debit Transfer', 'Debit Txfr', 'Debit Trf', 'Dr Transfer', 'Dr Txfr', 'Dr Trf'])
+  };
+
+  // Respect the actual source layout even if the header row is merged or partially blank.
+  const defaults = { account: 1, scheme: 2, txnId: 3, date: 4, userId: 5, remarks: 6,
+    creditCash: 7, creditClearing: 8, creditTransfer: 9, debitCash: 10, debitClearing: 11, debitTransfer: 12 };
+  Object.keys(defaults).forEach(key => { if (columns[key] < 0) columns[key] = defaults[key]; });
+
+  const firstDataRow = headerIndex >= 0 ? headerIndex + (detailLooksLikeAmounts(nextRow) ? 2 : 1) : 0;
+  const output = [];
+  for (let i = firstDataRow; i < rows.length; i++) {
+    const row = rows[i] || [];
+    const accountNo = normalizeLotAccount(row[columns.account]);
+    if (!/^\d{5,}$/.test(accountNo) || (skipPrefix && accountNo.startsWith(skipPrefix))) continue;
+
+    const amount = key => lotReadAmount(row[columns[key]]);
+    const creditCash = amount('creditCash');
+    const creditClearing = amount('creditClearing');
+    const creditTransfer = amount('creditTransfer');
+    const debitCash = amount('debitCash');
+    const debitClearing = amount('debitClearing');
+    const debitTransfer = amount('debitTransfer');
+    const credit = creditCash + creditClearing + creditTransfer;
+    const debit = debitCash + debitClearing + debitTransfer;
+    output.push({
+      sourceFile: fileName,
+      slNo: columns.slNo >= 0 ? (row[columns.slNo] || output.length + 1) : output.length + 1,
+      accountNo,
+      scheme: String(row[columns.scheme] || '').trim() || 'Unspecified',
+      txnId: String(row[columns.txnId] || '').trim(),
+      date: normalizeLotDate(row[columns.date]) || 'Unspecified',
+      entryUserId: String(row[columns.userId] || '').trim(),
+      remarks: String(row[columns.remarks] || '').trim(),
+      creditCash, creditClearing, creditTransfer, debitCash, debitClearing, debitTransfer,
+      credit, debit,
+      category: credit > 0 ? 'CREDIT' : (debit > 0 ? 'DEBIT' : 'UNSPECIFIED'),
+      vfnAddress: 'NOT FOUND IN DATABASE',
+      matchStatus: 'UNMATCHED'
+    });
+  }
+  return output;
+}
+
+async function processLotImport() {
+  const directFiles = Array.from($('lotFileInput')?.files || []);
+  const folderFiles = Array.from($('lotFolderInput')?.files || []);
+  const files = [...directFiles, ...folderFiles].filter(file => /\.(xlsx|xls|csv|txt)$/i.test(file.name));
+  if (!files.length) return alert('Select XLSX, XLS, CSV, or TXT files directly, or choose a folder containing them.');
+  const skipPrefix = normalizeLotAccount($('lotSkipAccountPrefix')?.value || '');
+  const parsed = [];
+  const failures = [];
+
+  for (const file of files) {
+    try {
+      const buffer = await file.arrayBuffer();
+      const extension = file.name.split('.').pop().toLowerCase();
+      let workbook;
+      if (extension === 'txt') {
+        const text = new TextDecoder().decode(buffer).replace(/^\uFEFF/, '');
+        const firstLine = text.split(/\r?\n/).find(line => line.trim()) || '';
+        const delimiter = firstLine.includes('\t') ? '\t' : (firstLine.includes(',') ? ',' : (firstLine.includes(';') ? ';' : '\t'));
+        workbook = XLSX.read(text, { type: 'string', FS: delimiter, cellDates: true, raw: true });
+      } else if (extension === 'csv') {
+        workbook = XLSX.read(new TextDecoder().decode(buffer), { type: 'string', cellDates: true, raw: true });
+      } else {
+        workbook = XLSX.read(new Uint8Array(buffer), { type: 'array', cellDates: true, raw: true });
+      }
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      if (!firstSheet) continue;
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true, blankrows: false });
+      parsed.push(...parseLotWorksheet(rows, file.webkitRelativePath || file.name, skipPrefix));
+    } catch (error) {
+      failures.push(`${file.name}: ${error.message}`);
+    }
+  }
+  if (!parsed.length) return alert(`No account rows found in the selected files.${failures.length ? `\n${failures.join('\n')}` : ''}`);
+
+  parsedLotData = parsed;
+  currentLotImportId = crypto.randomUUID ? crypto.randomUUID() : `lot-${Date.now()}`;
+  await crossMatchWithCentPercentVfn();
+  if (failures.length) alert(`Imported ${parsed.length} rows. Some files could not be read:\n${failures.join('\n')}`);
+}
+
+async function crossMatchWithCentPercentVfn() {
+  matchedLotData = [];
+  unmatchedLotData = [];
+  const accountNos = [...new Set(parsedLotData.map(row => row.accountNo).filter(Boolean))];
+  const recordMap = new Map();
+  try {
+    for (let start = 0; start < accountNos.length; start += 100) {
+      const { data, error } = await supabaseClient.from('cent_percent_verification')
+        .select('account_no, address, scheme').in('account_no', accountNos.slice(start, start + 100));
+      if (error) throw error;
+      (data || []).forEach(record => {
+        const key = normalizeLotAccount(record.account_no);
+        if (!recordMap.has(key) || (!recordMap.get(key).address && record.address)) recordMap.set(key, record);
+      });
+    }
+  } catch (error) {
+    console.error('Cent Percent Verification lookup failed:', error);
+    return alert('Could not fetch address/scheme data from cent_percent_verification: ' + error.message);
+  }
+
+  parsedLotData = parsedLotData.map(row => {
+    const account = recordMap.get(row.accountNo);
+    const hasAddress = Boolean(account?.address?.trim());
+    const result = {
+      ...row,
+      scheme: row.scheme && row.scheme !== 'Unspecified' ? row.scheme : (account?.scheme || 'Unspecified'),
+      vfnAddress: account?.address || 'NOT FOUND IN DATABASE',
+      matchStatus: hasAddress ? 'MATCHED' : 'UNMATCHED'
+    };
+    (hasAddress ? matchedLotData : unmatchedLotData).push(result);
+    return result;
+  });
+  renderLotResults();
+}
+
+function renderLotResults() {
+  const escape = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  $('cntTotal').innerText = parsedLotData.length;
+  $('cntMatched').innerText = matchedLotData.length;
+  $('cntUnmatched').innerText = unmatchedLotData.length;
+  $('badgeMatched').innerText = `${matchedLotData.length} Records`;
+  $('badgeUnmatched').innerText = `${unmatchedLotData.length} Records`;
+  const summaryBody = $('tblLotSummaryBody');
+  if (summaryBody) summaryBody.innerHTML = getLotSummaryRows().map(row => `<tr>
+    <td class="p-2">${escape(row.date)}</td><td class="p-2">${escape(row.scheme)}</td><td class="p-2">${escape(row.category)}</td>
+    <td class="p-2 text-center">${row.total}</td><td class="p-2 text-center text-emerald-700">${row.matched}</td><td class="p-2 text-center text-rose-700">${row.unmatched}</td></tr>`).join('');
+
+  const renderRows = rows => rows.map(row => `<tr class="hover:bg-slate-50/70">
+    <td class="p-2 whitespace-nowrap">${escape(row.date)}</td><td class="p-2">${escape(row.scheme)}</td>
+    <td class="p-2">${escape(row.category)}</td><td class="p-2 font-mono">${escape(row.accountNo)}</td>
+    <td class="p-2 text-right">${lotFormatAmount(row.credit)}</td><td class="p-2 text-right">${lotFormatAmount(row.debit)}</td>
+    <td class="p-2">${escape(row.vfnAddress)}</td></tr>`).join('');
+  $('tblMatchedBody').innerHTML = renderRows(matchedLotData) || '<tr><td colspan="7" class="p-3 text-center">No matched records.</td></tr>';
+  $('tblUnmatchedBody').innerHTML = renderRows(unmatchedLotData) || '<tr><td colspan="7" class="p-3 text-center">No unmatched records.</td></tr>';
+  $('lotSummaryContainer').classList.remove('hidden');
+  $('lotResultsContainer').classList.remove('hidden');
+}
+
+function buildLotExportRows(rows, consolidated = false) {
+  return rows.map(row => consolidated ? {
+    'Sl. No.': row.slNo, 'Account No': row.accountNo, Scheme: row.scheme, 'Tran ID': row.txnId,
+    'Value Date': row.date, 'Entry User ID': row.entryUserId, Remarks: row.remarks,
+    Credit: row.credit, Debit: row.debit, Category: row.category, Address: row.vfnAddress,
+    'Address Match': row.matchStatus, 'Source File': row.sourceFile
+  } : {
+    'Sl. No.': row.slNo, 'Account No': row.accountNo, Scheme: row.scheme, 'Tran ID': row.txnId,
+    'Value Date': row.date, 'Entry User ID': row.entryUserId, Remarks: row.remarks,
+    'Credit Cash': row.creditCash, 'Credit Clearing': row.creditClearing, 'Credit Transfer': row.creditTransfer,
+    'Credit Total': row.credit, 'Debit Cash': row.debitCash, 'Debit Clearing': row.debitClearing,
+    'Debit Transfer': row.debitTransfer, 'Debit Total': row.debit, Category: row.category,
+    Address: row.vfnAddress, 'Address Match': row.matchStatus, 'Source File': row.sourceFile
+  });
+}
+
+function exportLotToExcel() {
+  if (!parsedLotData.length) return alert('No parsed data available to export.');
+  const workbook = XLSX.utils.book_new();
+  const summaryRows = getLotSummaryRows().map(row => ({ 'Value Date': row.date, Scheme: row.scheme, Category: row.category, Total: row.total, Matched: row.matched, Unmatched: row.unmatched }));
+  XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(summaryRows), 'Summary');
+  [['Matched Detailed', matchedLotData, false], ['Unmatched Detailed', unmatchedLotData, false], ['Matched Consolidated', matchedLotData, true], ['Unmatched Consolidated', unmatchedLotData, true]].forEach(([name, rows, consolidated]) => {
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(buildLotExportRows(rows, consolidated)), name);
+  });
+  XLSX.writeFile(workbook, `Lot_Verification_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function exportLotToPDF() {
+  if (!parsedLotData.length) return alert('No parsed data available to export.');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' });
+  const addTable = (title, rows, consolidated) => {
+    doc.addPage();
+    doc.setFontSize(12); doc.text(title, 12, 14);
+    const data = buildLotExportRows(rows, consolidated);
+    if (!data.length) { doc.setFontSize(9); doc.text('No records.', 12, 22); return; }
+    const headers = Object.keys(data[0]);
+    doc.autoTable({ startY: 19, head: [headers], body: data.map(row => headers.map(key => row[key] ?? '')),
+      styles: { fontSize: 6, cellPadding: 1, overflow: 'linebreak' }, headStyles: { fillColor: [168,15,40] },
+      horizontalPageBreak: true, horizontalPageBreakRepeat: [0,1,2] });
+  };
+  doc.setFontSize(14); doc.text('Lot Import & Address Verification Summary', 12, 16);
+  doc.autoTable({ startY: 22, head: [['Value Date','Scheme','Category','Total','Matched','Unmatched']],
+    body: getLotSummaryRows().map(row => [row.date,row.scheme,row.category,row.total,row.matched,row.unmatched]),
+    styles: { fontSize: 8 }, headStyles: { fillColor: [30,64,175] } });
+  addTable('Matched Detailed Records', matchedLotData, false);
+  addTable('Unmatched Detailed Records', unmatchedLotData, false);
+  addTable('Matched Consolidated Credit/Debit', matchedLotData, true);
+  addTable('Unmatched Consolidated Credit/Debit', unmatchedLotData, true);
+  doc.save(`Lot_Verification_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+let currentLotImportId = null;
+async function saveLotRecordsToDatabase() {
+  if (!parsedLotData.length) return alert('Import lot records before saving.');
+  const tableName = 'cent_vfn_lot_transactions';
+  const importId = currentLotImportId || (crypto.randomUUID ? crypto.randomUUID() : `lot-${Date.now()}`);
+  const payload = parsedLotData.map(row => ({
+    import_id: importId, source_file: row.sourceFile, sl_no: String(row.slNo), account_no: row.accountNo,
+    scheme: row.scheme, tran_id: row.txnId || null, value_date: /^\d{4}-\d{2}-\d{2}$/.test(row.date) ? row.date : null,
+    entry_user_id: row.entryUserId || null, remarks: row.remarks || null,
+    credit_cash: row.creditCash, credit_clearing: row.creditClearing, credit_transfer: row.creditTransfer,
+    debit_cash: row.debitCash, debit_clearing: row.debitClearing, debit_transfer: row.debitTransfer,
+    credit_total: row.credit, debit_total: row.debit, category: row.category,
+    address: row.vfnAddress === 'NOT FOUND IN DATABASE' ? null : row.vfnAddress,
+    address_match: row.matchStatus === 'MATCHED', imported_by: currentUser?.id || null
+  }));
+  try {
+    for (let start = 0; start < payload.length; start += 300) {
+      const { error } = await supabaseClient.from(tableName).upsert(payload.slice(start, start + 300), { onConflict: 'import_id,source_file,sl_no' });
+      if (error) throw error;
+    }
+    alert(`Saved ${payload.length} lot transaction rows to ${tableName}.`);
+  } catch (error) {
+    console.error('Lot database save failed:', error);
+    alert(`Could not save lot rows. Ensure the ${tableName} table and access policy are configured.\n${error.message}`);
+  }
+}
+
   </script>
 </body>
 </html>
