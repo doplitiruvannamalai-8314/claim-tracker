@@ -1238,6 +1238,7 @@
               <th class="p-2">Scheme</th>
               <th class="p-2">Category</th>
               <th class="p-2">Account/Ref No</th>
+              <th class="p-2">Customer Name</th>
               <th class="p-2">Credit Amount (₹)</th>
               <th class="p-2">Debit Amount (₹)</th>
               <th class="p-2">CentPercentVfn Address</th>
@@ -1265,6 +1266,7 @@
               <th class="p-2">Scheme</th>
               <th class="p-2">Category</th>
               <th class="p-2">Account/Ref No</th>
+              <th class="p-2">Customer Name</th>
               <th class="p-2">Credit Amount (₹)</th>
               <th class="p-2">Debit Amount (₹)</th>
               <th class="p-2">CentPercentVfn Address</th>
@@ -17213,7 +17215,7 @@ async function crossMatchWithCentPercentVfn() {
   try {
     for (let start = 0; start < accountNos.length; start += 100) {
       const { data, error } = await supabaseClient.from('cent_percent_verification')
-        .select('account_no, address, scheme').in('account_no', accountNos.slice(start, start + 100));
+        .select('account_no, customer_name, address, scheme').in('account_no', accountNos.slice(start, start + 100));
       if (error) throw error;
       (data || []).forEach(record => {
         const key = normalizeLotAccount(record.account_no);
@@ -17230,6 +17232,7 @@ async function crossMatchWithCentPercentVfn() {
     const hasAddress = Boolean(account?.address?.trim());
     const result = {
       ...row,
+      customerName: account?.customer_name || '',
       scheme: row.scheme && row.scheme !== 'Unspecified' ? row.scheme : (account?.scheme || 'Unspecified'),
       vfnAddress: account?.address || 'NOT FOUND IN DATABASE',
       matchStatus: hasAddress ? 'MATCHED' : 'UNMATCHED'
@@ -17263,22 +17266,23 @@ function renderLotResults() {
   const renderRows = rows => rows.map(row => `<tr class="hover:bg-slate-50/70">
     <td class="p-2 whitespace-nowrap">${escape(row.date)}</td><td class="p-2">${escape(row.scheme)}</td>
     <td class="p-2">${escape(row.category)}</td><td class="p-2 font-mono">${escape(row.accountNo)}</td>
+    <td class="p-2">${escape(row.customerName || '-')}</td>
     <td class="p-2 text-right">${lotFormatAmount(row.credit)}</td><td class="p-2 text-right">${lotFormatAmount(row.debit)}</td>
     <td class="p-2">${escape(row.vfnAddress)}</td></tr>`).join('');
-  $('tblMatchedBody').innerHTML = renderRows(visibleMatched) || '<tr><td colspan="7" class="p-3 text-center">No matched records.</td></tr>';
-  $('tblUnmatchedBody').innerHTML = renderRows(visibleUnmatched) || '<tr><td colspan="7" class="p-3 text-center">No unmatched records.</td></tr>';
+  $('tblMatchedBody').innerHTML = renderRows(visibleMatched) || '<tr><td colspan="8" class="p-3 text-center">No matched records.</td></tr>';
+  $('tblUnmatchedBody').innerHTML = renderRows(visibleUnmatched) || '<tr><td colspan="8" class="p-3 text-center">No unmatched records.</td></tr>';
   $('lotSummaryContainer').classList.remove('hidden');
   $('lotResultsContainer').classList.remove('hidden');
 }
 
 function buildLotExportRows(rows, consolidated = false) {
   return rows.map(row => consolidated ? {
-    'Sl. No.': row.slNo, 'Account No': row.accountNo, Scheme: row.scheme, 'Tran ID': row.txnId,
+    'Sl. No.': row.slNo, 'Account No': row.accountNo, 'Customer Name': row.customerName || '', Scheme: row.scheme, 'Tran ID': row.txnId,
     'Value Date': row.date, 'Entry User ID': row.entryUserId, Remarks: row.remarks,
     Credit: row.credit, Debit: row.debit, Category: row.category, Address: row.vfnAddress,
     'Address Match': row.matchStatus, 'Source File': row.sourceFile
   } : {
-    'Sl. No.': row.slNo, 'Account No': row.accountNo, Scheme: row.scheme, 'Tran ID': row.txnId,
+    'Sl. No.': row.slNo, 'Account No': row.accountNo, 'Customer Name': row.customerName || '', Scheme: row.scheme, 'Tran ID': row.txnId,
     'Value Date': row.date, 'Entry User ID': row.entryUserId, Remarks: row.remarks,
     'Credit Cash': row.creditCash, 'Credit Clearing': row.creditClearing, 'Credit Transfer': row.creditTransfer,
     'Credit Total': row.credit, 'Debit Cash': row.debitCash, 'Debit Clearing': row.debitClearing,
@@ -17366,6 +17370,7 @@ function exportLotSubset(type) {
 
   const worksheet = XLSX.utils.json_to_sheet(rows.map(row => ({
     'Account No': row.accountNo,
+    'Customer Name': row.customerName || '',
     Scheme: row.scheme,
     'Transaction ID': row.txnId || '',
     'Value Date': row.date,
@@ -17392,13 +17397,14 @@ function printUniqueLotAccounts() {
   rows.forEach(row => {
     const address = row.vfnAddress || 'NOT FOUND IN DATABASE';
     const key = `${row.accountNo}|${address}`;
-    if (!accounts.has(key)) accounts.set(key, { accountNo: row.accountNo, address, scheme: row.scheme, transactions: [] });
+    if (!accounts.has(key)) accounts.set(key, { accountNo: row.accountNo, customerName: row.customerName || '', address, scheme: row.scheme, transactions: [] });
     accounts.get(key).transactions.push(row);
   });
 
   const accountCards = [...accounts.values()].map(account => `
     <section class="account">
       <h2>Account No: ${escape(account.accountNo)} <span>${escape(account.scheme || '')}</span></h2>
+      <p><strong>Customer Name:</strong> ${escape(account.customerName || '-')}</p>
       <p><strong>Address:</strong> ${escape(account.address)}</p>
       <table><thead><tr><th>Date</th><th>Tran ID</th><th>Category</th><th>Credit (₹)</th><th>Debit (₹)</th><th>Remarks / Particulars</th></tr></thead>
         <tbody>${account.transactions.map(txn => `<tr>
