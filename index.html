@@ -1198,6 +1198,13 @@
 
   <!-- RESULT TABLES (SUMMARY, MATCHED & UNMATCHED DATA) -->
   <div id="lotResultsContainer" class="hidden space-y-4">
+    <div class="flex flex-wrap items-end justify-between gap-2 bg-slate-50 border border-slate-200 rounded-xl p-3">
+      <div class="flex-1 min-w-[220px] max-w-md">
+        <label for="lotResultsSearch" class="block text-xs font-bold text-slate-700 mb-1">Search Account No / Transaction ID</label>
+        <input type="search" id="lotResultsSearch" oninput="renderLotResults()" placeholder="Enter account number or Tran ID..." class="w-full border border-slate-300 p-2 rounded text-xs bg-white outline-none focus:ring-2 focus:ring-postRed-600">
+      </div>
+      <button type="button" onclick="printUniqueLotAccounts()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded font-bold text-xs cursor-pointer">🖨️ Print Unique Accounts &amp; Transactions</button>
+    </div>
 
     <div class="border border-blue-300 rounded-xl overflow-hidden shadow-xs">
       <div class="bg-blue-100 text-blue-900 px-3 py-2 font-bold text-xs">📊 Date-wise / Scheme-wise / Category-wise Summary</div>
@@ -1216,9 +1223,12 @@
     
     <!-- MATCHED DATA SECTION -->
     <div class="border border-emerald-300 rounded-xl overflow-hidden shadow-xs">
-      <div class="bg-emerald-100 text-emerald-900 px-3 py-2 font-bold text-xs flex justify-between items-center">
+      <div class="bg-emerald-100 text-emerald-900 px-3 py-2 font-bold text-xs flex justify-between items-center flex-wrap gap-2">
         <span>✅ Address Matched Records</span>
-        <span id="badgeMatched" class="bg-emerald-700 text-white px-2 py-0.5 rounded-full text-[10px]">0 Records</span>
+        <div class="flex items-center gap-2">
+          <span id="badgeMatched" class="bg-emerald-700 text-white px-2 py-0.5 rounded-full text-[10px]">0 Records</span>
+          <button type="button" onclick="exportLotSubset('matched')" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">Export Matched</button>
+        </div>
       </div>
       <div class="max-h-60 overflow-auto">
         <table class="w-full text-left text-xs border-collapse">
@@ -1240,9 +1250,12 @@
 
     <!-- UNMATCHED DATA SECTION -->
     <div class="border border-rose-300 rounded-xl overflow-hidden shadow-xs">
-      <div class="bg-rose-100 text-rose-900 px-3 py-2 font-bold text-xs flex justify-between items-center">
+      <div class="bg-rose-100 text-rose-900 px-3 py-2 font-bold text-xs flex justify-between items-center flex-wrap gap-2">
         <span>❌ Address Unmatched / Missing Records</span>
-        <span id="badgeUnmatched" class="bg-rose-700 text-white px-2 py-0.5 rounded-full text-[10px]">0 Records</span>
+        <div class="flex items-center gap-2">
+          <span id="badgeUnmatched" class="bg-rose-700 text-white px-2 py-0.5 rounded-full text-[10px]">0 Records</span>
+          <button type="button" onclick="exportLotSubset('unmatched')" class="bg-rose-700 hover:bg-rose-800 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">Export Unmatched</button>
+        </div>
       </div>
       <div class="max-h-60 overflow-auto">
         <table class="w-full text-left text-xs border-collapse">
@@ -15641,8 +15654,11 @@ function getLotAmount(row, direction, component) {
 
 function normalizeLotAccount(value) {
   if (value === null || value === undefined) return '';
-  // Preserve numeric account identifiers read from Excel without a trailing .0.
-  return String(value).trim().replace(/\.0$/, '').replace(/[^0-9]/g, '');
+  // Restore leading zeroes lost in spreadsheets and normalize supported formats.
+  let accountNo = String(value).trim().replace(/\.0$/, '').replace(/[^0-9]/g, '');
+  if (accountNo.length > 0 && accountNo.length < 10) accountNo = accountNo.padStart(10, '0');
+  else if (accountNo.length === 11) accountNo = accountNo.padStart(12, '0');
+  return accountNo;
 }
 
 function normalizeLotDate(value) {
@@ -15663,9 +15679,9 @@ function normalizeLotCategory(value, row = {}) {
   return 'Unspecified';
 }
 
-function getLotSummaryRows() {
+function getLotSummaryRows(rows = parsedLotData) {
   const groups = new Map();
-  parsedLotData.forEach(row => {
+  rows.forEach(row => {
     const key = `${row.date}|${row.scheme}|${row.category}`;
     if (!groups.has(key)) groups.set(key, { date: row.date, scheme: row.scheme, category: row.category, total: 0, matched: 0, unmatched: 0 });
     const group = groups.get(key);
@@ -17117,8 +17133,9 @@ function parseLotWorksheet(rows, fileName, skipPrefix) {
   const output = [];
   for (let i = firstDataRow; i < rows.length; i++) {
     const row = rows[i] || [];
-    const accountNo = normalizeLotAccount(row[columns.account]);
-    if (!/^\d{5,}$/.test(accountNo) || (skipPrefix && accountNo.startsWith(skipPrefix))) continue;
+    const rawAccountNo = String(row[columns.account] ?? '').trim().replace(/\.0$/, '').replace(/\D/g, '');
+    if (!/^\d{5,}$/.test(rawAccountNo) || (skipPrefix && rawAccountNo.startsWith(skipPrefix))) continue;
+    const accountNo = normalizeLotAccount(rawAccountNo);
 
     const amount = key => lotReadAmount(row[columns[key]]);
     const creditCash = amount('creditCash');
@@ -17153,7 +17170,7 @@ async function processLotImport() {
   const folderFiles = Array.from($('lotFolderInput')?.files || []);
   const files = [...directFiles, ...folderFiles].filter(file => /\.(xlsx|xls|csv|txt)$/i.test(file.name));
   if (!files.length) return alert('Select XLSX, XLS, CSV, or TXT files directly, or choose a folder containing them.');
-  const skipPrefix = normalizeLotAccount($('lotSkipAccountPrefix')?.value || '');
+  const skipPrefix = String($('lotSkipAccountPrefix')?.value || '').replace(/\D/g, '');
   const parsed = [];
   const failures = [];
 
@@ -17225,13 +17242,21 @@ async function crossMatchWithCentPercentVfn() {
 
 function renderLotResults() {
   const escape = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  $('cntTotal').innerText = parsedLotData.length;
-  $('cntMatched').innerText = matchedLotData.length;
-  $('cntUnmatched').innerText = unmatchedLotData.length;
-  $('badgeMatched').innerText = `${matchedLotData.length} Records`;
-  $('badgeUnmatched').innerText = `${unmatchedLotData.length} Records`;
+  const query = ($('lotResultsSearch')?.value || '').trim().toLowerCase();
+  const visibleRows = parsedLotData.filter(row => !query ||
+    String(row.accountNo || '').toLowerCase().includes(query) ||
+    String(row.txnId || '').toLowerCase().includes(query)
+  );
+  const visibleMatched = visibleRows.filter(row => row.matchStatus === 'MATCHED');
+  const visibleUnmatched = visibleRows.filter(row => row.matchStatus !== 'MATCHED');
+
+  $('cntTotal').innerText = visibleRows.length;
+  $('cntMatched').innerText = visibleMatched.length;
+  $('cntUnmatched').innerText = visibleUnmatched.length;
+  $('badgeMatched').innerText = `${visibleMatched.length} Records`;
+  $('badgeUnmatched').innerText = `${visibleUnmatched.length} Records`;
   const summaryBody = $('tblLotSummaryBody');
-  if (summaryBody) summaryBody.innerHTML = getLotSummaryRows().map(row => `<tr>
+  if (summaryBody) summaryBody.innerHTML = getLotSummaryRows(visibleRows).map(row => `<tr>
     <td class="p-2">${escape(row.date)}</td><td class="p-2">${escape(row.scheme)}</td><td class="p-2">${escape(row.category)}</td>
     <td class="p-2 text-center">${row.total}</td><td class="p-2 text-center text-emerald-700">${row.matched}</td><td class="p-2 text-center text-rose-700">${row.unmatched}</td></tr>`).join('');
 
@@ -17240,8 +17265,8 @@ function renderLotResults() {
     <td class="p-2">${escape(row.category)}</td><td class="p-2 font-mono">${escape(row.accountNo)}</td>
     <td class="p-2 text-right">${lotFormatAmount(row.credit)}</td><td class="p-2 text-right">${lotFormatAmount(row.debit)}</td>
     <td class="p-2">${escape(row.vfnAddress)}</td></tr>`).join('');
-  $('tblMatchedBody').innerHTML = renderRows(matchedLotData) || '<tr><td colspan="7" class="p-3 text-center">No matched records.</td></tr>';
-  $('tblUnmatchedBody').innerHTML = renderRows(unmatchedLotData) || '<tr><td colspan="7" class="p-3 text-center">No unmatched records.</td></tr>';
+  $('tblMatchedBody').innerHTML = renderRows(visibleMatched) || '<tr><td colspan="7" class="p-3 text-center">No matched records.</td></tr>';
+  $('tblUnmatchedBody').innerHTML = renderRows(visibleUnmatched) || '<tr><td colspan="7" class="p-3 text-center">No unmatched records.</td></tr>';
   $('lotSummaryContainer').classList.remove('hidden');
   $('lotResultsContainer').classList.remove('hidden');
 }
@@ -17323,6 +17348,82 @@ async function saveLotRecordsToDatabase() {
     console.error('Lot database save failed:', error);
     alert(`Could not save lot rows. Ensure the ${tableName} table and access policy are configured.\n${error.message}`);
   }
+}
+
+function getLotSearchFilteredRows() {
+  const query = ($('lotResultsSearch')?.value || '').trim().toLowerCase();
+  return parsedLotData.filter(row => !query ||
+    String(row.accountNo || '').toLowerCase().includes(query) ||
+    String(row.txnId || '').toLowerCase().includes(query)
+  );
+}
+
+function exportLotSubset(type) {
+  const rows = getLotSearchFilteredRows().filter(row =>
+    type === 'matched' ? row.matchStatus === 'MATCHED' : row.matchStatus !== 'MATCHED'
+  );
+  if (!rows.length) return alert(`No ${type} records to export for the current search.`);
+
+  const worksheet = XLSX.utils.json_to_sheet(rows.map(row => ({
+    'Account No': row.accountNo,
+    Scheme: row.scheme,
+    'Transaction ID': row.txnId || '',
+    'Value Date': row.date,
+    Category: row.category,
+    Credit: row.credit,
+    Debit: row.debit,
+    'Entry User ID': row.entryUserId || '',
+    Remarks: row.remarks || '',
+    Address: row.vfnAddress || 'NOT FOUND IN DATABASE',
+    'Address Match': row.matchStatus,
+    'Source File': row.sourceFile || ''
+  })));
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, type === 'matched' ? 'Matched Records' : 'Unmatched Records');
+  XLSX.writeFile(workbook, `Lot_${type === 'matched' ? 'Address_Matched' : 'Address_Unmatched'}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+function printUniqueLotAccounts() {
+  const rows = getLotSearchFilteredRows();
+  if (!rows.length) return alert('No lot records match the current search.');
+
+  const escape = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const accounts = new Map();
+  rows.forEach(row => {
+    const address = row.vfnAddress || 'NOT FOUND IN DATABASE';
+    const key = `${row.accountNo}|${address}`;
+    if (!accounts.has(key)) accounts.set(key, { accountNo: row.accountNo, address, scheme: row.scheme, transactions: [] });
+    accounts.get(key).transactions.push(row);
+  });
+
+  const accountCards = [...accounts.values()].map(account => `
+    <section class="account">
+      <h2>Account No: ${escape(account.accountNo)} <span>${escape(account.scheme || '')}</span></h2>
+      <p><strong>Address:</strong> ${escape(account.address)}</p>
+      <table><thead><tr><th>Date</th><th>Tran ID</th><th>Category</th><th>Credit (₹)</th><th>Debit (₹)</th><th>Remarks / Particulars</th></tr></thead>
+        <tbody>${account.transactions.map(txn => `<tr>
+          <td>${escape(txn.date)}</td><td>${escape(txn.txnId || '-')}</td><td>${escape(txn.category)}</td>
+          <td class="amount">${lotFormatAmount(txn.credit)}</td><td class="amount">${lotFormatAmount(txn.debit)}</td>
+          <td>${escape(txn.remarks || '-')}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </section>`).join('');
+
+  const printWindow = window.open('', '_blank', 'width=1100,height=850');
+  if (!printWindow) return alert('Popup blocked. Allow popups to print the unique account report.');
+  printWindow.document.open();
+  printWindow.document.write(`<!DOCTYPE html><html><head><title>Unique Lot Accounts &amp; Transaction Particulars</title>
+    <style>
+      body{font:12px Arial,sans-serif;color:#1e293b;margin:18px}h1{color:#a80f28;font-size:18px}.meta{margin-bottom:16px;color:#475569}
+      .account{margin:0 0 18px;padding:10px;border:1px solid #cbd5e1;break-inside:avoid}.account h2{font-size:14px;margin:0 0 6px;color:#7f1d1d}.account h2 span{font-size:11px;color:#475569;margin-left:8px}
+      .account p{margin:4px 0 8px;white-space:pre-wrap}table{width:100%;border-collapse:collapse}th,td{border:1px solid #cbd5e1;padding:5px;text-align:left;vertical-align:top}th{background:#f1f5f9}.amount{text-align:right;white-space:nowrap}
+      .no-print{margin-bottom:14px}@media print{.no-print{display:none}body{margin:8mm}}
+    </style></head><body>
+    <div class="no-print"><button onclick="window.print()">Print Report</button></div>
+    <h1>Unique Accounts &amp; Transaction Particulars</h1>
+    <p class="meta">Unique account/address entries: ${accounts.size} | Transactions: ${rows.length} | Generated: ${escape(new Date().toLocaleString('en-IN'))}</p>
+    ${accountCards}</body></html>`);
+  printWindow.document.close();
 }
 
   </script>
