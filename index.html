@@ -990,7 +990,7 @@
 <div id="monthlyReportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
   <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
     <div>
-      <h3 class="text-sm font-bold text-postRed-700 uppercase">📅 Monthly Reports — eMO Booking</h3>
+      <h3 class="text-sm font-bold text-postRed-700 uppercase">📅 eMO Booking Reports</h3>
       <p class="text-[11px] text-slate-500">Import and search CODMO, EMO, and SMO booking totals across offices and dates.</p>
     </div>
     <div class="flex gap-2 flex-wrap">
@@ -1004,10 +1004,7 @@
 
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end text-xs">
-    <div class="sm:col-span-2">
-      <label for="monthlyReportSearch" class="block font-bold text-slate-700 mb-0.5">Search Office / ID / Product</label>
-      <input type="search" id="monthlyReportSearch" oninput="renderMonthlyReports()" placeholder="Search report rows..." class="w-full border border-slate-300 p-1.5 rounded bg-white outline-none focus:ring-2 focus:ring-postRed-600">
-    </div>
+    
     <div>
       <label for="monthlyReportOffice" class="block font-bold text-slate-700 mb-0.5">Offices (multi-select)</label>
       <select id="monthlyReportOffice" multiple size="4" onchange="loadMonthlyReports()" class="w-full min-h-[100px] border border-slate-300 p-2 rounded bg-white" aria-describedby="monthlyReportOfficeHint"></select>
@@ -1034,6 +1031,10 @@
         <button type="button" onclick="resetMonthlyReportFilters()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold cursor-pointer">Reset Filters</button>
         <button type="button" onclick="loadMonthlyReports()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded font-bold cursor-pointer">Search Reports</button>
       </div>
+    </div>
+    <div class="sm:col-span-2">
+      <label for="monthlyReportSearch" class="block font-bold text-slate-700 mb-0.5">Search Office / ID / Product</label>
+      <input type="search" id="monthlyReportSearch" oninput="renderMonthlyReports()" placeholder="Search report rows..." class="w-full border border-slate-300 p-1.5 rounded bg-white outline-none focus:ring-2 focus:ring-postRed-600">
     </div>
   </div>
 
@@ -1100,9 +1101,15 @@
         <!-- SINGLE ROW TOOLBAR: FILTER SEARCH, FILE IMPORT & ACTION BUTTONS -->
         <div class="flex items-center justify-between gap-2.5 flex-wrap bg-amber-50/40 p-2.5 rounded-lg border border-amber-200">
           
-          <!-- LEFT: Search Filter -->
-          <div class="flex-1 min-w-[220px] max-w-sm">
-            <input type="text" id="userInstantSearch" oninput="filterUserAccounts()" placeholder="🔍 Filter Emp Name, ID, Office..." class="w-full border border-amber-300 px-2.5 py-1.5 rounded text-xs bg-white outline-none focus:ring-1 focus:ring-amber-400 font-mono">
+          <!-- LEFT: Search and Approval Filters -->
+          <div class="flex flex-1 min-w-[220px] max-w-2xl items-center gap-2 flex-wrap">
+            <input type="text" id="userInstantSearch" oninput="filterUserAccounts()" placeholder="🔍 Filter Emp Name, ID, Office..." class="flex-1 min-w-[220px] border border-amber-300 px-2.5 py-1.5 rounded text-xs bg-white outline-none focus:ring-1 focus:ring-amber-400 font-mono">
+            <select id="userApprovalFilter" onchange="filterUserAccounts()" aria-label="Filter users by approval status" class="border border-amber-300 px-2.5 py-1.5 rounded text-xs bg-white font-semibold">
+              <option value="all">All Approval Statuses</option>
+              <option value="pending">Pending Approval</option>
+              <option value="approved">Approved</option>
+            </select>
+            <span class="text-[11px] font-bold text-amber-800">Awaiting approval: <span id="pendingApprovalCount">0</span></span>
           </div>
 
           <!-- RIGHT: Import, Exports, and Controls in One Line -->
@@ -1132,8 +1139,9 @@
                 <th class="p-2.5">Registered On</th>
                 <th class="p-2.5">Mobile No</th>
                 <th class="p-2.5">Office Name</th>
+                <th class="p-2.5">Approval</th>
                 <th class="p-2.5">Status</th>
-                <th class="p-2.5 text-center min-w-[210px]">Admin Actions</th>
+                <th class="p-2.5 text-center min-w-[240px]">Admin Actions</th>
               </tr>
             </thead>
             <tbody id="usersTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
@@ -3513,7 +3521,8 @@ async function handleEmpIdRegister(e) {
       mobile_number,
       office_name,
       role: 'user',
-      is_active: true
+      is_active: true,
+      is_approved: false
     }]);
 
     if (profileErr) {
@@ -3531,6 +3540,11 @@ async function handleEmpIdRegister(e) {
       await supabaseClient.auth.signOut();
       window.location.reload();
     }
+
+function isProfileApproved(profile = userProfile) {
+  // Profiles created before approval tracking was added remain approved.
+  return profile?.is_approved !== false;
+}
 
 async function initApp() {
   if (appInitialized) return;
@@ -3566,9 +3580,10 @@ async function initApp() {
   $('userInfo').innerText = `${profile.emp_name} [${profile.emp_id}] (${(profile.role || 'user').toUpperCase()})\n ${profile.office_name || 'N/A'}`;
 
   const role = (profile.role || 'user').toLowerCase();
-  const isAdmin = role === 'admin' || role === 'superadmin';
-  const isSuperadmin = role === 'superadmin';
-  const canAccessCentVfn = role === 'centvfn' || isAdmin;
+  const isApproved = isProfileApproved(profile);
+  const isAdmin = isApproved && (role === 'admin' || role === 'superadmin');
+  const isSuperadmin = isAdmin && role === 'superadmin';
+  const canAccessCentVfn = isApproved && (role === 'centvfn' || isAdmin);
 
   // Toggle Admin & Restricted Tab Buttons
   if (isAdmin) {
@@ -3585,6 +3600,8 @@ async function initApp() {
 
   // Toggle Cent Percent Verification Tab
   if ($('tabBtnClaimsHub')) $('tabBtnClaimsHub').classList.remove('hidden');
+  if ($('monthlyReportsTabBtn')) $('monthlyReportsTabBtn').classList.toggle('hidden', !isApproved);
+  if ($('subBtnReports')) $('subBtnReports').classList.toggle('hidden', !isApproved);
   if ($('subBtnConverter') && !isAdmin) $('subBtnConverter').classList.add('hidden');
   if ($('subBtnAdminDocuments')) {
     $('subBtnAdminDocuments').classList.toggle('hidden', !isAdmin);
@@ -3608,8 +3625,15 @@ async function initApp() {
   if (!isAdmin && adminOnlyTabs.includes(currentActiveTab)) {
     currentActiveTab = 'claimsHub';
   }
+  if (!isApproved && currentActiveTab === 'monthlyReports') {
+    currentActiveTab = 'claimsHub';
+  }
   if (!canAccessCentVfn && (currentActiveTab === 'centVfnView' || currentActiveTab === 'centVfn')) {
     currentActiveTab = 'claimsHub';
+  }
+  if (!isApproved && !['track', 'register'].includes(currentClaimsSubTab)) {
+    currentClaimsSubTab = 'track';
+    sessionStorage.setItem('claimsSubTab', 'track');
   }
 
   const mobileInput = $('claimUserMobile');
@@ -3650,9 +3674,15 @@ async function initApp() {
 
 function showTab(tabName) {
   const role = (userProfile?.role || 'user').toLowerCase();
-  const isAdmin = role === 'admin' || role === 'superadmin';
-  const canAccessCentVfn = role === 'centvfn' || isAdmin;
+  const isApproved = isProfileApproved();
+  const isAdmin = isApproved && (role === 'admin' || role === 'superadmin');
+  const canAccessCentVfn = isApproved && (role === 'centvfn' || isAdmin);
   const claimsSubModules = ['track', 'registerClaim', 'converterTab', 'reports', 'adminDocuments'];
+
+  if (tabName === 'monthlyReports' && !isApproved) {
+    alert('Access pending: only Refund Claims Management is available until an administrator approves your account.');
+    tabName = 'claimsHub';
+  }
 
   if (tabName === 'adminDocuments' && !isAdmin) {
     alert("Access Restricted: Admin Documents requires admin privileges.");
@@ -4047,7 +4077,7 @@ function exportMonthlyReports(format) {
 
   if (format === 'excel') {
     const sheet = XLSX.utils.aoa_to_sheet([
-      ['Monthly Reports — eMO Booking'],
+      ['eMO Booking Report'],
       [`Generated on: ${generatedOn}`],
       [`Offices: ${officeScope} | Products: ${productScope} | Date range: ${dateScope} | Rows: ${rows.length}`],
       [],
@@ -4066,7 +4096,7 @@ function exportMonthlyReports(format) {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   doc.setFontSize(14);
   doc.setTextColor(168, 15, 40);
-  doc.text('Monthly Reports — eMO Booking', 148.5, 13, { align: 'center' });
+  doc.text('eMO Booking Report', 148.5, 13, { align: 'center' });
   doc.setFontSize(8);
   doc.setTextColor(71, 85, 105);
   doc.text(`Generated on: ${generatedOn}`, 148.5, 18, { align: 'center' });
@@ -4113,7 +4143,18 @@ async function copyMonthlyReportsSetupSql() {
 
 function switchClaimsSubView(subKey) {
   const role = (userProfile?.role || 'user').toLowerCase();
-  const isAdmin = role === 'admin' || role === 'superadmin';
+  const isApproved = isProfileApproved();
+  const isAdmin = isApproved && (role === 'admin' || role === 'superadmin');
+
+  if (!isApproved && !['track', 'register'].includes(subKey)) {
+    alert('Access pending: Track Claim and Claim Registration are available until an administrator approves your account.');
+    subKey = 'track';
+  }
+
+  if (subKey === 'adminDocuments' && !isAdmin) {
+    alert('Access Restricted: Admin Documents requires approved admin privileges.');
+    subKey = 'track';
+  }
 
   if (subKey === 'converter' && !isAdmin) {
     alert("Access Restricted: Theme Converter requires admin privileges.");
@@ -8133,6 +8174,11 @@ async function exportBookingReportImage() {
 // =========================================================================
 
 async function loadAllUsers() {
+  const role = (userProfile?.role || '').toLowerCase();
+  if (!isProfileApproved() || !['admin', 'superadmin'].includes(role)) {
+    return alert('Access denied. Approved administrator privileges are required to manage users.');
+  }
+
   const { data: users, error } = await supabaseClient
     .from('profiles')
     .select('*')
@@ -8149,22 +8195,28 @@ async function loadAllUsers() {
 
 function filterUserAccounts() {
   const query = $('userInstantSearch')?.value.trim().toLowerCase() || '';
-  if (!query) return renderUserAccounts(allLoadedUsers);
-
-  renderUserAccounts(allLoadedUsers.filter(u => 
-    (u.emp_id || '').toLowerCase().includes(query) ||
-    (u.emp_name || '').toLowerCase().includes(query) ||
-    (u.office_name || '').toLowerCase().includes(query) ||
-    (u.role || '').toLowerCase().includes(query)
-  ));
+  const approvalFilter = $('userApprovalFilter')?.value || 'all';
+  const filteredUsers = allLoadedUsers.filter(user => {
+    const approved = user.is_approved !== false;
+    const matchesApproval = approvalFilter === 'all' ||
+      (approvalFilter === 'pending' && !approved) ||
+      (approvalFilter === 'approved' && approved);
+    const matchesSearch = !query || [user.emp_id, user.emp_name, user.office_name, user.role]
+      .some(value => String(value || '').toLowerCase().includes(query));
+    return matchesApproval && matchesSearch;
+  });
+  renderUserAccounts(filteredUsers);
 }
 
 function renderUserAccounts(users) {
   const tbody = $('usersTableBody');
   if (!tbody) return;
+
+  const pendingCount = allLoadedUsers.filter(user => user.is_approved === false).length;
+  if ($('pendingApprovalCount')) $('pendingApprovalCount').innerText = pendingCount.toLocaleString('en-IN');
   
   if (!users.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-400">No user accounts found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="p-3 text-center text-slate-400">No user accounts found.</td></tr>`;
     return;
   }
 
@@ -8174,6 +8226,7 @@ function renderUserAccounts(users) {
   let htmlArr = [];
   users.forEach(u => {
     const isActive = u.is_active !== false;
+    const isApproved = u.is_approved !== false;
     const isSelf = String(u.id) === String(callerId);
     const targetRole = (u.role || 'user').toLowerCase();
     const isTargetAdmin = targetRole === 'admin' || targetRole === 'superadmin';
@@ -8185,6 +8238,10 @@ function renderUserAccounts(users) {
       ? `<button type="button" onclick="confirmDeleteUser('${u.id}', '${(u.emp_name || u.emp_id).replace(/'/g, "\\'")}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs" title="Remove Account">🗑️ Remove</button>`
       : `<button type="button" disabled class="bg-slate-200 text-slate-400 px-2 py-0.5 rounded text-[10px] font-bold cursor-not-allowed" title="${isSelf ? 'Cannot remove your own logged-in account' : 'Protected Administrator Account'}">🗑️ Remove</button>`;
 
+    const approvalBtnHtml = isSelf
+      ? `<span class="text-[10px] text-slate-400 italic">Your account</span>`
+      : `<button type="button" onclick="setUserApproval('${u.id}', ${!isApproved})" class="${isApproved ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'} px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition">${isApproved ? '⛔ Revoke Access' : '✅ Approve Access'}</button>`;
+
     htmlArr.push(`
       <tr class="hover:bg-amber-50/40 transition border-b border-slate-100">
         <td class="p-2 font-mono font-bold text-slate-800">${u.emp_id || '-'}</td>
@@ -8193,9 +8250,11 @@ function renderUserAccounts(users) {
         <td class="p-2 text-slate-700">${u.created_at ? u.created_at.split('T')[0] : '-'}</td>
         <td class="p-2 font-mono text-slate-700">${u.mobile_number || '-'}</td>
         <td class="p-2 text-slate-700">${u.office_name || '-'}</td>
+        <td class="p-2"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${isApproved ? 'Approved' : 'Pending'}</span></td>
         <td class="p-2 font-bold ${isActive ? 'text-emerald-700' : 'text-rose-700'}">${isActive ? 'Active' : 'Locked'}</td>
         <td class="p-2 text-center">
           <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
+            ${approvalBtnHtml}
             <button type="button" onclick="openAdminUserEditModal('${u.id}')" class="bg-amber-100 hover:bg-amber-200 text-postRed-800 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">✏️ Edit</button>
             <button type="button" onclick="openAdminResetPwdModal('${u.id}')" class="bg-postGold-100 hover:bg-postGold-200 text-postGold-700 border border-postGold-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">🔑 Reset Pwd</button>
             <button type="button" onclick="toggleUserLock('${u.id}', ${isActive})" class="${isActive ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'} px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition shadow-2xs">
@@ -8209,6 +8268,34 @@ function renderUserAccounts(users) {
   });
 
   tbody.innerHTML = htmlArr.join('');
+}
+
+async function setUserApproval(userId, approved) {
+  if (!userId) return;
+  const callerRole = (userProfile?.role || '').toLowerCase();
+  if (!isProfileApproved() || !['admin', 'superadmin'].includes(callerRole)) {
+    return alert('Access denied. Approved administrator privileges are required to change user approval.');
+  }
+  if (String(userId) === String(currentUser?.id)) {
+    return alert('You cannot change approval for your own active account.');
+  }
+
+  const user = allLoadedUsers.find(item => String(item.id) === String(userId));
+  const label = user?.emp_name || user?.emp_id || 'this user';
+  const action = approved ? 'grant access to' : 'revoke access from';
+  if (!confirm(`Are you sure you want to ${action} ${label}?`)) return;
+
+  const { error } = await supabaseClient
+    .from('profiles')
+    .update({ is_approved: approved })
+    .eq('id', userId);
+
+  if (error) {
+    alert(`Could not update approval: ${error.message}. Confirm the profiles.is_approved column exists.`);
+    return;
+  }
+
+  await loadAllUsers();
 }
 
 async function confirmDeleteUser(userId, userName) {
@@ -8236,8 +8323,24 @@ async function confirmDeleteUser(userId, userName) {
 }
 
 async function openAdminUserEditModal(userId) {
+  const callerRole = (userProfile?.role || '').toLowerCase();
+  if (!isProfileApproved() || !['admin', 'superadmin'].includes(callerRole)) {
+    return alert('Access denied. Approved administrator privileges are required to edit users.');
+  }
+
   const user = allLoadedUsers.find(u => String(u.id) === String(userId));
   if (!user) return alert("User not found!");
+  const targetRole = (user.role || 'user').toLowerCase();
+  if (callerRole !== 'superadmin' && ['admin', 'superadmin'].includes(targetRole)) {
+    return alert('Only a superadmin can edit administrator accounts.');
+  }
+
+  const roleSelect = $('editUserRole');
+  if (roleSelect) {
+    Array.from(roleSelect.options).forEach(option => {
+      option.disabled = callerRole !== 'superadmin' && ['admin', 'superadmin'].includes(option.value);
+    });
+  }
 
   $('editUserId').value = user.id;
   $('editUserEmpId').value = user.emp_id || '';
@@ -8255,7 +8358,21 @@ function closeAdminUserEditModal() {
 
 async function submitAdminUserEdit(e) {
   e.preventDefault();
+  const callerRole = (userProfile?.role || '').toLowerCase();
+  if (!isProfileApproved() || !['admin', 'superadmin'].includes(callerRole)) {
+    return alert('Access denied. Approved administrator privileges are required to edit users.');
+  }
+
   const userId = $('editUserId').value;
+  const targetUser = allLoadedUsers.find(user => String(user.id) === String(userId));
+  const requestedRole = $('editUserRole').value;
+  if (callerRole !== 'superadmin' && (
+    ['admin', 'superadmin'].includes((targetUser?.role || '').toLowerCase()) ||
+    ['admin', 'superadmin'].includes(requestedRole.toLowerCase())
+  )) {
+    return alert('Only a superadmin can edit administrator accounts or assign administrator roles.');
+  }
+
   const emp_name = $('editUserEmpName').value.trim();
   const mobile_number = $('editUserMobile').value.trim();
   const office_name = $('editUserOffice').value;
@@ -8311,6 +8428,10 @@ async function submitAdminPasswordReset(e) {
 }
 
 async function toggleUserLock(userId, currentActive) {
+  const callerRole = (userProfile?.role || '').toLowerCase();
+  if (!isProfileApproved() || !['admin', 'superadmin'].includes(callerRole)) {
+    return alert('Access denied. Approved administrator privileges are required to change account status.');
+  }
   if (!confirm(`Are you sure you want to ${currentActive ? 'LOCK' : 'UNLOCK'} this user account?`)) return;
   
   const { error } = await supabaseClient
