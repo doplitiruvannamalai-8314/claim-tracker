@@ -127,6 +127,9 @@
           <button type="button" id="tabBtnClaimsHub" onclick="showTab('claimsHub')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
             📋 Refund Claims Management
           </button>
+          <button type="button" id="monthlyReportsTabBtn" onclick="showTab('monthlyReports')" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+            📅 Monthly Reports
+          </button>
           <button type="button" id="adminBookingDashTabBtn" onclick="showTab('bookingDash')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
             📈 Digital vs Cash Performance
           </button>
@@ -982,6 +985,75 @@
     </div>
   </div>
 </div>
+
+<!-- MONTHLY REPORTS: eMO BOOKING REPORT -->
+<div id="monthlyReportsView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
+  <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2 border-amber-200">
+    <div>
+      <h3 class="text-sm font-bold text-postRed-700 uppercase">📅 Monthly Reports — eMO Booking</h3>
+      <p class="text-[11px] text-slate-500">Import and search CODMO, EMO, and SMO booking totals across offices and dates.</p>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <input type="file" id="monthlyReportFile" accept=".xlsx,.xls,.csv" class="hidden" onchange="importMonthlyReportFile(event)">
+      <button type="button" onclick="$('monthlyReportFile').click()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📥 Import Excel / CSV</button>
+      <button type="button" onclick="exportMonthlyReports('excel')" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📊 Export Excel</button>
+      <button type="button" onclick="exportMonthlyReports('pdf')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📄 Export PDF</button>
+      <button type="button" onclick="loadMonthlyReports()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">🔄 Refresh</button>
+    </div>
+  </div>
+
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end text-xs">
+    <div class="sm:col-span-2">
+      <label for="monthlyReportSearch" class="block font-bold text-slate-700 mb-0.5">Search Office / ID / Product</label>
+      <input type="search" id="monthlyReportSearch" oninput="renderMonthlyReports()" placeholder="Search report rows..." class="w-full border border-slate-300 p-1.5 rounded bg-white outline-none focus:ring-2 focus:ring-postRed-600">
+    </div>
+    <div>
+      <label for="monthlyReportOffice" class="block font-bold text-slate-700 mb-0.5">Offices (multi-select)</label>
+      <select id="monthlyReportOffice" multiple size="4" onchange="loadMonthlyReports()" class="w-full min-h-[100px] border border-slate-300 p-2 rounded bg-white" aria-describedby="monthlyReportOfficeHint"></select>
+      <p id="monthlyReportOfficeHint" class="text-[10px] text-slate-500 mt-0.5">Tap to select offices; no selection includes all offices.</p>
+    </div>
+    <div>
+      <label for="monthlyReportProduct" class="block font-bold text-slate-700 mb-0.5">Product Codes (multi-select)</label>
+      <select id="monthlyReportProduct" multiple size="4" onchange="handleMonthlyReportProductChange()" class="w-full min-h-[100px] border border-slate-300 p-2 rounded bg-white" aria-describedby="monthlyReportProductHint">
+        <option value="ALL" selected>All Products</option><option value="CODMO">CODMO</option><option value="EMO">EMO</option><option value="SMO">SMO</option>
+      </select>
+      <p id="monthlyReportProductHint" class="text-[10px] text-slate-500 mt-0.5">Tap one or more codes; choose All Products to include every code.</p>
+    </div>
+    <div>
+      <label for="monthlyReportFrom" class="block font-bold text-slate-700 mb-0.5">From Date</label>
+      <input type="date" id="monthlyReportFrom" onchange="loadMonthlyReports()" class="w-full border border-slate-300 p-1.5 rounded bg-white">
+    </div>
+    <div>
+      <label for="monthlyReportTo" class="block font-bold text-slate-700 mb-0.5">To Date</label>
+      <input type="date" id="monthlyReportTo" onchange="loadMonthlyReports()" class="w-full border border-slate-300 p-1.5 rounded bg-white">
+    </div>
+    <div class="sm:col-span-2 lg:col-span-6 flex justify-between items-center gap-2 border-t border-amber-200 pt-2">
+      <span id="monthlyReportCount" class="font-bold text-slate-700">No report loaded</span>
+      <div class="flex gap-2">
+        <button type="button" onclick="resetMonthlyReportFilters()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold cursor-pointer">Reset Filters</button>
+        <button type="button" onclick="loadMonthlyReports()" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded font-bold cursor-pointer">Search Reports</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+    <div class="border border-slate-200 rounded-lg p-2 text-center"><span class="block text-[10px] text-slate-500 font-bold">Matching Rows</span><strong id="monthlyReportTotalRows" class="text-base">0</strong></div>
+    <div class="border border-slate-200 rounded-lg p-2 text-center"><span class="block text-[10px] text-slate-500 font-bold">MO Count</span><strong id="monthlyReportTotalCount" class="text-base">0</strong></div>
+    <div class="border border-slate-200 rounded-lg p-2 text-center"><span class="block text-[10px] text-slate-500 font-bold">MO Value</span><strong id="monthlyReportTotalValue" class="text-base">₹0.00</strong></div>
+    <div class="border border-slate-200 rounded-lg p-2 text-center"><span class="block text-[10px] text-slate-500 font-bold">Commission / Total Value</span><strong id="monthlyReportTotalCommission" class="text-base">₹0.00 / ₹0.00</strong></div>
+  </div>
+
+  <div class="max-h-[560px] overflow-auto border border-slate-200 rounded-xl">
+    <table class="w-full text-left text-xs border-collapse">
+      <thead class="sticky top-0 z-10 bg-postRed-700 text-white font-bold whitespace-nowrap">
+        <tr><th class="p-2">Office ID</th><th class="p-2">Office Name</th><th class="p-2">Booking Date</th><th class="p-2">Product Code</th><th class="p-2 text-right">MO Count</th><th class="p-2 text-right">MO Value (₹)</th><th class="p-2 text-right">MO Commission (₹)</th><th class="p-2 text-right">Total Value (₹)</th></tr>
+      </thead>
+      <tbody id="monthlyReportsTableBody"><tr><td colspan="8" class="p-4 text-center text-slate-400">Import a report or search existing records.</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
         <!-- TAB 6: USER MANAGEMENT -->
       <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
         
@@ -3629,6 +3701,7 @@ function showTab(tabName) {
   // 1. Hide all tab view containers
   const viewMap = {
     'claimsHub': 'claimsHubView',
+    'monthlyReports': 'monthlyReportsView',
     'bookingDash': 'bookingDashView',
     'adminRoleMgmt': 'adminRoleMgmtView',
     'centVfn': 'centVfnView'
@@ -3642,6 +3715,7 @@ function showTab(tabName) {
   // 2. Reset navigation button styles
   const btnMap = {
     'claimsHub': 'tabBtnClaimsHub',
+    'monthlyReports': 'monthlyReportsTabBtn',
     'bookingDash': 'adminBookingDashTabBtn',
     'adminRoleMgmt': 'adminTabBtn',
     'centVfn': 'tabBtnCentVfn'
@@ -3671,6 +3745,10 @@ function showTab(tabName) {
   }
 
   // 5. Trigger on-demand loaders for selected tab
+  if (tabName === 'monthlyReports') {
+    loadMonthlyReports();
+  }
+
   if (tabName === 'bookingDash' && isAdmin) {
     if (!$('bookingFromDate')?.value || !$('bookingToDate')?.value) {
       if ($('bookingQuickPeriod')) $('bookingQuickPeriod').value = 'yesterday';
@@ -3689,6 +3767,347 @@ function showTab(tabName) {
   // Trigger loader when opening Cent Percent Verification
   if (tabName === 'centVfn' && canAccessCentVfn && typeof loadCentVfnData === 'function') {
     loadCentVfnData();
+  }
+}
+
+let monthlyReportRecords = [];
+let monthlyReportRequestId = 0;
+let monthlyReportOfficesLoaded = false;
+
+async function populateMonthlyReportOffices() {
+  const select = $('monthlyReportOffice');
+  if (!select || monthlyReportOfficesLoaded) return;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('offices')
+      .select('office_name')
+      .order('office_name', { ascending: true });
+    if (error) throw error;
+
+    const selected = new Set(Array.from(select.selectedOptions).map(option => option.value));
+    const officeNames = [...new Set((data || []).map(row => String(row.office_name || '').trim()).filter(Boolean))];
+    select.innerHTML = officeNames.map(name => {
+      const escaped = escapeMonthlyReportHtml(name);
+      return `<option value="${escaped}" ${selected.has(name) ? 'selected' : ''}>${escaped}</option>`;
+    }).join('');
+    monthlyReportOfficesLoaded = true;
+  } catch (error) {
+    console.warn('Monthly report office list load failed:', error);
+    select.innerHTML = '<option disabled>Office list unavailable</option>';
+  }
+}
+
+function normalizeMonthlyReportDate(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+  }
+  if (typeof value === 'number' && value > 20000 && value < 70000) {
+    const date = new Date(Math.round((value - 25569) * 86400000));
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+  }
+  const text = String(value ?? '').trim().split(/[ T]/)[0];
+  let match = text.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (match) return `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
+  match = text.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (match) return `${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
+  return '';
+}
+
+function escapeMonthlyReportHtml(value) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function getSelectedMonthlyReportProducts() {
+  return Array.from($('monthlyReportProduct')?.selectedOptions || [])
+    .map(option => option.value)
+    .filter(value => value && value !== 'ALL');
+}
+
+function handleMonthlyReportProductChange() {
+  const select = $('monthlyReportProduct');
+  if (!select) return;
+  const allOption = Array.from(select.options).find(option => option.value === 'ALL');
+  if (allOption?.selected) {
+    Array.from(select.options).forEach(option => { option.selected = option.value === 'ALL'; });
+  } else if (allOption) {
+    allOption.selected = false;
+  }
+  loadMonthlyReports();
+}
+
+async function importMonthlyReportFile(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const data = new Uint8Array(await file.arrayBuffer());
+    const workbook = XLSX.read(data, { type: 'array', cellDates: true, raw: true });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: true, blankrows: false });
+    if (!rows.length) return alert('The selected report has no rows.');
+
+    const key = value => String(value ?? '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const headerIndex = rows.findIndex(row => {
+      const headers = (row || []).map(key);
+      return ['officeid', 'officename', 'bookingdate', 'productcode', 'mocount', 'movalue', 'mocommission', 'totalvalue']
+        .every(required => headers.includes(required));
+    });
+    if (headerIndex < 0) return alert('Could not find the required headers: office_id, office_name, booking_date, product_code, mo_count, mo_value, mo_commission, total_value.');
+
+    const headers = rows[headerIndex].map(key);
+    const col = name => headers.indexOf(key(name));
+    const number = value => {
+      const parsed = Number(String(value ?? 0).replace(/[₹,\s]/g, ''));
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+    const records = [];
+    const invalidProducts = new Set();
+
+    rows.slice(headerIndex + 1).forEach(row => {
+      const officeId = String(row[col('office_id')] ?? '').trim();
+      const officeName = String(row[col('office_name')] ?? '').trim();
+      const bookingDate = normalizeMonthlyReportDate(row[col('booking_date')]);
+      const productCode = String(row[col('product_code')] ?? '').trim().toUpperCase();
+      if (!officeId && !officeName && !productCode) return;
+      if (!['CODMO', 'EMO', 'SMO'].includes(productCode)) {
+        if (productCode) invalidProducts.add(productCode);
+        return;
+      }
+      if (!officeId || !officeName || !bookingDate) return;
+      records.push({
+        office_id: officeId,
+        office_name: officeName,
+        booking_date: bookingDate,
+        product_code: productCode,
+        mo_count: Math.round(number(row[col('mo_count')])) ,
+        mo_value: number(row[col('mo_value')]),
+        mo_commission: number(row[col('mo_commission')]),
+        total_value: number(row[col('total_value')]),
+        imported_by: currentUser?.id || null,
+        updated_at: new Date().toISOString()
+      });
+    });
+
+    if (!records.length) return alert('No valid CODMO, EMO, or SMO rows were found. Check the product codes and required office/date values.');
+    const chunkSize = 500;
+    for (let start = 0; start < records.length; start += chunkSize) {
+      const { error } = await supabaseClient.from('monthly_reports').upsert(records.slice(start, start + chunkSize), {
+        onConflict: 'office_id,booking_date,product_code'
+      });
+      if (error) throw error;
+    }
+    const skipped = invalidProducts.size ? ` Unsupported product codes skipped: ${[...invalidProducts].join(', ')}.` : '';
+    alert(`Imported ${records.length.toLocaleString('en-IN')} monthly report row(s). Existing office/date/product rows were updated.${skipped}`);
+    await loadMonthlyReports();
+  } catch (error) {
+    console.error('Monthly report import failed:', error);
+    alert(`Monthly report import failed: ${error.message}. Confirm that the monthly_reports table and RLS policies have been created.`);
+  } finally {
+    event.target.value = '';
+  }
+}
+
+async function loadMonthlyReports() {
+  const tbody = $('monthlyReportsTableBody');
+  if (!tbody) return;
+  const requestId = ++monthlyReportRequestId;
+  await populateMonthlyReportOffices();
+  if (requestId !== monthlyReportRequestId) return;
+
+  // Keep the initial query narrow: load today's records unless a date range is chosen.
+  if (!$('monthlyReportFrom')?.value && !$('monthlyReportTo')?.value) {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    $('monthlyReportFrom').value = todayStr;
+    $('monthlyReportTo').value = todayStr;
+  }
+  const fromDate = $('monthlyReportFrom')?.value || '';
+  const toDate = $('monthlyReportTo')?.value || '';
+  const selectedProducts = getSelectedMonthlyReportProducts();
+  const selectedOffices = Array.from($('monthlyReportOffice')?.selectedOptions || []).map(option => option.value);
+  if (fromDate && toDate && fromDate > toDate) return alert('From Date cannot be later than To Date.');
+  tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Loading monthly reports...</td></tr>';
+  try {
+    let countQuery = supabaseClient.from('monthly_reports').select('id', { count: 'exact', head: true });
+    if (fromDate) countQuery = countQuery.gte('booking_date', fromDate);
+    if (toDate) countQuery = countQuery.lte('booking_date', toDate);
+    if (selectedProducts.length) countQuery = countQuery.in('product_code', selectedProducts);
+    if (selectedOffices.length) countQuery = countQuery.in('office_name', selectedOffices);
+    const { count, error: countError } = await countQuery;
+    if (countError) throw countError;
+
+    const fetched = [];
+    const pageSize = 1000;
+    for (let start = 0; start < (count || 0); start += pageSize) {
+      let query = supabaseClient.from('monthly_reports').select('*');
+      if (fromDate) query = query.gte('booking_date', fromDate);
+      if (toDate) query = query.lte('booking_date', toDate);
+      if (selectedProducts.length) query = query.in('product_code', selectedProducts);
+      if (selectedOffices.length) query = query.in('office_name', selectedOffices);
+      const { data, error } = await query.order('booking_date', { ascending: false }).order('office_name', { ascending: true }).range(start, start + pageSize - 1);
+      if (error) throw error;
+      fetched.push(...(data || []));
+      if (!data || data.length < pageSize) break;
+    }
+    if (requestId !== monthlyReportRequestId) return;
+    monthlyReportRecords = fetched;
+    renderMonthlyReports();
+  } catch (error) {
+    if (requestId !== monthlyReportRequestId) return;
+    console.error('Monthly reports load failed:', error);
+    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-600">Unable to load monthly reports: ${escapeMonthlyReportHtml(error.message)}. Create the table using the setup SQL above.</td></tr>`;
+    $('monthlyReportCount').innerText = 'Could not load records';
+  }
+}
+
+function getFilteredMonthlyReports() {
+  const search = ($('monthlyReportSearch')?.value || '').trim().toLowerCase();
+  const selectedOffices = Array.from($('monthlyReportOffice')?.selectedOptions || []).map(option => option.value);
+  const selectedProducts = getSelectedMonthlyReportProducts();
+  return monthlyReportRecords.filter(row =>
+    (!selectedOffices.length || selectedOffices.includes(row.office_name)) &&
+    (!selectedProducts.length || selectedProducts.includes(row.product_code)) &&
+    (!search || [
+      row.office_id, row.office_name, row.product_code, row.booking_date,
+      row.mo_count, row.mo_value, row.mo_commission, row.total_value
+    ].some(value => String(value ?? '').toLowerCase().includes(search)))
+  );
+}
+
+function renderMonthlyReports() {
+  const rows = getFilteredMonthlyReports();
+  const tbody = $('monthlyReportsTableBody');
+  if (!tbody) return;
+  const totals = rows.reduce((sum, row) => {
+    sum.count += Number(row.mo_count) || 0;
+    sum.value += Number(row.mo_value) || 0;
+    sum.commission += Number(row.mo_commission) || 0;
+    sum.total += Number(row.total_value) || 0;
+    return sum;
+  }, { count: 0, value: 0, commission: 0, total: 0 });
+  const money = value => `₹${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  $('monthlyReportCount').innerText = `Showing ${rows.length.toLocaleString('en-IN')} of ${monthlyReportRecords.length.toLocaleString('en-IN')} loaded rows`;
+  $('monthlyReportTotalRows').innerText = rows.length.toLocaleString('en-IN');
+  $('monthlyReportTotalCount').innerText = totals.count.toLocaleString('en-IN');
+  $('monthlyReportTotalValue').innerText = money(totals.value);
+  $('monthlyReportTotalCommission').innerText = `${money(totals.commission)} / ${money(totals.total)}`;
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">No matching monthly report rows.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(row => `<tr class="border-b border-slate-100 hover:bg-amber-50/50">
+    <td class="p-2 font-mono">${escapeMonthlyReportHtml(row.office_id)}</td>
+    <td class="p-2 font-semibold">${escapeMonthlyReportHtml(row.office_name)}</td>
+    <td class="p-2 whitespace-nowrap">${escapeMonthlyReportHtml(row.booking_date)}</td>
+    <td class="p-2"><span class="bg-blue-50 text-blue-800 px-1.5 py-0.5 rounded font-bold">${escapeMonthlyReportHtml(row.product_code)}</span></td>
+    <td class="p-2 text-right">${(Number(row.mo_count) || 0).toLocaleString('en-IN')}</td>
+    <td class="p-2 text-right">${money(Number(row.mo_value) || 0)}</td>
+    <td class="p-2 text-right">${money(Number(row.mo_commission) || 0)}</td>
+    <td class="p-2 text-right font-bold">${money(Number(row.total_value) || 0)}</td>
+  </tr>`).join('');
+}
+
+function resetMonthlyReportFilters() {
+  if ($('monthlyReportSearch')) $('monthlyReportSearch').value = '';
+  if ($('monthlyReportProduct')) Array.from($('monthlyReportProduct').options).forEach(option => { option.selected = option.value === 'ALL'; });
+  if ($('monthlyReportOffice')) Array.from($('monthlyReportOffice').options).forEach(option => { option.selected = false; });
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  if ($('monthlyReportFrom')) $('monthlyReportFrom').value = todayStr;
+  if ($('monthlyReportTo')) $('monthlyReportTo').value = todayStr;
+  loadMonthlyReports();
+}
+
+function exportMonthlyReports(format) {
+  const rows = getFilteredMonthlyReports();
+  if (!rows.length) return alert('No monthly report rows match the selected filters.');
+  const exportRows = rows.map(row => ({
+    office_id: row.office_id, office_name: row.office_name, booking_date: row.booking_date,
+    product_code: row.product_code, mo_count: Number(row.mo_count) || 0,
+    mo_value: Number(row.mo_value) || 0, mo_commission: Number(row.mo_commission) || 0,
+    total_value: Number(row.total_value) || 0
+  }));
+  const totals = exportRows.reduce((sum, row) => {
+    sum.mo_count += row.mo_count;
+    sum.mo_value += row.mo_value;
+    sum.mo_commission += row.mo_commission;
+    sum.total_value += row.total_value;
+    return sum;
+  }, { mo_count: 0, mo_value: 0, mo_commission: 0, total_value: 0 });
+  const now = new Date();
+  const stamp = now.toISOString().slice(0, 10);
+  const generatedOn = now.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  const selectedOffices = Array.from($('monthlyReportOffice')?.selectedOptions || []).map(option => option.value);
+  const selectedProducts = getSelectedMonthlyReportProducts();
+  const officeScope = selectedOffices.length ? selectedOffices.join(', ') : 'All Offices';
+  const productScope = selectedProducts.length ? selectedProducts.join(', ') : 'All Products';
+  const dateScope = `${$('monthlyReportFrom')?.value || 'Any'} to ${$('monthlyReportTo')?.value || 'Any'}`;
+  const headers = ['Office ID', 'Office Name', 'Booking Date', 'Product Code', 'MO Count', 'MO Value (Rs.)', 'MO Commission (Rs.)', 'Total Value (Rs.)'];
+  const totalRow = ['TOTAL', '', '', '', totals.mo_count, totals.mo_value, totals.mo_commission, totals.total_value];
+
+  if (format === 'excel') {
+    const sheet = XLSX.utils.aoa_to_sheet([
+      ['Monthly Reports — eMO Booking'],
+      [`Generated on: ${generatedOn}`],
+      [`Offices: ${officeScope} | Products: ${productScope} | Date range: ${dateScope} | Rows: ${rows.length}`],
+      [],
+      headers,
+      ...exportRows.map(row => [row.office_id, row.office_name, row.booking_date, row.product_code, row.mo_count, row.mo_value, row.mo_commission, row.total_value]),
+      totalRow
+    ]);
+    sheet['!cols'] = [{ wch: 14 }, { wch: 28 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 18 }, { wch: 16 }];
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, sheet, 'Monthly Reports');
+    XLSX.writeFile(workbook, `Monthly_eMO_Report_${stamp}.xlsx`);
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  doc.setFontSize(14);
+  doc.setTextColor(168, 15, 40);
+  doc.text('Monthly Reports — eMO Booking', 148.5, 13, { align: 'center' });
+  doc.setFontSize(8);
+  doc.setTextColor(71, 85, 105);
+  doc.text(`Generated on: ${generatedOn}`, 148.5, 18, { align: 'center' });
+  doc.text(`Offices: ${officeScope} | Products: ${productScope} | Date range: ${dateScope} | Rows: ${rows.length}`, 148.5, 23, { align: 'center' });
+  doc.autoTable({
+    startY: 27,
+    head: [headers],
+    body: [
+      ...exportRows.map(row => [row.office_id, row.office_name, row.booking_date, row.product_code, row.mo_count, row.mo_value.toFixed(2), row.mo_commission.toFixed(2), row.total_value.toFixed(2)]),
+      ['TOTAL', '', '', '', String(totals.mo_count), totals.mo_value.toFixed(2), totals.mo_commission.toFixed(2), totals.total_value.toFixed(2)]
+    ],
+    styles: { fontSize: 7.5, cellPadding: 2 },
+    headStyles: { fillColor: [168, 15, 40], textColor: [255, 255, 255] },
+    didParseCell(data) {
+      if (data.section === 'body' && data.row.index === exportRows.length) {
+        data.cell.styles.fillColor = [254, 242, 242];
+        data.cell.styles.textColor = [136, 19, 55];
+        data.cell.styles.fontStyle = 'bold';
+      }
+    },
+    margin: { bottom: 16 }
+  });
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let page = 1; page <= pageCount; page++) {
+    doc.setPage(page);
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Generated on: ${generatedOn}`, 10, doc.internal.pageSize.getHeight() - 7);
+    doc.text(`Page ${page} of ${pageCount}`, doc.internal.pageSize.getWidth() - 10, doc.internal.pageSize.getHeight() - 7, { align: 'right' });
+  }
+  doc.save(`Monthly_eMO_Report_${stamp}.pdf`);
+}
+
+async function copyMonthlyReportsSetupSql() {
+  const sql = $('monthlyReportsSetupSql')?.innerText || '';
+  try {
+    await navigator.clipboard.writeText(sql);
+    alert('Supabase table setup SQL copied.');
+  } catch (error) {
+    alert('Could not copy automatically. Select and copy the SQL shown in the setup section.');
   }
 }
 
