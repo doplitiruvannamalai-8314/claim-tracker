@@ -2268,7 +2268,7 @@
     </div>
     <div id="bookingExportPreviewBody" class="p-3 overflow-auto flex-1 bg-slate-50"></div>
     <div class="flex justify-end gap-2 p-3 border-t border-slate-200">
-                    <button type="button" onclick="copyBookingExportPreview()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📋 Copy Text</button>
+              <button type="button" onclick="copyBookingExportPreview()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📋 Copy Text</button>
               <button type="button" onclick="copyBookingExportPreviewAsImage()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">🖼️ Copy Image</button>
               <button type="button" onclick="downloadBookingExportPreview()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">⬇️ Download</button>
       <button type="button" onclick="closeBookingExportPreview()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Close</button>
@@ -9915,10 +9915,10 @@ function renderClaimsSummaryTable() {
         <td class="p-2 whitespace-nowrap">
           <div class="flex items-center gap-1.5">
             <span class="text-postRed-700 font-bold font-mono text-xs cursor-pointer hover:underline" onclick="openDetailsModal('${c.id}')">${c.txn_id_ref}</span>
+            <button type="button" aria-label="Copy reference number" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-sm font-bold cursor-pointer">📋</button>
           </div>
           <div class="mt-1 flex items-center gap-1.5">
-            <button type="button" aria-label="Copy reference number" onclick="copyTextToClipboard('${c.txn_id_ref}', this)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-sm font-bold cursor-pointer">📋</button>
-            <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
+                        <span class="inline-block bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded text-[10px] border">${c.module}</span>
             <span class="inline-block bg-blue-50 text-blue-800 font-semibold px-1.5 py-0.2 rounded text-[10px] border border-blue-200">${c.payment_channel || '-'}</span>
           </div>
         </td>
