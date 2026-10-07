@@ -6608,6 +6608,12 @@ async function applyBookingQuickPeriod() {
   await loadBookingDashboardData();
 }
 
+function compareBookingAdoptionRank(a, b) {
+  if (a.isZero && !b.isZero) return 1;
+  if (!a.isZero && b.isZero) return -1;
+  return (b.pct - a.pct) || (b.dig_cnt - a.dig_cnt) || a.name.localeCompare(b.name);
+}
+
 async function loadBookingDashboardData() {
   const from = $('bookingFromDate')?.value;
   const to = $('bookingToDate')?.value;
@@ -6738,11 +6744,7 @@ async function loadBookingDashboardData() {
         const isZero = tot === 0;
         const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
         return { name, cash_cnt: o.cash_cnt, dig_cnt: o.dig_cnt, tot, pct, isZero };
-      }).sort((a, b) => {
-        if (a.isZero && !b.isZero) return 1;
-        if (!a.isZero && b.isZero) return -1;
-        return (b.pct - a.pct) || (b.dig_cnt - a.dig_cnt);
-      });
+      }).sort(compareBookingAdoptionRank);
 
       let htmlArr = [];
       processedOffices.forEach((o, i) => {
@@ -7232,11 +7234,7 @@ async function exportBookingReportImage(previewOnly = false) {
     const isZero = tot === 0;
     const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
     return { name, cash_cnt: o.cash_cnt, dig_cnt: o.dig_cnt, tot, pct, isZero };
-  }).sort((a, b) => {
-    if (a.isZero && !b.isZero) return 1;
-    if (!a.isZero && b.isZero) return -1;
-    return b.pct - a.pct;
-  });
+  }).sort(compareBookingAdoptionRank);
 
   // Dedicated off-screen container with 25mm (2.5cm) lateral margins
   const container = document.createElement('div');
@@ -7409,8 +7407,8 @@ async function exportBookingReportImage(previewOnly = false) {
     const o = officeMap[name];
     const tot = o.cash_cnt + o.dig_cnt;
     const pct = tot > 0 ? (o.dig_cnt / tot) * 100 : 0;
-    return { name, ...o, tot, pct };
-  }).sort((a, b) => b.pct - a.pct).map((o, idx) => [
+    return { name, ...o, tot, pct, isZero: tot === 0 };
+  }).sort(compareBookingAdoptionRank).map((o, idx) => [
     idx + 1, 
     o.name, 
     o.cash_cnt.toLocaleString('en-IN'), 
@@ -7660,11 +7658,15 @@ async function exportBookingReportImage(previewOnly = false) {
         totalDigital += digital;
       });
 
-      const rows = Object.entries(officeMap).sort(([a], [b]) => a.localeCompare(b)).map(([name, values], index) => {
+      const rows = Object.entries(officeMap).map(([name, values]) => {
         const total = values.cash + values.digital;
-        const share = total ? ((values.digital / total) * 100).toFixed(2) : '0.00';
-        return `<tr class="border-b border-slate-200"><td class="p-2 text-center">${index + 1}</td><td class="p-2 font-bold">${name}</td><td class="p-2 text-center">${values.cash.toLocaleString('en-IN')}</td><td class="p-2 text-center text-blue-800 font-bold">${values.digital.toLocaleString('en-IN')}</td><td class="p-2 text-center font-bold">${share}%</td></tr>`;
-      }).join('');
+        const pct = total ? (values.digital / total) * 100 : 0;
+        return { name, ...values, total, pct, isZero: total === 0 };
+      }).sort((a, b) => compareBookingAdoptionRank({ ...a, dig_cnt: a.digital }, { ...b, dig_cnt: b.digital }))
+        .map((office, index) => {
+          const share = office.pct.toFixed(2);
+          return `<tr class="border-b border-slate-200"><td class="p-2 text-center">${index + 1}</td><td class="p-2 font-bold">${office.name}</td><td class="p-2 text-center">${office.cash.toLocaleString('en-IN')}</td><td class="p-2 text-center text-blue-800 font-bold">${office.digital.toLocaleString('en-IN')}</td><td class="p-2 text-center font-bold">${share}%</td></tr>`;
+        }).join('');
 
       const grandTotal = totalCash + totalDigital;
       const grandShare = grandTotal ? ((totalDigital / grandTotal) * 100).toFixed(2) : '0.00';
