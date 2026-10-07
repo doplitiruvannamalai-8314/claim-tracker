@@ -1177,7 +1177,7 @@
         🏷️ Allot Speedpost Barcodes
       </button>
       <!-- TAB BUTTON -->
-      <button type="button" id="tabBtnLotImport" onclick="openLotImportModal()" class="tab-btn bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+      <button type="button" id="tabBtnLotImport" onclick="openLotImportModal()" class="tab-btn bg-indigo-700 hover:bg-indigo-800 text-white border border-indigo-800 px-4 py-1.5 rounded-lg font-semibold text-xs cursor-pointer flex items-center gap-1.5">
         📥 Lot Import & Address Verification
       </button>
       <!-- 4. Prepare Notices -->
@@ -2269,9 +2269,27 @@
     <div id="bookingExportPreviewBody" class="p-3 overflow-auto flex-1 bg-slate-50"></div>
     <div class="flex justify-end gap-2 p-3 border-t border-slate-200">
               <button type="button" onclick="copyBookingExportPreview()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📋 Copy Text</button>
+              <button type="button" onclick="shareBookingExportPreview()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">📤 Share Report</button>
               <button type="button" onclick="copyBookingExportPreviewAsImage()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">🖼️ Copy Image</button>
               <button type="button" onclick="downloadBookingExportPreview()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">⬇️ Download</button>
       <button type="button" onclick="closeBookingExportPreview()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs cursor-pointer">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING REPORT SHARE FALLBACK MODAL -->
+<div id="bookingShareFallbackModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 space-y-3 border-t-8 border-green-700">
+    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+      <h3 class="font-bold text-sm text-green-800">📤 Share Booking Report</h3>
+      <button type="button" onclick="closeBookingShareFallback()" class="text-xl font-bold text-slate-500 cursor-pointer">&times;</button>
+    </div>
+    <p id="bookingShareFallbackNote" class="text-xs text-slate-600">This browser cannot share image files directly. The report image has been copied if clipboard access is available. Open an app below and paste or attach it.</p>
+    <div class="flex flex-wrap justify-end gap-2">
+      <a id="bookingShareWhatsAppLink" href="#" target="_blank" rel="noopener" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded font-bold text-xs">WhatsApp</a>
+      <a id="bookingShareEmailLink" href="#" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded font-bold text-xs">Email</a>
+      <button type="button" onclick="downloadBookingExportPreview()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs">Download Image</button>
+      <button type="button" onclick="closeBookingShareFallback()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1.5 rounded font-bold text-xs">Close</button>
     </div>
   </div>
 </div>
@@ -6723,7 +6741,7 @@ async function loadBookingDashboardData() {
       }).sort((a, b) => {
         if (a.isZero && !b.isZero) return 1;
         if (!a.isZero && b.isZero) return -1;
-        return b.pct - a.pct;
+        return (b.pct - a.pct) || (b.dig_cnt - a.dig_cnt);
       });
 
       let htmlArr = [];
@@ -7180,7 +7198,7 @@ function printDayWisePivotReport() {
   `);
   printWindow.document.close();
 }
-async function exportBookingReportImage() {
+async function exportBookingReportImage(previewOnly = false) {
   if (!bookingImportedRecords.length) return alert("No booking data available to export as image!");
   const fromVal = $('bookingFromDate')?.value || 'Inception';
   const toVal = $('bookingToDate')?.value || 'CurrentDate';
@@ -7302,10 +7320,17 @@ async function exportBookingReportImage() {
   document.body.appendChild(container);
   try {
     const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
-    const link = document.createElement('a');
-    link.download = fileName;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const imageUrl = canvas.toDataURL("image/png");
+    if (previewOnly) {
+      $('bookingExportPreviewTitle').innerText = 'IMAGE Preview';
+      $('bookingExportPreviewBody').innerHTML = `<img src="${imageUrl}" alt="Booking performance report preview" class="block max-w-full h-auto mx-auto bg-white shadow-sm">`;
+      $('bookingExportPreviewModal').classList.remove('hidden');
+    } else {
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = imageUrl;
+      link.click();
+    }
   } catch (err) {
     alert("Image export failed: " + err.message);
   } finally {
@@ -7609,6 +7634,10 @@ async function exportBookingReportImage() {
       const body = $('bookingExportPreviewBody');
       if (!modal || !body) return;
 
+      if (format === 'image') {
+        return exportBookingReportImage(true);
+      }
+
       const from = $('bookingFromDate')?.value || 'Inception';
       const to = $('bookingToDate')?.value || 'Current Date';
       const office = $('bookingFilterOffice')?.value || 'All Offices';
@@ -7650,6 +7679,51 @@ async function exportBookingReportImage() {
 
     function closeBookingExportPreview() {
       $('bookingExportPreviewModal')?.classList.add('hidden');
+    }
+
+    async function shareBookingExportPreview() {
+      const image = $('bookingExportPreviewBody')?.querySelector('img');
+      if (!image?.src) return alert('Generate the image preview before sharing the report.');
+
+      try {
+        const blob = await (await fetch(image.src)).blob();
+        const file = new File([blob], 'Booking_Performance_Report.png', { type: 'image/png' });
+        const shareData = {
+          files: [file],
+          title: 'Booking Performance Report',
+          text: 'Booking Performance & Digital Adoption Report'
+        };
+
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          await navigator.share(shareData);
+          return;
+        }
+
+        let copied = false;
+        if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          copied = true;
+        }
+
+        const message = 'Booking Performance & Digital Adoption Report';
+        const whatsapp = $('bookingShareWhatsAppLink');
+        const email = $('bookingShareEmailLink');
+        if (whatsapp) whatsapp.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        if (email) email.href = `mailto:?subject=${encodeURIComponent('Booking Performance Report')}&body=${encodeURIComponent(`${message}\n\nThe report image ${copied ? 'has been copied; paste it into your message.' : 'is ready to download and attach.'}`)}`;
+        if ($('bookingShareFallbackNote')) {
+          $('bookingShareFallbackNote').innerText = copied
+            ? 'Direct image sharing is unavailable. The report image was copied to your clipboard; open WhatsApp or Email and paste it into your message.'
+            : 'Direct image sharing and clipboard copy are unavailable. Open WhatsApp or Email for a report message, or download the image and attach it manually.';
+        }
+        $('bookingShareFallbackModal')?.classList.remove('hidden');
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+        alert(`Could not share the report: ${error.message}`);
+      }
+    }
+
+    function closeBookingShareFallback() {
+      $('bookingShareFallbackModal')?.classList.add('hidden');
     }
 
     async function copyBookingExportPreview() {
@@ -8197,7 +8271,7 @@ function filterUserAccounts() {
   const query = $('userInstantSearch')?.value.trim().toLowerCase() || '';
   const approvalFilter = $('userApprovalFilter')?.value || 'all';
   const filteredUsers = allLoadedUsers.filter(user => {
-    const approved = user.is_approved !== false;
+    const approved = user.is_approved !== false && String(user.is_approved).toLowerCase() !== 'false';
     const matchesApproval = approvalFilter === 'all' ||
       (approvalFilter === 'pending' && !approved) ||
       (approvalFilter === 'approved' && approved);
@@ -8212,7 +8286,9 @@ function renderUserAccounts(users) {
   const tbody = $('usersTableBody');
   if (!tbody) return;
 
-  const pendingCount = allLoadedUsers.filter(user => user.is_approved === false).length;
+  const pendingCount = allLoadedUsers.filter(user =>
+    user.is_approved === false || String(user.is_approved).toLowerCase() === 'false'
+  ).length;
   if ($('pendingApprovalCount')) $('pendingApprovalCount').innerText = pendingCount.toLocaleString('en-IN');
   
   if (!users.length) {
@@ -8226,7 +8302,7 @@ function renderUserAccounts(users) {
   let htmlArr = [];
   users.forEach(u => {
     const isActive = u.is_active !== false;
-    const isApproved = u.is_approved !== false;
+    const isApproved = u.is_approved !== false && String(u.is_approved).toLowerCase() !== 'false';
     const isSelf = String(u.id) === String(callerId);
     const targetRole = (u.role || 'user').toLowerCase();
     const isTargetAdmin = targetRole === 'admin' || targetRole === 'superadmin';
