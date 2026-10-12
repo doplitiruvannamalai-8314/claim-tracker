@@ -1023,6 +1023,12 @@
       <label class="block font-bold text-slate-700 mb-0.5">Offices</label>
       <details class="relative rounded border border-slate-300 bg-white">
         <summary class="flex cursor-pointer list-none justify-between p-2 font-semibold text-slate-700">Choose offices <span aria-hidden="true">▾</span></summary>
+        <div class="border-t border-slate-200 p-2">
+          <label class="flex items-center gap-2 py-1 font-bold text-postRed-800">
+            <input type="checkbox" id="monthlyReportSelectAllOffices" onchange="setMonthlyReportOffices(this.checked)" class="h-4 w-4 accent-postRed-600">
+            <span>Select All Offices</span>
+          </label>
+        </div>
         <div id="monthlyReportOfficeChecklist" class="max-h-48 overflow-y-auto border-t border-slate-200 p-2 space-y-1" role="group" aria-label="Select report offices">
           <p class="text-[10px] text-slate-500">No selection includes all offices.</p>
         </div>
@@ -4014,10 +4020,11 @@ async function populateMonthlyReportOffices() {
 
     const selected = new Set(Array.from(container.querySelectorAll('input:checked')).map(input => input.value));
     const officeNames = [...new Set((data || []).map(row => String(row.office_name || '').trim()).filter(Boolean))];
-    container.innerHTML = officeNames.length ? officeNames.map((name, index) => {
+    container.innerHTML = officeNames.length ? officeNames.map(name => {
       const escaped = escapeMonthlyReportHtml(name);
-      return `<label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportOfficeOption" value="${escaped}" ${selected.has(name) ? 'checked' : ''} onchange="loadMonthlyReports()" class="h-4 w-4 accent-postRed-600"><span>${escaped}</span></label>`;
+      return `<label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportOfficeOption" value="${escaped}" ${selected.has(name) ? 'checked' : ''} onchange="handleMonthlyReportOfficeChange()" class="h-4 w-4 accent-postRed-600"><span>${escaped}</span></label>`;
     }).join('') : '<p class="text-[10px] text-slate-500">No offices found.</p>';
+    updateMonthlyReportSelectAllState();
     monthlyReportOfficesLoaded = true;
   } catch (error) {
     console.warn('Monthly report office list load failed:', error);
@@ -4047,6 +4054,28 @@ function escapeMonthlyReportHtml(value) {
 
 function getSelectedMonthlyReportOffices() {
   return Array.from(document.querySelectorAll('input[name="monthlyReportOfficeOption"]:checked')).map(input => input.value);
+}
+
+function updateMonthlyReportSelectAllState() {
+  const options = Array.from(document.querySelectorAll('input[name="monthlyReportOfficeOption"]'));
+  const selectAll = $('monthlyReportSelectAllOffices');
+  if (!selectAll) return;
+  const checkedCount = options.filter(input => input.checked).length;
+  selectAll.checked = options.length > 0 && checkedCount === options.length;
+  selectAll.indeterminate = checkedCount > 0 && checkedCount < options.length;
+}
+
+function setMonthlyReportOffices(checked) {
+  document.querySelectorAll('input[name="monthlyReportOfficeOption"]').forEach(input => {
+    input.checked = Boolean(checked);
+  });
+  updateMonthlyReportSelectAllState();
+  loadMonthlyReports();
+}
+
+function handleMonthlyReportOfficeChange() {
+  updateMonthlyReportSelectAllState();
+  loadMonthlyReports();
 }
 
 function getSelectedMonthlyReportProducts() {
@@ -4243,6 +4272,7 @@ function resetMonthlyReportFilters() {
   if ($('monthlyReportSearch')) $('monthlyReportSearch').value = '';
   document.querySelectorAll('input[name="monthlyReportProductOption"]').forEach(input => { input.checked = input.value === 'ALL'; });
   document.querySelectorAll('input[name="monthlyReportOfficeOption"]').forEach(input => { input.checked = false; });
+  updateMonthlyReportSelectAllState();
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   if ($('monthlyReportFrom')) $('monthlyReportFrom').value = todayStr;
