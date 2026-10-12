@@ -204,8 +204,8 @@
           </div>
 
           <!-- FILTERS -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
-            <div class="col-span-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-2 items-end bg-amber-50/60 p-3 rounded-xl border border-amber-200">
+            <div class="sm:col-span-2 lg:col-span-3">
               <label class="block text-[11px] font-bold text-postRed-800 mb-0.5">⚡ Search (Ref No / Ticket / Name / Office)</label>
               <input type="text" id="overviewInstantSearch" oninput="applyOverviewFilters()" placeholder="Type to filter..." class="w-full border-2 border-postGold-400 p-1.5 rounded text-xs bg-white focus:ring-2 focus:ring-postRed-600 outline-none font-mono">
             </div>
@@ -239,6 +239,15 @@
                 <option value="In Progress">In Progress</option>
                 <option value="Settled">Settled</option>
                 <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Display</label>
+              <select id="overviewDisplayLimit" onchange="applyOverviewFilters()" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white outline-none">
+                <option value="10" selected>Last 10</option>
+                <option value="50">Last 50</option>
+                <option value="100">Last 100</option>
+                <option value="all">All Records</option>
               </select>
             </div>
             <div>
@@ -1011,16 +1020,27 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 items-end text-xs">
     
     <div>
-      <label for="monthlyReportOffice" class="block font-bold text-slate-700 mb-0.5">Offices (multi-select)</label>
-      <select id="monthlyReportOffice" multiple size="4" onchange="loadMonthlyReports()" class="w-full min-h-[100px] border border-slate-300 p-2 rounded bg-white" aria-describedby="monthlyReportOfficeHint"></select>
-      <p id="monthlyReportOfficeHint" class="text-[10px] text-slate-500 mt-0.5">Tap to select offices; no selection includes all offices.</p>
+      <label class="block font-bold text-slate-700 mb-0.5">Offices</label>
+      <details class="relative rounded border border-slate-300 bg-white">
+        <summary class="flex cursor-pointer list-none justify-between p-2 font-semibold text-slate-700">Choose offices <span aria-hidden="true">▾</span></summary>
+        <div id="monthlyReportOfficeChecklist" class="max-h-48 overflow-y-auto border-t border-slate-200 p-2 space-y-1" role="group" aria-label="Select report offices">
+          <p class="text-[10px] text-slate-500">No selection includes all offices.</p>
+        </div>
+      </details>
+      <p id="monthlyReportOfficeHint" class="text-[10px] text-slate-500 mt-0.5">Select one or more; no selection includes all offices.</p>
     </div>
     <div>
-      <label for="monthlyReportProduct" class="block font-bold text-slate-700 mb-0.5">Product Codes (multi-select)</label>
-      <select id="monthlyReportProduct" multiple size="4" onchange="handleMonthlyReportProductChange()" class="w-full min-h-[100px] border border-slate-300 p-2 rounded bg-white" aria-describedby="monthlyReportProductHint">
-        <option value="ALL" selected>All Products</option><option value="CODMO">CODMO</option><option value="EMO">EMO</option><option value="SMO">SMO</option>
-      </select>
-      <p id="monthlyReportProductHint" class="text-[10px] text-slate-500 mt-0.5">Tap one or more codes; choose All Products to include every code.</p>
+      <label class="block font-bold text-slate-700 mb-0.5">Product Codes</label>
+      <details class="relative rounded border border-slate-300 bg-white">
+        <summary class="flex cursor-pointer list-none justify-between p-2 font-semibold text-slate-700">Choose product codes <span aria-hidden="true">▾</span></summary>
+        <div id="monthlyReportProductChecklist" class="border-t border-slate-200 p-2 space-y-1" role="group" aria-label="Select product codes">
+          <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="ALL" checked onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">All Products</label>
+          <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="CODMO" onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">CODMO</label>
+          <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="EMO" onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">EMO</label>
+          <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="SMO" onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">SMO</label>
+        </div>
+      </details>
+      <p id="monthlyReportProductHint" class="text-[10px] text-slate-500 mt-0.5">Choose any combination or All Products.</p>
     </div>
     <div>
       <label for="monthlyReportFrom" class="block font-bold text-slate-700 mb-0.5">From Date</label>
@@ -1130,13 +1150,19 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
           <div class="sm:col-span-2"><label class="block font-bold text-slate-700 mb-0.5">Posting Date From / To</label><div class="flex gap-2"><input type="date" id="rpDateFrom" onchange="renderReceiptPaymentReport()" class="min-w-0 w-1/2 border p-1.5 rounded bg-white"><input type="date" id="rpDateTo" onchange="renderReceiptPaymentReport()" class="min-w-0 w-1/2 border p-1.5 rounded bg-white"></div></div>
         </div>
         <div class="lg:col-span-3 rounded-lg border border-blue-200 bg-white p-2">
-          <div class="flex justify-between items-center mb-1"><label for="rpFilterOffice" class="font-bold text-slate-700">Office Name (multi-select)</label><div class="flex gap-2 text-[10px]"><button type="button" onclick="setReceiptPaymentOffices(true)" class="font-bold text-blue-700 hover:underline">Select All</button><button type="button" onclick="setReceiptPaymentOffices(false)" class="font-bold text-slate-600 hover:underline">Clear</button></div></div>
-          <select id="rpFilterOffice" multiple size="8" onchange="renderReceiptPaymentReport()" class="w-full min-h-[220px] border p-1.5 rounded bg-white" aria-label="Select one or more offices"></select>
+          <div class="flex justify-between items-center mb-1"><span class="font-bold text-slate-700">Office Name</span><div class="flex gap-2 text-[10px]"><button type="button" onclick="setReceiptPaymentOffices(true)" class="font-bold text-blue-700 hover:underline">Select All</button><button type="button" onclick="setReceiptPaymentOffices(false)" class="font-bold text-slate-600 hover:underline">Clear</button></div></div>
+          <div id="rpFilterOfficeChecklist" class="max-h-56 overflow-y-auto border border-slate-200 rounded p-2 space-y-1" role="group" aria-label="Select one or more offices"><p class="text-[10px] text-slate-500">Load local or saved data to populate offices.</p></div>
           <p class="text-[10px] text-slate-500 mt-1">No selection includes all offices.</p>
         </div>
         <div class="lg:col-span-4 rounded-lg border border-blue-200 bg-white p-2">
-          <label for="rpGroupDimensions" class="block font-bold text-slate-700 mb-1">Consolidate by (select any combination)</label>
-          <select id="rpGroupDimensions" multiple size="8" onchange="renderReceiptPaymentReport()" class="w-full min-h-[220px] border p-1.5 rounded bg-white"><option value="receiptType" selected>Receipt / Payment</option><option value="officeName" selected>Office Name</option><option value="glCode">GL Code</option><option value="accountDescription">Account Code Description</option><option value="hoa">HOA</option></select>
+          <label class="block font-bold text-slate-700 mb-1">Consolidate by (select any combination)</label>
+          <div id="rpGroupDimensionsChecklist" class="max-h-56 overflow-y-auto border border-slate-200 rounded p-2 space-y-1" role="group" aria-label="Choose report grouping fields">
+            <label class="flex items-center gap-2 py-1"><input type="checkbox" name="rpGroupDimensionOption" value="receiptType" checked onchange="renderReceiptPaymentReport()" class="h-4 w-4 accent-blue-700">Receipt / Payment</label>
+            <label class="flex items-center gap-2 py-1"><input type="checkbox" name="rpGroupDimensionOption" value="officeName" checked onchange="renderReceiptPaymentReport()" class="h-4 w-4 accent-blue-700">Office Name</label>
+            <label class="flex items-center gap-2 py-1"><input type="checkbox" name="rpGroupDimensionOption" value="glCode" onchange="renderReceiptPaymentReport()" class="h-4 w-4 accent-blue-700">GL Code</label>
+            <label class="flex items-center gap-2 py-1"><input type="checkbox" name="rpGroupDimensionOption" value="accountDescription" onchange="renderReceiptPaymentReport()" class="h-4 w-4 accent-blue-700">Account Code Description</label>
+            <label class="flex items-center gap-2 py-1"><input type="checkbox" name="rpGroupDimensionOption" value="hoa" onchange="renderReceiptPaymentReport()" class="h-4 w-4 accent-blue-700">HOA</label>
+          </div>
           <p class="text-[10px] text-slate-500 mt-1">Choose any fields; multiple selection is supported.</p>
         </div>
         <div class="lg:col-span-12 flex flex-wrap items-end gap-2 border-t border-slate-200 pt-2">
@@ -3976,8 +4002,8 @@ let monthlyReportRequestId = 0;
 let monthlyReportOfficesLoaded = false;
 
 async function populateMonthlyReportOffices() {
-  const select = $('monthlyReportOffice');
-  if (!select || monthlyReportOfficesLoaded) return;
+  const container = $('monthlyReportOfficeChecklist');
+  if (!container || monthlyReportOfficesLoaded) return;
 
   try {
     const { data, error } = await supabaseClient
@@ -3986,16 +4012,16 @@ async function populateMonthlyReportOffices() {
       .order('office_name', { ascending: true });
     if (error) throw error;
 
-    const selected = new Set(Array.from(select.selectedOptions).map(option => option.value));
+    const selected = new Set(Array.from(container.querySelectorAll('input:checked')).map(input => input.value));
     const officeNames = [...new Set((data || []).map(row => String(row.office_name || '').trim()).filter(Boolean))];
-    select.innerHTML = officeNames.map(name => {
+    container.innerHTML = officeNames.length ? officeNames.map((name, index) => {
       const escaped = escapeMonthlyReportHtml(name);
-      return `<option value="${escaped}" ${selected.has(name) ? 'selected' : ''}>${escaped}</option>`;
-    }).join('');
+      return `<label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportOfficeOption" value="${escaped}" ${selected.has(name) ? 'checked' : ''} onchange="loadMonthlyReports()" class="h-4 w-4 accent-postRed-600"><span>${escaped}</span></label>`;
+    }).join('') : '<p class="text-[10px] text-slate-500">No offices found.</p>';
     monthlyReportOfficesLoaded = true;
   } catch (error) {
     console.warn('Monthly report office list load failed:', error);
-    select.innerHTML = '<option disabled>Office list unavailable</option>';
+    container.innerHTML = '<p class="text-rose-600">Office list unavailable.</p>';
   }
 }
 
@@ -4019,20 +4045,25 @@ function escapeMonthlyReportHtml(value) {
   return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+function getSelectedMonthlyReportOffices() {
+  return Array.from(document.querySelectorAll('input[name="monthlyReportOfficeOption"]:checked')).map(input => input.value);
+}
+
 function getSelectedMonthlyReportProducts() {
-  return Array.from($('monthlyReportProduct')?.selectedOptions || [])
-    .map(option => option.value)
+  return Array.from(document.querySelectorAll('input[name="monthlyReportProductOption"]:checked'))
+    .map(input => input.value)
     .filter(value => value && value !== 'ALL');
 }
 
-function handleMonthlyReportProductChange() {
-  const select = $('monthlyReportProduct');
-  if (!select) return;
-  const allOption = Array.from(select.options).find(option => option.value === 'ALL');
-  if (allOption?.selected) {
-    Array.from(select.options).forEach(option => { option.selected = option.value === 'ALL'; });
-  } else if (allOption) {
-    allOption.selected = false;
+function handleMonthlyReportProductChange(event) {
+  const options = Array.from(document.querySelectorAll('input[name="monthlyReportProductOption"]'));
+  const allOption = options.find(input => input.value === 'ALL');
+  const clicked = event?.target;
+  if (clicked?.value === 'ALL' && clicked.checked) {
+    options.forEach(input => { input.checked = input.value === 'ALL'; });
+  } else {
+    if (allOption) allOption.checked = false;
+    if (!options.some(input => input.value !== 'ALL' && input.checked) && allOption) allOption.checked = true;
   }
   loadMonthlyReports();
 }
@@ -4125,7 +4156,7 @@ async function loadMonthlyReports() {
   const fromDate = $('monthlyReportFrom')?.value || '';
   const toDate = $('monthlyReportTo')?.value || '';
   const selectedProducts = getSelectedMonthlyReportProducts();
-  const selectedOffices = Array.from($('monthlyReportOffice')?.selectedOptions || []).map(option => option.value);
+  const selectedOffices = getSelectedMonthlyReportOffices();
   if (fromDate && toDate && fromDate > toDate) return alert('From Date cannot be later than To Date.');
   tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Loading monthly reports...</td></tr>';
   try {
@@ -4163,7 +4194,7 @@ async function loadMonthlyReports() {
 
 function getFilteredMonthlyReports() {
   const search = ($('monthlyReportSearch')?.value || '').trim().toLowerCase();
-  const selectedOffices = Array.from($('monthlyReportOffice')?.selectedOptions || []).map(option => option.value);
+  const selectedOffices = getSelectedMonthlyReportOffices();
   const selectedProducts = getSelectedMonthlyReportProducts();
   return monthlyReportRecords.filter(row =>
     (!selectedOffices.length || selectedOffices.includes(row.office_name)) &&
@@ -4210,8 +4241,8 @@ function renderMonthlyReports() {
 
 function resetMonthlyReportFilters() {
   if ($('monthlyReportSearch')) $('monthlyReportSearch').value = '';
-  if ($('monthlyReportProduct')) Array.from($('monthlyReportProduct').options).forEach(option => { option.selected = option.value === 'ALL'; });
-  if ($('monthlyReportOffice')) Array.from($('monthlyReportOffice').options).forEach(option => { option.selected = false; });
+  document.querySelectorAll('input[name="monthlyReportProductOption"]').forEach(input => { input.checked = input.value === 'ALL'; });
+  document.querySelectorAll('input[name="monthlyReportOfficeOption"]').forEach(input => { input.checked = false; });
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   if ($('monthlyReportFrom')) $('monthlyReportFrom').value = todayStr;
@@ -4238,7 +4269,7 @@ function exportMonthlyReports(format) {
   const now = new Date();
   const stamp = now.toISOString().slice(0, 10);
   const generatedOn = now.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-  const selectedOffices = Array.from($('monthlyReportOffice')?.selectedOptions || []).map(option => option.value);
+  const selectedOffices = getSelectedMonthlyReportOffices();
   const selectedProducts = getSelectedMonthlyReportProducts();
   const officeScope = selectedOffices.length ? selectedOffices.join(', ') : 'All Offices';
   const productScope = selectedProducts.length ? selectedProducts.join(', ') : 'All Products';
@@ -4838,19 +4869,37 @@ async function clearReceiptPaymentData() {
   }
 }
 
+function getSelectedReceiptPaymentOffices() {
+  return new Set(Array.from(document.querySelectorAll('input[name="rpOfficeOption"]:checked')).map(input => input.value));
+}
+
+function getSelectedReceiptPaymentGroupDimensions() {
+  return Array.from(document.querySelectorAll('input[name="rpGroupDimensionOption"]:checked')).map(input => input.value);
+}
+
 function populateReceiptPaymentFilters() {
   const fields = [
-    ['rpFilterType', 'receiptType', 'All'], ['rpFilterOffice', 'officeName', 'All Offices'],
-    ['rpFilterGl', 'glCode', 'All GL Codes'], ['rpFilterDescription', 'accountDescription', 'All Descriptions'], ['rpFilterHoa', 'hoa', 'All HOAs']
+    ['rpFilterType', 'receiptType', 'All'], ['rpFilterGl', 'glCode', 'All GL Codes'],
+    ['rpFilterDescription', 'accountDescription', 'All Descriptions'], ['rpFilterHoa', 'hoa', 'All HOAs']
   ];
   fields.forEach(([id, key, defaultLabel]) => {
     const select = $(id);
     if (!select) return;
-    const selected = new Set(Array.from(select.selectedOptions || []).map(option => option.value).filter(Boolean));
+    const selected = select.value;
     const values = [...new Set(receiptPaymentRecords.map(row => row[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-    select.innerHTML = `${select.multiple ? '' : `<option value="">${defaultLabel}</option>`}` + values.map(value => `<option value="${escapeMonthlyReportHtml(value)}">${escapeMonthlyReportHtml(value)}</option>`).join('');
-    Array.from(select.options).forEach(option => { option.selected = selected.has(option.value); });
+    select.innerHTML = `<option value="">${defaultLabel}</option>` + values.map(value => `<option value="${escapeMonthlyReportHtml(value)}">${escapeMonthlyReportHtml(value)}</option>`).join('');
+    if (values.includes(selected)) select.value = selected;
   });
+
+  const officeList = $('rpFilterOfficeChecklist');
+  if (officeList) {
+    const selectedOffices = new Set(getSelectedReceiptPaymentOffices());
+    const offices = [...new Set(receiptPaymentRecords.map(row => row.officeName).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    officeList.innerHTML = offices.length ? offices.map(office => {
+      const safeOffice = escapeMonthlyReportHtml(office);
+      return `<label class="flex items-center gap-2 py-1"><input type="checkbox" name="rpOfficeOption" value="${safeOffice}" ${selectedOffices.has(office) ? 'checked' : ''} onchange="renderReceiptPaymentReport()" class="h-4 w-4 accent-blue-700"><span>${safeOffice}</span></label>`;
+    }).join('') : '<p class="text-[10px] text-slate-500">No offices found.</p>';
+  }
   updateReceiptPaymentLinkedFilters();
 }
 
@@ -4875,14 +4924,12 @@ function updateReceiptPaymentLinkedFilters(changed = '') {
 }
 
 function setReceiptPaymentOffices(selectAll) {
-  const select = $('rpFilterOffice');
-  if (!select) return;
-  Array.from(select.options).forEach(option => { option.selected = Boolean(selectAll); });
+  document.querySelectorAll('input[name="rpOfficeOption"]').forEach(input => { input.checked = Boolean(selectAll); });
   renderReceiptPaymentReport();
 }
 
 function getFilteredReceiptPaymentRows() {
-  const offices = Array.from($('rpFilterOffice')?.selectedOptions || []).map(option => option.value).filter(Boolean);
+  const offices = getSelectedReceiptPaymentOffices();
   const filters = {
     receiptType: $('rpFilterType')?.value || '', glCode: $('rpFilterGl')?.value || '',
     accountDescription: $('rpFilterDescription')?.value || '', hoa: $('rpFilterHoa')?.value || ''
@@ -4892,7 +4939,7 @@ function getFilteredReceiptPaymentRows() {
   const search = ($('rpSearch')?.value || '').trim().toLowerCase();
   return receiptPaymentRecords.filter(row =>
     Object.entries(filters).every(([key, value]) => !value || row[key] === value) &&
-    (!offices.length || offices.includes(row.officeName)) &&
+    (!offices.size || offices.has(row.officeName)) &&
     (!from || (row.postingDate && row.postingDate >= from)) &&
     (!to || (row.postingDate && row.postingDate <= to)) &&
     (!search || [row.treasuryTranId, row.sourceTranId, row.remarks, row.accountDescription, row.hoa, row.officeName, row.glCode].some(value => String(value || '').toLowerCase().includes(search)))
@@ -4900,7 +4947,7 @@ function getFilteredReceiptPaymentRows() {
 }
 
 function getReceiptPaymentGroups(rows) {
-  const dimensions = Array.from($('rpGroupDimensions')?.selectedOptions || []).map(option => option.value);
+  const dimensions = getSelectedReceiptPaymentGroupDimensions();
   if ($('rpGroupByDay')?.checked && !dimensions.includes('postingDate')) dimensions.push('postingDate');
   const labels = { ...receiptPaymentDimensions, postingDate: { label: 'Posting Date', field: 'postingDate' } };
   const groups = new Map();
@@ -4939,10 +4986,9 @@ function renderReceiptPaymentReport() {
 
 function resetReceiptPaymentFilters() {
   ['rpFilterType', 'rpFilterGl', 'rpFilterDescription', 'rpFilterHoa', 'rpDateFrom', 'rpDateTo', 'rpSearch'].forEach(id => { if ($(id)) $(id).value = ''; });
-  if ($('rpFilterOffice')) Array.from($('rpFilterOffice').options).forEach(option => { option.selected = false; });
+  document.querySelectorAll('input[name="rpOfficeOption"]').forEach(input => { input.checked = false; });
   if ($('rpGroupByDay')) $('rpGroupByDay').checked = false;
-  const grouping = $('rpGroupDimensions');
-  if (grouping) Array.from(grouping.options).forEach(option => { option.selected = ['receiptType', 'officeName'].includes(option.value); });
+  document.querySelectorAll('input[name="rpGroupDimensionOption"]').forEach(input => { input.checked = ['receiptType', 'officeName'].includes(input.value); });
   renderReceiptPaymentReport();
 }
 
@@ -6657,6 +6703,8 @@ if (isAdmin) {
         return true; 
     }); 
     currentClaimsList.sort((a, b) => new Date(b.txn_date || 0) - new Date(a.txn_date || 0));
+    const displayLimit = $('overviewDisplayLimit')?.value || '10';
+    if (displayLimit !== 'all') currentClaimsList = currentClaimsList.slice(0, Number(displayLimit));
     currentSortCol = 'txn_date';
     currentSortDir = 'desc';
     renderClaimsSummaryTable(); 
@@ -6668,7 +6716,8 @@ function resetOverviewFilters() {
     if ($('overviewFilterOffice')) $('overviewFilterOffice').value = ''; 
     if ($('overviewFilterEmpUser')) $('overviewFilterEmpUser').value = ''; 
         if ($('overviewFilterStatus')) $('overviewFilterStatus').value = '';
-    currentClaimsList = [...rawClaimsList];
+    if ($('overviewDisplayLimit')) $('overviewDisplayLimit').value = '10';
+    currentClaimsList = [...rawClaimsList].sort((a, b) => new Date(b.txn_date || 0) - new Date(a.txn_date || 0)).slice(0, 10);
     currentClaimsList.sort((a, b) => new Date(b.txn_date || 0) - new Date(a.txn_date || 0));  
     renderClaimsSummaryTable(); 
 } 
