@@ -2899,6 +2899,46 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
         </div>
       </div>
 
+      <!-- ADMIN USER DOCUMENT REVIEW / REPLACEMENT MODAL -->
+      <div id="userDocumentActionModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 max-w-xl w-full space-y-3 shadow-2xl border-t-8 border-indigo-600 max-h-[92vh] overflow-y-auto">
+          <div class="flex justify-between items-center border-b pb-2 border-indigo-200">
+            <div>
+              <h3 class="font-bold text-sm text-indigo-800 uppercase">📄 Review / Correct User Document</h3>
+              <p class="text-[11px] text-slate-500">Preview the applicant’s attachment, then replace or remove it if needed.</p>
+            </div>
+            <button type="button" onclick="closeUserDocumentActionModal()" aria-label="Close user document manager" class="text-xl font-bold cursor-pointer text-slate-400 hover:text-slate-700">&times;</button>
+          </div>
+          <input type="hidden" id="userDocumentActionClaimId">
+          <div class="bg-indigo-50 p-2.5 rounded-lg border border-indigo-200 text-xs grid grid-cols-2 gap-2">
+            <div><span class="block text-[10px] text-slate-500 font-bold">Reference No.</span><span id="userDocumentActionRef" class="font-mono font-bold text-postRed-700">-</span></div>
+            <div><span class="block text-[10px] text-slate-500 font-bold">Office / Module</span><span id="userDocumentActionOffice" class="font-semibold text-slate-800">-</span></div>
+          </div>
+          <div id="userDocumentCurrentPreview" class="hidden border border-indigo-200 rounded-lg p-2 bg-slate-50">
+            <p class="font-bold text-[11px] text-indigo-900 mb-1">Current User Document</p>
+            <div id="userDocumentCurrentMedia" class="flex justify-center"></div>
+          </div>
+          <div class="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-200 space-y-2">
+            <label for="userDocumentActionFile" class="font-bold text-indigo-900 text-xs">Upload Replacement Document (JPG, PNG, or PDF)</label>
+            <input type="file" id="userDocumentActionFile" accept=".jpg,.jpeg,.png,.pdf" onchange="previewUserDocumentActionFile(event)" class="w-full border border-slate-300 p-1.5 rounded text-xs bg-white">
+            <div id="userDocumentActionDropZone" tabindex="0" class="border-2 border-dashed border-indigo-300 hover:border-indigo-700 bg-white p-3 rounded-lg text-center cursor-pointer outline-none transition">
+              <p class="text-[11px] font-bold text-indigo-900">📋 Click here, then press <kbd class="bg-indigo-100 px-1 py-0.5 border rounded font-mono">Ctrl + V</kbd> to paste a correction</p>
+            </div>
+            <div id="userDocumentActionNewPreview" class="hidden border border-indigo-300 rounded p-2 bg-white">
+              <div id="userDocumentActionNewMedia" class="flex justify-center"></div>
+              <p id="userDocumentActionNewLabel" class="text-[10px] text-indigo-800 font-bold text-center mt-1"></p>
+            </div>
+          </div>
+          <div class="flex justify-between gap-2 pt-2 border-t border-indigo-200">
+            <button type="button" onclick="deleteUserDocumentFromModal()" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">🗑️ Delete Current</button>
+            <div class="flex gap-2">
+              <button type="button" onclick="closeUserDocumentActionModal()" class="bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Cancel</button>
+              <button type="button" id="btnSaveUserDocumentAction" onclick="saveUserDocumentFromModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer shadow-xs">Upload / Replace</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ADMIN EDIT USER MODAL -->
       <div id="adminUserEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 max-w-md w-full space-y-3 shadow-2xl border-t-8 border-postRed-600">
@@ -6639,13 +6679,18 @@ function renderClaimsSummaryTable() {
       ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
       : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user || '-'}</div>`;
 
-    let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
+    let userDocHtml = c.file_url
+      ? `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`
+      : `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">No User Doc</span>`;
 
     if (needsRevision && isOwner) {
       userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
     } else if (needsRevision) {
       userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
     }
+    const userDocManageHtml = isAdmin
+      ? `<button type="button" onclick="openUserDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage User Doc</button>`
+      : '';
 
     let adminDocHtml = '';
     if (c.admin_file_url) {
@@ -6706,6 +6751,7 @@ if (isAdmin) {
             ${actionBtnHtml}
             <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
             ${userDocHtml}
+            ${userDocManageHtml}
             ${adminDocHtml}
           </div>
         </td>
@@ -6813,13 +6859,18 @@ function sortTable(col) {
       ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
       : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user || '-'}</div>`;
 
-    let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
+    let userDocHtml = c.file_url
+      ? `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`
+      : `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">No User Doc</span>`;
 
     if (needsRevision && isOwner) {
       userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
     } else if (needsRevision) {
       userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
     }
+    const userDocManageHtml = isAdmin
+      ? `<button type="button" onclick="openUserDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage User Doc</button>`
+      : '';
 
     let adminDocHtml = '';
     if (c.admin_file_url) {
@@ -6871,6 +6922,7 @@ function sortTable(col) {
             ${actionBtnHtml}
             <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
             ${userDocHtml}
+            ${userDocManageHtml}
             ${adminDocHtml}
           </div>
         </td>
@@ -11015,13 +11067,18 @@ function renderClaimsSummaryTable() {
       ? `<div class="bg-amber-50 text-postRed-900 border border-amber-300 p-1.5 rounded text-[11px] leading-tight break-words max-w-[190px]"><span class="font-bold text-slate-600 block text-[10px]">Admin:</span>${c.reply_remarks_admin}</div>`
       : `<div class="text-slate-600 italic text-[11px] truncate max-w-[170px]"><span class="font-bold text-slate-700 not-italic">User:</span> ${c.remarks_by_user || '-'}</div>`;
 
-    let userDocHtml = `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`;
+    let userDocHtml = c.file_url
+      ? `<a href="${c.file_url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded text-[10px] font-bold text-center">📄 User Doc</a>`
+      : `<span class="w-full text-[9.5px] text-slate-400 italic py-1 px-1 border border-dashed border-slate-200 rounded text-center">No User Doc</span>`;
 
     if (needsRevision && isOwner) {
       userDocHtml = `<button type="button" onclick="openReuploadModal('${c.id}', '${c.doc_revision_remarks || 'Document illegible. Please re-upload.'}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold animate-pulse">⚠️ Re-upload</button>`;
     } else if (needsRevision) {
       userDocHtml = `<span class="w-full bg-rose-100 text-rose-800 border border-rose-300 px-1 py-0.5 rounded text-[9.5px] font-bold text-center">Needs Revision</span>`;
     }
+    const userDocManageHtml = isAdmin
+      ? `<button type="button" onclick="openUserDocumentActionModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🛠️ Manage User Doc</button>`
+      : '';
 
     let adminDocHtml = '';
     if (c.admin_file_url) {
@@ -11079,6 +11136,7 @@ function renderClaimsSummaryTable() {
             ${actionBtnHtml}
             <button type="button" onclick="printClaimDetails('${c.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer">🖨️ Docket</button>
             ${userDocHtml}
+            ${userDocManageHtml}
             ${adminDocHtml}
           </div>
         </td>
@@ -11797,6 +11855,158 @@ function getClaimStoragePath(publicUrl) {
   return index >= 0 ? decodeURIComponent(publicUrl.slice(index + marker.length)) : null;
 }
 
+// Admin-only review and replacement controls for the applicant's attachment.
+let userDocumentActionFile = null;
+
+function assertAdminForUserDocumentAction() {
+  const role = (userProfile?.role || '').toLowerCase();
+  if (!isProfileApproved() || !['admin', 'superadmin'].includes(role)) {
+    alert('Access denied. Approved administrator privileges are required to manage user documents.');
+    return false;
+  }
+  return true;
+}
+
+function findClaimForDocumentAction(claimId) {
+  return [...(rawClaimsList || []), ...(rawMISMasterList || [])]
+    .find(claim => String(claim.id) === String(claimId));
+}
+
+function openUserDocumentActionModal(claimId) {
+  if (!assertAdminForUserDocumentAction()) return;
+  const claim = findClaimForDocumentAction(claimId);
+  if (!claim) return alert('Claim record not found. Refresh the claims list and try again.');
+
+  $('userDocumentActionClaimId').value = claim.id;
+  $('userDocumentActionRef').innerText = claim.txn_id_ref || '-';
+  $('userDocumentActionOffice').innerText = `${claim.raised_for_office || '-'} / ${claim.module || '-'}`;
+  userDocumentActionFile = null;
+  if ($('userDocumentActionFile')) $('userDocumentActionFile').value = '';
+  renderUserDocumentActionPreview(claim.file_url);
+  renderUserDocumentActionFile(null);
+  $('userDocumentActionModal')?.classList.remove('hidden');
+}
+
+function renderUserDocumentActionPreview(url) {
+  const container = $('userDocumentCurrentPreview');
+  const media = $('userDocumentCurrentMedia');
+  if (!container || !media) return;
+  if (!url) {
+    container.classList.add('hidden');
+    media.innerHTML = '<p class="text-xs text-slate-500">No user document is currently attached.</p>';
+    return;
+  }
+  const safeUrl = String(url).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  media.innerHTML = /\.pdf(?:$|\?)/i.test(url)
+    ? `<iframe src="${safeUrl}" title="Current user document" class="w-full h-64 rounded border border-slate-300 bg-white"></iframe>`
+    : `<img src="${safeUrl}" alt="Current user document" class="max-h-64 max-w-full object-contain rounded border border-slate-300 bg-white">`;
+  container.classList.remove('hidden');
+}
+
+function renderUserDocumentActionFile(file) {
+  const preview = $('userDocumentActionNewPreview');
+  const media = $('userDocumentActionNewMedia');
+  const label = $('userDocumentActionNewLabel');
+  if (!preview || !media || !label) return;
+  if (!file) {
+    preview.classList.add('hidden');
+    media.innerHTML = '';
+    label.innerText = '';
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  media.innerHTML = file.type === 'application/pdf'
+    ? `<iframe src="${url}" title="Replacement user document" class="w-full h-64 rounded border border-slate-300 bg-white"></iframe>`
+    : `<img src="${url}" alt="Replacement user document" class="max-h-64 max-w-full object-contain rounded border border-slate-300 bg-white">`;
+  label.innerText = `✓ ${file.name || 'Pasted image'} (${(file.size / 1024).toFixed(1)} KB)`;
+  preview.classList.remove('hidden');
+}
+
+function previewUserDocumentActionFile(event) {
+  userDocumentActionFile = event.target.files?.[0] || null;
+  renderUserDocumentActionFile(userDocumentActionFile);
+}
+
+function handleUserDocumentActionPaste(event) {
+  const item = [...(event.clipboardData?.items || [])].find(entry => entry.type.startsWith('image/'));
+  if (!item) return;
+  event.preventDefault();
+  userDocumentActionFile = item.getAsFile();
+  renderUserDocumentActionFile(userDocumentActionFile);
+}
+
+function closeUserDocumentActionModal() {
+  $('userDocumentActionModal')?.classList.add('hidden');
+  userDocumentActionFile = null;
+  if ($('userDocumentActionFile')) $('userDocumentActionFile').value = '';
+  renderUserDocumentActionFile(null);
+}
+
+async function saveUserDocumentFromModal() {
+  if (!assertAdminForUserDocumentAction()) return;
+  const claimId = $('userDocumentActionClaimId')?.value;
+  if (!claimId || !userDocumentActionFile) return alert('Select a replacement file or paste an image first.');
+  const btn = $('btnSaveUserDocumentAction');
+  if (btn) { btn.disabled = true; btn.innerText = 'Saving...'; }
+
+  try {
+    const { blob, extension } = await optimizeImageForUpload(userDocumentActionFile);
+    const path = `claims/admin-corrected-userdoc-${claimId}-${Date.now()}.${extension}`;
+    const { error: uploadError } = await supabaseClient.storage.from('claim-attachments').upload(path, blob, {
+      upsert: true,
+      contentType: extension === 'pdf' ? 'application/pdf' : 'image/jpeg'
+    });
+    if (uploadError) throw uploadError;
+
+    const claim = findClaimForDocumentAction(claimId);
+    const oldPath = getClaimStoragePath(claim?.file_url);
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/claim-attachments/${path}`;
+    const { error } = await supabaseClient.from('claims').update({
+      file_url: publicUrl,
+      doc_status: 'Approved',
+      doc_revision_remarks: null
+    }).eq('id', claimId);
+    if (error) throw error;
+    if (oldPath) await supabaseClient.storage.from('claim-attachments').remove([oldPath]);
+
+    alert('User document replaced and marked as approved.');
+    closeUserDocumentActionModal();
+    await loadClaimsSummary();
+    await generateMISReport(currentMISReportFilter || 'All');
+  } catch (error) {
+    alert('User document replacement failed: ' + error.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerText = 'Upload / Replace'; }
+  }
+}
+
+async function deleteUserDocumentFromModal() {
+  if (!assertAdminForUserDocumentAction()) return;
+  const claimId = $('userDocumentActionClaimId')?.value;
+  const claim = findClaimForDocumentAction(claimId);
+  if (!claimId || !claim) return alert('Claim record not found.');
+  if (!claim.file_url) return alert('There is no user document attached to delete.');
+  if (!confirm('Delete the applicant’s current document? The claim will be marked “Needs Revision” so the applicant can upload a replacement.')) return;
+
+  try {
+    const oldPath = getClaimStoragePath(claim.file_url);
+    const { error } = await supabaseClient.from('claims').update({
+      file_url: null,
+      doc_status: 'Needs Revision',
+      doc_revision_remarks: 'User document removed by administrator. Please upload a replacement.'
+    }).eq('id', claimId);
+    if (error) throw error;
+    if (oldPath) await supabaseClient.storage.from('claim-attachments').remove([oldPath]);
+
+    alert('User document deleted. The applicant has been asked to upload a replacement.');
+    closeUserDocumentActionModal();
+    await loadClaimsSummary();
+    await generateMISReport(currentMISReportFilter || 'All');
+  } catch (error) {
+    alert('Could not delete user document: ' + error.message);
+  }
+}
+
 async function deleteAdminClaimDocument(claimId) {
   if (!assertAdminForClaimDocumentAction()) return;
   if (!confirm('Delete the admin resolution document from this claim?')) return;
@@ -11966,6 +12176,13 @@ async function deleteClaimByAdmin() {
       const registerClaimView = $('registerClaimView');
       const converterView = $('converterTabView');
       const reuploadModal = $('reuploadModal');
+
+      const userDocumentActionModal = $('userDocumentActionModal');
+      if (userDocumentActionModal && !userDocumentActionModal.classList.contains('hidden')) {
+        userDocumentActionFile = imageBlob;
+        renderUserDocumentActionFile(userDocumentActionFile);
+        return;
+      }
 
       const adminDocumentActionModal = $('adminDocumentActionModal');
       if (adminDocumentActionModal && !adminDocumentActionModal.classList.contains('hidden')) {
@@ -18565,6 +18782,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (adminDocumentDropZone) {
         adminDocumentDropZone.addEventListener('click', () => adminDocumentDropZone.focus());
         adminDocumentDropZone.addEventListener('paste', handleAdminDocumentActionPaste);
+      }
+
+      const userDocumentDropZone = document.getElementById('userDocumentActionDropZone');
+      if (userDocumentDropZone) {
+        userDocumentDropZone.addEventListener('click', () => userDocumentDropZone.focus());
+        userDocumentDropZone.addEventListener('paste', handleUserDocumentActionPaste);
       }
 
       const userDropZone = document.getElementById('userPasteDropZone');
