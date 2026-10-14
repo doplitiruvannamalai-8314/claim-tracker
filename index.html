@@ -832,7 +832,7 @@
       <button type="button" onclick="previewBookingReport('pdf')" class="bg-postRed-600 hover:bg-postRed-700 text-white px-3 py-1.5 rounded font-bold text-xs shadow-xs cursor-pointer">
         📄 Preview PDF
       </button>
-      <button type="button" onclick="downloadBookingExportPreview()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">⬇️ Download Image</button>
+      <button type="button" onclick="exportBookingReportImage()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded font-bold text-xs cursor-pointer">⬇️ Download Image</button>
     </div>
   </div>
 
@@ -1310,7 +1310,7 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
             <!-- File Import -->
             <input type="file" id="bulkUserImportInput" accept=".csv, .xlsx" class="hidden" onchange="handleBulkUserImport(event)">
             <button type="button" onclick="document.getElementById('bulkUserImportInput').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1.5 rounded text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-1">
-              📥 Export CSV
+              📥 Import CSV / Excel
             </button>
 
             <!-- Action Buttons -->
