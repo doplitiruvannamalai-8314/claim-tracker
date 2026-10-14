@@ -2626,7 +2626,7 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
       </div>
 
       <!-- Mode 2: Scheme Select -->
-      <div id="sb46SchemeContainer" class="hidden bg-slate-50 p-2.5 rounded border border-slate-200">
+      <div id="sb46SchemeContainer" class="hidden bg-slate-50 p-2.5 rounded border border-slate-200 space-y-2">
         <div class="flex justify-between items-center mb-0.5">
           <label class="block font-bold text-slate-700 text-xs">Select Scheme to Print *</label>
           <span id="sb46SchemeLoadingIndicator" class="text-[10px] text-slate-400 font-semibold hidden">Refreshing...</span>
@@ -2634,6 +2634,24 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
         <select id="sb46SchemeSelect" onchange="onSb46SchemeSelectChange()" class="w-full border border-slate-300 p-1.5 rounded font-bold text-xs bg-white outline-none focus:border-postRed-600">
           <option value="ALL">-- Loading Imported Schemes... --</option>
         </select>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div>
+            <label for="sb46SchemeFromSl" class="block font-bold text-slate-700 mb-0.5">From Sl. No.</label>
+            <input type="number" id="sb46SchemeFromSl" min="1" placeholder="1" onchange="updateSb46EligibleCount()" class="w-full border border-slate-300 p-1 rounded font-mono bg-white">
+          </div>
+          <div>
+            <label for="sb46SchemeToSl" class="block font-bold text-slate-700 mb-0.5">To Sl. No.</label>
+            <input type="number" id="sb46SchemeToSl" min="1" placeholder="Last" onchange="updateSb46EligibleCount()" class="w-full border border-slate-300 p-1 rounded font-mono bg-white">
+          </div>
+          <div>
+            <label for="sb46SchemePrintStatus" class="block font-bold text-slate-700 mb-0.5">Print Status</label>
+            <select id="sb46SchemePrintStatus" onchange="updateSb46EligibleCount()" class="w-full border border-slate-300 p-1 rounded font-semibold bg-white">
+              <option value="all">All eligible</option>
+              <option value="not_printed">Not printed</option>
+              <option value="printed">Already printed</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <!-- Mode 3: Single Account No -->
@@ -15634,14 +15652,23 @@ async function updateSb46EligibleCount() {
       }
       query = query.eq('account_no', accountNo);
     } else {
-      query = query.in('status', ['imported', 'printed']);
-      if (mode === 'range') {
+      if (mode === 'scheme') {
+        const printStatus = $('sb46SchemePrintStatus')?.value || 'all';
+        if (printStatus === 'printed') query = query.eq('status', 'printed');
+        else if (printStatus === 'not_printed') query = query.eq('status', 'imported');
+        else query = query.in('status', ['imported', 'printed']);
+
+        const fromSl = parseInt($('sb46SchemeFromSl')?.value, 10);
+        const toSl = parseInt($('sb46SchemeToSl')?.value, 10);
+        if (Number.isFinite(fromSl)) query = query.gte('sl_no', fromSl);
+        if (Number.isFinite(toSl)) query = query.lte('sl_no', toSl);
+      } else {
+        query = query.in('status', ['imported', 'printed']);
         const fromSl = parseInt($('sb46FromSl')?.value, 10) || 1;
         const toSl = parseInt($('sb46ToSl')?.value, 10) || 999999;
         query = query.gte('sl_no', fromSl).lte('sl_no', toSl);
-      } else if (scheme && scheme !== 'ALL') {
-        query = query.eq('scheme', scheme);
       }
+      if (scheme && scheme !== 'ALL') query = query.eq('scheme', scheme);
     }
 
     const { count, error } = await query;
@@ -15665,6 +15692,28 @@ async function onSb46OfficeChange() {
 // EXECUTE SB-46 PRINT ENGINE WITH STRICT STATUS VALIDATION
 // -------------------------------------------------------------
 
+// Fetch bulk print records in explicit pages to avoid PostgREST's 1,000-row cap.
+async function fetchSb46BulkRecords(buildQuery) {
+  const pageSize = 1000;
+  const countQuery = buildQuery(
+    supabaseClient.from('cent_percent_verification').select('id', { count: 'exact', head: true })
+  );
+  const { count, error: countError } = await countQuery;
+  if (countError) throw countError;
+
+  const records = [];
+  for (let from = 0; from < (count || 0); from += pageSize) {
+    const query = buildQuery(supabaseClient.from('cent_percent_verification').select('*'))
+      .order('sl_no', { ascending: true })
+      .range(from, from + pageSize - 1);
+    const { data, error } = await query;
+    if (error) throw error;
+    records.push(...(data || []));
+    if (!data?.length || data.length < pageSize) break;
+  }
+  return records;
+}
+
 // Global array holding accounts waiting for print confirmation
 let pendingPrintedRecords = [];
 
@@ -15675,29 +15724,42 @@ async function executeSb46Print() {
   // Apply the office scope consistently across range, scheme, and individual printing.
   const selectedOffice = $('sb46OfficeFilter')?.value?.trim() || '';
 
-  // Step 1: Query selected records
+  // Step 1: Query selected records. Bulk modes fetch all matching pages, not only the first 1,000.
   if (mode === 'range') {
     const fromSl = parseInt($('sb46FromSl')?.value, 10) || 1;
     const toSl = parseInt($('sb46ToSl')?.value, 10) || 999999;
-    let query = supabaseClient
-      .from('cent_percent_verification')
-      .select('*')
-      .gte('sl_no', fromSl)
-      .lte('sl_no', toSl);
-    if (selectedOffice) query = query.eq('office_name', selectedOffice);
-    const { data, error } = await query.order('sl_no', { ascending: true });
-
-    if (error) return alert("Fetch error: " + error.message);
-    rawAccounts = data || [];
+    if (fromSl > toSl) return alert('From Sl. No. cannot be greater than To Sl. No.');
+    try {
+      rawAccounts = await fetchSb46BulkRecords(query => {
+        query = query.gte('sl_no', fromSl).lte('sl_no', toSl).in('status', ['imported', 'printed']);
+        if (selectedOffice) query = query.eq('office_name', selectedOffice);
+        return query;
+      });
+    } catch (error) {
+      return alert("Fetch error: " + error.message);
+    }
   } else if (mode === 'scheme') {
     const scheme = $('sb46SchemeSelect')?.value || 'ALL';
-    let query = supabaseClient.from('cent_percent_verification').select('*');
-    if (scheme && scheme !== 'ALL') query = query.eq('scheme', scheme);
-    if (selectedOffice) query = query.eq('office_name', selectedOffice);
-    const { data, error } = await query.order('sl_no', { ascending: true });
-
-    if (error) return alert("Fetch error: " + error.message);
-    rawAccounts = data || [];
+    const fromSl = parseInt($('sb46SchemeFromSl')?.value, 10);
+    const toSl = parseInt($('sb46SchemeToSl')?.value, 10);
+    const printStatus = $('sb46SchemePrintStatus')?.value || 'all';
+    if (Number.isFinite(fromSl) && Number.isFinite(toSl) && fromSl > toSl) {
+      return alert('From Sl. No. cannot be greater than To Sl. No.');
+    }
+    try {
+      rawAccounts = await fetchSb46BulkRecords(query => {
+        if (scheme && scheme !== 'ALL') query = query.eq('scheme', scheme);
+        if (selectedOffice) query = query.eq('office_name', selectedOffice);
+        if (Number.isFinite(fromSl)) query = query.gte('sl_no', fromSl);
+        if (Number.isFinite(toSl)) query = query.lte('sl_no', toSl);
+        if (printStatus === 'printed') query = query.eq('status', 'printed');
+        else if (printStatus === 'not_printed') query = query.eq('status', 'imported');
+        else query = query.in('status', ['imported', 'printed']);
+        return query;
+      });
+    } catch (error) {
+      return alert("Fetch error: " + error.message);
+    }
   } else if (mode === 'individual') {
     const acc = $('sb46TargetAccNo')?.value.trim().replace(/[^0-9]/g, '');
     if (!acc) return alert("Please enter a valid Account Number!");
