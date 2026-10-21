@@ -1024,31 +1024,29 @@
     
     <div class="lg:col-span-2 min-w-0">
       <label class="block font-bold text-slate-700 mb-1">Offices</label>
-      <details class="relative rounded border border-slate-300 bg-white">
-        <summary class="flex min-h-[34px] cursor-pointer list-none items-center justify-between px-2 py-1.5 font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-postRed-600">Choose offices <span aria-hidden="true">▾</span></summary>
-        <div class="border-t border-slate-200 p-2">
-          <label class="flex items-center gap-2 py-1 font-bold text-postRed-800">
-            <input type="checkbox" id="monthlyReportSelectAllOffices" onchange="setMonthlyReportOffices(this.checked)" class="h-4 w-4 accent-postRed-600">
-            <span>Select All Offices</span>
-          </label>
-        </div>
-        <div id="monthlyReportOfficeChecklist" class="max-h-48 overflow-y-auto border-t border-slate-200 p-2 space-y-1" role="group" aria-label="Select report offices">
+      <div class="rounded border border-slate-300 bg-white p-2">
+        <input type="search" id="monthlyReportOfficeSearch" oninput="filterMonthlyReportChecklist('monthlyReportOfficeSearch', 'monthlyReportOfficeChecklist')" placeholder="Search offices..." aria-label="Search offices" class="w-full border border-slate-300 rounded px-2 py-1 mb-1 outline-none focus:ring-2 focus:ring-postRed-600">
+        <label class="flex items-center gap-2 py-1 font-bold text-postRed-800">
+          <input type="checkbox" id="monthlyReportSelectAllOffices" onchange="setMonthlyReportOffices(this.checked)" class="h-4 w-4 accent-postRed-600">
+          <span>Select All Offices</span>
+        </label>
+        <div id="monthlyReportOfficeChecklist" class="h-28 overflow-y-auto border-t border-slate-200 pt-1 space-y-1" role="group" aria-label="Select report offices">
           <p class="text-[10px] text-slate-500">No selection includes all offices.</p>
         </div>
-      </details>
+      </div>
       <p id="monthlyReportOfficeHint" class="text-[10px] text-slate-500 mt-0.5">Select one or more; no selection includes all offices.</p>
     </div>
     <div class="lg:col-span-2 min-w-0">
       <label class="block font-bold text-slate-700 mb-1">Product Codes</label>
-      <details class="relative rounded border border-slate-300 bg-white">
-        <summary class="flex min-h-[34px] cursor-pointer list-none items-center justify-between px-2 py-1.5 font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-postRed-600">Choose product codes <span aria-hidden="true">▾</span></summary>
-        <div id="monthlyReportProductChecklist" class="border-t border-slate-200 p-2 space-y-1" role="group" aria-label="Select product codes">
+      <div class="rounded border border-slate-300 bg-white p-2">
+        <input type="search" id="monthlyReportProductSearch" oninput="filterMonthlyReportChecklist('monthlyReportProductSearch', 'monthlyReportProductChecklist')" placeholder="Search products..." aria-label="Search product codes" class="w-full border border-slate-300 rounded px-2 py-1 mb-1 outline-none focus:ring-2 focus:ring-postRed-600">
+        <div id="monthlyReportProductChecklist" class="h-36 overflow-y-auto border-t border-slate-200 pt-1 space-y-1" role="group" aria-label="Select product codes">
           <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="ALL" checked onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">All Products</label>
           <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="CODMO" onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">CODMO</label>
           <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="EMO" onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">EMO</label>
           <label class="flex items-center gap-2 py-1"><input type="checkbox" name="monthlyReportProductOption" value="SMO" onchange="handleMonthlyReportProductChange(event)" class="h-4 w-4 accent-postRed-600">SMO</label>
         </div>
-      </details>
+      </div>
       <p id="monthlyReportProductHint" class="text-[10px] text-slate-500 mt-0.5">Choose any combination or All Products.</p>
     </div>
     <div>
@@ -2655,6 +2653,19 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
             </select>
           </div>
         </div>
+        <div class="mt-2 border border-slate-300 rounded-lg bg-white p-2">
+          <label for="sb46PincodeMode" class="block font-bold text-slate-700 mb-1">Addressee Pincode Filter</label>
+          <select id="sb46PincodeMode" onchange="updateSb46EligibleCount()" class="w-full border border-slate-300 p-1.5 rounded bg-white font-semibold">
+            <option value="all">All pincodes</option>
+            <option value="include">Only selected pincodes</option>
+            <option value="exclude">Exclude selected pincodes</option>
+          </select>
+          <input type="search" id="sb46PincodeSearch" oninput="filterSb46PincodeOptions()" placeholder="Search 6-digit pincode..." aria-label="Search pincode list" class="w-full border border-slate-300 p-1.5 rounded mt-1.5 outline-none focus:ring-2 focus:ring-postRed-600">
+          <div id="sb46PincodeList" class="h-24 overflow-y-auto border border-slate-200 rounded mt-1 p-1 space-y-1" role="group" aria-label="Select one or more addressee pincodes">
+            <p class="text-[10px] text-slate-500">Open this dialog to load pincodes from customer addresses.</p>
+          </div>
+          <p id="sb46PincodeHint" class="text-[10px] text-slate-500 mt-1">Pincodes are detected from the six-digit number in each customer address.</p>
+        </div>
       </div>
 
       <!-- Mode 3: Single Account No -->
@@ -4133,6 +4144,13 @@ function updateMonthlyReportSelectAllState() {
   const checkedCount = options.filter(input => input.checked).length;
   selectAll.checked = options.length > 0 && checkedCount === options.length;
   selectAll.indeterminate = checkedCount > 0 && checkedCount < options.length;
+}
+
+function filterMonthlyReportChecklist(searchId, checklistId) {
+  const query = ($(searchId)?.value || '').trim().toLowerCase();
+  $(checklistId)?.querySelectorAll('label').forEach(label => {
+    label.classList.toggle('hidden', !label.textContent.toLowerCase().includes(query));
+  });
 }
 
 function setMonthlyReportOffices(checked) {
@@ -15629,6 +15647,82 @@ function toggleSb46ModeInputs() {
 }
 
 let sb46CountRequestId = 0;
+let sb46PincodeRecords = [];
+let sb46PincodeScopeKey = '';
+let sb46PincodeRequestId = 0;
+
+function getPincodesFromAddress(address) {
+  return [...new Set(String(address || '').match(/\b\d{6}\b/g) || [])];
+}
+
+function getSelectedSb46Pincodes() {
+  return new Set(Array.from(document.querySelectorAll('input[name="sb46PincodeOption"]:checked')).map(input => input.value));
+}
+
+function filterSb46PincodeOptions() {
+  const query = ($('sb46PincodeSearch')?.value || '').trim();
+  $('sb46PincodeList')?.querySelectorAll('label').forEach(label => {
+    label.classList.toggle('hidden', !label.textContent.includes(query));
+  });
+}
+
+async function loadSb46PincodeOptions() {
+  const list = $('sb46PincodeList');
+  if (!list) return;
+  const office = $('sb46OfficeFilter')?.value?.trim() || '';
+  const scheme = $('sb46SchemeSelect')?.value || 'ALL';
+  const scopeKey = `${office}|${scheme}`;
+  if (scopeKey === sb46PincodeScopeKey) return;
+
+  const requestId = ++sb46PincodeRequestId;
+  const selected = getSelectedSb46Pincodes();
+  list.innerHTML = '<p class="text-[10px] text-slate-500">Loading pincodes from customer addresses...</p>';
+  try {
+    let countQuery = supabaseClient.from('cent_percent_verification').select('id', { count: 'exact', head: true }).in('status', ['imported', 'printed']);
+    if (office) countQuery = countQuery.eq('office_name', office);
+    if (scheme && scheme !== 'ALL') countQuery = countQuery.eq('scheme', scheme);
+    const { count, error: countError } = await countQuery;
+    if (countError) throw countError;
+
+    const records = [];
+    for (let from = 0; from < (count || 0); from += 1000) {
+      let query = supabaseClient.from('cent_percent_verification')
+        .select('id, sl_no, scheme, status, address, office_name')
+        .in('status', ['imported', 'printed']);
+      if (office) query = query.eq('office_name', office);
+      if (scheme && scheme !== 'ALL') query = query.eq('scheme', scheme);
+      const { data, error } = await query.order('id', { ascending: true }).range(from, from + 999);
+      if (error) throw error;
+      let scoped = data || [];
+      if (office) scoped = scoped.filter(record => record.office_name === office);
+      if (scheme && scheme !== 'ALL') scoped = scoped.filter(record => record.scheme === scheme);
+      records.push(...scoped);
+      if (!data || data.length < 1000) break;
+    }
+    if (requestId !== sb46PincodeRequestId) return;
+    sb46PincodeRecords = records;
+    sb46PincodeScopeKey = scopeKey;
+    const pincodes = [...new Set(records.flatMap(record => getPincodesFromAddress(record.address)))].sort();
+    list.innerHTML = pincodes.length ? pincodes.map(pincode => `<label class="flex items-center gap-2 py-0.5"><input type="checkbox" name="sb46PincodeOption" value="${pincode}" ${selected.has(pincode) ? 'checked' : ''} onchange="updateSb46EligibleCount()" class="h-4 w-4 accent-postRed-600"><span class="font-mono">${pincode}</span></label>`).join('')
+      : '<p class="text-[10px] text-slate-500">No six-digit pincodes found in customer addresses for this selection.</p>';
+    filterSb46PincodeOptions();
+  } catch (error) {
+    if (requestId !== sb46PincodeRequestId) return;
+    sb46PincodeRecords = [];
+    sb46PincodeScopeKey = '';
+    list.innerHTML = `<p class="text-[10px] text-rose-600">Could not load address pincodes: ${escapeMonthlyReportHtml(error.message)}</p>`;
+  }
+}
+
+function getSb46PincodeFilteredRecords(records) {
+  const mode = $('sb46PincodeMode')?.value || 'all';
+  const selected = getSelectedSb46Pincodes();
+  if (mode === 'all' || !selected.size) return records;
+  return records.filter(record => {
+    const matches = getPincodesFromAddress(record.address).some(pincode => selected.has(pincode));
+    return mode === 'include' ? matches : !matches;
+  });
+}
 
 async function updateSb46EligibleCount() {
   const countEl = $('sb46EligibleCount');
@@ -15641,12 +15735,30 @@ async function updateSb46EligibleCount() {
   countEl.innerText = 'Matching eligible accounts: checking…';
 
   try {
-    let query = supabaseClient
-      .from('cent_percent_verification')
-      .select('id', { count: 'exact', head: true });
+    if (mode === 'scheme') {
+      await loadSb46PincodeOptions();
+      const fromSl = parseInt($('sb46SchemeFromSl')?.value, 10);
+      const toSl = parseInt($('sb46SchemeToSl')?.value, 10);
+      const printStatus = $('sb46SchemePrintStatus')?.value || 'all';
+      let records = sb46PincodeRecords.filter(record =>
+        (!office || record.office_name === office) &&
+        (!scheme || scheme === 'ALL' || record.scheme === scheme) &&
+        (!Number.isFinite(fromSl) || Number(record.sl_no) >= fromSl) &&
+        (!Number.isFinite(toSl) || Number(record.sl_no) <= toSl) &&
+        (printStatus === 'all' || (printStatus === 'printed' ? record.status === 'printed' : record.status === 'imported'))
+      );
+      const pincodeMode = $('sb46PincodeMode')?.value || 'all';
+      if (pincodeMode === 'include' && !getSelectedSb46Pincodes().size) {
+        if (requestId === sb46CountRequestId) countEl.innerText = 'Select at least one pincode to include.';
+        return;
+      }
+      records = getSb46PincodeFilteredRecords(records);
+      if (requestId === sb46CountRequestId) countEl.innerText = `Matching eligible accounts: ${records.length.toLocaleString('en-IN')}`;
+      return;
+    }
 
+    let query = supabaseClient.from('cent_percent_verification').select('id', { count: 'exact', head: true });
     if (office) query = query.eq('office_name', office);
-
     if (mode === 'individual') {
       const accountNo = ($('sb46TargetAccNo')?.value || '').trim().replace(/[^0-9]/g, '');
       if (!accountNo) {
@@ -15655,39 +15767,24 @@ async function updateSb46EligibleCount() {
       }
       query = query.eq('account_no', accountNo);
     } else {
-      if (mode === 'scheme') {
-        const printStatus = $('sb46SchemePrintStatus')?.value || 'all';
-        if (printStatus === 'printed') query = query.eq('status', 'printed');
-        else if (printStatus === 'not_printed') query = query.eq('status', 'imported');
-        else query = query.in('status', ['imported', 'printed']);
-
-        const fromSl = parseInt($('sb46SchemeFromSl')?.value, 10);
-        const toSl = parseInt($('sb46SchemeToSl')?.value, 10);
-        if (Number.isFinite(fromSl)) query = query.gte('sl_no', fromSl);
-        if (Number.isFinite(toSl)) query = query.lte('sl_no', toSl);
-      } else {
-        query = query.in('status', ['imported', 'printed']);
-        const fromSl = parseInt($('sb46FromSl')?.value, 10) || 1;
-        const toSl = parseInt($('sb46ToSl')?.value, 10) || 999999;
-        query = query.gte('sl_no', fromSl).lte('sl_no', toSl);
-      }
+      query = query.in('status', ['imported', 'printed']);
+      const fromSl = parseInt($('sb46FromSl')?.value, 10) || 1;
+      const toSl = parseInt($('sb46ToSl')?.value, 10) || 999999;
+      query = query.gte('sl_no', fromSl).lte('sl_no', toSl);
       if (scheme && scheme !== 'ALL') query = query.eq('scheme', scheme);
     }
-
     const { count, error } = await query;
     if (error) throw error;
-    if (requestId === sb46CountRequestId) {
-      countEl.innerText = `Matching eligible accounts: ${(count || 0).toLocaleString('en-IN')}`;
-    }
+    if (requestId === sb46CountRequestId) countEl.innerText = `Matching eligible accounts: ${(count || 0).toLocaleString('en-IN')}`;
   } catch (error) {
-    if (requestId === sb46CountRequestId) {
-      countEl.innerText = `Could not load account count: ${error.message}`;
-    }
+    if (requestId === sb46CountRequestId) countEl.innerText = `Could not load account count: ${error.message}`;
   }
 }
 
 async function onSb46OfficeChange() {
   await populateSb46PrintSchemes();
+  sb46PincodeScopeKey = '';
+  await loadSb46PincodeOptions();
   updateSb46EligibleCount();
 }
 
@@ -15773,6 +15870,13 @@ async function executeSb46Print() {
 
     if (error) return alert("Fetch error: " + error.message);
     rawAccounts = data || [];
+  }
+
+  if (mode === 'scheme') {
+    if ($('sb46PincodeMode')?.value === 'include' && !getSelectedSb46Pincodes().size) {
+      return alert('Select at least one pincode to include in the print run.');
+    }
+    rawAccounts = getSb46PincodeFilteredRecords(rawAccounts);
   }
 
   if (!rawAccounts.length) {
@@ -18114,8 +18218,10 @@ async function openSb46GeneratorModal() {
   // Ensure the office selector reflects the current division office list.
   populateCentVfnOfficeFilters();
 
-  // Load imported schemes into the dropdown
+  // Load imported schemes and address-derived pincode options.
   await populateSb46PrintSchemes();
+  sb46PincodeScopeKey = '';
+  await loadSb46PincodeOptions();
 
   if (typeof updateSb46EligibleCount === 'function') {
     updateSb46EligibleCount();
@@ -18125,7 +18231,9 @@ async function openSb46GeneratorModal() {
 /**
  * Recalculate eligible counts upon scheme change
  */
-function onSb46SchemeSelectChange() {
+async function onSb46SchemeSelectChange() {
+  sb46PincodeScopeKey = '';
+  await loadSb46PincodeOptions();
   if (typeof updateSb46EligibleCount === 'function') {
     updateSb46EligibleCount();
   }
