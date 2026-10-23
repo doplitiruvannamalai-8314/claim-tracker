@@ -16459,15 +16459,15 @@ function renderSb46PrintWindow(accounts) {
     // -------------------------------------------------------------
     // PAGE 1: SB-46 NOTICE WITH OPTIONAL ARTICLE NO (NO BARCODES)
     // -------------------------------------------------------------
-    pagesHtml += `
+   pagesHtml += `
       <div class="page-sheet page-notice">
         <!-- TOP SECTION: HEADER + NOTICE BODY -->
         <div class="notice-top-container">
           <div class="header-banner">
             <div class="header-text-block">
-              <h3>DEPARTMENT OF POSTS, INDIA</h3>
-              <p><h4>Office of ${senderDesignation}</h4></p>
-              <p class="division-sub">${senderDivision},${senderAddress}</p>
+              <h3 style="text-transform: uppercase;">DEPARTMENT OF POSTS, INDIA</h3>
+              <h4 style="text-transform: uppercase;">OFFICE OF ${senderDesignation ? senderDesignation.toUpperCase() : ''}</h4>
+              <p class="division-sub" style="text-transform: uppercase;">${senderDivision}, ${senderAddress}</p>
             </div>
             <div class="header-logo-block">
             ${typeof currentAppLogo !== 'undefined' && currentAppLogo ? `<img src="${currentAppLogo}" style="height: 62px; width: 84px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
@@ -16476,10 +16476,10 @@ function renderSb46PrintWindow(accounts) {
           
           <div class="ref-bar">
             <div><b>SB-46</b></div>
-            <div style="text-align: center;"><b>Intimation to the depositor of the balance at credit of the account and acknowledgement</b></div>
+            <div style="text-align: center; text-transform: uppercase;"><b>INTIMATION TO THE DEPOSITOR OF THE BALANCE AT CREDIT OF THE ACCOUNT AND ACKNOWLEDGEMENT</b></div>
             <div></div>
           </div>
-          
+                 
           <div class="ref-bar">
             <div><b>Ref. No: ${referenceNo}</b></div>
             ${!excludeBarcode ? `
