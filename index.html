@@ -142,6 +142,9 @@
           <button type="button" id="tabBtnCentVfn" onclick="showTab('centVfn')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
             🔍 Cent Percent Verification
           </button>
+          <button type="button" id="masterDataTabBtn" onclick="showTab('masterDataManagement')" class="tab-btn hidden bg-white text-slate-700 border border-amber-300 px-4 py-1.5 rounded-lg font-semibold text-xs hover:bg-amber-100/50 cursor-pointer flex items-center gap-1.5">
+            ⚙️ Master Data Management
+          </button>
         </div>
 
 
@@ -1249,6 +1252,60 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
   </div>
 </div>
 
+        <!-- SUPERADMIN: OFFICE MASTER DATA -->
+        <div id="masterDataManagementView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
+          <div class="border-b border-amber-200 pb-2">
+            <h3 class="text-sm font-bold text-postRed-700 uppercase">⚙️ Master Data Management — Offices</h3>
+            <p class="text-[11px] text-slate-600">Maintain office short codes and SB‑46 sender/recipient details. Short codes are used in the notice reference number.</p>
+          </div>
+          <details class="border border-amber-200 rounded-lg bg-amber-50/50 p-2 text-[11px]">
+            <summary class="font-bold text-postRed-800 cursor-pointer">One-time offices table migration SQL</summary>
+            <pre id="officeMasterSetupSql" class="my-2 whitespace-pre-wrap break-words bg-white border border-amber-200 rounded p-2 text-[10px]">alter table public.offices
+  add column if not exists short_code text,
+  add column if not exists sender_designation text,
+  add column if not exists sender_division text,
+  add column if not exists sender_address text,
+  add column if not exists recipient_designation text,
+  add column if not exists recipient_division text,
+  add column if not exists recipient_address text;
+
+create unique index if not exists offices_short_code_key on public.offices (short_code) where short_code is not null;
+
+alter table public.offices enable row level security;
+drop policy if exists "Authenticated users can read office directory" on public.offices;
+create policy "Authenticated users can read office directory" on public.offices for select to anon, authenticated using (true);
+drop policy if exists "Superadmins can insert offices" on public.offices;
+create policy "Superadmins can insert offices" on public.offices for insert to authenticated
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and lower(p.role) = 'superadmin' and coalesce(p.is_approved, true)));
+drop policy if exists "Superadmins can update offices" on public.offices;
+create policy "Superadmins can update offices" on public.offices for update to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and lower(p.role) = 'superadmin' and coalesce(p.is_approved, true)))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and lower(p.role) = 'superadmin' and coalesce(p.is_approved, true)));
+drop policy if exists "Superadmins can delete offices" on public.offices;
+create policy "Superadmins can delete offices" on public.offices for delete to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and lower(p.role) = 'superadmin' and coalesce(p.is_approved, true)));</pre>
+            <button type="button" onclick="copyOfficeMasterSetupSql()" class="bg-amber-700 hover:bg-amber-800 text-white px-2.5 py-1 rounded font-bold cursor-pointer">📋 Copy Migration SQL</button>
+          </details>
+          <form id="officeMasterForm" onsubmit="saveOfficeMasterRecord(event)" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <input type="hidden" id="officeMasterEditingId">
+            <div><label for="officeMasterName" class="block font-bold mb-0.5">Office Name *</label><input id="officeMasterName" required class="w-full border p-1.5 rounded bg-white"></div>
+            <div><label for="officeMasterCode" class="block font-bold mb-0.5">SB‑46 Short Code (exactly 3 chars) *</label><input id="officeMasterCode" maxlength="3" required placeholder="e.g. MYP" class="w-full border p-1.5 rounded bg-white font-mono uppercase"></div>
+            <div><label for="officeMasterSenderDesignation" class="block font-bold mb-0.5">From — Officer / Designation</label><input id="officeMasterSenderDesignation" placeholder="Senior Superintendent of Post Offices" class="w-full border p-1.5 rounded bg-white"></div>
+            <div><label for="officeMasterSenderDivision" class="block font-bold mb-0.5">From — Division / Office</label><input id="officeMasterSenderDivision" placeholder="Chennai City Central Division" class="w-full border p-1.5 rounded bg-white"></div>
+            <div class="md:col-span-2"><label for="officeMasterSenderAddress" class="block font-bold mb-0.5">From — Address</label><input id="officeMasterSenderAddress" placeholder="CHENNAI - 600017" class="w-full border p-1.5 rounded bg-white"></div>
+            <div><label for="officeMasterRecipientDesignation" class="block font-bold mb-0.5">Reply To — Officer / Designation</label><input id="officeMasterRecipientDesignation" placeholder="Senior Superintendent of Post Offices" class="w-full border p-1.5 rounded bg-white"></div>
+            <div><label for="officeMasterRecipientDivision" class="block font-bold mb-0.5">Reply To — Division / Office</label><input id="officeMasterRecipientDivision" placeholder="Chennai City Central Division" class="w-full border p-1.5 rounded bg-white"></div>
+            <div class="md:col-span-2"><label for="officeMasterRecipientAddress" class="block font-bold mb-0.5">Reply To — Address</label><input id="officeMasterRecipientAddress" placeholder="CHENNAI - 600017" class="w-full border p-1.5 rounded bg-white"></div>
+            <div class="xl:col-span-4 flex justify-end gap-2 border-t border-slate-200 pt-2">
+              <button type="button" id="officeMasterCancelEdit" onclick="resetOfficeMasterForm()" class="hidden bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded font-bold cursor-pointer">Cancel Edit</button>
+              <button type="submit" id="officeMasterSaveButton" class="bg-postRed-600 hover:bg-postRed-700 text-white px-4 py-1.5 rounded font-bold cursor-pointer">Save Office</button>
+            </div>
+          </form>
+          <div class="overflow-auto border border-slate-200 rounded-lg">
+            <table class="w-full min-w-[1000px] text-left text-xs border-collapse"><thead class="bg-postRed-700 text-white"><tr><th class="p-2">Office</th><th class="p-2">Code</th><th class="p-2">Sender</th><th class="p-2">Reply To</th><th class="p-2 text-center">Actions</th></tr></thead><tbody id="officeMasterTableBody"><tr><td colspan="5" class="p-3 text-center text-slate-400">Loading offices...</td></tr></tbody></table>
+          </div>
+        </div>
+
         <!-- TAB 6: USER MANAGEMENT -->
       <div id="adminRoleMgmtView" class="tab-content hidden bg-white p-5 rounded-xl shadow-md border border-amber-200 space-y-4">
         
@@ -1280,7 +1337,7 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
               </div>
               <div>
                 <h4 class="font-bold text-xs text-blue-900 uppercase">SB-46 Issuer Signature (Office-wise)</h4>
-                <p class="text-[11px] text-slate-600">Choose one or more offices to assign this signature.</p>
+                <p class="text-[11px] text-slate-600">Choose offices and add one or more signature images; select the desired signer when preparing SB‑46 notices.</p>
               </div>
             </div>
             <div>
@@ -1291,9 +1348,9 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
               <p id="issuerSignatureStatus" class="text-[10px] text-slate-500 mt-0.5">Select offices, then choose a signature image to assign it.</p>
             </div>
             <div class="flex items-center justify-end gap-1.5 pt-1 border-t border-blue-200/60">
-              <input type="file" id="customSigFileInput" accept="image/*" class="hidden" onchange="handleSignatureUpload(event)">
-              <button type="button" onclick="document.getElementById('customSigFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-xs font-semibold shadow-xs cursor-pointer">✍️ Assign Signature</button>
-              <button type="button" onclick="removeIssuerSignature()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded text-xs font-semibold cursor-pointer">✕ Remove Selected</button>
+              <input type="file" id="customSigFileInput" accept="image/*" multiple class="hidden" onchange="handleSignatureUpload(event)">
+              <button type="button" onclick="document.getElementById('customSigFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-xs font-semibold shadow-xs cursor-pointer">✍️ Add Signature(s)</button>
+              <button type="button" onclick="removeIssuerSignature()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded text-xs font-semibold cursor-pointer">✕ Remove Office Signatures</button>
             </div>
           </div>
 
@@ -1832,6 +1889,28 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
 
       </div>
     </div>
+  <!-- ACCOUNT / CIF LOOKUP -->
+  <section class="bg-indigo-50/50 border border-indigo-200 rounded-xl p-3 space-y-2">
+    <div>
+      <h3 class="font-bold text-xs text-indigo-900 uppercase">🔎 Account / CIF Search</h3>
+      <p class="text-[10px] text-slate-600">Search by account number or any CIF (Cust1, Cust2, or Cust3) to list matching accounts.</p>
+    </div>
+    <div class="flex flex-wrap gap-2 max-w-2xl">
+      <input id="vfnAccountCifSearch" type="search" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchVfnAccountsByAccountOrCif();}" placeholder="Account number or CIF ID" class="flex-1 min-w-[220px] border border-indigo-300 p-2 rounded bg-white outline-none focus:ring-2 focus:ring-indigo-600">
+      <button type="button" onclick="searchVfnAccountsByAccountOrCif()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded font-bold cursor-pointer">Search</button>
+      <button type="button" onclick="clearVfnAccountCifSearch()" class="bg-slate-200 hover:bg-slate-300 px-3 py-2 rounded font-bold cursor-pointer">Clear</button>
+    </div>
+    <div id="vfnAccountCifSearchStatus" class="text-[11px] text-slate-500" role="status" aria-live="polite">Enter an account number or CIF ID.</div>
+    <div class="max-h-80 overflow-auto border border-indigo-200 rounded-lg bg-white">
+      <table class="w-full text-left text-[11px] border-collapse min-w-[1050px]">
+        <thead class="sticky top-0 bg-indigo-700 text-white font-bold"><tr>
+          <th class="p-2">Office</th><th class="p-2">Account No</th><th class="p-2">Customer(s) / CIF(s)</th><th class="p-2">Address</th><th class="p-2">Scheme</th><th class="p-2 text-right">Balance / BAT (₹)</th><th class="p-2">Last Txn (DLT)</th><th class="p-2">Account Type</th><th class="p-2">Article No</th><th class="p-2">Reply Date</th><th class="p-2">Status</th>
+        </tr></thead>
+        <tbody id="vfnAccountCifSearchBody"><tr><td colspan="11" class="p-3 text-center text-slate-400">No search results.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
   <!-- KPI SUMMARY SCORECARDS (5 CARDS) -->
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
     <div class="bg-white border-2 border-slate-700 p-3 rounded-xl shadow-2xs">
@@ -2620,6 +2699,11 @@ create policy "Users can delete own receipt payment records" on public.receipt_p
           <option value="">All Offices</option>
         </select>
         <p id="sb46EligibleCount" class="mt-1 text-[11px] font-bold text-emerald-800">Matching eligible accounts: checking…</p>
+      </div>
+      <div>
+        <label for="sb46IssuerSignatureSelect" class="block font-bold text-slate-700 mb-0.5">Issuer Signature (optional)</label>
+        <select id="sb46IssuerSignatureSelect" class="w-full border border-slate-300 p-1.5 rounded bg-white"><option value="">Use first signature saved for each office</option></select>
+        <p class="text-[10px] text-slate-500 mt-0.5">Choose a saved signature; it is applied to accounts belonging to that signature’s office.</p>
       </div>
       <div>
         <label class="block font-bold text-slate-700 mb-0.5">2. Print Generation Mode</label>
@@ -3649,10 +3733,19 @@ function getSelectedIssuerSignatureOffices() {
   return Array.from($('issuerSignatureOfficeSelect')?.selectedOptions || []).map(option => option.value).filter(Boolean);
 }
 
+function getIssuerSignaturesForOffice(office) {
+  const saved = issuerSignaturesByOffice[office];
+  if (!saved) return [];
+  if (typeof saved === 'string') return [{ id: 'legacy', name: 'Previously saved signature', data: saved }];
+  return Array.isArray(saved) ? saved.map((item, index) => typeof item === 'string'
+    ? { id: `saved-${index}`, name: `Signature ${index + 1}`, data: item }
+    : item).filter(item => item?.data) : [];
+}
+
 function updateIssuerSignaturePreview() {
   const selectedOffices = getSelectedIssuerSignatureOffices();
-  const signatures = selectedOffices.map(office => issuerSignaturesByOffice[office]).filter(Boolean);
-  const previewUrl = signatures[0] || null;
+  const signatures = selectedOffices.flatMap(office => getIssuerSignaturesForOffice(office));
+  const previewUrl = signatures[0]?.data || null;
   const previewImg = $('issuerSigPreview');
   const notice = $('noSigNotice');
   if (previewUrl && previewImg && notice) {
@@ -3674,38 +3767,41 @@ function updateIssuerSignaturePreview() {
 }
 
 async function handleSignatureUpload(e) {
-  const file = e.target.files?.[0];
+  const files = Array.from(e.target.files || []);
   const offices = getSelectedIssuerSignatureOffices();
-  if (!file) return;
+  if (!files.length) return;
   if (!offices.length) {
     e.target.value = '';
-    return alert('Select at least one office before assigning a signature.');
+    return alert('Select at least one office before assigning signatures.');
   }
-  if (file.size > 500 * 1024) {
+  const oversized = files.filter(file => file.size > 500 * 1024);
+  if (oversized.length) {
     e.target.value = '';
-    return alert('Please select a signature image under 500 KB.');
+    return alert(`Each signature must be under 500 KB. Oversized: ${oversized.map(file => file.name).join(', ')}`);
   }
 
-  const reader = new FileReader();
-  reader.onload = async event => {
+  try {
+    const additions = await Promise.all(files.map(file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = event => resolve({ id: (crypto.randomUUID ? crypto.randomUUID() : `sig-${Date.now()}-${Math.random().toString(36).slice(2)}`), name: file.name || 'Issuer signature', data: event.target.result });
+      reader.onerror = () => reject(reader.error || new Error(`Could not read ${file.name}`));
+      reader.readAsDataURL(file);
+    })));
     const nextSignatures = { ...issuerSignaturesByOffice };
-    offices.forEach(office => { nextSignatures[office] = event.target.result; });
+    offices.forEach(office => { nextSignatures[office] = [...getIssuerSignaturesForOffice(office), ...additions]; });
     const { error } = await supabaseClient.from('configurationmaster').upsert([{
-      id: 'issuer_signatures_by_office',
-      config_key: 'ISSUER_SIGNATURES_BY_OFFICE',
-      config_value: JSON.stringify(nextSignatures)
+      id: 'issuer_signatures_by_office', config_key: 'ISSUER_SIGNATURES_BY_OFFICE', config_value: JSON.stringify(nextSignatures)
     }], { onConflict: 'config_key' });
-    if (error) {
-      alert('Error saving office signatures: ' + error.message);
-      return;
-    }
+    if (error) throw error;
     issuerSignaturesByOffice = nextSignatures;
-    currentIssuerSignature = event.target.result;
+    currentIssuerSignature = additions[0]?.data || null;
     updateIssuerSignaturePreview();
-    alert(`Signature assigned to ${offices.length} office(s).`);
+    alert(`${files.length} signature(s) added to ${offices.length} office(s).`);
+  } catch (error) {
+    alert('Error saving office signatures: ' + error.message);
+  } finally {
     e.target.value = '';
-  };
-  reader.readAsDataURL(file);
+  }
 }
 
 async function removeIssuerSignature() {
@@ -3917,6 +4013,7 @@ async function initApp() {
   const canAccessCentVfn = isApproved && (role === 'centvfn' || isAdmin);
 
   // Toggle Admin & Restricted Tab Buttons
+  if ($('masterDataTabBtn')) $('masterDataTabBtn').classList.toggle('hidden', !isSuperadmin);
   if (isAdmin) {
     if ($('adminTabBtn')) $('adminTabBtn').classList.remove('hidden');
     if ($('adminBookingDashTabBtn')) $('adminBookingDashTabBtn').classList.remove('hidden');
@@ -3956,6 +4053,7 @@ async function initApp() {
   if (!isAdmin && adminOnlyTabs.includes(currentActiveTab)) {
     currentActiveTab = 'claimsHub';
   }
+  if (role !== 'superadmin' && currentActiveTab === 'masterDataManagement') currentActiveTab = 'claimsHub';
   if (!isApproved && currentActiveTab === 'monthlyReports') {
     currentActiveTab = 'claimsHub';
   }
@@ -4050,6 +4148,10 @@ function showTab(tabName) {
     alert("Access Restricted: You do not have permission to access this module.");
     tabName = 'claimsHub';
   }
+  if (tabName === 'masterDataManagement' && role !== 'superadmin') {
+    alert('Access Restricted: Master Data Management is for superadmins only.');
+    tabName = 'claimsHub';
+  }
 
   if (!canAccessCentVfn && tabName === 'centVfn') {
     alert("Access Restricted: Cent Percent Verification requires centvfn or admin privileges.");
@@ -4065,7 +4167,8 @@ function showTab(tabName) {
     'monthlyReports': 'monthlyReportsView',
     'bookingDash': 'bookingDashView',
     'adminRoleMgmt': 'adminRoleMgmtView',
-    'centVfn': 'centVfnView'
+    'centVfn': 'centVfnView',
+    'masterDataManagement': 'masterDataManagementView'
   };
 
   Object.values(viewMap).forEach(viewId => {
@@ -4079,7 +4182,8 @@ function showTab(tabName) {
     'monthlyReports': 'monthlyReportsTabBtn',
     'bookingDash': 'adminBookingDashTabBtn',
     'adminRoleMgmt': 'adminTabBtn',
-    'centVfn': 'tabBtnCentVfn'
+    'centVfn': 'tabBtnCentVfn',
+    'masterDataManagement': 'masterDataTabBtn'
   };
 
   Object.values(btnMap).forEach(btnId => {
@@ -4125,6 +4229,7 @@ function showTab(tabName) {
   if (tabName === 'adminRoleMgmt' && isAdmin && typeof loadAllUsers === 'function') {
     loadAllUsers();
   }
+  if (tabName === 'masterDataManagement' && role === 'superadmin') loadOfficeMasterRecords();
 
   // Trigger loader when opening Cent Percent Verification
   if (tabName === 'centVfn' && canAccessCentVfn && typeof loadCentVfnData === 'function') {
@@ -4132,9 +4237,129 @@ function showTab(tabName) {
   }
 }
 
+let officeMasterRecords = [];
 let monthlyReportRecords = [];
 let monthlyReportRequestId = 0;
 let monthlyReportOfficesLoaded = false;
+
+function assertSuperadminForOfficeMaster() {
+  if ((userProfile?.role || '').toLowerCase() !== 'superadmin' || !isProfileApproved()) {
+    alert('Access denied. Approved superadmin privileges are required to manage office data.');
+    return false;
+  }
+  return true;
+}
+
+async function loadOfficeMasterConfig() {
+  const { data, error } = await supabaseClient.from('offices')
+    .select('id, office_name, short_code, sender_designation, sender_division, sender_address, recipient_designation, recipient_division, recipient_address')
+    .order('office_name', { ascending: true });
+  if (error) throw error;
+  officeMasterRecords = data || [];
+  return officeMasterRecords;
+}
+
+async function loadOfficeMasterRecords() {
+  if (!assertSuperadminForOfficeMaster()) return;
+  const tbody = $('officeMasterTableBody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Loading offices...</td></tr>';
+  try {
+    const offices = await loadOfficeMasterConfig();
+    const escape = escapeMonthlyReportHtml;
+    if (!tbody) return;
+    tbody.innerHTML = offices.length ? offices.map(office => `<tr class="border-b border-slate-100 hover:bg-amber-50/50">
+      <td class="p-2 font-semibold">${escape(office.office_name)}</td><td class="p-2 font-mono font-bold">${escape(office.short_code || '—')}</td>
+      <td class="p-2">${escape([office.sender_designation, office.sender_division, office.sender_address].filter(Boolean).join(', ') || '—')}</td>
+      <td class="p-2">${escape([office.recipient_designation, office.recipient_division, office.recipient_address].filter(Boolean).join(', ') || '—')}</td>
+      <td class="p-2 text-center whitespace-nowrap"><button type="button" onclick="editOfficeMasterRecord('${escape(office.id)}')" class="bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded font-bold">Edit</button>
+      <button type="button" onclick="deleteOfficeMasterRecord('${escape(office.id)}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 px-2 py-1 rounded font-bold">Remove</button></td>
+    </tr>`).join('') : '<tr><td colspan="5" class="p-3 text-center text-slate-400">No office records found.</td></tr>';
+  } catch (error) {
+    console.error('Office master load failed:', error);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-rose-600">${escapeMonthlyReportHtml(error.message)}. Apply the migration SQL above.</td></tr>`;
+  }
+}
+
+function resetOfficeMasterForm() {
+  $('officeMasterForm')?.reset();
+  if ($('officeMasterEditingId')) $('officeMasterEditingId').value = '';
+  $('officeMasterCancelEdit')?.classList.add('hidden');
+  if ($('officeMasterSaveButton')) $('officeMasterSaveButton').innerText = 'Save Office';
+  if ($('officeMasterName')) $('officeMasterName').disabled = false;
+}
+
+function editOfficeMasterRecord(id) {
+  if (!assertSuperadminForOfficeMaster()) return;
+  const office = officeMasterRecords.find(row => String(row.id) === String(id));
+  if (!office) return alert('Office record not found. Refresh and try again.');
+  $('officeMasterEditingId').value = office.id;
+  $('officeMasterName').value = office.office_name || '';
+  $('officeMasterName').disabled = true;
+  $('officeMasterCode').value = office.short_code || '';
+  $('officeMasterSenderDesignation').value = office.sender_designation || '';
+  $('officeMasterSenderDivision').value = office.sender_division || '';
+  $('officeMasterSenderAddress').value = office.sender_address || '';
+  $('officeMasterRecipientDesignation').value = office.recipient_designation || '';
+  $('officeMasterRecipientDivision').value = office.recipient_division || '';
+  $('officeMasterRecipientAddress').value = office.recipient_address || '';
+  $('officeMasterCancelEdit').classList.remove('hidden');
+  $('officeMasterSaveButton').innerText = 'Update Office';
+  $('officeMasterName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+async function saveOfficeMasterRecord(event) {
+  event.preventDefault();
+  if (!assertSuperadminForOfficeMaster()) return;
+  const id = $('officeMasterEditingId').value;
+  const payload = {
+    office_name: $('officeMasterName').value.trim(),
+    short_code: $('officeMasterCode').value.trim().toUpperCase(),
+    sender_designation: $('officeMasterSenderDesignation').value.trim() || null,
+    sender_division: $('officeMasterSenderDivision').value.trim() || null,
+    sender_address: $('officeMasterSenderAddress').value.trim() || null,
+    recipient_designation: $('officeMasterRecipientDesignation').value.trim() || null,
+    recipient_division: $('officeMasterRecipientDivision').value.trim() || null,
+    recipient_address: $('officeMasterRecipientAddress').value.trim() || null
+  };
+  if (!payload.office_name || !/^[A-Z0-9]{3}$/.test(payload.short_code)) return alert('Enter an office name and an exactly 3-character alphanumeric short code.');
+  const button = $('officeMasterSaveButton');
+  button.disabled = true;
+  try {
+    const response = id
+      ? await supabaseClient.from('offices').update(payload).eq('id', id)
+      : await supabaseClient.from('offices').insert([payload]);
+    if (response.error) throw response.error;
+    resetOfficeMasterForm();
+    await loadOfficeMasterRecords();
+    await loadFilterDropdowns();
+    populateCentVfnOfficeFilters();
+    alert('Office details saved.');
+  } catch (error) {
+    alert(`Could not save office details: ${error.message}`);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function deleteOfficeMasterRecord(id) {
+  if (!assertSuperadminForOfficeMaster()) return;
+  const office = officeMasterRecords.find(row => String(row.id) === String(id));
+  if (!office || !confirm(`Remove office “${office.office_name}” from the offices master? Existing verification accounts will not be deleted.`)) return;
+  const { error } = await supabaseClient.from('offices').delete().eq('id', id);
+  if (error) return alert(`Could not remove office: ${error.message}`);
+  await loadOfficeMasterRecords();
+  await loadFilterDropdowns();
+  populateCentVfnOfficeFilters();
+}
+
+async function copyOfficeMasterSetupSql() {
+  try {
+    await navigator.clipboard.writeText($('officeMasterSetupSql')?.innerText || '');
+    alert('Office master migration SQL copied.');
+  } catch (error) {
+    alert('Clipboard access is unavailable. Select and copy the migration SQL from the panel.');
+  }
+}
 
 async function populateMonthlyReportOffices() {
   const container = $('monthlyReportOfficeChecklist');
@@ -12946,6 +13171,61 @@ function exportVfnTransactionReport(format) {
   doc.save(`Account_Transactions_${scopeLabel}${schemeLabel}_${stamp}.pdf`);
 }
 
+function clearVfnAccountCifSearch() {
+  if ($('vfnAccountCifSearch')) $('vfnAccountCifSearch').value = '';
+  if ($('vfnAccountCifSearchStatus')) $('vfnAccountCifSearchStatus').innerText = 'Enter an account number or CIF ID.';
+  if ($('vfnAccountCifSearchBody')) $('vfnAccountCifSearchBody').innerHTML = '<tr><td colspan="11" class="p-3 text-center text-slate-400">No search results.</td></tr>';
+}
+
+async function searchVfnAccountsByAccountOrCif() {
+  const queryText = ($('vfnAccountCifSearch')?.value || '').trim();
+  const status = $('vfnAccountCifSearchStatus');
+  const tbody = $('vfnAccountCifSearchBody');
+  if (!queryText) return alert('Enter an account number or CIF ID.');
+  if (!/^[a-zA-Z0-9_-]+$/.test(queryText)) return alert('Use letters, numbers, hyphens, or underscores only for account/CIF search.');
+  if (status) status.innerText = 'Searching all customer CIF fields...';
+  if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-3 text-center text-slate-400">Searching...</td></tr>';
+  try {
+    const safe = queryText;
+    const matchesSearch = query => query.or(`account_no.ilike.%${safe}%,cust1_cif_id.ilike.%${safe}%,cust2_cif_id.ilike.%${safe}%,cust3_cif_id.ilike.%${safe}%`);
+    const { count, error: countError } = await matchesSearch(
+      supabaseClient.from('cent_percent_verification').select('id', { count: 'exact', head: true })
+    );
+    if (countError) throw countError;
+    const rows = [];
+    for (let from = 0; from < (count || 0); from += 1000) {
+      const { data, error } = await matchesSearch(supabaseClient.from('cent_percent_verification').select('*'))
+        .order('office_name', { ascending: true }).order('account_no', { ascending: true }).range(from, from + 999);
+      if (error) throw error;
+      rows.push(...(data || []));
+      if (!data || data.length < 1000) break;
+    }
+    const escape = escapeMonthlyReportHtml;
+    if (status) status.innerText = `${rows.length.toLocaleString('en-IN')} matching account(s).`;
+    if (!tbody) return;
+    tbody.innerHTML = rows.length ? rows.map(row => {
+      const customers = [
+        `Cust1: ${escapeMonthlyReportHtml(row.customer_name || '—')}${row.cust1_cif_id ? ` (CIF ${escapeMonthlyReportHtml(row.cust1_cif_id)})` : ''}`,
+        row.cust2_name ? `Cust2: ${escapeMonthlyReportHtml(row.cust2_name)}${row.cust2_cif_id ? ` (CIF ${escapeMonthlyReportHtml(row.cust2_cif_id)})` : ''}` : '',
+        row.cust3_name ? `Cust3: ${escapeMonthlyReportHtml(row.cust3_name)}${row.cust3_cif_id ? ` (CIF ${escapeMonthlyReportHtml(row.cust3_cif_id)})` : ''}` : ''
+      ].filter(Boolean).join('<br>');
+      const balance = Number(row.balance) || 0;
+      return `<tr class="border-b border-slate-100 hover:bg-indigo-50/40">
+        <td class="p-2">${escape(row.office_name || '—')}</td><td class="p-2 font-mono font-bold">${escape(row.account_no || '—')}</td>
+        <td class="p-2">${customers.replace(/<br>/g, '<br>')}</td><td class="p-2 whitespace-pre-wrap">${escape(row.address || '—')}</td>
+        <td class="p-2 font-bold">${escape(row.scheme || '—')}</td><td class="p-2 text-right font-mono">₹${balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="p-2 whitespace-nowrap">${escape(typeof formatDate === 'function' ? formatDate(row.date_of_last_txn) : (row.date_of_last_txn || '—'))}</td>
+        <td class="p-2">${escape(row.account_type || '—')}</td><td class="p-2 font-mono">${escape(row.outward_article_no || row.article_no || '—')}</td>
+        <td class="p-2 whitespace-nowrap">${escape(row.reply_rxd_date || '—')}</td><td class="p-2">${escape((row.status || 'imported').replace(/_/g, ' '))}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="11" class="p-3 text-center text-slate-400">No accounts matched this account/CIF value.</td></tr>';
+  } catch (error) {
+    console.error('Account/CIF search failed:', error);
+    if (status) status.innerText = `Search failed: ${error.message}. Confirm the CIF columns exist in the table.`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="p-3 text-center text-rose-600">${escapeMonthlyReportHtml(error.message)}</td></tr>`;
+  }
+}
+
 // =========================================================================
 // 11. CENT PERCENT VERIFICATION (CENTVFN) ENGINE
 // =========================================================================
@@ -16143,10 +16423,28 @@ function renderSb46PrintWindow(accounts) {
   let pagesHtml = '';
   accounts.forEach((acc, i) => {
     const balStr = (parseFloat(acc.balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
-    const officeSignature = issuerSignaturesByOffice[String(acc.office_name || '').trim()];
+    const officeName = String(acc.office_name || '').trim();
+    const officeConfig = officeMasterRecords.find(office => String(office.office_name || '').trim() === officeName) || {};
+    const selectedSignatureKey = $('sb46IssuerSignatureSelect')?.value || '';
+    const signatureSeparator = selectedSignatureKey.lastIndexOf('::');
+    const selectedSignatureOffice = signatureSeparator >= 0 ? selectedSignatureKey.slice(0, signatureSeparator) : '';
+    const selectedSignatureId = signatureSeparator >= 0 ? selectedSignatureKey.slice(signatureSeparator + 2) : '';
+    const officeSignatures = getIssuerSignaturesForOffice(officeName);
+    const officeSignature = selectedSignatureOffice === officeName
+      ? officeSignatures.find(signature => signature.id === selectedSignatureId)?.data
+      : officeSignatures[0]?.data;
     const sigHtml = officeSignature
-      ? `<img src="${officeSignature}" alt="Issuer signature for ${acc.office_name || 'office'}" style="max-height: 45px; max-width: 140px; margin: 0 auto -8px auto; display: block; object-fit: contain;" />`
+      ? `<img src="${officeSignature}" alt="Issuer signature for ${officeName || 'office'}" style="max-height: 45px; max-width: 140px; margin: 0 auto -8px auto; display: block; object-fit: contain;" />`
       : `<div style="height: 35px;"></div>`;
+    const referenceNo = officeConfig.short_code
+      ? `TNN/CentVfn/SB-46/${officeConfig.short_code}/${acc.sl_no}`
+      : `${referenceNo}`;
+    const senderDesignation = officeConfig.sender_designation || 'The Senior Superintendent of Post Offices';
+    const senderDivision = officeConfig.sender_division || 'Chennai City Central Division';
+    const senderAddress = officeConfig.sender_address || 'Chennai - 600017';
+    const recipientDesignation = officeConfig.recipient_designation || 'The Senior Superintendent of Post Offices';
+    const recipientDivision = officeConfig.recipient_division || 'Chennai City Central Division';
+    const recipientAddress = officeConfig.recipient_address || 'CHENNAI - 600017';
     const depositorNames = [acc.customer_name, acc.cust2_name, acc.cust3_name].map(name => String(name || '').trim()).filter(Boolean).join(' / ') || 'Depositor';
     const rawDate = acc.resolvedPrintDate || acc.printed_date || new Date().toISOString().split('T')[0];
     const noticeDateFormatted = typeof formatDate === 'function' ? formatDate(rawDate) : rawDate;
@@ -16183,7 +16481,7 @@ function renderSb46PrintWindow(accounts) {
           </div>
           
           <div class="ref-bar">
-            <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
+            <div><b>Ref. No: ${referenceNo}</b></div>
             ${!excludeBarcode ? `
               <div style="font-family: Consolas, monospace; font-weight: bold; font-size: 11px; color: #000;">
                 <b>Article No:</b> ${formatReadable(outwardCode)}
@@ -16237,7 +16535,7 @@ function renderSb46PrintWindow(accounts) {
             </div>
           </div>
           <div class="sign-block">   
-            <p><b>Assistant Superintendent of Posts [BD & Addl]</b><br>Chennai City Central Division, Chennai - 600017</p>
+            <p><b>${senderDesignation}</b><br>${senderDivision}, ${senderAddress}</p>
           </div>
           
           <div style="font-size: 9.5px; font-style: italic; color: #475569; margin-top: 2px;">Note – No postage stamp is required on the service cover / reply card.</div>
@@ -16263,12 +16561,12 @@ function renderSb46PrintWindow(accounts) {
             ` : ''}
 
             <div class="ref-bar" style="display: flex; justify-content: space-between; margin-top: 8px; margin-bottom: 8px; font-size: 12px;">
-              <div><b>Ref. No: TNN/CentVfn/SB-46/${acc.sl_no}</b></div>
+              <div><b>Ref. No: ${referenceNo}</b></div>
               <div><b>Date:</b> ${noticeDateFormatted}</div>
             </div>
 
             <div style="margin-bottom: 8px; font-size: 12px; line-height: 1.5;">
-              <b>To:</b> The Senior Superintendent of Post Offices, Chennai City Central Division, Chennai - 600017
+              <b>To:</b> ${recipientDesignation}, ${recipientDivision}, ${recipientAddress}
             </div>
 
             <p style="margin: 0 0 10px 0; text-align: justify; line-height: 1.5; font-size: 12px;">
@@ -16332,10 +16630,10 @@ function renderSb46PrintWindow(accounts) {
               <div class="from-sub-box">
                 <span class="lbl">From:</span>
                 <p class="addr-text">
-                  <b>The Senior Superintendent of Post Offices</b><br>
-                  Chennai City Central Division<br>
-                  Chennai - 600017
-                <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>
+                  <b>${senderDesignation}</b><br>
+                  ${senderDivision}<br>
+                  ${senderAddress}
+                <div class="ref-sub">Ref: ${referenceNo}</div>
                 </p>
               </div>
 
@@ -16382,15 +16680,15 @@ function renderSb46PrintWindow(accounts) {
                   <b>${depositorNames}</b><br>
                   ${acc.address || 'Address on record'}<br>   
                   ${acc.mobile_no ? `<b>Mob:</b> ${acc.mobile_no}` : ''}
-                                <div class="ref-sub">Ref: TNN/CentVfn/SB-46/${acc.sl_no}</div>   </p>            
+                                <div class="ref-sub">Ref: ${referenceNo}</div>   </p>            
               </div>
 
               <div class="to-sub-box highlight-to">
                 <span class="lbl">To:</span>
                 <p class="addr-main" style="font-size: 12.5px; line-height: 1.4;">
-                  <b>The Senior Superintendent of Post Offices</b><br>
-                  Chennai City Central Division<br>
-                  <b>CHENNAI - 600017</b><br>
+                                  <b>${recipientDesignation}</b><br>
+                ${recipientDivision}<br>
+                <b>${recipientAddress}</b><br>
                 </p>
               </div>
             </div>
@@ -18213,6 +18511,21 @@ function exportLotToPDF() {
   addReportTable('Unmatched Records', unmatchedLotData, true, [190, 35, 55]);
   doc.save(`Lot_Verification_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
+function populateSb46IssuerSignatureOptions() {
+  const select = $('sb46IssuerSignatureSelect');
+  if (!select) return;
+  const current = select.value;
+  const options = [];
+  Object.entries(issuerSignaturesByOffice || {}).forEach(([office, saved]) => {
+    getIssuerSignaturesForOffice(office).forEach(signature => {
+      options.push({ value: `${office}::${signature.id}`, label: `${office} — ${signature.name || 'Issuer signature'}` });
+    });
+  });
+  select.innerHTML = '<option value="">Use first signature saved for each office</option>' +
+    options.map(option => `<option value="${escapeMonthlyReportHtml(option.value)}">${escapeMonthlyReportHtml(option.label)}</option>`).join('');
+  if (options.some(option => option.value === current)) select.value = current;
+}
+
 /** Populate SB-46 scheme options with counts of printable accounts in the selected office. */
 async function populateSb46PrintSchemes() {
   const select = $('sb46SchemeSelect') || $('sb46PrintSchemeFilter') || $('sb46ModalSchemeSelect');
@@ -18295,7 +18608,10 @@ async function openSb46GeneratorModal() {
   const modal = $('sb46GeneratorModal') || $('vfnPrintModal');
   if (modal) modal.classList.remove('hidden');
 
-  // Ensure the office selector reflects the current division office list.
+  // Keep office-specific SB-46 references and sender/recipient settings current.
+  try { await loadOfficeMasterConfig(); } catch (error) { console.warn('Office SB-46 settings unavailable:', error); }
+  await loadIssuerSignatureFromDatabase();
+  populateSb46IssuerSignatureOptions();
   populateCentVfnOfficeFilters();
 
   // Load imported schemes and address-derived pincode options.
