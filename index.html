@@ -16437,21 +16437,21 @@ function renderSb46PrintWindow(accounts) {
       ? `<img src="${officeSignature}" alt="Issuer signature for ${officeName || 'office'}" style="max-height: 45px; max-width: 140px; margin: 0 auto -8px auto; display: block; object-fit: contain;" />`
       : `<div style="height: 35px;"></div>`;
     const referenceNo = officeConfig.short_code
-      ? `TNN/CentVfn/SB-46/${officeConfig.short_code}/${acc.sl_no}`
+      ? `CentVfn/SB-46/${officeConfig.short_code}/${acc.sl_no}`
       : `${referenceNo}`;
     const senderDesignation = officeConfig.sender_designation || 'The Senior Superintendent of Post Offices';
     const senderDivision = officeConfig.sender_division || 'Chennai City Central Division';
     const senderAddress = officeConfig.sender_address || 'Chennai - 600017';
     const recipientDesignation = officeConfig.recipient_designation || 'The Senior Superintendent of Post Offices';
     const recipientDivision = officeConfig.recipient_division || 'Chennai City Central Division';
-    const recipientAddress = officeConfig.recipient_address || 'CHENNAI - 600017';
+    const recipientAddress = officeConfig.recipient_address || 'Chennai - 600017';
     const depositorNames = [acc.customer_name, acc.cust2_name, acc.cust3_name].map(name => String(name || '').trim()).filter(Boolean).join(' / ') || 'Depositor';
     const rawDate = acc.resolvedPrintDate || acc.printed_date || new Date().toISOString().split('T')[0];
     const noticeDateFormatted = typeof formatDate === 'function' ? formatDate(rawDate) : rawDate;
 
     // Resolve outward and reply barcodes
-    const outwardCode = acc.outward_article_no || acc.article_no || `RT${String(acc.sl_no).padStart(8, '0')}5IN`;
-    const replyCode = acc.reply_article_no || `RM${String(acc.sl_no).padStart(8, '0')}5IN`;
+    const outwardCode = acc.outward_article_no || acc.article_no || `ET${String(acc.sl_no).padStart(8, '0')}5IN`;
+    const replyCode = acc.reply_article_no || `EM${String(acc.sl_no).padStart(8, '0')}5IN`;
 
     const outwardBarcodeImg = getBarcodeDataUrl(outwardCode);
     const replyBarcodeImg = getBarcodeDataUrl(replyCode);
@@ -16466,8 +16466,8 @@ function renderSb46PrintWindow(accounts) {
           <div class="header-banner">
             <div class="header-text-block">
               <h3>DEPARTMENT OF POSTS, INDIA</h3>
-              <h4>OFFICE OF THE SENIOR SUPERINTENDENT OF POST OFFICES</h4>
-              <p class="division-sub">CHENNAI CITY CENTRAL DIVISION, CHENNAI - 600017</p>
+              <h4>Office of {senderDesignation}</h4>
+              <p class="division-sub">{senderDivision},{senderAddress}</p>
             </div>
             <div class="header-logo-block">
             ${typeof currentAppLogo !== 'undefined' && currentAppLogo ? `<img src="${currentAppLogo}" style="height: 62px; width: 84px; object-fit: contain; background: #fff; padding: 2px; border-radius: 4px;">` : ''}
@@ -16535,7 +16535,7 @@ function renderSb46PrintWindow(accounts) {
             </div>
           </div>
           <div class="sign-block">   
-            <p><b>$Assistant Supdt. Of Post Office (BD & Addl)</b><br>${senderDivision}, ${senderAddress}</p>
+            <p><b>Assistant Superintendent of Posts [BD & Addl]</b><br>${senderDivision}, ${senderAddress}</p>
           </div>
           
           <div style="font-size: 9.5px; font-style: italic; color: #475569; margin-top: 2px;">Note – No postage stamp is required on the service cover / reply card.</div>
