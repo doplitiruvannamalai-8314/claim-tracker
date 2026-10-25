@@ -1782,12 +1782,31 @@ create policy "Superadmins can delete offices" on public.offices for delete to a
                 <p class="text-[11px] text-slate-500 mt-0.5">Supports Microsoft Excel (.xlsx, .xls) and CSV (.csv)</p>
               </div>
               <span class="inline-block mt-1 text-[10px] font-mono font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded border border-slate-200">
-                Expected: Account Number | Article Number | Dispatched Date | Reply Received Date | Remarks
+                Expected: Account Number | Article Number | Reply Article Number (optional) | Dispatched Date | Reply Received Date | Remarks
               </span>
             </div>
           </div>
 
-          <!-- STAGE 2: PROCESSING PROGRESS -->
+          <!-- STAGE 2: REVIEW IMPORTED ROWS BEFORE POSTING -->
+          <div id="vfnBatchPreviewSection" class="hidden space-y-3">
+            <div class="flex flex-wrap justify-between items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
+              <div>
+                <p class="font-extrabold text-amber-900">Review imported dispatch and reply updates</p>
+                <p class="text-[11px] text-slate-600">Nothing is saved until you select “Post Updates”. Rows without a matching account are excluded.</p>
+              </div>
+              <span id="vfnBatchPreviewSummary" class="font-bold text-slate-700">0 rows</span>
+            </div>
+            <div class="max-h-64 overflow-auto border border-slate-200 rounded-lg">
+              <table class="w-full min-w-[900px] text-left border-collapse text-[11px]">
+                <thead class="sticky top-0 bg-blue-900 text-white font-bold">
+                  <tr><th class="p-2">Account Number</th><th class="p-2">Article Number</th><th class="p-2">Reply Article No</th><th class="p-2">Dispatched Date</th><th class="p-2">Reply Received Date</th><th class="p-2">Resulting Status</th><th class="p-2">Remarks</th><th class="p-2">Account Match</th></tr>
+                </thead>
+                <tbody id="vfnBatchPreviewBody"><tr><td colspan="8" class="p-3 text-center text-slate-400">Select a file to preview.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- STAGE 3: POSTING PROGRESS -->
           <div id="vfnBatchProgressSection" class="hidden space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
             <div class="flex justify-between items-center font-bold">
               <span id="vfnBatchProgressStatus" class="text-blue-900 flex items-center gap-2">
@@ -1878,6 +1897,9 @@ create policy "Superadmins can delete offices" on public.offices for delete to a
         <div class="bg-slate-50 border-t border-slate-200 p-3.5 flex justify-between items-center shrink-0">
           <span id="vfnBatchFooterNote" class="text-[11px] text-slate-500 font-medium">Ready for file input</span>
           <div class="flex gap-2">
+            <button type="button" id="vfnBatchPostBtn" onclick="postVfnBatchPreview()" class="hidden px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-lg transition cursor-pointer">
+              Post Updates
+            </button>
             <button type="button" id="vfnBatchResetBtn" onclick="resetBatchUploadModal()" class="hidden px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-lg transition cursor-pointer">
               Upload Another
             </button>
@@ -13780,6 +13802,7 @@ function downloadCentVfnBatchTemplate() {
     {
       "Account Number": "100234567891",
       "Article Number": "RT123456789IN",
+      "Reply Article Number": "EM123456789IN",
       "Dispatched Date": "2026-09-02",
       "Reply Received Date": "",
       "Remarks": "Dispatched via Speed Post"
@@ -19907,6 +19930,235 @@ function printUniqueLotAccounts() {
     <p class="meta">Unique account/address entries: ${accounts.size} | Transactions: ${rows.length} | Generated: ${escape(new Date().toLocaleString('en-IN'))}</p>
     ${accountCards}</body></html>`);
   printWindow.document.close();
+}
+
+// Batch status import: stage file data for review before making database changes.
+let vfnBatchPreviewRows = [];
+
+function resetBatchUploadModal() {
+  vfnBatchPreviewRows = [];
+  $('vfnBatchDropSection')?.classList.remove('hidden');
+  $('vfnBatchPreviewSection')?.classList.add('hidden');
+  $('vfnBatchProgressSection')?.classList.add('hidden');
+  $('vfnBatchResultSection')?.classList.add('hidden');
+  $('vfnBatchOmissionsCard')?.classList.add('hidden');
+  $('vfnBatchResetBtn')?.classList.add('hidden');
+  $('vfnBatchPostBtn')?.classList.add('hidden');
+  if ($('centVfnBatchStatusFileInput')) $('centVfnBatchStatusFileInput').value = '';
+  if ($('vfnBatchProgressBar')) $('vfnBatchProgressBar').style.width = '0%';
+  if ($('vfnBatchProgressPct')) $('vfnBatchProgressPct').innerText = '0%';
+  if ($('vfnBatchFooterNote')) $('vfnBatchFooterNote').innerText = 'Ready for file input';
+  if ($('vfnBatchPreviewBody')) $('vfnBatchPreviewBody').innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">Select a file to preview.</td></tr>';
+  if ($('vfnBatchPreviewSummary')) $('vfnBatchPreviewSummary').innerText = '0 rows';
+  vfnBatchSkippedRows = [];
+}
+
+async function startBatchUploadProcessing(file) {
+  $('vfnBatchDropSection')?.classList.add('hidden');
+  $('vfnBatchPreviewSection')?.classList.add('hidden');
+  $('vfnBatchProgressSection')?.classList.remove('hidden');
+  $('vfnBatchResultSection')?.classList.add('hidden');
+  $('vfnBatchPostBtn')?.classList.add('hidden');
+  $('vfnBatchFooterNote').innerText = `Reading ${file.name} for preview...`;
+  vfnBatchPreviewRows = [];
+  vfnBatchSkippedRows = [];
+
+  try {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let workbook;
+    if (/\.(csv|txt)$/i.test(file.name)) {
+      const text = new TextDecoder().decode(bytes).replace(/^\uFEFF/, '');
+      const firstLine = text.split(/\r?\n/).find(line => line.trim()) || '';
+      const delimiter = firstLine.includes('\t') ? '\t' : (firstLine.includes(';') ? ';' : ',');
+      workbook = XLSX.read(text, { type: 'string', FS: delimiter, raw: true });
+    } else {
+      workbook = XLSX.read(bytes, { type: 'array', cellDates: false, raw: false });
+    }
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    if (!sheet) throw new Error('No worksheet found in the selected file.');
+    const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false, blankrows: false });
+    const key = value => String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const aliases = {
+      account: ['Account Number', 'Account No', 'account_no', 'Account'],
+      article: ['Article Number', 'Article No', 'article_no'],
+      replyArticle: ['Reply Article Number', 'Reply Article No', 'reply_article_no', 'Inward Article No'],
+      dispatch: ['Dispatched Date', 'Dispatch Date', 'dispatched_date'],
+      reply: ['Reply Received Date', 'Reply Date', 'reply_rxd_date'],
+      remarks: ['Remarks', 'Remark', 'remarks']
+    };
+    const headerIndex = matrix.findIndex(row => (row || []).some(cell => aliases.account.map(key).includes(key(cell))));
+    if (headerIndex < 0) throw new Error('Could not find an Account Number / Account No header.');
+    const headers = matrix[headerIndex].map(key);
+    const findColumn = names => headers.findIndex(header => names.map(key).includes(header));
+    const columns = Object.fromEntries(Object.entries(aliases).map(([name, names]) => [name, findColumn(names)]));
+    const clean = value => String(value ?? '').trim();
+    const parsedRows = matrix.slice(headerIndex + 1).map((row, index) => {
+      const accountNo = clean(row[columns.account]).replace(/\.0$/, '').replace(/\D/g, '');
+      const articleNo = clean(row[columns.article]).toUpperCase();
+      const replyArticleNo = clean(row[columns.replyArticle]).toUpperCase();
+      const rawDispatch = clean(row[columns.dispatch]);
+      const rawReply = clean(row[columns.reply]);
+      const dispatchDate = normalizeDateToYMD(rawDispatch);
+      const replyDate = normalizeDateToYMD(rawReply);
+      const remarks = clean(row[columns.remarks]);
+      const isBlankDate = value => !value || /^[-—–]+$/.test(value) || /^(na|n\/a|null|nil)$/i.test(value);
+      const invalidDate = (!isBlankDate(rawDispatch) && !dispatchDate) || (!isBlankDate(rawReply) && !replyDate);
+      const requestedStatus = replyDate ? 'reply_received' : (dispatchDate || articleNo ? 'dispatched' : '');
+      return {
+        rowNumber: headerIndex + index + 2,
+        accountNo,
+        articleNo,
+        replyArticleNo,
+        dispatchDate,
+        replyDate,
+        remarks,
+        requestedStatus,
+        invalidDate,
+        matchedIds: [],
+        matchedRecords: []
+      };
+    }).filter(row => row.accountNo || row.articleNo || row.replyArticleNo || row.dispatchDate || row.replyDate || row.remarks);
+
+    if (!parsedRows.length) throw new Error('No dispatch, reply, article, or remarks rows were found.');
+    const accountNos = [...new Set(parsedRows.map(row => row.accountNo).filter(Boolean))];
+    const accountMap = new Map();
+    for (let i = 0; i < accountNos.length; i += 100) {
+      const { data, error } = await supabaseClient.from('cent_percent_verification')
+        .select('id, account_no, scheme, status, reply_rxd_date')
+        .in('account_no', accountNos.slice(i, i + 100));
+      if (error) throw error;
+      (data || []).forEach(record => {
+        const account = String(record.account_no || '').replace(/\D/g, '');
+        if (!accountMap.has(account)) accountMap.set(account, []);
+        accountMap.get(account).push(record);
+      });
+      $('vfnBatchProgressPct').innerText = `${Math.min(99, Math.round(((i + 100) / Math.max(accountNos.length, 1)) * 100))}%`;
+    }
+
+    vfnBatchPreviewRows = parsedRows.map(row => {
+      const matchedRecords = accountMap.get(row.accountNo) || [];
+      const existingReply = matchedRecords.some(record => record.status === 'reply_received' || record.reply_rxd_date);
+      const resultingStatus = row.replyDate || existingReply
+        ? 'reply_received'
+        : (row.requestedStatus || matchedRecords[0]?.status || 'No status change');
+      return { ...row, matchedRecords, matchedIds: matchedRecords.map(record => record.id), resultingStatus };
+    });
+
+    const escape = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const matchedCount = vfnBatchPreviewRows.filter(row => row.matchedIds.length && !row.invalidDate).length;
+    const skippedCount = vfnBatchPreviewRows.length - matchedCount;
+    $('vfnBatchPreviewSummary').innerText = `${vfnBatchPreviewRows.length} rows • ${matchedCount} ready • ${skippedCount} skipped`;
+    $('vfnBatchPreviewBody').innerHTML = vfnBatchPreviewRows.map(row => {
+      const matched = row.matchedIds.length > 0;
+      const valid = matched && !row.invalidDate;
+      const dateWarning = row.invalidDate ? 'Invalid date — correct the source file' : '';
+      const matchText = !matched ? 'Account not found' : (row.invalidDate ? dateWarning : `Matched (${row.matchedIds.length})`);
+      const statusText = row.resultingStatus === 'reply_received' ? 'Reply Received' : row.resultingStatus === 'dispatched' ? 'Dispatched' : row.resultingStatus;
+      return `<tr class="border-b border-slate-100 ${valid ? '' : 'bg-rose-50/60'}">
+        <td class="p-2 font-mono">${escape(row.accountNo || '—')}</td><td class="p-2 font-mono">${escape(row.articleNo || '—')}</td><td class="p-2 font-mono">${escape(row.replyArticleNo || '—')}</td>
+        <td class="p-2">${escape(row.dispatchDate || '—')}</td><td class="p-2">${escape(row.replyDate || '—')}</td>
+        <td class="p-2 font-bold">${escape(statusText || '—')}</td><td class="p-2 whitespace-pre-wrap">${escape(row.remarks || '—')}</td>
+        <td class="p-2 font-bold ${valid ? 'text-emerald-700' : 'text-rose-700'}">${escape(matchText)}</td></tr>`;
+    }).join('');
+
+    $('vfnBatchProgressSection')?.classList.add('hidden');
+    $('vfnBatchPreviewSection')?.classList.remove('hidden');
+    $('vfnBatchPostBtn')?.classList.toggle('hidden', matchedCount === 0);
+    $('vfnBatchResetBtn')?.classList.remove('hidden');
+    $('vfnBatchFooterNote').innerText = `${matchedCount} matched row(s) ready. Review the grid, then post updates.`;
+  } catch (error) {
+    console.error('Batch status preview failed:', error);
+    resetBatchUploadModal();
+    alert(`Could not prepare the batch preview: ${error.message}`);
+  }
+}
+
+async function postVfnBatchPreview() {
+  const eligibleRows = vfnBatchPreviewRows.filter(row => row.matchedIds.length && !row.invalidDate &&
+    (row.articleNo || row.replyArticleNo || row.dispatchDate || row.replyDate || row.remarks));
+  if (!eligibleRows.length) return alert('There are no valid matched rows to post.');
+  if (!confirm(`Post dispatch, reply, article, and remarks updates for ${eligibleRows.length} matched row(s)?`)) return;
+
+  $('vfnBatchPostBtn').disabled = true;
+  $('vfnBatchPreviewSection')?.classList.add('hidden');
+  $('vfnBatchProgressSection')?.classList.remove('hidden');
+  $('vfnBatchProgressStatus').innerText = 'Posting reviewed updates...';
+  $('vfnBatchFooterNote').innerText = 'Posting reviewed rows to the database...';
+  let updatedCount = 0, replyDatesPosted = 0, remarksPosted = 0;
+  const schemeMap = {};
+  vfnBatchSkippedRows = vfnBatchPreviewRows.filter(row => !row.matchedIds.length || row.invalidDate).map(row => ({
+    account_no: row.accountNo || 'BLANK',
+    details: `Article: ${row.articleNo || '-'}, Dispatch: ${row.dispatchDate || '-'}, Reply: ${row.replyDate || '-'}, Remarks: ${row.remarks || '-'}`,
+    reason: !row.matchedIds.length ? 'Account not found in Cent Percent Verification table' : 'Invalid dispatch or reply date'
+  }));
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const nowIso = new Date().toISOString();
+
+  try {
+    for (let index = 0; index < eligibleRows.length; index++) {
+      const row = eligibleRows[index];
+      const existingReply = row.matchedRecords.some(record => record.status === 'reply_received' || record.reply_rxd_date);
+      const resultingStatus = row.replyDate || existingReply ? 'reply_received' : (row.requestedStatus || row.matchedRecords[0]?.status || 'imported');
+      const updates = { updated_at: nowIso };
+      if (row.articleNo) {
+        updates.outward_article_no = row.articleNo;
+        updates.article_no = row.articleNo;
+      }
+      if (row.replyArticleNo) updates.reply_article_no = row.replyArticleNo;
+      if (row.remarks) {
+        updates.remarks = row.remarks;
+        updates.remark_entry_date = todayStr;
+      }
+      if (row.replyDate) {
+        updates.status = 'reply_received';
+        updates.reply_rxd_date = row.replyDate;
+        if (row.dispatchDate) updates.dispatched_date = row.dispatchDate;
+      } else if (row.dispatchDate || row.articleNo) {
+        updates.status = resultingStatus;
+        updates.dispatched_date = row.dispatchDate || todayStr;
+      }
+      const eventParts = [`Status: ${resultingStatus.replace(/_/g, ' ')}`];
+      if (row.articleNo) eventParts.push(`Article No: ${row.articleNo}`);
+      if (row.replyArticleNo) eventParts.push(`Reply Article No: ${row.replyArticleNo}`);
+      if (row.dispatchDate) eventParts.push(`Dispatched: ${row.dispatchDate}`);
+      if (row.replyDate) eventParts.push(`Reply received: ${row.replyDate}`);
+      if (row.remarks) eventParts.push(`Remarks: ${row.remarks}`);
+      updates.last_event_record = `Batch update — ${eventParts.join(' | ')}`;
+
+      const { data, error } = await supabaseClient.from('cent_percent_verification')
+        .update(updates).in('id', row.matchedIds).select('id, scheme');
+      if (error) throw error;
+      if (!data?.length) {
+        vfnBatchSkippedRows.push({ account_no: row.accountNo, details: row.remarks || row.articleNo || '-', reason: 'Database did not update the matched record' });
+      } else {
+        updatedCount += data.length;
+        if (row.replyDate) replyDatesPosted += data.length;
+        if (row.remarks) remarksPosted += data.length;
+        data.forEach(record => {
+          const scheme = String(record.scheme || 'UNASSIGNED').toUpperCase();
+          if (!schemeMap[scheme]) schemeMap[scheme] = { updated: 0, replies: 0, dispatches: 0, remarks: 0 };
+          schemeMap[scheme].updated++;
+          if (row.replyDate) schemeMap[scheme].replies++;
+          else if (row.dispatchDate || row.articleNo) schemeMap[scheme].dispatches++;
+          if (row.remarks) schemeMap[scheme].remarks++;
+        });
+      }
+      const pct = Math.round(((index + 1) / eligibleRows.length) * 100);
+      $('vfnBatchProgressBar').style.width = `${pct}%`;
+      $('vfnBatchProgressPct').innerText = `${pct}%`;
+      $('vfnBatchProgressCount').innerText = `${index + 1} / ${eligibleRows.length} reviewed rows posted`;
+      if (index % 20 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    $('vfnBatchPostBtn')?.classList.add('hidden');
+    await displayBatchUploadResults({ totalRows: vfnBatchPreviewRows.length, updatedCount, replyDatesPosted, remarksPosted, schemeMap });
+  } catch (error) {
+    console.error('Batch status posting failed:', error);
+    alert(`Batch posting stopped: ${error.message}. Rows processed before the error may already be saved.`);
+    $('vfnBatchProgressSection')?.classList.add('hidden');
+    $('vfnBatchPreviewSection')?.classList.remove('hidden');
+  } finally {
+    $('vfnBatchPostBtn').disabled = false;
+  }
 }
 
   </script>
